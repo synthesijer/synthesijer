@@ -9,6 +9,11 @@ public class HDLIdent implements HDLExpr{
 	}
 
 	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLIdent(this);
+	}
+
+	@Override
 	public String getVHDL() {
 		return sym;
 	}
@@ -17,7 +22,5 @@ public class HDLIdent implements HDLExpr{
 	public String getVerilogHDL() {
 		return sym;
 	}
-	
-	
 
 }

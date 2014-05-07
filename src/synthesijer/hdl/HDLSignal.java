@@ -1,9 +1,8 @@
 package synthesijer.hdl;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class HDLSignal implements SynthesizableObject{
+public class HDLSignal implements HDLTree{
 	
 	private final HDLModule module;
 	private final String name;
@@ -33,8 +32,24 @@ public class HDLSignal implements SynthesizableObject{
 		return name;
 	}
 	
+	public HDLType getType(){
+		return type;
+	}
+	
+	public ResourceKind getKind(){
+		return kind;
+	}
+	
+	public HDLModule getModule(){
+		return module;
+	}
+	
 	public void setResetValue(HDLExpr s){
 		this.resetValue = s;
+	}
+	
+	public HDLExpr getResetValue(){
+		return resetValue;
 	}
 	
 	public void setAssignCondition(String methodId, String stateKey, String stateId, String phaseKey, String phaseId, HDLExpr value){
@@ -46,65 +61,12 @@ public class HDLSignal implements SynthesizableObject{
 		AssignmentCondition c = new AssignmentCondition(methodId, stateKey, stateId, null, null, value);
 		conditions.add(c);
 	}
-
-	public void dumpAsVHDL(PrintWriter dest, int offset){
-		if(type instanceof HDLUserDefinedType){
-			((HDLUserDefinedType) type).genUserDefinedTypeAsVHDL(dest, offset);
-		}
-		HDLUtils.println(dest, offset, String.format("signal %s : %s;", name, type.getVHDL()));
-	}
-
-	public void dumpAsVerilogHDL(PrintWriter dest, int offset){
-		if(type instanceof HDLUserDefinedType){
-			((HDLUserDefinedType) type).genUserDefinedTypeAsVerilog	(dest, offset);
-		}
-		HDLUtils.println(dest, offset, String.format("%s %s %s;", kind.toString(), type.getVerilogHDL(), name));
+	
+	public ArrayList<AssignmentCondition> getConditions(){
+		return conditions;
 	}
 	
-	public void dumpAssignProcessAsVHDL(PrintWriter dest, int offset){
-		HDLUtils.println(dest, offset, String.format("process(%s)", module.getSysClkName()));
-		HDLUtils.println(dest, offset, "begin");
-		HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", module.getSysClkName(), module.getSysClkName()));
-		HDLUtils.println(dest, offset+4, String.format("if %s = '1' then", module.getSysResetName()));
-		HDLUtils.println(dest, offset+6, String.format("%s <= %s;", name, resetValue.getVHDL()));
-		HDLUtils.println(dest, offset+4, String.format("else"));
-		if(conditions.size() > 0){
-			String sep = "if";
-			for(AssignmentCondition c: conditions){
-				HDLUtils.println(dest, offset+6, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
-				HDLUtils.println(dest, offset+8, String.format("%s <= %s;", name, c.value.getVHDL()));
-				sep = "elsif";
-			}
-			HDLUtils.println(dest, offset+6, String.format("end if;"));
-		}else{
-			HDLUtils.println(dest, offset+6, String.format("null;"));
-		}
-		HDLUtils.println(dest, offset+4, String.format("end if;"));
-		HDLUtils.println(dest, offset+2, String.format("end if;"));
-		HDLUtils.println(dest, offset, "end process;");
-		HDLUtils.nl(dest);
-	}
-	
-	public void dumpAssignProcessAsVerilogHDL(PrintWriter dest, int offset){
-		HDLUtils.println(dest, offset, String.format("always @(posedge %s) begin", module.getSysClkName()));
-		HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b1) begin", module.getSysResetName()));
-		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", name, resetValue.getVerilogHDL()));
-		HDLUtils.println(dest, offset+2, String.format("end else begin"));
-		if(conditions.size() > 0){
-			String sep = "";
-			for(AssignmentCondition c: conditions){
-				HDLUtils.println(dest, offset+4, String.format("%s if (%s) begin", sep, c.getCondExprAsVerilogHDL()));
-				HDLUtils.println(dest, offset+6, String.format("%s <= %s;", name, c.value.getVerilogHDL()));
-				sep = "end else";
-			}
-			HDLUtils.println(dest, offset+4, String.format("end"));
-		}
-		HDLUtils.println(dest, offset+2, String.format("end"));
-		HDLUtils.println(dest, offset, "end");
-		HDLUtils.nl(dest);
-	}
-	
-	class AssignmentCondition{
+	public class AssignmentCondition{
 		final String methodId;
 		final String stateKey;
 		final String stateId;
@@ -136,6 +98,15 @@ public class HDLSignal implements SynthesizableObject{
 				return String.format("methodId == %s && %s == %s", methodId, stateKey, stateId);
 			}
 		}
+		
+		public HDLExpr getValue(){
+			return value;
+		}
+	}
+
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLSignal(this);
 	}
 	
 }

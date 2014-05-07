@@ -1,6 +1,7 @@
 package synthesijer.hdl.literal;
 
 import synthesijer.hdl.HDLLiteral;
+import synthesijer.hdl.HDLTreeVisitor;
 
 public class HDLSymbol implements HDLLiteral{
 	
@@ -22,6 +23,11 @@ public class HDLSymbol implements HDLLiteral{
 	@Override
 	public String getVerilogHDL() {
 		return sym;
+	}
+
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLLitral(this);
 	}
 
 }

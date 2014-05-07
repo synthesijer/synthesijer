@@ -1,6 +1,7 @@
 package synthesijer.hdl.literal;
 
 import synthesijer.hdl.HDLLiteral;
+import synthesijer.hdl.HDLTreeVisitor;
 
 public class HDLValue implements HDLLiteral{
 	
@@ -50,4 +51,8 @@ public class HDLValue implements HDLLiteral{
 		}
 	}
 
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLLitral(this);
+	}
 }

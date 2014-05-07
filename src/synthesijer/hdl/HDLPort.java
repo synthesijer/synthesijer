@@ -1,8 +1,7 @@
 package synthesijer.hdl;
 
-import java.io.PrintWriter;
 
-public class HDLPort implements SynthesizableObject{
+public class HDLPort implements HDLTree{
 	
 	private final String name;
 		
@@ -18,31 +17,30 @@ public class HDLPort implements SynthesizableObject{
 		this.type = type;
 	}
 	
-	public void dumpAsVHDL(PrintWriter dest, int offset){
-		HDLUtils.print(dest, offset, String.format("%s : %s %s", name, dir.getVHDL(), type.getVHDL()));
-	}
-
-	public void dumpAsVerilogHDL(PrintWriter dest, int offset){
-		HDLUtils.print(dest, offset, String.format("%s %s %s", dir.getVerilogHDL(), type.getVerilogHDL(), name));
+	public String getName(){
+		return name;
 	}
 	
+	public DIR getDir(){
+		return dir;
+	}
+	
+	public boolean isOutput(){
+		return dir == DIR.OUT;
+	}
+	
+	public HDLType getType(){
+		return type;
+	}
+		
 	public void setSrcSignal(HDLSignal src){
 		srcSig = src;
 	}
 	
-	public void assignAsVHDL(PrintWriter dest, int offset){
-		if(dir == DIR.OUT){
-			HDLUtils.println(dest, offset, String.format("%s <= %s;", name, srcSig.getName()));
-		}
+	public HDLSignal getSrcSignal(){
+		return srcSig;
 	}
-
-	public void assignAsVerilogHDL(PrintWriter dest, int offset){
-		if(dir == DIR.OUT){
-			HDLUtils.println(dest, offset, String.format("assign %s = %s;", name, srcSig.getName()));
-		}
-	}
-
-
+	
 	public enum DIR {
 		IN("in", "input"),
 		OUT("out", "output"),
@@ -61,6 +59,12 @@ public class HDLPort implements SynthesizableObject{
 		public String getVerilogHDL(){
 			return verilog;
 		}
+	}
+
+
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLPort(this);
 	};
 
 }

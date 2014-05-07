@@ -1,10 +1,8 @@
 package synthesijer.hdl;
 
-import java.io.PrintWriter;
-
 import synthesijer.hdl.literal.HDLSymbol;
 
-class HDLUserDefinedType extends HDLType{
+public class HDLUserDefinedType extends HDLType implements HDLTree{
 
 	private final String base;
 	private final HDLSymbol defaultValue;
@@ -33,21 +31,12 @@ class HDLUserDefinedType extends HDLType{
 		return defaultValue;
 	}
 	
-	public void genUserDefinedTypeAsVHDL(PrintWriter dest, int offset){
-		HDLUtils.println(dest, offset, String.format("type %s is (", base));
-		String sep = "";
-		for(HDLSymbol s: items){
-			HDLUtils.print(dest, 0, sep);
-			HDLUtils.print(dest, offset+2, String.format("%s", s.getSymbol()));
-			sep = ",\n";
-		}
-		HDLUtils.println(dest, offset, String.format("\n  );"));
+	public HDLSymbol[] getItems(){
+		return items;
 	}
-	
-	public void genUserDefinedTypeAsVerilog(PrintWriter dest, int offset){
-		for(int i = 0; i < items.length; i++){
-			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", items[i].getSymbol(), i));
-		}
+		
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLUserDefinedType(this);
 	}
-	
 }

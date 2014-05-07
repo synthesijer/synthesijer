@@ -1,6 +1,7 @@
 package synthesijer.hdl.literal;
 
 import synthesijer.hdl.HDLLiteral;
+import synthesijer.hdl.HDLTreeVisitor;
 
 public enum HDLConstant implements HDLLiteral{
 	
@@ -21,6 +22,11 @@ public enum HDLConstant implements HDLLiteral{
 
 	public String getVerilogHDL(){
 		return verilog;
+	}
+
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLLitral(this);
 	}
 
 }

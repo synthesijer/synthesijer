@@ -1,9 +1,8 @@
 package synthesijer.hdl;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class HDLSequencer {
+public class HDLSequencer implements HDLTree{
 	
 	private final HDLModule module;
 	
@@ -25,83 +24,20 @@ public class HDLSequencer {
 		return s;
 	}
 	
+	public HDLModule getModule(){
+		return module;
+	}
+	
+	public String getStateKey(){
+		return stateKey;
+	}
+	
+	public ArrayList<SequencerState> getStates(){
+		return states;
+	}
+	
 	public SequencerState getIdleState(){
 		return idle;
-	}
-	
-	public void genStateDefinitionAsVHDL(PrintWriter dest, int offset){
-		HDLUtils.println(dest, offset, String.format("type StateType_%s is (", stateKey));
-		String sep = "";
-		for(SequencerState s: states){
-			HDLUtils.print(dest, 0, sep);
-			HDLUtils.print(dest, offset+2, String.format("%s", s.getStateId()));
-			sep = ",\n";
-		}
-		HDLUtils.println(dest, offset, String.format("\n  );"));
-		HDLUtils.println(dest, offset, String.format("signal %s : StateType_%s := %s;", stateKey, stateKey, idle.getStateId()));
-		HDLUtils.nl(dest);
-	}
-	
-	public void genStateDefinitionAsVerilogHDL(PrintWriter dest, int offset){
-		for(int i = 0; i < states.size(); i++){
-			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", states.get(i).getStateId(), i));
-		}
-		HDLUtils.println(dest, offset, String.format("reg [31:0] %s;", stateKey));
-		HDLUtils.nl(dest);
-	}
-	
-	public void genSequencerAsVHDL(PrintWriter dest, int offset){
-		HDLUtils.println(dest, offset, String.format("process (%s)", module.getSysClkName()));
-		HDLUtils.println(dest, offset, String.format("begin"));
-		HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", module.getSysClkName(), module.getSysClkName()));
-		
-		// reset
-		HDLUtils.println(dest, offset+4, String.format("if %s = '1' then", module.getSysResetName()));
-		HDLUtils.println(dest, offset+6, String.format("%s <= %s;", stateKey, idle.getStateId()));
-		
-		HDLUtils.println(dest, offset+4, String.format("else"));
-		
-		// state-machine body
-		if(states.size() > 0){
-			HDLUtils.println(dest, offset+6, String.format("case (%s) is", stateKey));
-			for(SequencerState s: states){
-				HDLUtils.println(dest, offset+8, String.format("when %s => ", s.getStateId()));
-				s.generateStateTransitionAsVHDL(dest, offset+10);
-			}
-			HDLUtils.println(dest, offset+8, String.format("when others => null;"));
-			HDLUtils.println(dest, offset+6, String.format("end case;"));
-		}
-		
-		HDLUtils.println(dest, offset+4, String.format("end if;"));
-		HDLUtils.println(dest, offset+2, String.format("end if;"));
-		HDLUtils.println(dest, offset, String.format("end process;"));
-		HDLUtils.nl(dest);
-	}
-	
-	public void genSequencerAsVerilogHDL(PrintWriter dest, int offset){
-		HDLUtils.println(dest, offset, String.format("always @(posedge %s) begin", module.getSysClkName()));
-		
-		// reset
-		HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b1) begin", module.getSysResetName()));
-		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", stateKey, idle.getStateId()));
-		
-		HDLUtils.println(dest, offset+2, String.format("end else begin"));
-		
-		// state-machine body
-		if(states.size() > 0){
-			HDLUtils.println(dest, offset+4, String.format("case (%s)", stateKey));
-
-			for(SequencerState s: states){
-				HDLUtils.println(dest, offset+6, String.format("%s : begin", s.getStateId()));
-				s.generateStateTransitionAsVerilogHDL(dest, offset+8);
-				HDLUtils.println(dest, offset+6, String.format("end"));
-			}
-			HDLUtils.println(dest, offset+4, String.format("endcase"));
-		}
-		
-		HDLUtils.println(dest, offset+2, String.format("end"));
-		HDLUtils.println(dest, offset, String.format("end"));
-		HDLUtils.nl(dest);
 	}
 
 	public class SequencerState{
@@ -120,39 +56,21 @@ public class HDLSequencer {
 			return id;
 		}
 		
+		public String getKey(){
+			return key;
+		}
+		
 		public void addStateTransit(SequencerState dest, String phaseKey, String phaseId, HDLExpr cond, HDLExpr condValue){
 			transitions.add(new StateTransitCondition(key, id, phaseKey, phaseId, cond, condValue, dest));
 		}
 		
-		public void generateStateTransitionAsVHDL(PrintWriter dest, int offset){
-			if(transitions.size() > 0){
-				String sep = "if";
-				for(StateTransitCondition c: transitions){
-					HDLUtils.println(dest, offset, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
-					HDLUtils.println(dest, offset+2, String.format("%s <= %s;", key, c.destState.getStateId()));
-					sep = "elsif";
-				}
-				HDLUtils.println(dest, offset, String.format("end if;"));
-			}else{
-				HDLUtils.println(dest, offset, "null;");
-			}
+		public ArrayList<StateTransitCondition> getTransitions(){
+			return transitions;
 		}
-		
-		public void generateStateTransitionAsVerilogHDL(PrintWriter dest, int offset){
-			if(transitions.size() > 0){
-				String sep = "";
-				for(StateTransitCondition c: transitions){
-					HDLUtils.println(dest, offset, String.format("%sif (%s) begin", sep, c.getCondExprAsVerilogHDL()));
-					HDLUtils.println(dest, offset+2, String.format("%s <= %s;", key, c.destState.getStateId()));
-					sep = "end else ";
-				}
-				HDLUtils.println(dest, offset, String.format("end"));
-			}else{
-			}
-		}
+				
 	}
 	
-	class StateTransitCondition{
+	public class StateTransitCondition{
 		final String stateKey;
 		final String stateId;
 		final String phaseKey;
@@ -171,6 +89,10 @@ public class HDLSequencer {
 			this.destState = dest;
 		}
 		
+		public SequencerState getDestState(){
+			return destState;
+		}
+		
 		public String getCondExprAsVHDL(){
 			String s = stateKey + " = " + stateId;
 			if(phaseId != null) s += " and " + phaseKey + " = " + phaseId;
@@ -184,5 +106,10 @@ public class HDLSequencer {
 			if(cond != null) s += " && " + cond.getVerilogHDL() + " == " + condValue.getVerilogHDL();
 			return s;
 		}
+	}
+
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLSequencer(this);
 	}
 }

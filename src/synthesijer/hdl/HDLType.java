@@ -8,7 +8,7 @@ import synthesijer.hdl.literal.HDLSymbol;
  *   
  * @author miyo
   */
-public class HDLType {
+public class HDLType implements HDLTree{
 
 	enum KIND {
 		VECTOR, BIT, SIGNED, USERDEF, UNKNOWN
@@ -68,6 +68,11 @@ public class HDLType {
 		case SIGNED: return String.format("signed [%d-1 : 0]", width);
 		default: return "UNKNOWN";
 		}
+	}
+
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLType(this);
 	}
 
 }
