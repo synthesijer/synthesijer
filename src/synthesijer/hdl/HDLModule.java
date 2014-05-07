@@ -1,6 +1,10 @@
 package synthesijer.hdl;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import synthesijer.hdl.verilog.GenerateVerilogVisitor;
+import synthesijer.hdl.vhdl.GenerateVHDLVisitor;
 
 public class HDLModule implements HDLTree{
 	
@@ -54,6 +58,14 @@ public class HDLModule implements HDLTree{
 	
 	public ArrayList<HDLSequencer> getSequencers(){
 		return statemachines;
+	}
+	
+	public void genVHDL(PrintWriter dest){
+		accept(new GenerateVHDLVisitor(dest, 0));
+	}
+	
+	public void genVerilogHDL(PrintWriter dest){
+		accept(new GenerateVerilogVisitor(dest, 0));
 	}
 
 	@Override
