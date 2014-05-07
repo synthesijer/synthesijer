@@ -7,6 +7,9 @@ import java.util.Iterator;
 
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLSignal;
+import synthesijer.hdl.HDLType;
+import synthesijer.hdl.literal.HDLSymbol;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
@@ -107,6 +110,17 @@ public class Module implements Scope{
 		HDLModule hm = new HDLModule(name, "clk", "reset");
 		for(VariableDecl v: variables){
 			v.genHDLSignal(hm);
+		}
+		ArrayList<HDLSymbol> methodIds = new ArrayList<HDLSymbol>();
+		methodIds.add(new HDLSymbol("methodId_IDLE"));
+		for(Method m: methods){
+			if(m.isConstructor()) continue;
+			methodIds.add(new HDLSymbol(m.getUniqueName("methodID_")));
+		}
+		HDLType t = HDLType.genUserDefType("methodId", methodIds.toArray(new HDLSymbol[]{}), 0);
+		hm.addSignal(new HDLSignal(hm, "methodId", t, HDLSignal.ResourceKind.REGISTER));
+		for(Method method: methods){
+			method.generateHDL(hm);
 		}
 		for(Method method: methods){
 			method.generateHDL(hm);

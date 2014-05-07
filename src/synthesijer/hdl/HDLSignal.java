@@ -48,10 +48,16 @@ public class HDLSignal implements SynthesizableObject{
 	}
 
 	public void dumpAsVHDL(PrintWriter dest, int offset){
+		if(type instanceof HDLUserDefinedType){
+			((HDLUserDefinedType) type).genUserDefinedTypeAsVHDL(dest, offset);
+		}
 		HDLUtils.println(dest, offset, String.format("signal %s : %s;", name, type.getVHDL()));
 	}
 
 	public void dumpAsVerilogHDL(PrintWriter dest, int offset){
+		if(type instanceof HDLUserDefinedType){
+			((HDLUserDefinedType) type).genUserDefinedTypeAsVerilog	(dest, offset);
+		}
 		HDLUtils.println(dest, offset, String.format("%s %s %s;", kind.toString(), type.getVerilogHDL(), name));
 	}
 	

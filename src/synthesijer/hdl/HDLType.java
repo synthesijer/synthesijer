@@ -1,24 +1,25 @@
 package synthesijer.hdl;
 
 import synthesijer.hdl.literal.HDLConstant;
+import synthesijer.hdl.literal.HDLSymbol;
 
+/**
+ * In order to make an instance of this class, use builder method.
+ *   
+ * @author miyo
+  */
 public class HDLType {
 
 	enum KIND {
-		VECTOR, BIT, SIGNED, UNKNOWN
+		VECTOR, BIT, SIGNED, USERDEF, UNKNOWN
 	}
 
 	public final KIND kind;
 	public final int width;
 
-	public HDLType(KIND kind, int width) {
+	HDLType(KIND kind, int width) {
 		this.kind = kind;
 		this.width = width;
-	}
-
-	public HDLType(KIND kind) {
-		this.kind = kind;
-		this.width = 1;
 	}
 	
 	public static HDLType genBitType(){
@@ -31,6 +32,10 @@ public class HDLType {
 	
 	public static HDLType genVectorType(int width){
 		return new HDLType(KIND.VECTOR, width);
+	}
+	
+	public static HDLType genUserDefType(String base, HDLSymbol[] suffixes, int defaultValueIndex){
+		return new HDLUserDefinedType(base, suffixes, defaultValueIndex);
 	}
 	
 	public static HDLType genUnkonwType(){

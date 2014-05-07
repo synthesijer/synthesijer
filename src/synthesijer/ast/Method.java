@@ -95,10 +95,18 @@ public class Method implements Scope{
 	public void setConstructorFlag(boolean f){
 		constructorFlag = f;
 	}
+	
+	public boolean isConstructor(){
+		return constructorFlag;
+	}
 		
 	public String getName(){
 		if(constructorFlag) return getModule().getName();
 		else return name;
+	}
+	
+	public String getUniqueName(String prefix){
+		return prefix + name;
 	}
 	
 	public BlockStatement getBody(){

@@ -37,7 +37,7 @@ public class HDLSequencer {
 			HDLUtils.print(dest, offset+2, String.format("%s", s.getStateId()));
 			sep = ",\n";
 		}
-		HDLUtils.println(dest, offset, String.format("\n  );", stateKey));
+		HDLUtils.println(dest, offset, String.format("\n  );"));
 		HDLUtils.println(dest, offset, String.format("signal %s : StateType_%s := %s;", stateKey, stateKey, idle.getStateId()));
 		HDLUtils.nl(dest);
 	}
