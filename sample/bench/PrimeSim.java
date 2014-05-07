@@ -1,6 +1,5 @@
-import net.wasamon.javarock.rt.*;
+import synthesijer.rt.*;
 
-@javarockhdl
 public class PrimeSim implements Runnable{
 	
 	Prime p = new Prime();

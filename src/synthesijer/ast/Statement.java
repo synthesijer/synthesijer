@@ -7,7 +7,7 @@ import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
 
-public abstract class Statement {
+public abstract class Statement implements SynthsijerAstTree{
 	
 	private final Scope scope; 
 	

@@ -24,7 +24,6 @@ public class VariableDecl extends ExprContainStatement{
 		super(scope);
 		this.init = init;
 		var = new Variable(name, type, scope.getMethod());
-		scope.registrate(var);
 	}
 	
 	public String getName(){

@@ -11,7 +11,7 @@ public class Main {
 		int err = compiler.compile(args);
 		if(err == 0){
 			dump("dump.xml");
-			Manager.INSTANCE.generate();
+			//Manager.INSTANCE.generate();
 		}
 		System.exit(err);
 	}

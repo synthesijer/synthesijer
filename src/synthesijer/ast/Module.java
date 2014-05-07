@@ -13,7 +13,7 @@ import synthesijer.hdl.literal.HDLSymbol;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
-public class Module implements Scope{
+public class Module implements Scope, SynthsijerAstTree{
 	
 	private final Scope parent;
 	private final String name;
@@ -42,10 +42,6 @@ public class Module implements Scope{
 		return parent;
 	}
 	
-	public void registrate(Variable v){
-		// should be already registrated
-	}
-
 	public Variable search(String name){
 		VariableDecl decl = variableTable.get(name);
 		if(decl != null)
@@ -68,7 +64,7 @@ public class Module implements Scope{
 		methods.add(m);
 	}
 	
-	public void addVariable(VariableDecl v){
+	public void addVariableDecl(VariableDecl v){
 		variableTable.put(v.getName(), v);
 		variables.add(v);
 	}

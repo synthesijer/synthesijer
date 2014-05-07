@@ -709,7 +709,7 @@ public class JavaCompiler implements ClassReader.SourceCompleter {
      */
     JavaFileObject genCode(Env<AttrContext> env, JCClassDecl cdef) throws IOException {
     	//System.out.printf("Compile: %s\n", cdef.name);
-    	synthesijer.jcfrontend.TopBuilder.INSTANCE.genNewEntry(env, cdef); // add hook for synthesijer
+    	synthesijer.jcfrontend.Main.newModule(env, cdef); // add hook for synthesijer
     	try {
             if (gen.genClass(env, cdef) && (errorCount() == 0))
                 return writer.writeClass(cdef.sym);

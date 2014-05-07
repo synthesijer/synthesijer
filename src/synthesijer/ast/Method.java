@@ -16,7 +16,7 @@ import synthesijer.hdl.HDLType;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
-public class Method implements Scope{
+public class Method implements Scope, SynthsijerAstTree{
 	
 	private final Scope parent;
 	private final String name;
@@ -117,8 +117,8 @@ public class Method implements Scope{
 		body.makeCallGraph();
 	}
 	
-	public void registrate(Variable v){
-		varTable.put(v.getName(), v);
+	public void addVariableDecl(VariableDecl v){
+		varTable.put(v.getVariable().getName(), v.getVariable());
 	}
 	
 	public Variable search(String name){

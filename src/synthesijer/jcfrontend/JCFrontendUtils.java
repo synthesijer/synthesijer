@@ -11,7 +11,7 @@ import openjdk.com.sun.tools.javac.tree.JCTree.JCIdent;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCModifiers;
 
-public class SynthesijerJCFrontendUtils {
+public class JCFrontendUtils {
 
 	public static boolean isAnnotatedBy(List<JCAnnotation> annotations, String key){
 		for(JCAnnotation a: annotations){

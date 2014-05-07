@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
@@ -69,8 +70,8 @@ public class ForStatement extends Statement implements Scope {
 		body.makeCallGraph();
 	}
 	
-	public void registrate(Variable v){
-		varTable.put(v.getName(), v);
+	public void addVariableDecl(VariableDecl v){
+		varTable.put(v.getVariable().getName(), v.getVariable());
 	}
 	
 	public Variable search(String s){
@@ -98,8 +99,9 @@ public class ForStatement extends Statement implements Scope {
 	public void dumpAsXML(PrintWriter dest) {
 		dest.printf("<statement type=\"for\">\n");
 		dest.printf("<init>\n");
-		for (Statement s : initializations)
+		for (Statement s : initializations){
 			s.dumpAsXML(dest);
+		}
 		dest.printf("</init>\n");
 		dest.printf("<condition>\n");
 		condition.dumpAsXML(dest);

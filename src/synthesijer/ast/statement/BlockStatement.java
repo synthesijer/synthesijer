@@ -67,8 +67,8 @@ public class BlockStatement extends Statement implements Scope{
 		}
 	}
 	
-	public void registrate(Variable v){
-		varTable.put(v.getName(), v);
+	public void addVariableDecl(VariableDecl v){
+		varTable.put(v.getVariable().getName(), v.getVariable());
 	}
 	
 	public Variable search(String s){

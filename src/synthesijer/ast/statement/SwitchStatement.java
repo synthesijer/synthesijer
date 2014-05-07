@@ -2,40 +2,21 @@ package synthesijer.ast.statement;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 import synthesijer.ast.Expr;
-import synthesijer.ast.Method;
-import synthesijer.ast.Module;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
-import synthesijer.ast.Variable;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
-public class SwitchStatement extends Statement implements Scope{
+public class SwitchStatement extends Statement{
 
 	private Expr selector;
 	private ArrayList<Elem> elements = new ArrayList<Elem>();
-	private Scope parent;
-	private Hashtable<String, Variable> varTable = new Hashtable<String, Variable>();
 	
 	public SwitchStatement(Scope scope){
 		super(scope);
-		this.parent = scope;
-	}
-	
-	public Scope getParentScope(){
-		return parent;
-	}
-	
-	public Module getModule(){
-		return parent.getModule();
-	}
-	
-	public Method getMethod(){
-		return parent.getMethod();
 	}
 
 	public void setSelector(Expr expr){
@@ -81,17 +62,7 @@ public class SwitchStatement extends Statement implements Scope{
 			elem.makeCallGraph();
 		}
 	}
-	
-	public void registrate(Variable v){
-		varTable.put(v.getName(), v);
-	}
-	
-	public Variable search(String s){
-		Variable v = varTable.get(s);
-		if(v != null) return v;
-		return parent.search(s);
-	}
-	
+
 	public class Elem{
 		
 		private final Expr pat;

@@ -1,6 +1,6 @@
 package synthesijer.ast;
 
-public enum Op {
+public enum Op  implements SynthsijerAstTree{
 	
 	ASSIGN("="),
 	PLUS("+"),

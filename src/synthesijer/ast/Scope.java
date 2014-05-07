@@ -1,11 +1,13 @@
 package synthesijer.ast;
 
+import synthesijer.ast.statement.VariableDecl;
 
-public interface Scope {
+
+public interface Scope extends SynthsijerAstTree{
 	
 	public Scope getParentScope();
 	
-	public void registrate(Variable v);
+	public void addVariableDecl(VariableDecl decl);
 	
 	public Variable search(String name);
 	

@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 
 import synthesijer.hdl.HDLExpr;
 
-public abstract class Expr {
+public abstract class Expr implements SynthsijerAstTree{
 	
 	public enum TERM {LEFT, RIGHT};
 	

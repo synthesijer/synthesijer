@@ -1,5 +1,5 @@
 import java.util.Calendar;
-import net.wasamon.javarock.rt.*;
+import synthesijer.rt.*;
 
 public class SieveMod{
 
@@ -7,7 +7,7 @@ public class SieveMod{
 
   private final char flags[] = new char[101]; // new boolean[SIZE+1];
 
-  synchronized public char set(int id, char data){
+  synchronized public void set(int id, char data){
     flags[id] = data;
   }
 

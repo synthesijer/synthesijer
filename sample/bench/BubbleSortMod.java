@@ -1,4 +1,4 @@
-import net.wasamon.javarock.rt.*;
+import synthesijer.rt.*;
 
 public class BubbleSortMod{
 
