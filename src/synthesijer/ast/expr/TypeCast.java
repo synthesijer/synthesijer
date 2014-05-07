@@ -21,10 +21,6 @@ public class TypeCast extends Expr{
 		return expr;
 	}
 
-	public void makeCallGraph(){
-		expr.makeCallGraph();
-	}
-
 	public HDLExpr getHDLExprResult(){
 		return expr.getHDLExprResult();
 	}

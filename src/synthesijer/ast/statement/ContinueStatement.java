@@ -13,11 +13,7 @@ public class ContinueStatement extends Statement{
 		super(parent);
 	}
 
-	public void makeCallGraph(){
-	}
-
 	// @TODO
-	// This is not illegal.
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		State s = m.newState("continue");
 		s.addTransition(loopCont);

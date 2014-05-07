@@ -38,11 +38,6 @@ public class AssignOp extends Expr{
 	public Op getOp(){
 		return op;
 	}
-
-	public void makeCallGraph(){
-		lhs.makeCallGraph();
-		rhs.makeCallGraph();
-	}
 	
 	public HDLExpr getHDLExprResult(){
 		return lhs.getHDLExprResult();

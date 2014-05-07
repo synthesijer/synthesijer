@@ -29,12 +29,7 @@ public class ArrayAccess extends Expr{
 	public Expr getIndex(){
 		return index;
 	}
-
-	public void makeCallGraph(){
-		indexed.makeCallGraph();
-		index.makeCallGraph();
-	}
-
+	
 	@Override
 	public HDLExpr getHDLExprResult() {
 		if(indexed instanceof Ident){

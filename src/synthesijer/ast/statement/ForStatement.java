@@ -74,17 +74,6 @@ public class ForStatement extends Statement implements Scope {
 		return body;
 	}
 
-	public void makeCallGraph(){
-		for(Statement s: initializations){
-			s.makeCallGraph();
-		}
-		condition.makeCallGraph();
-		for(Statement s: updates){
-			s.makeCallGraph();
-		}
-		body.makeCallGraph();
-	}
-	
 	public void addVariableDecl(VariableDecl v){
 		varTable.put(v.getVariable().getName(), v.getVariable());
 	}

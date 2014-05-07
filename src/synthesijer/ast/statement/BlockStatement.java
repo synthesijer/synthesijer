@@ -57,12 +57,6 @@ public class BlockStatement extends Statement implements Scope{
 		return d;
 	}
 	
-	public void makeCallGraph(){
-		for(Statement s: statements){
-			s.makeCallGraph();
-		}
-	}
-	
 	public void addVariableDecl(VariableDecl v){
 		varTable.put(v.getVariable().getName(), v.getVariable());
 	}

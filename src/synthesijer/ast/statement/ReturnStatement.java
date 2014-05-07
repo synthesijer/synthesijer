@@ -24,10 +24,6 @@ public class ReturnStatement extends ExprContainStatement{
 		this.expr = expr;
 	}
 
-	public void makeCallGraph(){
-		if(expr != null) expr.makeCallGraph();
-	}
-	
 	private State state;
 	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){

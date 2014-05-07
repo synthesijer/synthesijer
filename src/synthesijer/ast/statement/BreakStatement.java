@@ -13,9 +13,6 @@ public class BreakStatement extends Statement{
 		super(scope);
 	}
 	
-	public void makeCallGraph(){
-	}
-	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		State s = m.newState("break");
 		s.addTransition(loopout);

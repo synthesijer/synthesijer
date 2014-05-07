@@ -41,17 +41,6 @@ public class MethodInvocation extends Expr{
 		}
 		return method.toString();
 	}
-
-	public void makeCallGraph(){
-		System.out.println("MethodInvocation::makeCallGraph");
-		if(method instanceof Ident){
-			System.out.println("  class   :" + getScope().getModule().getName());
-			System.out.println("  instance:" + "this");
-			System.out.println("  method  :" + ((Ident)method).getSymbol());
-		}else{
-			method.makeCallGraph();
-		}
-	}
 	
 	public HDLExpr getHDLExprResult(){
 		return new HDLIdent(getMethodName() + "_return_value");

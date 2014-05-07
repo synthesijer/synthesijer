@@ -28,11 +28,6 @@ public class AssignExpr extends Expr{
 	public Expr getRhs(){
 		return rhs;
 	}
-
-	public void makeCallGraph(){
-		lhs.makeCallGraph();
-		rhs.makeCallGraph();
-	}
 	
 	public HDLExpr getHDLExprResult(){
 		return lhs.getHDLExprResult();

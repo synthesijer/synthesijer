@@ -41,12 +41,6 @@ public class IfStatement extends Statement{
 		return elsePart;
 	}
 
-	public void makeCallGraph(){
-		condition.makeCallGraph();
-		thenPart.makeCallGraph();
-		if(elsePart != null) elsePart.makeCallGraph();
-	}
-	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		State t = thenPart.genStateMachine(m, dest, terminal, loopout, loopCont);
 		State s = m.newState("if_cond");

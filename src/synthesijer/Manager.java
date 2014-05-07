@@ -40,8 +40,9 @@ public enum Manager {
 	}
 	
 	public void makeCallGraph(){
+		MakeCallFlowVisitor visitor = new MakeCallFlowVisitor();
 		for(Module m: entries){
-			m.makeCallGraph();
+			m.accept(visitor);
 		}
 	}
 

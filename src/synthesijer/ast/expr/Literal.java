@@ -1,7 +1,5 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
@@ -118,10 +116,6 @@ public class Literal extends Expr{
 		case NULL:    return "NULL";
 		default: return "UNKNOWN";
 		}
-	}
-	
-	public void makeCallGraph(){
-		// nothing to do
 	}
 	
 	private HDLValue.Type getHDLValueType(){

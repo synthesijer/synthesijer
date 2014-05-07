@@ -22,10 +22,6 @@ public class TryStatement extends Statement{
 	public Statement getBody(){
 		return this.body;
 	}
-
-	public void makeCallGraph(){
-		body.makeCallGraph();
-	}
 	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		return body.genStateMachine(m, dest, terminal, loopCont, loopCont);

@@ -49,10 +49,6 @@ public class VariableDecl extends ExprContainStatement{
 		return init;
 	}
 	
-	public void makeCallGraph(){
-		if(init != null) init.makeCallGraph();
-	}
-	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		if(init != null){
 			State s = m.newState("var_init");

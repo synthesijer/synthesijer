@@ -39,12 +39,7 @@ public class BinaryExpr extends Expr{
 	public Op getOp(){
 		return this.op;
 	}
-	
-	public void makeCallGraph(){
-		lhs.makeCallGraph();
-		rhs.makeCallGraph();
-	}
-	
+		
 	public HDLExpr getHDLExprResult(){
 		HDLIdent id = new HDLIdent("binaryexpr_result_" + this.hashCode());
 		return id;

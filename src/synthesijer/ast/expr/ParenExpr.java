@@ -20,11 +20,7 @@ public class ParenExpr extends Expr{
 	public Expr getExpr(){
 		return this.expr;
 	}
-	
-	public void makeCallGraph(){
-		expr.makeCallGraph();
-	}
-		
+			
 	public HDLExpr getHDLExprResult(){
 		return expr.getHDLExprResult();
 	}

@@ -1,6 +1,5 @@
 package synthesijer.ast;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -75,15 +74,6 @@ public class Module implements Scope, SynthesijerAstTree{
 
 	public ArrayList<Method> getMethods(){
 		return methods;
-	}
-
-	public void makeCallGraph(){
-		for(VariableDecl v: variables){
-			v.makeCallGraph();
-		}
-		for(Method m: methods){
-			m.makeCallGraph();
-		}
 	}
 	
 	private ArrayList<StateMachine> statemachines = new ArrayList<StateMachine>();

@@ -22,10 +22,6 @@ public class Ident extends Expr{
 		return symbol;
 	}
 	
-	public void makeCallGraph(){
-		// nothing to do
-	}
-
 	public HDLExpr getHDLExprResult(){
 		return new HDLIdent(symbol);
 	}

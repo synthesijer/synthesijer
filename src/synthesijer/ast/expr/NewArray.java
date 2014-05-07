@@ -23,12 +23,6 @@ public class NewArray extends Expr{
 		return dimExpr;
 	}
 
-	public void makeCallGraph(){
-		for(Expr expr: dimExpr){
-			expr.makeCallGraph();
-		}
-	}
-	
 	public HDLExpr getHDLExprResult(){
 		return null;
 	}

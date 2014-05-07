@@ -51,14 +51,7 @@ public class SwitchStatement extends Statement{
 		}
 		return s;
 	}
-		
-	public void makeCallGraph(){
-		selector.makeCallGraph();
-		for(Elem elem: elements){
-			elem.makeCallGraph();
-		}
-	}
-
+	
 	public class Elem implements SynthesijerAstTree{
 		
 		private final Expr pat;
@@ -74,13 +67,6 @@ public class SwitchStatement extends Statement{
 		
 		public ArrayList<Statement> getStatements(){
 			return statements;
-		}
-		
-		public void makeCallGraph(){
-			pat.makeCallGraph();
-			for(Statement s: statements){
-				s.makeCallGraph();
-			}
 		}
 		
 		public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){

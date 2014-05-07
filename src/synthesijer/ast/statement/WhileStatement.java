@@ -33,11 +33,6 @@ public class WhileStatement extends Statement{
 		return body;
 	}
 
-	public void makeCallGraph(){
-		condition.makeCallGraph();
-		body.makeCallGraph();
-	}
-
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		State s = m.newState("while_cond");
 		State d = body.genStateMachine(m, s, terminal, dest, s);

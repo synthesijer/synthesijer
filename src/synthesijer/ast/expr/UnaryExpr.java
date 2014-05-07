@@ -32,10 +32,6 @@ public class UnaryExpr extends Expr{
 		return this.op;
 	}
 	
-	public void makeCallGraph(){
-		arg.makeCallGraph();
-	}
-	
 	public HDLExpr getHDLExprResult(){
 		HDLIdent id = new HDLIdent("binaryexpr_result_" + this.hashCode());
 		return id;

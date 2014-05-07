@@ -146,11 +146,7 @@ public class Method implements Scope, SynthesijerAstTree{
 	public BlockStatement getBody(){
 		return body;
 	}
-	
-	public void makeCallGraph(){
-		body.makeCallGraph();
-	}
-	
+		
 	public void addVariableDecl(VariableDecl v){
 		varTable.put(v.getVariable().getName(), v.getVariable());
 	}

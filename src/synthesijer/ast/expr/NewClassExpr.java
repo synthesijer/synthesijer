@@ -32,12 +32,6 @@ public class NewClassExpr extends Expr{
 		return params;
 	}
 
-	public void makeCallGraph(){
-		System.out.println("NewClassExpr::makeCallGraph");
-		System.out.println(" class:" + clazz);
-		System.out.println(" method:" + "<init>");
-	}
-
 	public HDLExpr getHDLExprResult(){
 		return null;
 	}

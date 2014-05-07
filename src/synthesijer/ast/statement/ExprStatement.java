@@ -19,10 +19,6 @@ public class ExprStatement extends ExprContainStatement{
 	public Expr getExpr(){
 		return expr;
 	}
-
-	public void makeCallGraph(){
-		expr.makeCallGraph();
-	}
 	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		State s = m.newState("expr");
