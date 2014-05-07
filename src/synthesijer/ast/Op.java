@@ -1,6 +1,6 @@
 package synthesijer.ast;
 
-public enum Op  implements SynthsijerAstTree{
+public enum Op{
 	
 	ASSIGN("="),
 	PLUS("+"),
@@ -61,5 +61,5 @@ public enum Op  implements SynthsijerAstTree{
 		else if(DEC.name.equals(opName))    return Op.DEC;
 		else return Op.UNDEFINED;
 	}
-
+	
 }

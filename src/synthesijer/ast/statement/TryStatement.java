@@ -1,9 +1,8 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
@@ -20,6 +19,10 @@ public class TryStatement extends Statement{
 		this.body = s;
 	}
 
+	public Statement getBody(){
+		return this.body;
+	}
+
 	public void makeCallGraph(){
 		body.makeCallGraph();
 	}
@@ -28,15 +31,13 @@ public class TryStatement extends Statement{
 		return body.genStateMachine(m, dest, terminal, loopCont, loopCont);
 	}
 	
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<statement type=\"try\">");
-		body.dumpAsXML(dest);
-		dest.printf("</statement>");
-	}
-
 	@Override
 	public void generateHDL(HDLModule m) {
 		body.generateHDL(m);
 	}
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitTryStatement(this);
+	}
+
 }

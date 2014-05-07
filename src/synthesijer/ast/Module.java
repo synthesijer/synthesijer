@@ -13,7 +13,7 @@ import synthesijer.hdl.literal.HDLSymbol;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
-public class Module implements Scope, SynthsijerAstTree{
+public class Module implements Scope, SynthesijerAstTree{
 	
 	private final Scope parent;
 	private final String name;
@@ -69,6 +69,14 @@ public class Module implements Scope, SynthsijerAstTree{
 		variables.add(v);
 	}
 	
+	public ArrayList<VariableDecl> getVariables(){
+		return variables;
+	}
+
+	public ArrayList<Method> getMethods(){
+		return methods;
+	}
+
 	public void makeCallGraph(){
 		for(VariableDecl v: variables){
 			v.makeCallGraph();
@@ -126,16 +134,9 @@ public class Module implements Scope, SynthsijerAstTree{
 		}
 		return hm;
 	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<module name=\"%s\">\n", getName());
-		dest.println("<variables>");
-		for(VariableDecl v: variables){ v.dumpAsXML(dest); }
-		dest.println("</variables>");
-		dest.println("<methods>");
-		for(Method m: methods){ m.dumpAsXML(dest); }
-		dest.println("</methods>");
-		dest.printf("</module>\n");
+	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitModule(this);
 	}
 
 }

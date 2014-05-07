@@ -1,13 +1,11 @@
 package synthesijer.ast;
 
-import java.io.PrintWriter;
-
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
 
-public abstract class Statement implements SynthsijerAstTree{
+public abstract class Statement implements SynthesijerAstTree{
 	
 	private final Scope scope; 
 	
@@ -18,8 +16,6 @@ public abstract class Statement implements SynthsijerAstTree{
 	public Scope getScope(){
 		return scope;
 	}
-	
-	abstract public void dumpAsXML(PrintWriter dest);
 	
 	abstract public void makeCallGraph();
 	

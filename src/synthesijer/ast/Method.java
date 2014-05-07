@@ -1,9 +1,7 @@
 package synthesijer.ast;
 
-import java.io.PrintWriter;
 import java.util.Hashtable;
 
-import synthesijer.SynthesijerUtils;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.type.ArrayType;
@@ -16,7 +14,7 @@ import synthesijer.hdl.HDLType;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
-public class Method implements Scope, SynthsijerAstTree{
+public class Method implements Scope, SynthesijerAstTree{
 	
 	private final Scope parent;
 	private final String name;
@@ -64,32 +62,64 @@ public class Method implements Scope, SynthsijerAstTree{
 		unsynthesizableFlag = f;
 	}
 	
+	public boolean isUnsynthesizable(){
+		return unsynthesizableFlag;
+	}
+	
 	public void setAutoFlag(boolean f){
 		autoFlag = f;
 	}
-	
+
+	public boolean isAuto(){
+		return autoFlag;
+	}
+
 	public void setSynchronizedFlag(boolean f){
 		synchronizedFlag = f;
 	}
-	
+
+	public boolean isSynchronized(){
+		return synchronizedFlag;
+	}
+
 	public void setPrivateFlag(boolean f){
 		privateFlag = f;
+	}
+	
+	public boolean isPrivate(){
+		return privateFlag;
 	}
 	
 	public void setRawFlag(boolean f){
 		rawFlag = f;
 	}
 	
+	public boolean isRaw(){
+		return rawFlag;
+	}
+	
 	public void setCombinationFlag(boolean f){
 		combinationFlag = f;
+	}
+	
+	public boolean isCombination(){
+		return combinationFlag;
 	}
 	
 	public void setParallelFlag(boolean f){
 		parallelFlag = f;
 	}
 	
+	public boolean isParallel(){
+		return parallelFlag;
+	}
+	
 	public void setNoWaitFlag(boolean f){
 		noWaitFlag = f;
+	}
+	
+	public boolean isNoWait(){
+		return noWaitFlag;
 	}
 	
 	public void setConstructorFlag(boolean f){
@@ -107,6 +137,10 @@ public class Method implements Scope, SynthsijerAstTree{
 	
 	public String getUniqueName(String prefix){
 		return prefix + name;
+	}
+	
+	public Type getType(){
+		return type;
 	}
 	
 	public BlockStatement getBody(){
@@ -132,34 +166,10 @@ public class Method implements Scope, SynthsijerAstTree{
 		body.genStateMachine(s, terminal, terminal, null, null);
 	}
 	
-	public void dumpAsXML(PrintWriter dest){
-		String options = "";
-		options += " unsynthesizableFlag=\"%b\"";
-		options += " autoFlag=\"%b\"";
-		options += " synchronizedFlag=\"%b\"";
-		options += " privateFlag=\"%b\"";
-		options += " rawFlag=\"%b\"";
-		options += " combinationFlag=\"%b\"";
-		options += " parallelFlag=\"%b\"";
-		options += " noWaitFlag=\"%b\"";
-		options += " constructorFlag=\"%b\"";
-		
-		dest.printf("<method name=\"%s\"" + options + ">\n",
-					SynthesijerUtils.escapeXML(name),
-					unsynthesizableFlag,
-					autoFlag,
-					synchronizedFlag,
-					privateFlag,
-					rawFlag,
-					combinationFlag,
-					parallelFlag,
-					noWaitFlag,
-					constructorFlag);
-		type.dumpAsXML(dest);
-		body.dumpAsXML(dest);
-		dest.printf("</method>\n");
+	public void accept(SynthesijerAstVisitor v){
+		v.visitMethod(this);
 	}
-	
+		
 	public void generateHDL(HDLModule m){
 		for(VariableDecl v: args){
 			v.genHDLPort(m);

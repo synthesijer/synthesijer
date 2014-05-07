@@ -1,10 +1,10 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLIdent;
 
@@ -22,31 +22,24 @@ public class MethodInvocation extends Expr{
 	}
 	
 	public void addParameter(Expr expr){
-		params. add(expr);		
+		params.add(expr);		
+	}
+	
+	public Expr getMethod(){
+		return method;
+	}
+	
+	public ArrayList<Expr> getParameters(){
+		return params;
 	}
 	
 	public String getMethodName(){
 		if(method instanceof Ident){
-			return ((Ident)method).getIdent();
+			return ((Ident)method).getSymbol();
 		}else if(method instanceof FieldAccess){
-			return ((FieldAccess)method).getIdent();
+			return ((FieldAccess)method).getIdent().getSymbol();
 		}
 		return method.toString();
-	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\">", "MethodInvocation");
-		dest.printf("<method name=\"%s\">", getMethodName());
-		if(method instanceof FieldAccess){
-			method.dumpAsXML(dest);
-		}
-		dest.printf("</method>\n");
-		dest.printf("<params>\n");
-		for(Expr expr: params){
-			expr.dumpAsXML(dest);
-		}
-		dest.printf("</params>\n");
-		dest.printf("</expr>");
 	}
 
 	public void makeCallGraph(){
@@ -54,7 +47,7 @@ public class MethodInvocation extends Expr{
 		if(method instanceof Ident){
 			System.out.println("  class   :" + getScope().getModule().getName());
 			System.out.println("  instance:" + "this");
-			System.out.println("  method  :" + ((Ident)method).getIdent());
+			System.out.println("  method  :" + ((Ident)method).getSymbol());
 		}else{
 			method.makeCallGraph();
 		}
@@ -62,6 +55,10 @@ public class MethodInvocation extends Expr{
 	
 	public HDLExpr getHDLExprResult(){
 		return new HDLIdent(getMethodName() + "_return_value");
+	}
+
+	public void accept(SynthesijerAstVisitor v){
+		v.visitMethodInvocation(this);
 	}
 
 }

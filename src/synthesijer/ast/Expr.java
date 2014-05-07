@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 
 import synthesijer.hdl.HDLExpr;
 
-public abstract class Expr implements SynthsijerAstTree{
+public abstract class Expr implements SynthesijerAstTree{
 	
 	public enum TERM {LEFT, RIGHT};
 	
@@ -17,8 +17,6 @@ public abstract class Expr implements SynthsijerAstTree{
 	public Scope getScope(){
 		return scope;
 	}
-	
-	abstract public void dumpAsXML(PrintWriter dest);
 	
 	abstract public void makeCallGraph();
 	

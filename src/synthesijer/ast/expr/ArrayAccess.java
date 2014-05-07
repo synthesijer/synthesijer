@@ -1,9 +1,8 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLIdent;
 
@@ -22,28 +21,24 @@ public class ArrayAccess extends Expr{
 	public void setIndex(Expr expr){
 		index = expr;
 	}
+
+	public Expr getIndexed(){
+		return indexed;
+	}
 	
+	public Expr getIndex(){
+		return index;
+	}
+
 	public void makeCallGraph(){
 		indexed.makeCallGraph();
 		index.makeCallGraph();
 	}
 
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\">", "ArrayAccess");
-		dest.printf("<indexed>");
-		indexed.dumpAsXML(dest);
-		dest.printf("</indexed>");
-		dest.printf("<index>");
-		index.dumpAsXML(dest);
-		dest.printf("</index>");
-		dest.printf("</expr>", "ArrayAccess");
-	}
-	
-
 	@Override
 	public HDLExpr getHDLExprResult() {
 		if(indexed instanceof Ident){
-			String rdata = ((Ident)indexed).getIdent() + "_rdata";
+			String rdata = ((Ident)indexed).getSymbol() + "_rdata";
 			HDLIdent id = new HDLIdent(rdata);
 			return id;
 		}else{
@@ -51,5 +46,9 @@ public class ArrayAccess extends Expr{
 		}
 	}
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitArrayAccess(this);
+	}
+
 }
 

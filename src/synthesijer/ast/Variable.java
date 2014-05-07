@@ -8,7 +8,7 @@ import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 
-public class Variable implements SynthsijerAstTree{
+public class Variable{
 
 	private final String name;
 	private final Type type;
@@ -71,5 +71,5 @@ public class Variable implements SynthsijerAstTree{
 			return null;
 		}
 	}
-
+	
 }

@@ -1,9 +1,8 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLIdent;
 
@@ -19,7 +18,7 @@ public class Ident extends Expr{
 		symbol = value;
 	}
 	
-	public String getIdent(){
+	public String getSymbol(){
 		return symbol;
 	}
 	
@@ -27,12 +26,12 @@ public class Ident extends Expr{
 		// nothing to do
 	}
 
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\" value=\"%s\"/>", "Ident", symbol);
-	}
-
 	public HDLExpr getHDLExprResult(){
 		return new HDLIdent(symbol);
+	}
+
+	public void accept(SynthesijerAstVisitor v){
+		v.visitIdent(this);
 	}
 
 }

@@ -78,10 +78,11 @@ public enum Manager {
 	}
 
 	public void dumpAsXML(PrintWriter dest){
+		DumpAsXMLVisitor visitor = new DumpAsXMLVisitor(dest);
 		dest.printf("<?xml version=\"1.0\" ?>\n");
 		dest.printf("<modules>\n");
 		for(Module m: entries){
-			m.dumpAsXML(dest);
+			m.accept(visitor);
 		}
 		dest.printf("</modules>\n");
 	}

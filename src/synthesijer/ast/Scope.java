@@ -3,7 +3,7 @@ package synthesijer.ast;
 import synthesijer.ast.statement.VariableDecl;
 
 
-public interface Scope extends SynthsijerAstTree{
+public interface Scope extends SynthesijerAstTree{
 	
 	public Scope getParentScope();
 	

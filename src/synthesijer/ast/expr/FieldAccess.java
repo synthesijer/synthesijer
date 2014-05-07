@@ -1,9 +1,8 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
@@ -19,22 +18,26 @@ public class FieldAccess extends Expr{
 		super(scope);
 	}
 	
-	public void setSelecteExpr(Expr selected){
+	public void setSelected(Expr selected){
 		this.selected = selected;
 	}
-	
+
+	public Expr getSelected(){
+		return this.selected;
+	}
+
 	public void setIdent(Ident ident){
 		this.ident = ident;
 	}
 	
-	public String getIdent(){
-		return ident.getIdent();
+	public Ident getIdent(){
+		return ident;
 	}
 	
 	public void makeCallGraph(){
 		System.out.println("FieldAccess::makeCallGraph");
 		if(selected instanceof Ident){
-			String name = ((Ident)selected).getIdent();
+			String name = ((Ident)selected).getSymbol();
 			Variable v = getScope().search(name);
 			String clazz = "";
 			String inst = "";
@@ -59,13 +62,7 @@ public class FieldAccess extends Expr{
 			System.out.println(" ==>");
 			selected.makeCallGraph();	
 		}
-		System.out.println("  method  :" + ident.getIdent());
-	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\" ident=\"%s\">", "FieldAccess", ident.getIdent());
-		selected.dumpAsXML(dest);
-		dest.printf("</expr>");
+		System.out.println("  method  :" + ident.getSymbol());
 	}
 	
 	public HDLExpr getHDLExprResult(){
@@ -73,4 +70,8 @@ public class FieldAccess extends Expr{
 	}
 	
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitFieldAccess(this);
+	}
+
 }

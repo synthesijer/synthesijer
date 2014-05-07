@@ -1,9 +1,8 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
 import synthesijer.ast.type.ArrayType;
@@ -54,13 +53,6 @@ public class VariableDecl extends ExprContainStatement{
 		if(init != null) init.makeCallGraph();
 	}
 	
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<var name=\"%s\">\n", var.getName());
-		var.getType().dumpAsXML(dest);
-		if(init != null) init.dumpAsXML(dest);
-		dest.printf("</var>");
-	}
-
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		if(init != null){
 			State s = m.newState("var_init");
@@ -91,5 +83,8 @@ public class VariableDecl extends ExprContainStatement{
 		genHDLSignal(m);
 	}
 
+	public void accept(SynthesijerAstVisitor v){
+		v.visitVariableDecl(this);
+	}
 	
 }

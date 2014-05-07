@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.literal.HDLValue;
 
@@ -40,6 +41,10 @@ public class Literal extends Expr{
 		super(scope);
 	}
 	
+	public LITERAL_KIND getKind(){
+		return kind;
+	}
+		
 	public void setValue(boolean value){
 		this.kind = LITERAL_KIND.BOOLEAN;
 		this.valueBoolean = value;
@@ -118,12 +123,6 @@ public class Literal extends Expr{
 	public void makeCallGraph(){
 		// nothing to do
 	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\" ", "Literal");
-		dest.printf("value=\"%s\" litral_kind=\"%s\"", getValueAsStr(), kind);
-		dest.printf("/>");
-	}
 	
 	private HDLValue.Type getHDLValueType(){
 		switch(kind){
@@ -149,4 +148,7 @@ public class Literal extends Expr{
 		return new HDLValue(getValueAsStr(), getHDLValueType(), width);
 	}
 
+	public void accept(SynthesijerAstVisitor v){
+		v.visitLitral(this);
+	}
 }

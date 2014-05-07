@@ -1,10 +1,10 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 
 public class NewArray extends Expr{
@@ -15,8 +15,12 @@ public class NewArray extends Expr{
 		super(scope);
 	}
 
-	public void addDimExpr(Expr e){
-		dimExpr.add(e);
+	public void addDimExpr(Expr expr){
+		dimExpr.add(expr);
+	}
+
+	public ArrayList<Expr> getDimExpr(){
+		return dimExpr;
 	}
 
 	public void makeCallGraph(){
@@ -24,19 +28,12 @@ public class NewArray extends Expr{
 			expr.makeCallGraph();
 		}
 	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\">", "NewArray");
-		dest.printf("<dimension>");
-		for(Expr expr: dimExpr){
-			expr.dumpAsXML(dest);
-		}
-		dest.printf("</dimension>");
-		dest.println("</expr>");
-	}
 	
 	public HDLExpr getHDLExprResult(){
 		return null;
 	}
 
+	public void accept(SynthesijerAstVisitor v){
+		v.visitNewArray(this);
+	}
 }

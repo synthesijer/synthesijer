@@ -1,10 +1,9 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLIdent;
 
@@ -25,16 +24,16 @@ public class UnaryExpr extends Expr{
 		this.op = op;
 	}
 	
+	public Expr getArg(){
+		return this.arg;
+	}
+	
+	public Op getOp(){
+		return this.op;
+	}
+	
 	public void makeCallGraph(){
 		arg.makeCallGraph();
-	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\" op=\"%s\">", "UnaryExpr", op);
-		dest.printf("<arg>\n");
-		arg.dumpAsXML(dest);
-		dest.printf("</arg>\n");
-		dest.printf("</expr>\n");
 	}
 	
 	public HDLExpr getHDLExprResult(){
@@ -42,4 +41,7 @@ public class UnaryExpr extends Expr{
 		return id;
 	}
 
+	public void accept(SynthesijerAstVisitor v){
+		v.visitUnaryExpr(this);
+	}
 }

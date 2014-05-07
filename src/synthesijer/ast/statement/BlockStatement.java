@@ -1,6 +1,5 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -8,6 +7,7 @@ import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
@@ -44,6 +44,10 @@ public class BlockStatement extends Statement implements Scope{
 		}
 	}
 	
+	public ArrayList<Statement> getStatements(){
+		return statements;
+	}
+	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		State d = dest;
 		for(int i = statements.size(); i > 0; i--){
@@ -51,14 +55,6 @@ public class BlockStatement extends Statement implements Scope{
 			d = stmt.genStateMachine(m, d, terminal, loopout, loopCont);
 		}
 		return d;
-	}
-	
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<statement type=\"block\">\n");
-		for(Statement s: statements){
-			s.dumpAsXML(dest);
-		}
-		dest.printf("</statement>\n");
 	}
 	
 	public void makeCallGraph(){
@@ -84,4 +80,7 @@ public class BlockStatement extends Statement implements Scope{
 		}
 	}
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitBlockStatement(this);
+	}
 }

@@ -1,9 +1,8 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
@@ -16,10 +15,6 @@ public class SkipStatement extends Statement{
 
 	public void makeCallGraph(){
 	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<statement type=\"skip\"/>\n");
-	}
 	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		return dest;
@@ -28,4 +23,9 @@ public class SkipStatement extends Statement{
 	@Override
 	public void generateHDL(HDLModule m) {
 	}
+	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitSkipStatement(this);
+	}
+	
 }

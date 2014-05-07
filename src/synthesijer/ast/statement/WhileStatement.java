@@ -1,10 +1,9 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
@@ -22,8 +21,16 @@ public class WhileStatement extends Statement{
 		this.condition = expr;
 	}
 	
+	public Expr getCondition(){
+		return condition;
+	}
+	
 	public void setBody(Statement body){
 		this.body = body;
+	}
+	
+	public Statement getBody(){
+		return body;
 	}
 
 	public void makeCallGraph(){
@@ -39,19 +46,13 @@ public class WhileStatement extends Statement{
 		return s;
 	}
 
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<statement type=\"while\">\n");
-		dest.printf("<condition>\n");
-		condition.dumpAsXML(dest);
-		dest.printf("</condition>\n");
-		dest.printf("<body>\n");
-		body.dumpAsXML(dest);
-		dest.printf("</body>\n");
-		dest.printf("</statement>\n");
-	}
-
 	@Override
 	public void generateHDL(HDLModule m) {
 		body.generateHDL(m);
 	}
+
+	public void accept(SynthesijerAstVisitor v){
+		v.visitWhileStatement(this);
+	}
+
 }

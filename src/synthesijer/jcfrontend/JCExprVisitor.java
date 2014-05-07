@@ -92,7 +92,7 @@ public class JCExprVisitor extends Visitor{
 		FieldAccess tmp = new FieldAccess(scope);
 		JCExprVisitor visitor = new JCExprVisitor(scope);
 		that.selected.accept(visitor);
-		tmp.setSelecteExpr(visitor.getExpr());
+		tmp.setSelected(visitor.getExpr());
 		Ident id = new Ident(scope);
 		id.setIdent(that.name.toString());
 		tmp.setIdent(id);

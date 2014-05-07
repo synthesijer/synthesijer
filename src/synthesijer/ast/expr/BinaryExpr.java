@@ -1,10 +1,9 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLIdent;
 
@@ -28,26 +27,30 @@ public class BinaryExpr extends Expr{
 	public void setOp(Op op){
 		this.op = op;
 	}
+
+	public Expr getLhs(){
+		return this.lhs;
+	}
+	
+	public Expr getRhs(){
+		return this.rhs;
+	}
+	
+	public Op getOp(){
+		return this.op;
+	}
 	
 	public void makeCallGraph(){
 		lhs.makeCallGraph();
 		rhs.makeCallGraph();
 	}
 	
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\" op=\"%s\">", "BinaryExpr", op.toString());
-		dest.printf("<lhs>\n");
-		lhs.dumpAsXML(dest);
-		dest.printf("</lhs>\n");
-		dest.printf("<rhs>\n");
-		rhs.dumpAsXML(dest);
-		dest.printf("</rhs>\n");
-		dest.printf("</expr>\n");
-	}
-
 	public HDLExpr getHDLExprResult(){
 		HDLIdent id = new HDLIdent("binaryexpr_result_" + this.hashCode());
 		return id;
 	}
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitBinaryExpr(this);
+	}
 }

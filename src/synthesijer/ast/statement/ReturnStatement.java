@@ -1,9 +1,8 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.model.State;
@@ -29,12 +28,6 @@ public class ReturnStatement extends ExprContainStatement{
 		if(expr != null) expr.makeCallGraph();
 	}
 	
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<statement type=\"return\">\n");
-		if(expr != null) expr.dumpAsXML(dest);
-		dest.printf("</statement>\n");
-	}
-
 	private State state;
 	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
@@ -53,5 +46,8 @@ public class ReturnStatement extends ExprContainStatement{
 		}
 	}
 
+	public void accept(SynthesijerAstVisitor v){
+		v.visitReturnStatement(this);
+	}
 	
 }

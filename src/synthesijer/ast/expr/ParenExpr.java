@@ -1,9 +1,8 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 
 public class ParenExpr extends Expr{
@@ -18,18 +17,20 @@ public class ParenExpr extends Expr{
 		this.expr = expr;
 	}
 	
+	public Expr getExpr(){
+		return this.expr;
+	}
+	
 	public void makeCallGraph(){
 		expr.makeCallGraph();
 	}
-	
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\">", "ParenExpr");
-		expr.dumpAsXML(dest);
-		dest.printf("</expr>");
-	}
-	
+		
 	public HDLExpr getHDLExprResult(){
 		return expr.getHDLExprResult();
+	}
+
+	public void accept(SynthesijerAstVisitor v){
+		v.visitParenExpr(this);
 	}
 
 }

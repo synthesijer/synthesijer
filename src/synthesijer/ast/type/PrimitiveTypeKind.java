@@ -1,7 +1,6 @@
 package synthesijer.ast.type;
 
-import java.io.PrintWriter;
-
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.hdl.HDLType;
 
@@ -27,10 +26,6 @@ public enum PrimitiveTypeKind implements Type{
 	TYPEVAR,
 	WILDCARD,
 	UNDEFIEND;
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<type kind=\"primitive\" name=\"%s\"/>\n", toString());
-	}
 	
 	public HDLType getHDLType(){
 		if(this == PrimitiveTypeKind.BOOLEAN){
@@ -54,4 +49,7 @@ public enum PrimitiveTypeKind implements Type{
 		}
 	}
 
+	public void accept(SynthesijerAstVisitor v){
+		v.visitPrimitivyTypeKind(this);
+	}
 }

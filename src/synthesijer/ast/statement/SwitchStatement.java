@@ -1,11 +1,12 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstTree;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
@@ -23,10 +24,18 @@ public class SwitchStatement extends Statement{
 		selector = expr;
 	}
 
+	public Expr getSelector(){
+		return selector;
+	}
+
 	public Elem newElement(Expr pat){
 		Elem elem = new Elem(pat);
 		elements.add(elem);
 		return elem;
+	}
+	
+	public ArrayList<Elem> getElements(){
+		return elements;
 	}
 	
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
@@ -42,20 +51,7 @@ public class SwitchStatement extends Statement{
 		}
 		return s;
 	}
-	
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<statement type=\"switch\">\n");
-		dest.printf("<selector>\n");
-		selector.dumpAsXML(dest);
-		dest.printf("</selector>\n");
-		dest.printf("<elements>\n");
-		for(Elem elem: elements){
-			elem.dumpAsXML(dest);
-		}
-		dest.printf("</elements>\n");
-		dest.printf("</statement>\n");
-	}
-	
+		
 	public void makeCallGraph(){
 		selector.makeCallGraph();
 		for(Elem elem: elements){
@@ -63,7 +59,7 @@ public class SwitchStatement extends Statement{
 		}
 	}
 
-	public class Elem{
+	public class Elem implements SynthesijerAstTree{
 		
 		private final Expr pat;
 		private ArrayList<Statement> statements = new ArrayList<Statement>();
@@ -74,6 +70,10 @@ public class SwitchStatement extends Statement{
 		
 		public void addStatement(Statement s){
 			statements.add(s);
+		}
+		
+		public ArrayList<Statement> getStatements(){
+			return statements;
 		}
 		
 		public void makeCallGraph(){
@@ -95,17 +95,10 @@ public class SwitchStatement extends Statement{
 			return pat;
 		}
 		
-		public void dumpAsXML(PrintWriter dest){
-			dest.printf("<element>\n");
-			dest.printf("<pattern>\n");
-			pat.dumpAsXML(dest);
-			dest.printf("</pattern>\n");
-			dest.printf("<statements>\n");
-			for(Statement s: statements) s.dumpAsXML(dest);
-			dest.printf("</statements>\n");
-			dest.printf("</element>\n");	
+		public void accept(SynthesijerAstVisitor v){
+			v.visitSwitchCaseElement(this);
 		}
-		
+				
 	}
 
 	@Override
@@ -114,5 +107,8 @@ public class SwitchStatement extends Statement{
 		
 	}
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitSwitchStatement(this);
+	}
 	
 }

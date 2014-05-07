@@ -1,9 +1,8 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
@@ -12,10 +11,6 @@ public class ContinueStatement extends Statement{
 	
 	public ContinueStatement(Scope parent){
 		super(parent);
-	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<statement type=\"continue\"/>\n");
 	}
 
 	public void makeCallGraph(){
@@ -32,4 +27,7 @@ public class ContinueStatement extends Statement{
 	public void generateHDL(HDLModule m) {
 	}
 
+	public void accept(SynthesijerAstVisitor v){
+		v.visitContinueStatement(this);
+	}
 }

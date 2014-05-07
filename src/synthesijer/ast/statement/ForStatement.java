@@ -1,15 +1,14 @@
 package synthesijer.ast.statement;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
@@ -46,17 +45,33 @@ public class ForStatement extends Statement implements Scope {
 	public void addInitialize(Statement s) {
 		initializations.add(s);
 	}
+	
+	public ArrayList<Statement> getInitializations(){
+		return initializations;
+	}
 
 	public void setCondition(Expr expr) {
 		condition = expr;
+	}
+	
+	public Expr getCondition(){
+		return condition;
 	}
 
 	public void addUpdate(Statement s) {
 		updates.add(s);
 	}
 
+	public ArrayList<Statement> getUpdates(){
+		return updates;
+	}
+
 	public void setBody(Statement s) {
 		this.body = s;
+	}
+	
+	public Statement getBody(){
+		return body;
 	}
 
 	public void makeCallGraph(){
@@ -95,26 +110,6 @@ public class ForStatement extends Statement implements Scope {
 		}
 		return d;
 	}
-
-	public void dumpAsXML(PrintWriter dest) {
-		dest.printf("<statement type=\"for\">\n");
-		dest.printf("<init>\n");
-		for (Statement s : initializations){
-			s.dumpAsXML(dest);
-		}
-		dest.printf("</init>\n");
-		dest.printf("<condition>\n");
-		condition.dumpAsXML(dest);
-		dest.printf("</condition>");
-		dest.printf("<update>\n");
-		for (Statement s : updates)
-			s.dumpAsXML(dest);
-		dest.printf("</update>");
-		dest.printf("<body>\n");
-		body.dumpAsXML(dest);
-		dest.printf("</body>\n");
-		dest.printf("</statement>\n");
-	}
 	
 	public void generateHDL(HDLModule m) {
 		for(Statement s: initializations){
@@ -125,5 +120,10 @@ public class ForStatement extends Statement implements Scope {
 			s.generateHDL(m);
 		}
 	}
+
+	public void accept(SynthesijerAstVisitor v){
+		v.visitForStatement(this);
+	}
+
 
 }

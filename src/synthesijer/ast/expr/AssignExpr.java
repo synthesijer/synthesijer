@@ -1,9 +1,8 @@
 package synthesijer.ast.expr;
 
-import java.io.PrintWriter;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 
 public class AssignExpr extends Expr{
@@ -21,26 +20,26 @@ public class AssignExpr extends Expr{
 	public void setRhs(Expr expr){
 		rhs = expr;
 	}
+
+	public Expr getLhs(){
+		return lhs;
+	}
 	
+	public Expr getRhs(){
+		return rhs;
+	}
+
 	public void makeCallGraph(){
 		lhs.makeCallGraph();
 		rhs.makeCallGraph();
-	}
-
-	public void dumpAsXML(PrintWriter dest){
-		dest.printf("<expr kind=\"%s\">", "AssignExpr");
-		dest.printf("<lhs>");
-		lhs.dumpAsXML(dest);
-		dest.printf("</lhs>");
-		dest.printf("<rhs>");
-		rhs.dumpAsXML(dest);
-		dest.printf("</rhs>");
-		dest.printf("</expr>\n");
 	}
 	
 	public HDLExpr getHDLExprResult(){
 		return lhs.getHDLExprResult();
 	}
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitAssignExpr(this);
+	}
 	
 }
