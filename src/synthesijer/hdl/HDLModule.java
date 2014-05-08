@@ -14,7 +14,10 @@ public class HDLModule implements HDLTree{
 	
 	private ArrayList<HDLPort> ports = new ArrayList<HDLPort>();
 	private ArrayList<HDLSignal> signals = new ArrayList<HDLSignal>();
-	private ArrayList<HDLSequencer> statemachines = new ArrayList<HDLSequencer>();
+	private ArrayList<HDLSequencer> sequencer = new ArrayList<HDLSequencer>();
+	private ArrayList<HDLUserDefinedType> usertype = new ArrayList<HDLUserDefinedType>();
+	private ArrayList<HDLInstance> submodules = new ArrayList<HDLInstance>();
+	private ArrayList<HDLExpr> exprs = new ArrayList<HDLExpr>();
 	
 	public HDLModule(String name, String sysClkName, String sysResetName){
 		this.name = name;
@@ -53,11 +56,11 @@ public class HDLModule implements HDLTree{
 	}
 	
 	public void addStateMachine(HDLSequencer m){
-		statemachines.add(m);
+		sequencer.add(m);
 	}
 	
 	public ArrayList<HDLSequencer> getSequencers(){
-		return statemachines;
+		return sequencer;
 	}
 	
 	public void genVHDL(PrintWriter dest){
