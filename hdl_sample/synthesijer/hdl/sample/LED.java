@@ -42,6 +42,25 @@ public class LED {
 		HDLInstance inst = m.newModuleInstance(led, "U");
 		HDLSignal clk = m.newSignal("clk", HDLPrimitiveType.genBitType());
 		
+/*
+		  process
+		  begin
+		    clk <= '1'; wait for STEP/2;
+		    clk <= '0'; reset <= '1'; wait for STEP/2;
+		    clk <= '1'; wait for STEP/2;
+		    clk <= '0'; wait for STEP/2;
+		    clk <= '1'; wait for STEP/2;
+		    clk <= '0'; wait for STEP/2;
+		    clk <= '1'; reset <= '0'; wait for STEP/2;
+		    clk <= '0'; wait for STEP/2;
+		    clk <= '1'; wait for STEP/2;
+		    clk <= '0'; wait for STEP/2;
+		    while true loop
+		      clk <= '1'; wait for STEP/2;
+		      clk <= '0'; wait for STEP/2;
+		    end loop;
+		  end process;
+*/
 		/*
 		HDLSequencer seq = m.newSequencer("main");
 		
