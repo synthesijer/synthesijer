@@ -1,22 +1,28 @@
 package synthesijer.hdl;
 
-import synthesijer.hdl.literal.HDLSymbol;
+import synthesijer.hdl.literal.HDLValue;
 
-public class HDLUserDefinedType extends HDLType implements HDLTree{
+
+public class HDLUserDefinedType implements HDLTree, HDLType{
 
 	private final String base;
-	private final HDLSymbol defaultValue;
-	private final HDLSymbol[] items;
+	private final String defaultValue;
+	private final String[] items;
+	private final KIND kind;
 	
-	public HDLUserDefinedType(String base, HDLSymbol[] items, int defaultValueIndex) {
-		super(HDLType.KIND.USERDEF, 0);
+	public HDLUserDefinedType(String base, String[] items, int defaultValueIndex) {
 		this.base = "Type_" + base;
 		this.items = items;
 		this.defaultValue = items[defaultValueIndex];
+		this.kind = KIND.USERDEF;
 	}
 	
 	public String getName(){
 		return base;
+	}
+	
+	public KIND getKind(){
+		return kind;
 	}
 	
 	public String getVHDL(){
@@ -28,10 +34,10 @@ public class HDLUserDefinedType extends HDLType implements HDLTree{
 	}
 	
 	public HDLLiteral getDefaultValue(){
-		return defaultValue;
+		return new HDLValue(defaultValue, HDLPrimitiveType.genStringType());
 	}
 	
-	public HDLSymbol[] getItems(){
+	public String[] getItems(){
 		return items;
 	}
 		

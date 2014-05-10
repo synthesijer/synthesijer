@@ -6,7 +6,7 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLSignal;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 
 public class ArrayAccess extends Expr{
 	
@@ -36,7 +36,7 @@ public class ArrayAccess extends Expr{
 	public HDLExpr getHDLExprResult(HDLModule m) {
 		if(indexed instanceof Ident){
 			String rdata = ((Ident)indexed).getSymbol() + "_rdata";
-			HDLSignal id = m.newSignal(rdata, HDLType.genVectorType(32));
+			HDLSignal id = m.newSignal(rdata, HDLPrimitiveType.genVectorType(32));
 			return id;
 		}else{
 			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", indexed, indexed.getClass()));

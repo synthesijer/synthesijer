@@ -7,10 +7,10 @@ import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
+import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
-import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
 
@@ -26,8 +26,8 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLExpr(HDLExpr o) {
-		// TODO Auto-generated method stub
-		
+		String str = String.format("assign %s = %s;", o.getResultExpr().getVerilogHDL(), o.getVerilogHDL());
+		HDLUtils.println(dest, offset, str);
 	}
 
 	@Override
@@ -54,12 +54,18 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, "\n);");
 		HDLUtils.nl(dest);
 		// definitions
+		for(HDLPort p: o.getPorts()){
+			if(p.isOutput()) p.getSrcSignal().accept(new GenerateVerilogDefVisitor(dest, offset+2));
+		}
+		HDLUtils.nl(dest);
 		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVerilogDefVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
 		for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVerilogDefVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
 		// body
 		for(HDLPort p: o.getPorts()){ p.accept(new GenerateVerilogVisitor(dest, offset+2)); }
+		HDLUtils.nl(dest);
+		for(HDLExpr expr : o.getExprs()){ expr.accept(new GenerateVerilogVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
 		for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVerilogVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
@@ -71,6 +77,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	public void visitHDLPort(HDLPort o) {
 		if(o.isOutput()){
 			HDLUtils.println(dest, offset, String.format("assign %s = %s;", o.getName(), o.getSrcSignal().getName()));
+			o.getSrcSignal().accept(this);
 		}
 	}
 
@@ -114,9 +121,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		}
 	}
 
-
-	@Override
-	public void visitHDLSignal(HDLSignal o) {
+	private void genSignalRegisterProcess(HDLSignal o){
 		HDLUtils.println(dest, offset, String.format("always @(posedge %s) begin", o.getModule().getSysClkName()));
 		HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b1) begin", o.getModule().getSysResetName()));
 		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getResetValue().getVerilogHDL()));
@@ -134,9 +139,19 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, "end");
 		HDLUtils.nl(dest);
 	}
+	
+	
+	@Override
+	public void visitHDLSignal(HDLSignal o) {
+		if(o.isRegister()){
+			genSignalRegisterProcess(o);
+		}else if(o.isAssignAlways()){
+			HDLUtils.println(dest, offset, String.format("assign %s = %s;", o.getName(), o.getAssignAlwaysExpr().getResultExpr().getVHDL()));
+		}
+	}
 
 	@Override
-	public void visitHDLType(HDLType o) {
+	public void visitHDLType(HDLPrimitiveType o) {
 		// TODO Auto-generated method stub
 		
 	}

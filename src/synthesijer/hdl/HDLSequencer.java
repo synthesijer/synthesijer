@@ -63,7 +63,11 @@ public class HDLSequencer implements HDLTree{
 		public void addStateTransit(SequencerState dest, String phaseKey, String phaseId, HDLExpr cond, HDLExpr condValue){
 			transitions.add(new StateTransitCondition(key, id, phaseKey, phaseId, cond, condValue, dest));
 		}
-		
+
+		public void addStateTransit(SequencerState dest){
+			transitions.add(new StateTransitCondition(key, id, null, null, null, null, dest));
+		}
+
 		public ArrayList<StateTransitCondition> getTransitions(){
 			return transitions;
 		}
@@ -94,16 +98,30 @@ public class HDLSequencer implements HDLTree{
 		}
 		
 		public String getCondExprAsVHDL(){
-			String s = stateKey + " = " + stateId;
-			if(phaseId != null) s += " and " + phaseKey + " = " + phaseId;
-			if(cond != null) s += " and " + cond.getVHDL() + " = " + condValue.getVHDL();
+			String s = "";
+			String sep = "";
+			if(phaseId != null){
+				s += sep + phaseKey + " = " + phaseId;
+				sep = " and ";
+			}
+			if(cond != null){
+				s += sep + cond.getVHDL() + " = " + condValue.getVHDL();
+				sep = " and ";
+			}
 			return s;
 		}
 		
 		public String getCondExprAsVerilogHDL(){
-			String s = stateKey + " == " + stateId;
-			if(phaseId != null) s += " && " + phaseKey + " == " + phaseId;
-			if(cond != null) s += " && " + cond.getVerilogHDL() + " == " + condValue.getVerilogHDL();
+			String s = "";
+			String sep = "";
+			if(phaseId != null){
+				s += sep + phaseKey + " == " + phaseId;
+				sep = " && ";
+			}
+			if(cond != null){
+				s += sep + cond.getVerilogHDL() + " == " + condValue.getVerilogHDL();
+				sep = " && ";
+			}
 			return s;
 		}
 	}

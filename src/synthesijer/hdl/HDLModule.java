@@ -25,8 +25,14 @@ public class HDLModule implements HDLTree{
 		this.name = name;
 		this.sysClkName = sysClkName;
 		this.sysResetName = sysResetName;
-		newPort(sysClkName, HDLPort.DIR.IN, HDLType.genBitType());
-		newPort(sysResetName, HDLPort.DIR.IN, HDLType.genBitType());
+		newPort(sysClkName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		newPort(sysResetName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+	}
+	
+	public HDLModule(String name){
+		this.name = name;
+		sysClkName = "";
+		sysResetName = "";
 	}
 	
 	public String getName(){
@@ -56,9 +62,23 @@ public class HDLModule implements HDLTree{
 	}
 	
 	public HDLExpr newExpr(HDLOp op, HDLSignal arg0, int value){
-		return newExpr(op, arg0, new HDLValue(String.valueOf(value), HDLValue.Type.INTEGER, 0));
+		return newExpr(op, arg0, new HDLValue(String.valueOf(value), HDLPrimitiveType.genIntegerType()));
 	}
 	
+	public ArrayList<HDLExpr> getExprs(){
+		return exprs;
+	}
+
+	public HDLInstance newModuleInstance(HDLModule m, String n){
+		HDLInstance obj = new HDLInstance(this, n, m);
+		submodules.add(obj);
+		return obj;
+	}
+	
+	public ArrayList<HDLInstance> getModuleInstances(){
+		return submodules;
+	}
+		
 	private int getExprUniqueId(){
 		return exprs.size() + 1;
 	}

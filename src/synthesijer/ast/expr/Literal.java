@@ -5,6 +5,7 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.literal.HDLValue;
 
 public class Literal extends Expr{
@@ -119,28 +120,12 @@ public class Literal extends Expr{
 		}
 	}
 	
-	private HDLValue.Type getHDLValueType(){
-		switch(kind){
-		case BOOLEAN:
-			return HDLValue.Type.BIT;
-		case BYTE:
-		case SHORT:
-		case INT:
-		case LONG:
-			return HDLValue.Type.SIGNED;
-		case CHAR:
-		case DOUBLE:
-		case FLOAT:
-			return HDLValue.Type.VECTOR;
-		case STRING:
-		case NULL:
-		default:
-			return HDLValue.Type.UNKNOWN;
-		}
+	private HDLPrimitiveType getHDLValueType(){
+		return HDLPrimitiveType.genUnkonwType();
 	}
 	
 	public HDLExpr getHDLExprResult(HDLModule m){
-		return new HDLValue(getValueAsStr(), getHDLValueType(), width);
+		return new HDLValue(getValueAsStr(), getHDLValueType());
 	}
 
 	public void accept(SynthesijerAstVisitor v){

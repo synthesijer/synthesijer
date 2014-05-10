@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import synthesijer.SynthesijerUtils;
+
 public class HDLUtils {
 	
 	public static void println(PrintWriter dest, int offset, String str){
@@ -34,13 +36,20 @@ public class HDLUtils {
 	public static final Format VHDL = Format.VHDL; 
 	public static final Format Verilog = Format.Verilog; 
 	
-	public static void generate(HDLModule m, Format f) throws IOException{
+	public static void generate(HDLModule m, Format f){
 		String ext = f == Format.VHDL ? ".vhd" : ".v";
-		PrintWriter dest = new PrintWriter(new FileOutputStream(new File(m.getName() + ext)), true);
-		if(f == Format.VHDL){
-			m.genVHDL(dest);
-		}else{
-			m.genVerilogHDL(dest);
+		PrintWriter dest = null;
+		try{
+			dest = new PrintWriter(new FileOutputStream(new File(m.getName() + ext)), true);
+			if(f == Format.VHDL){
+				m.genVHDL(dest);
+			}else{
+				m.genVerilogHDL(dest);
+			}
+		}catch(IOException e){
+			SynthesijerUtils.error(e.toString());
+		}finally{
+			if(dest != null) dest.close();
 		}
 	}
 

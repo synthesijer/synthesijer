@@ -3,10 +3,11 @@ package synthesijer.hdl.literal;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLTreeVisitor;
+import synthesijer.hdl.HDLPrimitiveType;
 
 public enum HDLConstant implements HDLLiteral{
 	
-	INTEGER_ZERO("(ohters => '0')", "0"),
+	INTEGER_ZERO("(others => '0')", "0"),
 	BOOLEAN_TRUE("true", "1'b1"),
 	BOOLEAN_FALSE("false", "1'b0");
 	
@@ -32,6 +33,17 @@ public enum HDLConstant implements HDLLiteral{
 	
 	public HDLExpr getResultExpr(){
 		return this;
+	}
+	
+	public HDLPrimitiveType getType(){
+		switch(this){
+		case BOOLEAN_FALSE:
+		case BOOLEAN_TRUE:
+			return HDLPrimitiveType.genBitType();
+		case INTEGER_ZERO:
+			return HDLPrimitiveType.genVectorType(-1);
+		default: return HDLPrimitiveType.genUnkonwType();
+		}
 	}
 
 }

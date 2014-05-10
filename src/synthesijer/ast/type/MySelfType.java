@@ -2,11 +2,11 @@ package synthesijer.ast.type;
 
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 
 public class MySelfType implements Type{
 	
-	public HDLType getHDLType(){
+	public HDLPrimitiveType getHDLType(){
 		System.err.println("unsupported type: " + this);
 		return null;
 	}

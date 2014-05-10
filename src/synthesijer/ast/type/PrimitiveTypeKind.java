@@ -2,7 +2,7 @@ package synthesijer.ast.type;
 
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 
 public enum PrimitiveTypeKind implements Type{
 
@@ -27,25 +27,25 @@ public enum PrimitiveTypeKind implements Type{
 	WILDCARD,
 	UNDEFIEND;
 	
-	public HDLType getHDLType(){
+	public HDLPrimitiveType getHDLType(){
 		if(this == PrimitiveTypeKind.BOOLEAN){
-			return HDLType.genBitType(); 
+			return HDLPrimitiveType.genBitType(); 
 		}else if(this == PrimitiveTypeKind.BYTE){
-			return HDLType.genSignedType(8);
+			return HDLPrimitiveType.genSignedType(8);
 		}else if(this == PrimitiveTypeKind.CHAR){
-			return HDLType.genVectorType(16);
+			return HDLPrimitiveType.genVectorType(16);
 		}else if(this == PrimitiveTypeKind.SHORT){
-			return HDLType.genSignedType(16);
+			return HDLPrimitiveType.genSignedType(16);
 		}else if(this == PrimitiveTypeKind.INT){
-			return HDLType.genSignedType(32);
+			return HDLPrimitiveType.genSignedType(32);
 		}else if(this == PrimitiveTypeKind.LONG){
-			return HDLType.genSignedType(64);
+			return HDLPrimitiveType.genSignedType(64);
 		}else if(this == PrimitiveTypeKind.FLOAT){
-			return HDLType.genVectorType(32);
+			return HDLPrimitiveType.genVectorType(32);
 		}else if(this == PrimitiveTypeKind.DOUBLE){
-			return HDLType.genVectorType(64);
+			return HDLPrimitiveType.genVectorType(64);
 		}else{
-			return HDLType.genUnkonwType();
+			return HDLPrimitiveType.genUnkonwType();
 		}
 	}
 

@@ -8,7 +8,7 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
-import synthesijer.hdl.literal.HDLSymbol;
+import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.model.State;
 import synthesijer.model.StateMachine;
 
@@ -105,13 +105,13 @@ public class Module implements Scope, SynthesijerAstTree{
 		for(VariableDecl v: variables){
 			v.genHDLSignal(hm);
 		}
-		ArrayList<HDLSymbol> methodIds = new ArrayList<HDLSymbol>();
-		methodIds.add(new HDLSymbol("methodId_IDLE"));
+		ArrayList<String> methodIds = new ArrayList<String>();
+		methodIds.add(new String("methodId_IDLE"));
 		for(Method m: methods){
 			if(m.isConstructor()) continue;
-			methodIds.add(new HDLSymbol(m.getUniqueName("methodID_")));
+			methodIds.add(m.getUniqueName("methodID_"));
 		}
-		HDLType t = HDLType.genUserDefType("methodId", methodIds.toArray(new HDLSymbol[]{}), 0);
+		HDLType t = new HDLUserDefinedType("methodId", methodIds.toArray(new String[]{}), 0);
 		hm.newSignal("methodId", t, HDLSignal.ResourceKind.REGISTER);
 		for(Method method: methods){
 			method.generateHDL(hm);

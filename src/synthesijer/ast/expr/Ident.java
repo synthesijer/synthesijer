@@ -5,7 +5,7 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 
 public class Ident extends Expr{
 	
@@ -24,7 +24,7 @@ public class Ident extends Expr{
 	}
 	
 	public HDLExpr getHDLExprResult(HDLModule m){
-		return m.newSignal(symbol, HDLType.genVectorType(32));
+		return m.newSignal(symbol, HDLPrimitiveType.genVectorType(32));
 	}
 
 	public void accept(SynthesijerAstVisitor v){

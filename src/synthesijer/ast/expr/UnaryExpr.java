@@ -7,7 +7,7 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLSignal;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 
 public class UnaryExpr extends Expr{
 	
@@ -35,7 +35,7 @@ public class UnaryExpr extends Expr{
 	}
 	
 	public HDLExpr getHDLExprResult(HDLModule m){
-		HDLSignal id = m.newSignal("binaryexpr_result_" + this.hashCode(), HDLType.genVectorType(32));
+		HDLSignal id = m.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
 		return id;
 	}
 

@@ -16,7 +16,7 @@ public interface HDLTreeVisitor {
 
 	public void visitHDLSignal(HDLSignal o);
 
-	public void visitHDLType(HDLType o);
+	public void visitHDLType(HDLPrimitiveType o);
 
 	public void visitHDLUserDefinedType(HDLUserDefinedType o);
 

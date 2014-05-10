@@ -5,7 +5,7 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 
 public class FieldAccess extends Expr{
 	
@@ -33,7 +33,7 @@ public class FieldAccess extends Expr{
 	}
 		
 	public HDLExpr getHDLExprResult(HDLModule m){
-		return m.newSignal(String.format("%s_%s", selected, ident), HDLType.genVectorType(32));
+		return m.newSignal(String.format("%s_%s", selected, ident), HDLPrimitiveType.genVectorType(32));
 	}
 	
 	

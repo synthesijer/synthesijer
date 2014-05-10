@@ -6,5 +6,6 @@ public interface HDLExpr extends HDLTree{
 	public String getVerilogHDL();
 	
 	public HDLExpr getResultExpr();
+	public HDLType getType();	
 
 }

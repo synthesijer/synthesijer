@@ -7,11 +7,14 @@ public class HDLSignal implements HDLTree, HDLExpr{
 	private final HDLModule module;
 	private final String name;
 	private final HDLType type;
-	private final ResourceKind kind;
+	private ResourceKind kind;
 	
 	private HDLExpr resetValue;
 	
 	private ArrayList<AssignmentCondition> conditions = new ArrayList<AssignmentCondition>();
+	
+	private boolean assignAlwaysFlag;
+	private HDLExpr assignAlwaysExpr;
 	
 	public enum ResourceKind{
 		REGISTER("reg"), WIRE("wire");
@@ -25,7 +28,8 @@ public class HDLSignal implements HDLTree, HDLExpr{
 		this.name = name;
 		this.type = type;
 		this.kind = kind;
-		resetValue = type.getDefaultValue(); 
+		resetValue = type.getDefaultValue();
+		assignAlwaysFlag = false;
 	}
 	
 	public String getName(){
@@ -57,9 +61,22 @@ public class HDLSignal implements HDLTree, HDLExpr{
 	}
 	
 	public void setAssign(HDLSequencer.SequencerState s, HDLExpr expr){
-		System.out.println(expr);
-		AssignmentCondition c = new AssignmentCondition(s, expr);
-		conditions.add(c);
+		if(s != null){
+			AssignmentCondition c = new AssignmentCondition(s, expr);
+			conditions.add(c);
+		}else{
+			kind = ResourceKind.WIRE; // change resource kind to allow using "assign" statement
+			assignAlwaysFlag = true;
+			assignAlwaysExpr = expr;
+		}
+	}
+	
+	public boolean isAssignAlways(){
+		return assignAlwaysFlag;
+	}
+	
+	public HDLExpr getAssignAlwaysExpr(){
+		return assignAlwaysExpr;
 	}
 	
 	public void setAssignCondition(String methodId, String stateKey, String stateId, String phaseKey, String phaseId, HDLExpr value){
@@ -130,14 +147,12 @@ public class HDLSignal implements HDLTree, HDLExpr{
 
 	@Override
 	public String getVHDL() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
 	public String getVerilogHDL() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override

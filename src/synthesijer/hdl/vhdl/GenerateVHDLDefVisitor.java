@@ -10,10 +10,9 @@ import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
-import synthesijer.hdl.literal.HDLSymbol;
 
 public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	
@@ -33,8 +32,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLInstance(HDLInstance o) {
-		// TODO Auto-generated method stub
-		
+		HDLUtils.println(dest, offset, String.format("component %s", o.getSubModule().getName()));
+		GenerateVHDLVisitor.genPortList(dest, offset+2, o.getSubModule().getPorts());
+		HDLUtils.println(dest, offset, String.format("end component %s;", o.getSubModule().getName()));
 	}
 
 	@Override
@@ -73,11 +73,17 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		if(o.getType() instanceof HDLUserDefinedType){
 			((HDLUserDefinedType)o.getType()).accept(this);
 		}
-		HDLUtils.println(dest, offset, String.format("signal %s : %s;", o.getName(), o.getType().getVHDL()));
+		String s;
+		if(o.getResetValue() != null && o.isRegister()){
+			s = String.format("signal %s : %s := %s;", o.getName(), o.getType().getVHDL(), o.getResetValue().getVHDL());
+		}else{
+			s = String.format("signal %s : %s;", o.getName(), o.getType().getVHDL());
+		}
+		HDLUtils.println(dest, offset, s);
 	}
 
 	@Override
-	public void visitHDLType(HDLType o) {
+	public void visitHDLType(HDLPrimitiveType o) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -86,9 +92,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	public void visitHDLUserDefinedType(HDLUserDefinedType o) {
 		HDLUtils.println(dest, offset, String.format("type %s is (", o.getName()));
 		String sep = "";
-		for(HDLSymbol s: o.getItems()){
+		for(String s: o.getItems()){
 			HDLUtils.print(dest, 0, sep);
-			HDLUtils.print(dest, offset+2, String.format("%s", s.getSymbol()));
+			HDLUtils.print(dest, offset+2, String.format("%s", s));
 				sep = ",\n";
 		}
 		HDLUtils.println(dest, offset, String.format("\n  );"));

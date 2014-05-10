@@ -46,7 +46,7 @@ public class HDLTreeVisitorBase implements HDLTreeVisitor{
 	}
 
 	@Override
-	public void visitHDLType(HDLType o) {
+	public void visitHDLType(HDLPrimitiveType o) {
 		visitHDLTree(o);
 	}
 

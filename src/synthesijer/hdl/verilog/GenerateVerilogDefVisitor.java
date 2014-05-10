@@ -10,7 +10,7 @@ import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
-import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
 
@@ -58,7 +58,7 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 		for(int i = 0; i < o.getStates().size(); i++){
 			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getStates().get(i).getStateId(), i));
 		}
-		HDLUtils.println(dest, offset, String.format("reg [31:0] %s;", o.getStateKey()));
+		HDLUtils.println(dest, offset, String.format("reg [31:0] %s = %s;", o.getStateKey(), o.getIdleState().getStateId()));
 		HDLUtils.nl(dest);
 	}
 
@@ -67,11 +67,17 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 		if(o.getType() instanceof HDLUserDefinedType){
 			((HDLUserDefinedType) o.getType()).accept(this);
 		}
-		HDLUtils.println(dest, offset, String.format("%s %s %s;", o.getKind().toString(), o.getType().getVerilogHDL(), o.getName()));
+		String s;
+		if(o.getResetValue() != null && o.isRegister()){
+			s = String.format("%s %s %s = %s;", o.getKind().toString(), o.getType().getVerilogHDL(), o.getName(), o.getResetValue().getVerilogHDL());
+		}else{
+			s = String.format("%s %s %s;", o.getKind().toString(), o.getType().getVerilogHDL(), o.getName());
+		}
+		HDLUtils.println(dest, offset, s);
 	}
 
 	@Override
-	public void visitHDLType(HDLType o) {
+	public void visitHDLType(HDLPrimitiveType o) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -79,7 +85,7 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLUserDefinedType(HDLUserDefinedType o) {
 		for(int i = 0; i < o.getItems().length; i++){
-			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getItems()[i].getSymbol(), i));
+			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getItems()[i], i));
 		}
 	}
 
