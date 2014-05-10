@@ -9,12 +9,13 @@ public class HDLPort implements HDLTree{
 	
 	private final HDLType type;
 	
-	private HDLSignal srcSig;
+	private final HDLSignal srcSig;
 	
-	public HDLPort(String name, DIR dir, HDLType type){
+	HDLPort(HDLModule m, String name, DIR dir, HDLType type){
 		this.name = name;
 		this.dir = dir;
 		this.type = type;
+		this.srcSig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.REGISTER);
 	}
 	
 	public String getName(){
@@ -33,10 +34,6 @@ public class HDLPort implements HDLTree{
 		return type;
 	}
 		
-	public void setSrcSignal(HDLSignal src){
-		srcSig = src;
-	}
-	
 	public HDLSignal getSrcSignal(){
 		return srcSig;
 	}

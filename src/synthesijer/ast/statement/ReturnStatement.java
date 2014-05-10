@@ -38,7 +38,7 @@ public class ReturnStatement extends ExprContainStatement{
 		if(expr != null){
 			HDLSignal sig = getScope().getMethod().getHDLReturnSignal();
 			String methodId = getScope().getMethod().getName();
-			sig.setAssignCondition(methodId, state.getBase(), state.getId(), expr.getHDLExprResult());
+			sig.setAssignCondition(methodId, state.getBase(), state.getId(), expr.getHDLExprResult(m));
 		}
 	}
 

@@ -1,12 +1,13 @@
 package synthesijer.hdl.literal;
 
+import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLTreeVisitor;
 
 public class HDLValue implements HDLLiteral{
 	
 	public enum Type{
-		VECTOR, SIGNED, BIT, UNKNOWN
+		VECTOR, SIGNED, BIT, INTEGER, UNKNOWN
 	}
 	
 	private final int width;
@@ -21,32 +22,40 @@ public class HDLValue implements HDLLiteral{
 
 	@Override
 	public String getVHDL() {
-		if(type == Type.VECTOR || type == Type.SIGNED){
+		switch(type){
+		case VECTOR:
+		case SIGNED:
 			String v = String.format("%064x", Long.parseLong(value));
 			return String.format("X\"%s\"", v.substring(v.length()-1-width/4, v.length()-1));
-		}else if(type == Type.BIT){
+		case BIT :
 			if(value.equals("true")){
 				return "'1'";
 			}else{
 				return "'0'";
 			}
-		}else{
+		case INTEGER:
+			return String.valueOf(value);
+		default:
 			return "UNKNWON(" + value + ")";
 		}
 	}
 
 	@Override
 	public String getVerilogHDL() {
-		if(type == Type.VECTOR || type == Type.SIGNED){
+		switch(type){
+		case VECTOR:
+		case SIGNED:
 			String v = String.format("%064x", Long.parseLong(value));
 			return String.format("%d'h%s", width, v.substring(v.length()-1-width/4, v.length()-1));
-		}else if(type == Type.BIT){
+		case BIT:
 			if(value.equals("true")){
 				return "1'b1";
 			}else{
 				return "1'b0";
 			}
-		}else{
+		case INTEGER:
+			return String.valueOf(value);
+		default:
 			return "UNKNWON(" + value + ")";
 		}
 	}
@@ -55,4 +64,10 @@ public class HDLValue implements HDLLiteral{
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLLitral(this);
 	}
+	
+	@Override
+	public HDLExpr getResultExpr() {
+		return this;
+	}
+
 }

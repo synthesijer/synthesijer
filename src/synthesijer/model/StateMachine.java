@@ -44,7 +44,7 @@ public class StateMachine {
 	}
 
 	public HDLSequencer genHDLSequencer(HDLModule hm){
-		HDLSequencer hs = new HDLSequencer(hm, getKey());
+		HDLSequencer hs = hm.newSequencer(getKey());
 		Hashtable<State, HDLSequencer.SequencerState> map = new Hashtable<State, HDLSequencer.SequencerState>();
 		for(State s: stateList){
 			map.put(s, hs.addSequencerState(s.getId()));

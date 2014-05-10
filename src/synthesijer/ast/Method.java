@@ -190,10 +190,7 @@ public class Method implements Scope, SynthesijerAstTree{
 		if(type == PrimitiveTypeKind.VOID) return;
 		HDLType t = type.getHDLType();
 		if(type instanceof PrimitiveTypeKind){
-			HDLPort port = new HDLPort(name + "_return_out", HDLPort.DIR.OUT, t);
-			m.addPort(port);
-			port.setSrcSignal(getHDLReturnSignal(m, name + "_return", t));
-			m.addSignal(getHDLReturnSignal(m, name + "_return", t));
+			m.newPort(name + "_return", HDLPort.DIR.OUT, t);
 		}else if(type instanceof ArrayType){
 			System.err.println("unsupported type: " + type);
 		}else if(type instanceof ComponentType){

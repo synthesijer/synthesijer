@@ -1,5 +1,8 @@
 package synthesijer.hdl;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 public class HDLUtils {
@@ -22,6 +25,23 @@ public class HDLUtils {
 			s += " ";
 		}
 		return s;
+	}
+	
+	enum Format{
+		VHDL, Verilog
+	};
+	
+	public static final Format VHDL = Format.VHDL; 
+	public static final Format Verilog = Format.Verilog; 
+	
+	public static void generate(HDLModule m, Format f) throws IOException{
+		String ext = f == Format.VHDL ? ".vhd" : ".v";
+		PrintWriter dest = new PrintWriter(new FileOutputStream(new File(m.getName() + ext)), true);
+		if(f == Format.VHDL){
+			m.genVHDL(dest);
+		}else{
+			m.genVerilogHDL(dest);
+		}
 	}
 
 }

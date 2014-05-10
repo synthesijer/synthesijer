@@ -16,11 +16,6 @@ public class HDLTreeVisitorBase implements HDLTreeVisitor{
 	}
 
 	@Override
-	public void visitHDLIdent(HDLIdent o) {
-		visitHDLTree(o);
-	}
-
-	@Override
 	public void visitHDLInstance(HDLInstance o) {
 		visitHDLTree(o);
 	}

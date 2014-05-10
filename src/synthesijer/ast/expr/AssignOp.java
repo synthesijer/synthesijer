@@ -5,6 +5,7 @@ import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
+import synthesijer.hdl.HDLModule;
 
 public class AssignOp extends Expr{
 	
@@ -39,8 +40,8 @@ public class AssignOp extends Expr{
 		return op;
 	}
 	
-	public HDLExpr getHDLExprResult(){
-		return lhs.getHDLExprResult();
+	public HDLExpr getHDLExprResult(HDLModule m){
+		return lhs.getHDLExprResult(m);
 	}
 
 	public void accept(SynthesijerAstVisitor v){

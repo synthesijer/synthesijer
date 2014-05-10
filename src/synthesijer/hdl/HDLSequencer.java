@@ -67,7 +67,7 @@ public class HDLSequencer implements HDLTree{
 		public ArrayList<StateTransitCondition> getTransitions(){
 			return transitions;
 		}
-				
+		
 	}
 	
 	public class StateTransitCondition{

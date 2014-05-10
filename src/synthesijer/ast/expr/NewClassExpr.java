@@ -6,6 +6,7 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
+import synthesijer.hdl.HDLModule;
 
 public class NewClassExpr extends Expr{
 	
@@ -32,7 +33,7 @@ public class NewClassExpr extends Expr{
 		return params;
 	}
 
-	public HDLExpr getHDLExprResult(){
+	public HDLExpr getHDLExprResult(HDLModule m){
 		return null;
 	}
 

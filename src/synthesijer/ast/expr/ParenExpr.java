@@ -4,6 +4,7 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
+import synthesijer.hdl.HDLModule;
 
 public class ParenExpr extends Expr{
 	
@@ -21,8 +22,8 @@ public class ParenExpr extends Expr{
 		return this.expr;
 	}
 			
-	public HDLExpr getHDLExprResult(){
-		return expr.getHDLExprResult();
+	public HDLExpr getHDLExprResult(HDLModule m){
+		return expr.getHDLExprResult(m);
 	}
 
 	public void accept(SynthesijerAstVisitor v){

@@ -3,7 +3,6 @@ package synthesijer.hdl.vhdl;
 import java.io.PrintWriter;
 
 import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLIdent;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
@@ -27,12 +26,6 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLExpr(HDLExpr o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitHDLIdent(HDLIdent o) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -126,9 +119,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		}
 	}
 
-
-	@Override
-	public void visitHDLSignal(HDLSignal o) {
+	private void genSignalRegisterProcess(HDLSignal o){
 		HDLUtils.println(dest, offset, String.format("process(%s)", o.getModule().getSysClkName()));
 		HDLUtils.println(dest, offset, "begin");
 		HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
@@ -150,6 +141,13 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset+2, String.format("end if;"));
 		HDLUtils.println(dest, offset, "end process;");
 		HDLUtils.nl(dest);
+	}
+		
+	@Override
+	public void visitHDLSignal(HDLSignal o) {
+		if(o.isRegister()){
+			genSignalRegisterProcess(o);
+		}
 	}
 
 	@Override

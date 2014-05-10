@@ -1,5 +1,6 @@
 package synthesijer.hdl.literal;
 
+import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLTreeVisitor;
 
@@ -28,6 +29,11 @@ public class HDLSymbol implements HDLLiteral{
 	@Override
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLLitral(this);
+	}
+	
+	@Override
+	public HDLExpr getResultExpr() {
+		return this;
 	}
 
 }

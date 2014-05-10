@@ -4,6 +4,7 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
+import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.literal.HDLValue;
 
 public class Literal extends Expr{
@@ -138,7 +139,7 @@ public class Literal extends Expr{
 		}
 	}
 	
-	public HDLExpr getHDLExprResult(){
+	public HDLExpr getHDLExprResult(HDLModule m){
 		return new HDLValue(getValueAsStr(), getHDLValueType(), width);
 	}
 

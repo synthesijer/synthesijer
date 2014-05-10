@@ -4,8 +4,6 @@ public interface HDLTreeVisitor {
 
 	public void visitHDLExpr(HDLExpr o);
 
-	public void visitHDLIdent(HDLIdent o);
-
 	public void visitHDLInstance(HDLInstance o);
 
 	public void visitHDLLitral(HDLLiteral o);

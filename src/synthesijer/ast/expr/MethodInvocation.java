@@ -6,7 +6,8 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLIdent;
+import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLType;
 
 public class MethodInvocation extends Expr{
 	
@@ -42,8 +43,8 @@ public class MethodInvocation extends Expr{
 		return method.toString();
 	}
 	
-	public HDLExpr getHDLExprResult(){
-		return new HDLIdent(getMethodName() + "_return_value");
+	public HDLExpr getHDLExprResult(HDLModule m){
+		return m.newSignal(getMethodName() + "_return_value", HDLType.genVectorType(32));
 	}
 
 	public void accept(SynthesijerAstVisitor v){

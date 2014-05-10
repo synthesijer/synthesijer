@@ -2,7 +2,7 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
-public class HDLSignal implements HDLTree{
+public class HDLSignal implements HDLTree, HDLExpr{
 	
 	private final HDLModule module;
 	private final String name;
@@ -40,6 +40,10 @@ public class HDLSignal implements HDLTree{
 		return kind;
 	}
 	
+	public boolean isRegister(){
+		return kind == ResourceKind.REGISTER;
+	}
+	
 	public HDLModule getModule(){
 		return module;
 	}
@@ -50,6 +54,12 @@ public class HDLSignal implements HDLTree{
 	
 	public HDLExpr getResetValue(){
 		return resetValue;
+	}
+	
+	public void setAssign(HDLSequencer.SequencerState s, HDLExpr expr){
+		System.out.println(expr);
+		AssignmentCondition c = new AssignmentCondition(s, expr);
+		conditions.add(c);
 	}
 	
 	public void setAssignCondition(String methodId, String stateKey, String stateId, String phaseKey, String phaseId, HDLExpr value){
@@ -67,14 +77,16 @@ public class HDLSignal implements HDLTree{
 	}
 	
 	public class AssignmentCondition{
-		final String methodId;
-		final String stateKey;
-		final String stateId;
-		final String phaseKey;
-		final String phaseId;
-		final HDLExpr value;
+		String methodId;
+		String stateKey;
+		String stateId;
+		String phaseKey;
+		String phaseId;
+		private final HDLSequencer.SequencerState s;
+		private final HDLExpr value;
 		
 		AssignmentCondition(String methodId, String stateKey, String stateId, String phaseKey, String phaseId, HDLExpr value){
+			s = null;
 			this.methodId = methodId;
 			this.stateKey = stateKey;
 			this.stateId = stateId;
@@ -83,30 +95,54 @@ public class HDLSignal implements HDLTree{
 			this.value = value;
 		}
 		
+		public AssignmentCondition(HDLSequencer.SequencerState s, HDLExpr value) {
+			this.s = s;
+			this.value = value;
+		}
+		
 		public String getCondExprAsVHDL(){
-			if(phaseKey != null){
-				return String.format("methodId = %s and %s = %s and %s = %s", methodId, stateKey, stateId, phaseKey, phaseId);
-			}else{
-				return String.format("methodId = %s and %s = %s", methodId, stateKey, stateId);
-			}
+//			if(phaseKey != null){
+//				return String.format("methodId = %s and %s = %s and %s = %s", methodId, stateKey, stateId, phaseKey, phaseId);
+//			}else{
+//				return String.format("methodId = %s and %s = %s", methodId, stateKey, stateId);
+//			}
+			return s.getKey() + " = " + s.getStateId(); 
 		}
 
 		public String getCondExprAsVerilogHDL(){
-			if(phaseKey != null){
-				return String.format("methodId == %s && %s == %s && %s == %s", methodId, stateKey, stateId, phaseKey, phaseId);
-			}else{
-				return String.format("methodId == %s && %s == %s", methodId, stateKey, stateId);
-			}
+//			if(phaseKey != null){
+//				return String.format("methodId == %s && %s == %s && %s == %s", methodId, stateKey, stateId, phaseKey, phaseId);
+//			}else{
+//				return String.format("methodId == %s && %s == %s", methodId, stateKey, stateId);
+//			}
+			return s.getKey() + " == " + s.getStateId(); 
 		}
 		
 		public HDLExpr getValue(){
-			return value;
+			return value.getResultExpr();
 		}
 	}
 
 	@Override
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLSignal(this);
+	}
+
+	@Override
+	public String getVHDL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getVerilogHDL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HDLExpr getResultExpr() {
+		return this;
 	}
 	
 }

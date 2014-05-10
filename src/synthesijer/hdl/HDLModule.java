@@ -3,6 +3,8 @@ package synthesijer.hdl;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import synthesijer.hdl.expr.HDLBinaryExpr;
+import synthesijer.hdl.literal.HDLValue;
 import synthesijer.hdl.verilog.GenerateVerilogVisitor;
 import synthesijer.hdl.vhdl.GenerateVHDLVisitor;
 
@@ -23,26 +25,51 @@ public class HDLModule implements HDLTree{
 		this.name = name;
 		this.sysClkName = sysClkName;
 		this.sysResetName = sysResetName;
-		ports.add(new HDLPort(sysClkName, HDLPort.DIR.IN, HDLType.genBitType()));
-		ports.add(new HDLPort(sysResetName, HDLPort.DIR.IN, HDLType.genBitType()));
+		newPort(sysClkName, HDLPort.DIR.IN, HDLType.genBitType());
+		newPort(sysResetName, HDLPort.DIR.IN, HDLType.genBitType());
 	}
 	
 	public String getName(){
 		return name;
 	}
 	
-	public void addPort(HDLPort p){
-		ports.add(p);
+	public HDLPort newPort(String name, HDLPort.DIR dir, HDLType type){
+		HDLPort port = new HDLPort(this, name, dir, type);
+		ports.add(port);
+		return port;
 	}
 	
 	public ArrayList<HDLPort> getPorts(){
 		return ports;
 	}
 
-	public void addSignal(HDLSignal s){
-		signals.add(s);
+	public HDLSignal newSignal(String name, HDLType type, HDLSignal.ResourceKind kind){
+		HDLSignal sig = new HDLSignal(this, name, type, kind);
+		signals.add(sig);
+		return sig;
+	}
+
+	public HDLSignal newSignal(String name, HDLType type){
+		HDLSignal sig = new HDLSignal(this, name, type, HDLSignal.ResourceKind.REGISTER);
+		signals.add(sig);
+		return sig;
 	}
 	
+	public HDLExpr newExpr(HDLOp op, HDLSignal arg0, int value){
+		return newExpr(op, arg0, new HDLValue(String.valueOf(value), HDLValue.Type.INTEGER, 0));
+	}
+	
+	private int getExprUniqueId(){
+		return exprs.size() + 1;
+	}
+		
+	public HDLExpr newExpr(HDLOp op, HDLExpr arg0, HDLExpr arg1){
+		HDLExpr expr = null;
+		expr = new HDLBinaryExpr(this, getExprUniqueId(), op, arg0, arg1);
+		exprs.add(expr);
+		return expr;
+	}
+
 	public ArrayList<HDLSignal> getSignals(){
 		return signals;
 	}
@@ -55,8 +82,10 @@ public class HDLModule implements HDLTree{
 		return sysResetName;
 	}
 	
-	public void addStateMachine(HDLSequencer m){
-		sequencer.add(m);
+	public HDLSequencer newSequencer(String key){
+		HDLSequencer s = new HDLSequencer(this, key);
+		sequencer.add(s);
+		return s;
 	}
 	
 	public ArrayList<HDLSequencer> getSequencers(){

@@ -1,6 +1,7 @@
 package synthesijer.ast;
 
 import synthesijer.hdl.HDLExpr;
+import synthesijer.hdl.HDLModule;
 
 public abstract class Expr implements SynthesijerAstTree{
 	
@@ -16,6 +17,6 @@ public abstract class Expr implements SynthesijerAstTree{
 		return scope;
 	}
 	
-	abstract public HDLExpr getHDLExprResult();
+	abstract public HDLExpr getHDLExprResult(HDLModule m);
 	
 }

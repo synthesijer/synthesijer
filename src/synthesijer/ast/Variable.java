@@ -39,8 +39,7 @@ public class Variable{
 	public HDLSignal genHDLSignal(HDLModule m){
 		HDLType t = type.getHDLType();
 		if(type instanceof PrimitiveTypeKind){
-			HDLSignal s = new HDLSignal(m, getUniqueName(), t, HDLSignal.ResourceKind.REGISTER);
-			m.addSignal(s);
+			HDLSignal s = m.newSignal(getUniqueName(), t, HDLSignal.ResourceKind.REGISTER);
 			return s;
 		}else if(type instanceof ArrayType){
 			System.err.println("unsupported type: " + type);
@@ -57,8 +56,7 @@ public class Variable{
 	public HDLPort genHDLPort(HDLModule m, HDLPort.DIR dir){
 		if(type instanceof PrimitiveTypeKind){
 			HDLType t = ((PrimitiveTypeKind)type).getHDLType();
-			HDLPort port = new HDLPort(getUniqueName(), dir, t);
-			m.addPort(port);
+			HDLPort port = m.newPort(getUniqueName(), dir, t);
 			return port;
 		}else if(type instanceof ArrayType){
 			System.err.println("unsupported type: " + type);

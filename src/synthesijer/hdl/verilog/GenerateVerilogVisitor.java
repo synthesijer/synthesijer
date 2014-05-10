@@ -3,7 +3,6 @@ package synthesijer.hdl.verilog;
 import java.io.PrintWriter;
 
 import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLIdent;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
@@ -27,12 +26,6 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLExpr(HDLExpr o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitHDLIdent(HDLIdent o) {
 		// TODO Auto-generated method stub
 		
 	}

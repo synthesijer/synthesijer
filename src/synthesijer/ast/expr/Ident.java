@@ -4,7 +4,8 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLIdent;
+import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLType;
 
 public class Ident extends Expr{
 	
@@ -22,8 +23,8 @@ public class Ident extends Expr{
 		return symbol;
 	}
 	
-	public HDLExpr getHDLExprResult(){
-		return new HDLIdent(symbol);
+	public HDLExpr getHDLExprResult(HDLModule m){
+		return m.newSignal(symbol, HDLType.genVectorType(32));
 	}
 
 	public void accept(SynthesijerAstVisitor v){

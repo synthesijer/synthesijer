@@ -112,7 +112,7 @@ public class Module implements Scope, SynthesijerAstTree{
 			methodIds.add(new HDLSymbol(m.getUniqueName("methodID_")));
 		}
 		HDLType t = HDLType.genUserDefType("methodId", methodIds.toArray(new HDLSymbol[]{}), 0);
-		hm.addSignal(new HDLSignal(hm, "methodId", t, HDLSignal.ResourceKind.REGISTER));
+		hm.newSignal("methodId", t, HDLSignal.ResourceKind.REGISTER);
 		for(Method method: methods){
 			method.generateHDL(hm);
 		}
@@ -120,7 +120,7 @@ public class Module implements Scope, SynthesijerAstTree{
 			method.generateHDL(hm);
 		}
 		for(StateMachine m: statemachines){
-			hm.addStateMachine(m.genHDLSequencer(hm));
+			m.genHDLSequencer(hm);
 		}
 		return hm;
 	}
