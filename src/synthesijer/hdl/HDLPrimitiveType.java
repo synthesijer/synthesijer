@@ -53,7 +53,7 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		if(kind == KIND.VECTOR || kind == KIND.SIGNED){
 			return HDLConstant.INTEGER_ZERO;
 		}else if(kind == KIND.BIT){
-			return HDLConstant.BOOLEAN_FALSE;
+			return HDLConstant.LOW;
 		}else{
 			return null;
 		}

@@ -13,6 +13,7 @@ public class HDLModule implements HDLTree{
 	private final String name;
 	private final String sysClkName;
 	private final String sysResetName;
+	private final boolean syncronousFlag;
 	
 	private ArrayList<HDLPort> ports = new ArrayList<HDLPort>();
 	private ArrayList<HDLSignal> signals = new ArrayList<HDLSignal>();
@@ -27,12 +28,18 @@ public class HDLModule implements HDLTree{
 		this.sysResetName = sysResetName;
 		newPort(sysClkName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		newPort(sysResetName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		syncronousFlag = true;
 	}
 	
 	public HDLModule(String name){
 		this.name = name;
 		sysClkName = "";
 		sysResetName = "";
+		syncronousFlag = false;
+	}
+	
+	public boolean isSynchronous(){
+		return syncronousFlag;
 	}
 	
 	public String getName(){

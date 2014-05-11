@@ -12,6 +12,7 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.literal.HDLConstant;
+import synthesijer.hdl.literal.HDLValue;
 
 public class LED {
 	
@@ -41,6 +42,7 @@ public class LED {
 		HDLModule m = new HDLModule("led_sim");
 		HDLInstance inst = m.newModuleInstance(led, "U");
 		HDLSignal clk = m.newSignal("clk", HDLPrimitiveType.genBitType());
+		HDLSignal reset = m.newSignal("reset", HDLPrimitiveType.genBitType());
 		
 /*
 		  process
@@ -61,21 +63,23 @@ public class LED {
 		    end loop;
 		  end process;
 */
-		/*
+
 		HDLSequencer seq = m.newSequencer("main");
+		seq.setTransitionTime(10);
 		
 		HDLSequencer.SequencerState ss = seq.getIdleState();
-		for(int i = 0; i < 100; i++){
+		for(int i = 0; i < 5; i++){
 			HDLSequencer.SequencerState s0 = seq.addSequencerState("S_" + (2*i));
 			ss.addStateTransit(s0);
-			clk.setAssign(s0, HDLConstant.BOOLEAN_FALSE);
+			clk.setAssign(s0, HDLConstant.HIGH);
+			if(i == 3) reset.setAssign(s0, HDLConstant.LOW);
 			HDLSequencer.SequencerState s1 = seq.addSequencerState("S_" + (2*i+1));
 			s0.addStateTransit(s1);
-			clk.setAssign(s1, HDLConstant.BOOLEAN_TRUE);
+			clk.setAssign(s1, HDLConstant.LOW);
+			if(i == 0) reset.setAssign(s1, HDLConstant.HIGH);
 			ss = s1;
 		}
-		*/
-		
+
 		
 		
 		HDLUtils.generate(m, HDLUtils.VHDL);

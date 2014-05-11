@@ -9,7 +9,9 @@ public enum HDLConstant implements HDLLiteral{
 	
 	INTEGER_ZERO("(others => '0')", "0"),
 	BOOLEAN_TRUE("true", "1'b1"),
-	BOOLEAN_FALSE("false", "1'b0");
+	BOOLEAN_FALSE("false", "1'b0"),
+	LOW("'0'", "1'b0"),
+	HIGH("'1'", "1'b0");
 	
 	private final String vhdl, verilog;
 	

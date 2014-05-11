@@ -9,6 +9,7 @@ public class HDLSequencer implements HDLTree{
 	private final String stateKey;
 	private ArrayList<SequencerState> states;
 	private SequencerState idle;
+	private int timestep = -1;
 	
 	public HDLSequencer(HDLModule module, String stateKey){
 		this.module = module;
@@ -16,6 +17,18 @@ public class HDLSequencer implements HDLTree{
 		this.idle = new SequencerState(stateKey, stateKey + "_IDLE");
 		states = new ArrayList<SequencerState>();
 		states.add(idle);
+	}
+		
+	public void setTransitionTime(int step){
+		this.timestep = step;
+	}
+	
+	public int getTransitionTime(){
+		return timestep;
+	}
+	
+	public boolean hasTransitionTime(){
+		return (timestep > 0);
 	}
 	
 	public SequencerState addSequencerState(String id){
