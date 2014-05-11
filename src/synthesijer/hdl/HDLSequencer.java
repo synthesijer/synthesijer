@@ -6,15 +6,18 @@ public class HDLSequencer implements HDLTree{
 	
 	private final HDLModule module;
 	
-	private final String stateKey;
+	private final HDLSignal stateKey;
+	private final HDLUserDefinedType stateType;
 	private ArrayList<SequencerState> states;
 	private SequencerState idle;
 	private int timestep = -1;
 	
-	public HDLSequencer(HDLModule module, String stateKey){
+	public HDLSequencer(HDLModule module, String key){
 		this.module = module;
-		this.stateKey = stateKey;
-		this.idle = new SequencerState(stateKey, stateKey + "_IDLE");
+		this.stateType = module.newUserDefinedType(key, null, 0);
+		this.stateKey = module.newSignal(key, stateType);
+		this.idle = new SequencerState(stateKey, stateKey.getName() + "_IDLE");
+		stateType.addItem(stateKey.getName() + "_IDLE");
 		states = new ArrayList<SequencerState>();
 		states.add(idle);
 	}
@@ -34,6 +37,7 @@ public class HDLSequencer implements HDLTree{
 	public SequencerState addSequencerState(String id){
 		SequencerState s = new SequencerState(stateKey, id);
 		states.add(s);
+		stateType.addItem(id);
 		return s;
 	}
 	
@@ -41,7 +45,7 @@ public class HDLSequencer implements HDLTree{
 		return module;
 	}
 	
-	public String getStateKey(){
+	public HDLSignal getStateKey(){
 		return stateKey;
 	}
 	
@@ -52,15 +56,15 @@ public class HDLSequencer implements HDLTree{
 	public SequencerState getIdleState(){
 		return idle;
 	}
-
+	
 	public class SequencerState{
 		
 		private ArrayList<StateTransitCondition> transitions = new ArrayList<StateTransitCondition>();
 		
-		private final String key;
+		private final HDLSignal key;
 		private final String id;
 		
-		public SequencerState(String key, String id){
+		public SequencerState(HDLSignal key, String id){
 			this.key = key;
 			this.id = id;
 		}
@@ -69,16 +73,18 @@ public class HDLSequencer implements HDLTree{
 			return id;
 		}
 		
-		public String getKey(){
+		public HDLSignal getKey(){
 			return key;
 		}
 		
 		public void addStateTransit(SequencerState dest, String phaseKey, String phaseId, HDLExpr cond, HDLExpr condValue){
 			transitions.add(new StateTransitCondition(key, id, phaseKey, phaseId, cond, condValue, dest));
+			stateType.addItem(id);
 		}
 
 		public void addStateTransit(SequencerState dest){
 			transitions.add(new StateTransitCondition(key, id, null, null, null, null, dest));
+			stateType.addItem(id);
 		}
 
 		public ArrayList<StateTransitCondition> getTransitions(){
@@ -88,7 +94,7 @@ public class HDLSequencer implements HDLTree{
 	}
 	
 	public class StateTransitCondition{
-		final String stateKey;
+		final HDLSignal stateKey;
 		final String stateId;
 		final String phaseKey;
 		final String phaseId;
@@ -96,7 +102,7 @@ public class HDLSequencer implements HDLTree{
 		final HDLExpr condValue;
 		final SequencerState destState;
 		
-		StateTransitCondition(String stateKey, String stateId, String phaseKey, String phaseId, HDLExpr cond, HDLExpr condValue, SequencerState dest){
+		StateTransitCondition(HDLSignal stateKey, String stateId, String phaseKey, String phaseId, HDLExpr cond, HDLExpr condValue, SequencerState dest){
 			this.stateKey = stateKey;
 			this.stateId = stateId;
 			this.phaseKey = phaseKey;

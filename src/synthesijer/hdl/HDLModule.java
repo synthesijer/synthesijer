@@ -3,7 +3,7 @@ package synthesijer.hdl;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import synthesijer.hdl.expr.HDLBinaryExpr;
+import synthesijer.hdl.expr.HDLCombinationExpr;
 import synthesijer.hdl.literal.HDLValue;
 import synthesijer.hdl.verilog.GenerateVerilogVisitor;
 import synthesijer.hdl.vhdl.GenerateVHDLVisitor;
@@ -26,18 +26,22 @@ public class HDLModule implements HDLTree{
 		this.name = name;
 		this.sysClkName = sysClkName;
 		this.sysResetName = sysResetName;
-		newPort(sysClkName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
-		newPort(sysResetName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		if(sysClkName != null){
+			newPort(sysClkName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		}
+		if(sysResetName != null){
+			newPort(sysResetName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		}
 		syncronousFlag = true;
 	}
 	
-	public HDLModule(String name){
+	HDLModule(String name){
 		this.name = name;
-		sysClkName = "";
-		sysResetName = "";
+		this.sysClkName = "";
+		this.sysResetName = "";
 		syncronousFlag = false;
 	}
-	
+
 	public boolean isSynchronous(){
 		return syncronousFlag;
 	}
@@ -52,8 +56,8 @@ public class HDLModule implements HDLTree{
 		return port;
 	}
 	
-	public ArrayList<HDLPort> getPorts(){
-		return ports;
+	public HDLPort[] getPorts(){
+		return ports.toArray(new HDLPort[]{});
 	}
 
 	public HDLSignal newSignal(String name, HDLType type, HDLSignal.ResourceKind kind){
@@ -68,12 +72,28 @@ public class HDLModule implements HDLTree{
 		return sig;
 	}
 	
+	public void rmSignal(HDLSignal sig){
+		signals.remove(sig);
+	}
+	
+	public HDLUserDefinedType newUserDefinedType(String base, String[] items, int defaultIndex){
+		HDLUserDefinedType t = new HDLUserDefinedType(base, items, defaultIndex);
+		usertype.add(t);
+		return t;
+	}
+	
+	public HDLExpr newExpr(HDLOp op, HDLExpr arg0, HDLExpr arg1, HDLExpr arg2){
+		HDLExpr expr = new HDLCombinationExpr(this, getExprUniqueId(), op, arg0, arg1, arg2);
+		exprs.add(expr);
+		return expr;
+	}
+
 	public HDLExpr newExpr(HDLOp op, HDLSignal arg0, int value){
 		return newExpr(op, arg0, new HDLValue(String.valueOf(value), HDLPrimitiveType.genIntegerType()));
 	}
 	
-	public ArrayList<HDLExpr> getExprs(){
-		return exprs;
+	public HDLExpr[] getExprs(){
+		return exprs.toArray(new HDLExpr[]{});
 	}
 
 	public HDLInstance newModuleInstance(HDLModule m, String n){
@@ -82,8 +102,8 @@ public class HDLModule implements HDLTree{
 		return obj;
 	}
 	
-	public ArrayList<HDLInstance> getModuleInstances(){
-		return submodules;
+	public HDLInstance[] getModuleInstances(){
+		return submodules.toArray(new HDLInstance[]{});
 	}
 		
 	private int getExprUniqueId(){
@@ -92,13 +112,13 @@ public class HDLModule implements HDLTree{
 		
 	public HDLExpr newExpr(HDLOp op, HDLExpr arg0, HDLExpr arg1){
 		HDLExpr expr = null;
-		expr = new HDLBinaryExpr(this, getExprUniqueId(), op, arg0, arg1);
+		expr = new HDLCombinationExpr(this, getExprUniqueId(), op, arg0, arg1);
 		exprs.add(expr);
 		return expr;
 	}
 
-	public ArrayList<HDLSignal> getSignals(){
-		return signals;
+	public HDLSignal[] getSignals(){
+		return signals.toArray(new HDLSignal[]{});
 	}
 
 	public String getSysClkName(){
@@ -115,8 +135,8 @@ public class HDLModule implements HDLTree{
 		return s;
 	}
 	
-	public ArrayList<HDLSequencer> getSequencers(){
-		return sequencer;
+	public HDLSequencer[] getSequencers(){
+		return sequencer.toArray(new HDLSequencer[]{});
 	}
 	
 	public void genVHDL(PrintWriter dest){

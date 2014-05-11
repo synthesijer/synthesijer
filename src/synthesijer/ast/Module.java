@@ -111,8 +111,8 @@ public class Module implements Scope, SynthesijerAstTree{
 			if(m.isConstructor()) continue;
 			methodIds.add(m.getUniqueName("methodID_"));
 		}
-		HDLType t = new HDLUserDefinedType("methodId", methodIds.toArray(new String[]{}), 0);
-		hm.newSignal("methodId", t, HDLSignal.ResourceKind.REGISTER);
+		HDLType t = hm.newUserDefinedType("methodId", methodIds.toArray(new String[]{}), 0);
+		hm.newSignal("methodId", t);
 		for(Method method: methods){
 			method.generateHDL(hm);
 		}

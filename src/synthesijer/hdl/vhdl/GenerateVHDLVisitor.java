@@ -1,7 +1,6 @@
 package synthesijer.hdl.vhdl;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
@@ -50,18 +49,6 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		// TODO Auto-generated method stub
 		
 	}
-
-	public static void genPortList(PrintWriter dest, int offset, ArrayList<HDLPort> ports){
-		HDLUtils.println(dest, offset, "port (");
-		String sep = "";
-		for(HDLPort p: ports){
-			dest.print(sep);
-			p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
-			sep = ";\n";
-		}
-		HDLUtils.println(dest, 0, "");
-		HDLUtils.println(dest, offset, ");");
-	}
 		
 	@Override
 	public void visitHDLModule(HDLModule o) {
@@ -72,25 +59,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.nl(dest);
 		
 		// entity
-		HDLUtils.println(dest, offset, String.format("entity %s is", o.getName()));
-		if(o.getPorts().size() > 0){
-			genPortList(dest, offset+2, o.getPorts());
-		}
-		HDLUtils.println(dest, offset, String.format("end %s;", o.getName()));
-		HDLUtils.nl(dest);
-		
-		// architecture
-		HDLUtils.println(dest, offset, String.format("architecture RTL of %s is", o.getName()));
-		HDLUtils.nl(dest);
-		for(HDLInstance i: o.getModuleInstances()){ i.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
-		HDLUtils.nl(dest);
-		for(HDLPort p: o.getPorts()){
-			if(p.isOutput()) p.getSrcSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
-		}
-		HDLUtils.nl(dest);
-		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
-		HDLUtils.nl(dest);
-		for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVHDLDefVisitor(dest, offset+2)); };
+		o.accept(new GenerateVHDLDefVisitor(dest, offset));
 		
 		// architecture body
 		HDLUtils.println(dest, offset, String.format("begin"));
@@ -116,50 +85,63 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		}
 	}
 
-	private void genSequencerSyncHeader(HDLSequencer o, int offset){
+	private void genSyncSequencerHeader(HDLSequencer o, int offset){
 		HDLUtils.println(dest, offset, String.format("process (%s)", o.getModule().getSysClkName()));
 	}
 	
-	private void genSequencerAsyncHeader(HDLSequencer o, int offset){
+	private void genAsyncSequencerHeader(HDLSequencer o, int offset){
 		HDLUtils.println(dest, offset, String.format("process"));
+	}
+	
+	private void genSyncSequencerBody(HDLSequencer o, int offset){
+		HDLUtils.println(dest, offset, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
+		// reset
+		HDLUtils.println(dest, offset+2, String.format("if %s = '1' then", o.getModule().getSysResetName()));
+		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getStateKey().getName(), o.getIdleState().getStateId()));
+		
+		HDLUtils.println(dest, offset+2, String.format("else"));
+		
+		// state-machine body
+		if(o.getStates().size() > 0){
+			HDLUtils.println(dest, offset+4, String.format("case (%s) is", o.getStateKey().getName()));
+			for(HDLSequencer.SequencerState s: o.getStates()){
+				HDLUtils.println(dest, offset+6, String.format("when %s => ", s.getStateId()));
+				genStateTransition(dest, offset+8, s);
+			}
+			HDLUtils.println(dest, offset+6, String.format("when others => null;"));
+			HDLUtils.println(dest, offset+4, String.format("end case;"));
+		}
+		
+		if(o.getModule().isSynchronous()){
+			HDLUtils.println(dest, offset+2, String.format("end if;"));
+			HDLUtils.println(dest, offset, String.format("end if;"));
+		}
+	}
+	
+	private void genAsyncSequencerBody(HDLSequencer o, int offset){
+		if(o.getStates().size() > 0){
+			for(HDLSequencer.SequencerState s: o.getStates()){
+				HDLUtils.println(dest, offset, String.format("-- state %s = %s", o.getStateKey().getName(), s.getStateId()));
+				genStateTransition(dest, offset, s);
+				if(o.hasTransitionTime()) HDLUtils.println(dest, offset, String.format("wait for %d ns;", o.getTransitionTime()));
+			}
+		}
 	}
 	
 	@Override
 	public void visitHDLSequencer(HDLSequencer o) {
 		if(o.getModule().isSynchronous()){
-			genSequencerSyncHeader(o, offset);
+			genSyncSequencerHeader(o, offset);
 		}else{
-			genSequencerAsyncHeader(o, offset);
+			genAsyncSequencerHeader(o, offset);
 		}
 		HDLUtils.println(dest, offset, String.format("begin"));
-		
-		int offset1 = offset + 2; 
 		if(o.getModule().isSynchronous()){
-			HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
-			// reset
-			HDLUtils.println(dest, offset+4, String.format("if %s = '1' then", o.getModule().getSysResetName()));
-			HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getStateKey(), o.getIdleState().getStateId()));
-		
-			HDLUtils.println(dest, offset+4, String.format("else"));
-			offset1 = offset + 6;
+			genSyncSequencerBody(o, offset+2);
+		}else{
+			genAsyncSequencerBody(o, offset+2);
 		}
 		
-		// state-machine body
-		if(o.getStates().size() > 0){
-			HDLUtils.println(dest, offset1, String.format("case (%s) is", o.getStateKey()));
-			for(HDLSequencer.SequencerState s: o.getStates()){
-				HDLUtils.println(dest, offset1+2, String.format("when %s => ", s.getStateId()));
-				if(o.hasTransitionTime()) HDLUtils.println(dest, offset1+4, String.format("wait for %d ns;", o.getTransitionTime()));
-				genStateTransition(dest, offset1+4, s);
-			}
-			HDLUtils.println(dest, offset1+2, String.format("when others => null;"));
-			HDLUtils.println(dest, offset1, String.format("end case;"));
-		}
-		
-		if(o.getModule().isSynchronous()){
-			HDLUtils.println(dest, offset+4, String.format("end if;"));
-			HDLUtils.println(dest, offset+2, String.format("end if;"));
-		}
 		
 		HDLUtils.println(dest, offset, String.format("end process;"));
 		HDLUtils.nl(dest);
@@ -167,12 +149,12 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	
 	public void genStateTransition(PrintWriter dest, int offset, HDLSequencer.SequencerState s){
 		if(s.getTransitions().size() == 1){
-			HDLUtils.println(dest, offset, String.format("%s <= %s;", s.getKey(), s.getTransitions().get(0).getDestState().getStateId()));
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", s.getKey().getName(), s.getTransitions().get(0).getDestState().getStateId()));
 		}else if(s.getTransitions().size() > 1){
 			String sep = "if";
 			for(HDLSequencer.StateTransitCondition c: s.getTransitions()){
 				HDLUtils.println(dest, offset, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
-				HDLUtils.println(dest, offset+2, String.format("%s <= %s;", s.getKey(), c.getDestState().getStateId()));
+				HDLUtils.println(dest, offset+2, String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId()));
 				sep = "elsif";
 			}
 			HDLUtils.println(dest, offset, String.format("end if;"));
@@ -180,17 +162,17 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			HDLUtils.println(dest, offset, "null;");
 		}
 	}
-	
-	
 
 	private void genSyncProcess(HDLSignal o, int offset){
 		HDLUtils.println(dest, offset, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
 		HDLUtils.println(dest, offset+2, String.format("if %s = '1' then", o.getModule().getSysResetName()));
-		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getResetValue().getVHDL()));
+		if(o.getResetValue() != null){
+			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getResetValue().getVHDL()));
+		}
 		HDLUtils.println(dest, offset+2, String.format("else"));
-		if(o.getConditions().size() == 1){
-			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getConditions().get(0).getValue().getVHDL()));
-		}else if(o.getConditions().size() > 1){
+		if(o.getConditions().length == 1){
+			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getConditions()[0].getValue().getVHDL()));
+		}else if(o.getConditions().length > 1){
 			String sep = "if";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset+4, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
@@ -206,9 +188,9 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	}
 
 	private void genAsyncProcess(HDLSignal o, int offset){
-		if(o.getConditions().size() == 1){
-			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getConditions().get(0).getValue().getVHDL()));
-		}else if(o.getConditions().size() > 1){
+		if(o.getConditions().length == 1){
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getConditions()[0].getValue().getVHDL()));
+		}else if(o.getConditions().length > 1){
 			String sep = "if";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
@@ -226,7 +208,13 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	}
 	
 	private void genAsyncProcessHeader(HDLSignal o){
-		HDLUtils.println(dest, offset, String.format("process"));
+		String s = "";
+		String sep = "";
+		for(HDLSignal src: o.getSrcSignals()){
+			s += sep + src.getName();
+			sep = ", ";
+		}
+		HDLUtils.println(dest, offset, String.format("process(%s)", s));
 	}
 	
 	private void genSignalRegisterProcess(HDLSignal o){
@@ -248,6 +236,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLSignal(HDLSignal o) {
 		if(o.isRegister() && !o.isAssignAlways()){
+			if(o.getConditions().length == 0) return;
 			genSignalRegisterProcess(o);
 		}else if(o.isAssignAlways()){
 			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getAssignAlwaysExpr().getResultExpr().getVHDL()));

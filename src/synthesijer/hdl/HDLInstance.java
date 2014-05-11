@@ -22,7 +22,7 @@ public class HDLInstance implements HDLTree{
 	}
 	
 	private void genPortSignals(){
-		for(Pair pair: pairs){ module.getSignals().remove(pair.signal); }
+		for(Pair pair: pairs){ module.rmSignal(pair.signal); }
 		pairs.clear();
 		for(HDLPort p: submodule.getPorts()){
 			HDLSignal s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), HDLSignal.ResourceKind.WIRE);
@@ -44,6 +44,13 @@ public class HDLInstance implements HDLTree{
 	
 	public ArrayList<Pair> getPairs(){
 		return pairs;
+	}
+	
+	public HDLSignal getSignalForPort(String name){
+		for(Pair pair: pairs){
+			if(pair.port.getName().equals(name)) return pair.signal;
+		}
+		return null;
 	}
 	
 

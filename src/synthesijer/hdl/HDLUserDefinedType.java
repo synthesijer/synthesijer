@@ -1,19 +1,23 @@
 package synthesijer.hdl;
 
+import java.util.ArrayList;
+
 import synthesijer.hdl.literal.HDLValue;
 
 
 public class HDLUserDefinedType implements HDLTree, HDLType{
 
 	private final String base;
-	private final String defaultValue;
-	private final String[] items;
+	private final int defaultIndex;
+	private final ArrayList<HDLValue> items = new ArrayList<HDLValue>();
 	private final KIND kind;
 	
-	public HDLUserDefinedType(String base, String[] items, int defaultValueIndex) {
+	HDLUserDefinedType(String base, String[] items, int defaultIndex) {
 		this.base = "Type_" + base;
-		this.items = items;
-		this.defaultValue = items[defaultValueIndex];
+		if(items != null){
+			for(String s: items){ this.items.add(new HDLValue(s, HDLPrimitiveType.genStringType())); }
+		}
+		this.defaultIndex = defaultIndex;
 		this.kind = KIND.USERDEF;
 	}
 	
@@ -30,15 +34,33 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 	}
 	
 	public String getVerilogHDL(){
-		return base;
+		return "[31:0]";
 	}
 	
 	public HDLLiteral getDefaultValue(){
-		return new HDLValue(defaultValue, HDLPrimitiveType.genStringType());
+		if(items.size() > defaultIndex){
+			return items.get(defaultIndex);
+		}else{
+			return null;
+		}
 	}
 	
-	public String[] getItems(){
-		return items;
+	public HDLValue[] getItems(){
+		return items.toArray(new HDLValue[]{});
+	}
+	
+	private boolean isDefined(String s){
+		for(HDLValue v: items){
+			if(v.getValue().equals(s)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addItem(String s){
+		if(isDefined(s)) return;
+		items.add(new HDLValue(s, HDLPrimitiveType.genStringType()));
 	}
 		
 	@Override

@@ -2,6 +2,7 @@ package synthesijer.hdl.literal;
 
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLLiteral;
+import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
 import synthesijer.hdl.HDLPrimitiveType;
 
@@ -11,7 +12,7 @@ public enum HDLConstant implements HDLLiteral{
 	BOOLEAN_TRUE("true", "1'b1"),
 	BOOLEAN_FALSE("false", "1'b0"),
 	LOW("'0'", "1'b0"),
-	HIGH("'1'", "1'b0");
+	HIGH("'1'", "1'b1");
 	
 	private final String vhdl, verilog;
 	
@@ -42,10 +43,18 @@ public enum HDLConstant implements HDLLiteral{
 		case BOOLEAN_FALSE:
 		case BOOLEAN_TRUE:
 			return HDLPrimitiveType.genBitType();
+		case HIGH:
+		case LOW:
+			return HDLPrimitiveType.genBitType();
 		case INTEGER_ZERO:
 			return HDLPrimitiveType.genVectorType(-1);
 		default: return HDLPrimitiveType.genUnkonwType();
 		}
+	}
+
+	@Override
+	public HDLSignal[] getSrcSignals() {
+		return null;
 	}
 
 }

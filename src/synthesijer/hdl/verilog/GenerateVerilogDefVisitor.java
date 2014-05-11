@@ -26,14 +26,10 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLExpr(HDLExpr o) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void visitHDLInstance(HDLInstance o) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -44,8 +40,14 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLModule(HDLModule o) {
-		// TODO Auto-generated method stub
-		
+		for(HDLPort p: o.getPorts()){
+			if(p.isOutput()) p.getSrcSignal().accept(new GenerateVerilogDefVisitor(dest, offset));
+		}
+		HDLUtils.nl(dest);
+		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVerilogDefVisitor(dest, offset)); }
+		HDLUtils.nl(dest);
+		for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVerilogDefVisitor(dest, offset)); }
+		HDLUtils.nl(dest);
 	}
 
 	@Override
@@ -55,11 +57,6 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLSequencer(HDLSequencer o) {
-		for(int i = 0; i < o.getStates().size(); i++){
-			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getStates().get(i).getStateId(), i));
-		}
-		HDLUtils.println(dest, offset, String.format("reg [31:0] %s = %s;", o.getStateKey(), o.getIdleState().getStateId()));
-		HDLUtils.nl(dest);
 	}
 
 	@Override
@@ -85,7 +82,7 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLUserDefinedType(HDLUserDefinedType o) {
 		for(int i = 0; i < o.getItems().length; i++){
-			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getItems()[i], i));
+			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getItems()[i].getVerilogHDL(), i));
 		}
 	}
 

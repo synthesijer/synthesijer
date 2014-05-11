@@ -177,7 +177,7 @@ public class Method implements Scope, SynthesijerAstTree{
 	private HDLSignal hdlSignal = null;
 	public HDLSignal getHDLReturnSignal(HDLModule m, String name, HDLType t){
 		if(hdlSignal == null){
-			hdlSignal = new HDLSignal(m, name, t, HDLSignal.ResourceKind.REGISTER);
+			hdlSignal = m.newSignal(name, t);
 		}
 		return hdlSignal;
 	}

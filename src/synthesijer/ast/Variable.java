@@ -39,7 +39,7 @@ public class Variable{
 	public HDLSignal genHDLSignal(HDLModule m){
 		HDLType t = type.getHDLType();
 		if(type instanceof PrimitiveTypeKind){
-			HDLSignal s = m.newSignal(getUniqueName(), t, HDLSignal.ResourceKind.REGISTER);
+			HDLSignal s = m.newSignal(getUniqueName(), t);
 			return s;
 		}else if(type instanceof ArrayType){
 			System.err.println("unsupported type: " + type);

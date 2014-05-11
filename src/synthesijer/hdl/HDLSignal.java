@@ -1,4 +1,4 @@
-package synthesijer.hdl;
+	package synthesijer.hdl;
 
 import java.util.ArrayList;
 
@@ -23,12 +23,12 @@ public class HDLSignal implements HDLTree, HDLExpr{
 		public String toString(){ return sym; }
 	}
 	
-	public HDLSignal(HDLModule module, String name, HDLType type, ResourceKind kind){
+	HDLSignal(HDLModule module, String name, HDLType type, ResourceKind kind){
 		this.module = module;
 		this.name = name;
 		this.type = type;
 		this.kind = kind;
-		resetValue = type.getDefaultValue();
+		resetValue = null;
 		assignAlwaysFlag = false;
 	}
 	
@@ -57,7 +57,11 @@ public class HDLSignal implements HDLTree, HDLExpr{
 	}
 	
 	public HDLExpr getResetValue(){
-		return resetValue;
+		if(resetValue != null){
+			return resetValue;
+		}else{
+			return type.getDefaultValue();
+		}
 	}
 	
 	public void setAssign(HDLSequencer.SequencerState s, HDLExpr expr){
@@ -89,8 +93,22 @@ public class HDLSignal implements HDLTree, HDLExpr{
 		conditions.add(c);
 	}
 	
-	public ArrayList<AssignmentCondition> getConditions(){
-		return conditions;
+	public AssignmentCondition[] getConditions(){
+		return conditions.toArray(new AssignmentCondition[]{});
+	}
+	
+	@Override
+	public HDLSignal[] getSrcSignals(){
+		ArrayList<HDLSignal> list = new ArrayList<HDLSignal>();
+		for(AssignmentCondition c: conditions){
+			if(!list.contains(c.getStateKey())){
+				list.add(c.getStateKey());
+			}
+			if(c.getValue().getSrcSignals() != null){
+				for(HDLSignal s: c.getValue().getSrcSignals()){ list.add(s); }
+			}
+		}
+		return list.toArray(new HDLSignal[]{});
 	}
 	
 	public class AssignmentCondition{
@@ -123,7 +141,7 @@ public class HDLSignal implements HDLTree, HDLExpr{
 //			}else{
 //				return String.format("methodId = %s and %s = %s", methodId, stateKey, stateId);
 //			}
-			return s.getKey() + " = " + s.getStateId(); 
+			return s.getKey().getName() + " = " + s.getStateId(); 
 		}
 
 		public String getCondExprAsVerilogHDL(){
@@ -132,12 +150,18 @@ public class HDLSignal implements HDLTree, HDLExpr{
 //			}else{
 //				return String.format("methodId == %s && %s == %s", methodId, stateKey, stateId);
 //			}
-			return s.getKey() + " == " + s.getStateId(); 
+			return s.getKey().getName() + " == " + s.getStateId(); 
 		}
 		
 		public HDLExpr getValue(){
 			return value.getResultExpr();
 		}
+		
+		public HDLSignal getStateKey(){
+			return s.getKey();
+		}
+		
+		
 	}
 
 	@Override

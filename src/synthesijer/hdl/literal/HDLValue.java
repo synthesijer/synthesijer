@@ -2,8 +2,9 @@ package synthesijer.hdl.literal;
 
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLLiteral;
-import synthesijer.hdl.HDLTreeVisitor;
 import synthesijer.hdl.HDLPrimitiveType;
+import synthesijer.hdl.HDLSignal;
+import synthesijer.hdl.HDLTreeVisitor;
 
 public class HDLValue implements HDLLiteral{
 	
@@ -13,6 +14,10 @@ public class HDLValue implements HDLLiteral{
 	public HDLValue(String value, HDLPrimitiveType type){
 		this.value = value;
 		this.type = type;
+	}
+	
+	public String getValue(){
+		return value;
 	}
 
 	@Override
@@ -72,6 +77,11 @@ public class HDLValue implements HDLLiteral{
 	@Override
 	public HDLPrimitiveType getType() {
 		return type;
+	}
+	
+	@Override
+	public HDLSignal[] getSrcSignals() {
+		return null;
 	}
 
 }
