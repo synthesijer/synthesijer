@@ -6,7 +6,7 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPrimitiveType;
-import synthesijer.hdl.literal.HDLValue;
+import synthesijer.hdl.expr.HDLValue;
 
 public class Literal extends Expr{
 	

@@ -13,7 +13,7 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
-import synthesijer.hdl.literal.HDLValue;
+import synthesijer.hdl.expr.HDLValue;
 
 public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	

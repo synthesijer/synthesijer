@@ -1,6 +1,6 @@
 package synthesijer.hdl;
 
-import synthesijer.hdl.literal.HDLConstant;
+import synthesijer.hdl.expr.HDLConstant;
 
 /**
  * In order to make an instance of this class, use builder method.

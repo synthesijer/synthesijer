@@ -2,7 +2,7 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
-import synthesijer.hdl.literal.HDLValue;
+import synthesijer.hdl.expr.HDLValue;
 
 
 public class HDLUserDefinedType implements HDLTree, HDLType{

@@ -12,7 +12,7 @@ import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLSimModule;
 import synthesijer.hdl.HDLUtils;
-import synthesijer.hdl.literal.HDLConstant;
+import synthesijer.hdl.expr.HDLConstant;
 
 public class LED {
 	

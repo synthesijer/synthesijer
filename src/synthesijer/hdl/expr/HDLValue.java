@@ -1,4 +1,4 @@
-package synthesijer.hdl.literal;
+package synthesijer.hdl.expr;
 
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLLiteral;

@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import synthesijer.hdl.expr.HDLCombinationExpr;
-import synthesijer.hdl.literal.HDLValue;
+import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.verilog.GenerateVerilogVisitor;
 import synthesijer.hdl.vhdl.GenerateVHDLVisitor;
 
