@@ -67,4 +67,9 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLUserDefinedType(this);
 	}
+	
+	public boolean isBit(){
+		return false;
+	}
+
 }

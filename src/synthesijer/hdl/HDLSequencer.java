@@ -2,6 +2,9 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
+import synthesijer.SynthesijerUtils;
+import synthesijer.hdl.expr.HDLCombinationExpr;
+
 public class HDLSequencer implements HDLTree{
 	
 	private final HDLModule module;
@@ -80,6 +83,9 @@ public class HDLSequencer implements HDLTree{
 		public void addStateTransit(HDLExpr expr, SequencerState d){
 			transitions.add(new StateTransitCondition(key, id, expr, d));
 			stateType.addItem(id);
+			if(expr == null) return;
+			if(expr.getType().isBit()) return;
+			SynthesijerUtils.error(String.format("%s is not allowed, only bit type is allowd", expr));
 		}
 
 		public void addStateTransit(SequencerState dest){

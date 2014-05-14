@@ -30,6 +30,10 @@ public class HDLCombinationExpr implements HDLExpr{
 		return result.getType();
 	}
 	
+	public HDLOp getOp(){
+		return op;
+	}
+	
 	private HDLType getPriorType(HDLType t1, HDLType t2){
 		HDLType t = null;
 		if(t1.getKind().hasWdith() && t1.getKind().isPrimitive() &&

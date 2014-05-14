@@ -37,4 +37,6 @@ public interface HDLType {
 
 	public KIND getKind();
 	
+	public boolean isBit();
+	
 }

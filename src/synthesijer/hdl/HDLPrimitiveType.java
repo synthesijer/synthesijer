@@ -21,6 +21,10 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		return kind;
 	}
 
+	public boolean isBit(){
+		return kind == KIND.BIT;
+	}
+	
 	public int getWidth(){
 		return width;
 	}
