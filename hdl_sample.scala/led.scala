@@ -1,7 +1,7 @@
 import synthesijer.hdl._
 import synthesijer.hdl.expr._
 
-object led {
+object led extends HDLmodule{
 
   def gen_led(): HDLModule = {
     val m = new HDLModule("led", "clk", "reset");

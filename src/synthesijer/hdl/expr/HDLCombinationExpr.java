@@ -2,7 +2,6 @@ package synthesijer.hdl.expr;
 
 import java.util.ArrayList;
 
-import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLOp;
@@ -99,11 +98,11 @@ public class HDLCombinationExpr implements HDLExpr{
 		if(op.isInfix()){
 			return String.format("%s %s %s", args[0].getResultExpr().getVerilogHDL(), op.getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 		}else if(op.isCompare()){
-			return String.format("%s %s %s ? 1'b1 : 1'b0", args[0].getResultExpr().getVHDL(), op.getVHDL(), args[1].getResultExpr().getVHDL());
+			return String.format("%s %s %s ? 1'b1 : 1'b0", args[0].getResultExpr().getVerilogHDL(), op.getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 		}else{
 			switch(op){
 			case REF:
-				return String.format("%s[%s]", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
+				return String.format("%s[%s]", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 			case IF:
 				return String.format("%s == 1'b1 ? %s : %s", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL(), args[2].getResultExpr().getVerilogHDL());
 			default:

@@ -41,7 +41,7 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLModule(HDLModule o) {
 		for(HDLPort p: o.getPorts()){
-			if(p.isOutput()) p.getSrcSignal().accept(new GenerateVerilogDefVisitor(dest, offset));
+			p.getSignal().accept(new GenerateVerilogDefVisitor(dest, offset));
 		}
 		HDLUtils.nl(dest);
 		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVerilogDefVisitor(dest, offset)); }

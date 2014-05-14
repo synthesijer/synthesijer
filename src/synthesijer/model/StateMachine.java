@@ -52,10 +52,10 @@ public class StateMachine {
 		for(State s: stateList){
 			HDLSequencer.SequencerState ss = map.get(s);
 			for(Transition c: s.transitions){
-				ss.addStateTransit(map.get(c.getDestination()), null, null, null, null);
+				ss.addStateTransit(map.get(c.getDestination()));
 			}
 			if(s.isTerminate()){
-				ss.addStateTransit(hs.getIdleState(), null, null, null, null);
+				ss.addStateTransit(hs.getIdleState());
 			}
 		}
 		return hs;

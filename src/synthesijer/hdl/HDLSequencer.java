@@ -77,13 +77,13 @@ public class HDLSequencer implements HDLTree{
 			return key;
 		}
 		
-		public void addStateTransit(SequencerState dest, String phaseKey, String phaseId, HDLExpr cond, HDLExpr condValue){
-			transitions.add(new StateTransitCondition(key, id, phaseKey, phaseId, cond, condValue, dest));
+		public void addStateTransit(HDLExpr expr, SequencerState d){
+			transitions.add(new StateTransitCondition(key, id, expr, d));
 			stateType.addItem(id);
 		}
 
 		public void addStateTransit(SequencerState dest){
-			transitions.add(new StateTransitCondition(key, id, null, null, null, null, dest));
+			transitions.add(new StateTransitCondition(key, id, null, dest));
 			stateType.addItem(id);
 		}
 
@@ -96,19 +96,13 @@ public class HDLSequencer implements HDLTree{
 	public class StateTransitCondition{
 		final HDLSignal stateKey;
 		final String stateId;
-		final String phaseKey;
-		final String phaseId;
 		final HDLExpr cond;
-		final HDLExpr condValue;
 		final SequencerState destState;
 		
-		StateTransitCondition(HDLSignal stateKey, String stateId, String phaseKey, String phaseId, HDLExpr cond, HDLExpr condValue, SequencerState dest){
+		StateTransitCondition(HDLSignal stateKey, String stateId, HDLExpr cond, SequencerState dest){
 			this.stateKey = stateKey;
 			this.stateId = stateId;
-			this.phaseKey = phaseKey;
-			this.phaseId = phaseId;
 			this.cond = cond;
-			this.condValue = condValue;
 			this.destState = dest;
 		}
 		
@@ -118,28 +112,16 @@ public class HDLSequencer implements HDLTree{
 		
 		public String getCondExprAsVHDL(){
 			String s = "";
-			String sep = "";
-			if(phaseId != null){
-				s += sep + phaseKey + " = " + phaseId;
-				sep = " and ";
-			}
 			if(cond != null){
-				s += sep + cond.getVHDL() + " = " + condValue.getVHDL();
-				sep = " and ";
+				s = String.format("%s = '1'", cond.getResultExpr().getVHDL());
 			}
 			return s;
 		}
 		
 		public String getCondExprAsVerilogHDL(){
 			String s = "";
-			String sep = "";
-			if(phaseId != null){
-				s += sep + phaseKey + " == " + phaseId;
-				sep = " && ";
-			}
 			if(cond != null){
-				s += sep + cond.getVerilogHDL() + " == " + condValue.getVerilogHDL();
-				sep = " && ";
+				s = String.format("%s == 1'b1", cond.getResultExpr().getVHDL());
 			}
 			return s;
 		}

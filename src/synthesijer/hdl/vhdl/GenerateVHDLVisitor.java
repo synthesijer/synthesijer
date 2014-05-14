@@ -80,9 +80,11 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLPort(HDLPort o) {
 		if(o.isOutput()){
-			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getSrcSignal().getName()));
-			o.getSrcSignal().accept(this);
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getSignal().getName()));
+		}else{
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getSignal().getName(), o.getName()));
 		}
+		o.getSignal().accept(this);
 	}
 
 	private void genSyncSequencerHeader(HDLSequencer o, int offset){

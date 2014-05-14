@@ -72,7 +72,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLInstance i: o.getModuleInstances()){ i.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
 		for(HDLPort p: o.getPorts()){
-			if(p.isOutput()) p.getSrcSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			p.getSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
 		}
 		HDLUtils.nl(dest);
 		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
