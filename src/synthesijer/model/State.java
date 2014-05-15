@@ -1,6 +1,5 @@
 package synthesijer.model;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import synthesijer.ast.Expr;

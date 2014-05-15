@@ -5,11 +5,9 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import synthesijer.ast.Module;
 import synthesijer.hdl.HDLModule;
-import synthesijer.model.Statemachine;
 
 public enum Manager {
 	
@@ -67,6 +65,7 @@ public enum Manager {
 	public void genHDL(OutputFormat format) throws FileNotFoundException{
 		for(Module m: entries){
 			HDLModule top = new HDLModule(m.getName(), "clk", "reset");
+			m.accept(new GenerateHDLModuleVisitor(top));
 			if(format == OutputFormat.VHDL){
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.vhd", m.getName())), true); 
 				top.genVHDL(dest);

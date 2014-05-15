@@ -1,11 +1,6 @@
 package synthesijer.model;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
-
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLSequencer;
 
 public class Statemachine {
 	
@@ -44,24 +39,5 @@ public class Statemachine {
 		states.add(s);
 		return s;
 	}
-
-	public HDLSequencer genHDLSequencer(HDLModule hm){
-		HDLSequencer hs = hm.newSequencer(getKey());
-		Hashtable<State, HDLSequencer.SequencerState> map = new Hashtable<State, HDLSequencer.SequencerState>();
-		for(State s: states){
-			map.put(s, hs.addSequencerState(s.getId()));
-		}
-		for(State s: states){
-			HDLSequencer.SequencerState ss = map.get(s);
-			for(Transition c: s.transitions){
-				ss.addStateTransit(map.get(c.getDestination()));
-			}
-			if(s.isTerminate()){
-				ss.addStateTransit(hs.getIdleState());
-			}
-		}
-		return hs;
-	}
-
 
 }

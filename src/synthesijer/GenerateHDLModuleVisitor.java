@@ -41,12 +41,17 @@ import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
+import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.expr.HDLValue;
+import synthesijer.model.State;
+import synthesijer.model.Statemachine;
+import synthesijer.model.StatemachineVisitor;
+import synthesijer.model.Transition;
 
-public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
+public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor, StatemachineVisitor{
 	
 	private final HDLModule module;
 	
@@ -62,15 +67,13 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			HDLType t = getHDLType(v.getType());
 			if(t != null) module.newPort(v.getName(), HDLPort.DIR.IN, t);
 		}
-		{
-			HDLType t = getHDLType(o.getType());
-			if(t != null){
-				HDLPort p = module.newPort(o.getName() + "_return", HDLPort.DIR.OUT, t);
-				methodReturnTable.put(o, p);
-			}
+		HDLType t = getHDLType(o.getType());
+		if(t != null){
+			HDLPort p = module.newPort(o.getName() + "_return", HDLPort.DIR.OUT, t);
+			methodReturnTable.put(o, p);
 		}
 		o.getBody().accept(this);
-		o.getStateMachine().genHDLSequencer(module);
+		o.getStateMachine().accept(this);
 	}
 	
 	private HDLType getHDLType(Type type){
@@ -265,12 +268,11 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
 		Variable var = o.getVariable();
-		HDLSignal s = var.genHDLSignal(module);
-		if(var.getType() instanceof PrimitiveTypeKind){
-			if(o.getInitExpr() != null){ s.setResetValue(o.getInitExpr().getHDLExprResult(module)); }
-		}else if(var.getType() instanceof ArrayType){
-		}else if(var.getType() instanceof ComponentType){
-		}else{
+		HDLType t = getHDLType(var.getType());
+		if(t == null) return;
+		HDLSignal s = module.newSignal(var.getUniqueName(), t);
+		if(o.getInitExpr() != null){
+			s.setResetValue(o.getInitExpr().getHDLExprResult(module));
 		}
 	}
 
@@ -299,6 +301,30 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitPrimitivyTypeKind(PrimitiveTypeKind o) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visitStatemachine(Statemachine o) {
+		HDLSequencer hs = module.newSequencer(o.getKey());
+		Hashtable<State, HDLSequencer.SequencerState> map = new Hashtable<State, HDLSequencer.SequencerState>();
+		for(State s: o.getStates()){
+			map.put(s, hs.addSequencerState(s.getId()));
+		}
+		for(State s: o.getStates()){
+			HDLSequencer.SequencerState ss = map.get(s);
+			for(Transition c: s.getTransitions()){
+				ss.addStateTransit(map.get(c.getDestination()));
+			}
+			if(s.isTerminate()){
+				ss.addStateTransit(hs.getIdleState());
+			}
+		}
+	}
+
+	@Override
+	public void visitState(State o) {
 		// TODO Auto-generated method stub
 		
 	}

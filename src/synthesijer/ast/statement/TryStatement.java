@@ -3,7 +3,6 @@ package synthesijer.ast.statement;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 

@@ -64,6 +64,21 @@ public class DumpStatemachineVisitor implements SynthesijerAstVisitor, Statemach
 	}
 
 	@Override
+	public void visitStatemachine(Statemachine o) {
+		for(State s: o.getStates()){
+			s.accept(this);
+		}
+	}
+
+	@Override
+	public void visitState(State o) {
+		dest.printf("%s [label=\"%s\"];\n", o.getId(), o.getId() + "\\n" + o.getDescription());
+		for(Transition t: o.getTransitions()){
+			if(t.getDestination() != null) dest.printf("%s -> %s;\n", o.getId(), t.getDestination().getId());
+		}
+	}
+
+	@Override
 	public void visitArrayAccess(ArrayAccess o) {
 		// TODO Auto-generated method stub
 		
@@ -247,21 +262,6 @@ public class DumpStatemachineVisitor implements SynthesijerAstVisitor, Statemach
 	public void visitPrimitivyTypeKind(PrimitiveTypeKind o) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void visitStatemachine(Statemachine o) {
-		for(State s: o.getStates()){
-			s.accept(this);
-		}
-	}
-
-	@Override
-	public void visitState(State o) {
-		dest.printf("%s [label=\"%s\"];\n", o.getId(), o.getId() + "\\n" + o.getDescription());
-		for(Transition t: o.getTransitions()){
-			if(t.getDestination() != null) dest.printf("%s -> %s;\n", o.getId(), t.getDestination().getId());
-		}
 	}
 
 }

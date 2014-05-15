@@ -5,12 +5,6 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
-import synthesijer.ast.type.ArrayType;
-import synthesijer.ast.type.ComponentType;
-import synthesijer.ast.type.PrimitiveTypeKind;
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLPort;
-import synthesijer.hdl.HDLSignal;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 
