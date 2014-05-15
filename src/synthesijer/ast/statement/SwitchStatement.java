@@ -9,7 +9,7 @@ import synthesijer.ast.SynthesijerAstTree;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class SwitchStatement extends Statement{
 
@@ -38,7 +38,7 @@ public class SwitchStatement extends Statement{
 		return elements;
 	}
 	
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State d = dest;
 		State[] stats = new State[elements.size()];
 		for(int i = elements.size(); i > 0; i--){
@@ -69,7 +69,7 @@ public class SwitchStatement extends Statement{
 			return statements;
 		}
 		
-		public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+		public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 			State d = dest;
 			for(int i = statements.size(); i > 0; i--){
 				d = statements.get(i-1).genStateMachine(m, d, terminal, loopout, loopCont);

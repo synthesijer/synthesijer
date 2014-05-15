@@ -6,7 +6,7 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class ReturnStatement extends ExprContainStatement{
 	
@@ -26,7 +26,7 @@ public class ReturnStatement extends ExprContainStatement{
 
 	private State state;
 	
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		state = m.newState("return");
 		state.setBody(this);
 		state.addTransition(terminal);

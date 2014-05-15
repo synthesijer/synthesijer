@@ -6,7 +6,7 @@ import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class IfStatement extends Statement{
 	
@@ -41,7 +41,7 @@ public class IfStatement extends Statement{
 		return elsePart;
 	}
 
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State t = thenPart.genStateMachine(m, dest, terminal, loopout, loopCont);
 		State s = m.newState("if_cond");
 		s.addTransition(t, condition, true);

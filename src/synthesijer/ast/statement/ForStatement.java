@@ -12,7 +12,7 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class ForStatement extends Statement implements Scope {
 
@@ -84,7 +84,7 @@ public class ForStatement extends Statement implements Scope {
 		return parent.search(s);
 	}
 	
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State d = dest;
 		State c = m.newState("for_cond");
 		for(int i = updates.size(); i > 0; i--){

@@ -10,14 +10,14 @@ public class State {
 	
 	private final int id;
 	private final String desc;
-	private final StateMachine machine;
+	private final Statemachine machine;
 	private final boolean terminate;
 	
 	private ExprContainStatement body;
 	
 	ArrayList<Transition> transitions = new ArrayList<Transition>();
 	
-	State(StateMachine m, int id, String desc, boolean terminate){
+	State(Statemachine m, int id, String desc, boolean terminate){
 		this.machine = m;
 		this.id = id;
 		this.desc = desc;
@@ -50,6 +50,10 @@ public class State {
 	
 	public boolean isTerminate(){
 		return terminate;
+	}
+	
+	public void accept(StatemachineVisitor v){
+		v.visitState(this);
 	}
 	
 	public void dumpAsDot(PrintWriter dest){

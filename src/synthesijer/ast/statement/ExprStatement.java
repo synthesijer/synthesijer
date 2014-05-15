@@ -5,7 +5,7 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class ExprStatement extends ExprContainStatement{
 	
@@ -20,7 +20,7 @@ public class ExprStatement extends ExprContainStatement{
 		return expr;
 	}
 	
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State s = m.newState("expr");
 		s.setBody(this);
 		s.addTransition(dest);

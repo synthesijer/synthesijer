@@ -12,7 +12,7 @@ import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class VariableDecl extends ExprContainStatement{
 	
@@ -49,7 +49,7 @@ public class VariableDecl extends ExprContainStatement{
 		return init;
 	}
 	
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		if(init != null){
 			State s = m.newState("var_init");
 			s.setBody(this);

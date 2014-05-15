@@ -11,7 +11,7 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class BlockStatement extends Statement implements Scope{
 	
@@ -48,7 +48,7 @@ public class BlockStatement extends Statement implements Scope{
 		return statements;
 	}
 	
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State d = dest;
 		for(int i = statements.size(); i > 0; i--){
 			Statement stmt = statements.get(i-1);

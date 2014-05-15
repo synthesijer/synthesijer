@@ -12,7 +12,7 @@ import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class Method implements Scope, SynthesijerAstTree{
 	
@@ -30,7 +30,7 @@ public class Method implements Scope, SynthesijerAstTree{
 	private boolean noWaitFlag;
 	private boolean constructorFlag;
 	
-	private StateMachine stateMachine;
+	private Statemachine stateMachine;
 	
 	private VariableDecl[] args;
 	private final BlockStatement body;
@@ -164,12 +164,12 @@ public class Method implements Scope, SynthesijerAstTree{
 	}
 	
 	public void genStateMachine(){
-		stateMachine = new StateMachine(getUniqueName());
+		stateMachine = new Statemachine(getUniqueName());
 		State terminal = stateMachine.newState("function_exit", true);
 		body.genStateMachine(stateMachine, terminal, terminal, null, null);
 	}
 	
-	public StateMachine getStateMachine(){
+	public Statemachine getStateMachine(){
 		return stateMachine;
 	}
 	

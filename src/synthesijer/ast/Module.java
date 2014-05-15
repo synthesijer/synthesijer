@@ -2,15 +2,10 @@ package synthesijer.ast;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import synthesijer.ast.statement.VariableDecl;
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLSignal;
-import synthesijer.hdl.HDLType;
-import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class Module implements Scope, SynthesijerAstTree{
 	
@@ -22,6 +17,8 @@ public class Module implements Scope, SynthesijerAstTree{
 	private Hashtable<String, VariableDecl> variableTable = new Hashtable<String, VariableDecl>();
 	private ArrayList<Method> methods = new ArrayList<Method>();
 	private ArrayList<VariableDecl> variables = new ArrayList<VariableDecl>();
+	
+	private Statemachine statemachine;
 	
 	public Module(String name, Hashtable<String, String> importTable){
 		this(null, name, importTable);
@@ -74,11 +71,9 @@ public class Module implements Scope, SynthesijerAstTree{
 
 	public ArrayList<Method> getMethods(){
 		return methods;
-	}
+	}	
 	
-	private StateMachine statemachine;
-	
-	public void genModuleStateMachine(){
+	public void genStateMachine(){
 		genInitStateMachine();
 		for(Method m: methods){
 			m.genStateMachine();
@@ -86,7 +81,7 @@ public class Module implements Scope, SynthesijerAstTree{
 	}
 
 	private void genInitStateMachine(){
-		statemachine = new StateMachine("module_variale_declararions");
+		statemachine = new Statemachine("module_variale_declararions");
 		State d = statemachine.newState("init_end", true);
 		for(int i = variables.size(); i > 0; i--){
 			d = variables.get(i-1).genStateMachine(statemachine, d, null, null, null);

@@ -1,8 +1,7 @@
 package synthesijer.ast;
 
-import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 
 public abstract class Statement implements SynthesijerAstTree{
@@ -17,6 +16,6 @@ public abstract class Statement implements SynthesijerAstTree{
 		return scope;
 	}
 	
-	abstract public State genStateMachine(StateMachine m, State dest, State funcOut, State loopOut, State loopCont);
+	abstract public State genStateMachine(Statemachine m, State dest, State funcOut, State loopOut, State loopCont);
 
 }

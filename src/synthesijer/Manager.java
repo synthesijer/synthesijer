@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 import synthesijer.ast.Module;
 import synthesijer.hdl.HDLModule;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public enum Manager {
 	
@@ -46,26 +46,26 @@ public enum Manager {
 		}
 	}
 
-	public void makeStateMachine() throws FileNotFoundException{
+	public void makeStateMachine(){
 		for(Module m: entries){
-			m.genModuleStateMachine();
-			Iterator<StateMachine> it = m.getStatemachinesIterator();
+			m.genStateMachine();
+		}
+	}
+	
+	public void dumpStateMachine() throws FileNotFoundException{
+		for(Module m: entries){
 			PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s_statemachine.dot", m.getName())), true);
-			dest.printf("digraph " + m.getName() + "{\n");
-			while(it.hasNext()){
-				StateMachine machine = it.next();
-				machine.dumpAsDot(dest);
-			}
-			dest.printf("}\n");
+			m.accept(new DumpStatemachineVisitor(dest));
 			dest.close();
 		}
 	}
+
 	
 	enum OutputFormat { Verilog, VHDL; };
 	
 	public void genHDL(OutputFormat format) throws FileNotFoundException{
 		for(Module m: entries){
-			HDLModule top = m.getHDLModule();
+			HDLModule top = new HDLModule(m.getName(), "clk", "reset");
 			if(format == OutputFormat.VHDL){
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.vhd", m.getName())), true); 
 				top.genVHDL(dest);

@@ -7,14 +7,14 @@ import java.util.Hashtable;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLSequencer;
 
-public class StateMachine {
+public class Statemachine {
 	
 	private ArrayList<State> stateList = new ArrayList<State>();
 	
 	private int stateIdCounter;
 	private final String base;
 	
-	public StateMachine(String base){
+	public Statemachine(String base){
 		this.base = base;
 		stateIdCounter = 1;
 	}
@@ -28,6 +28,10 @@ public class StateMachine {
 		stateIdCounter++;
 		stateList.add(s);
 		return s;
+	}
+	
+	public void accept(StatemachineVisitor v){
+		v.visitStatemachine(this);
 	}
 
 	public State newState(String desc, boolean flag){

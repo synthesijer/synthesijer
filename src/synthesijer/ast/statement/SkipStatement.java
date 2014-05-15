@@ -5,7 +5,7 @@ import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
-import synthesijer.model.StateMachine;
+import synthesijer.model.Statemachine;
 
 public class SkipStatement extends Statement{
 	
@@ -13,7 +13,7 @@ public class SkipStatement extends Statement{
 		super(scope);
 	}
 
-	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
+	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		return dest;
 	}
 
