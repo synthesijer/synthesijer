@@ -40,10 +40,18 @@ public class State {
 		transitions.add(new Transition(s, cond, pat));
 	}
 	
+	public Transition[] getTransitions(){
+		return transitions.toArray(new Transition[]{});
+	}
+	
 	public String getId(){
 		return String.format("%s_%04d", getBase(), id);
 	}
-	
+
+	public String getDescription(){
+		return desc;
+	}
+
 	public String getBase(){
 		return machine.getKey();
 	}
@@ -55,14 +63,7 @@ public class State {
 	public void accept(StatemachineVisitor v){
 		v.visitState(this);
 	}
-	
-	public void dumpAsDot(PrintWriter dest){
-		dest.printf("%s [label=\"%s\"];\n", getId(), getId() + "\\n" + desc);
-		for(Transition t: transitions){
-			if(t.getDestination() != null) dest.printf("%s -> %s;\n", getId(), t.getDestination().getId());
-		}
-	}
-	
+		
 	public String toString(){
 		return String.format("State: id=%d, desc=%s, machine=%s", id, desc, machine.getKey());
 	}

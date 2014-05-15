@@ -36,9 +36,12 @@ import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.model.State;
 import synthesijer.model.Statemachine;
+import synthesijer.model.StatemachineVisitor;
+import synthesijer.model.Transition;
 
-public class DumpStatemachineVisitor implements SynthesijerAstVisitor{
+public class DumpStatemachineVisitor implements SynthesijerAstVisitor, StatemachineVisitor{
 	
 	private PrintWriter dest;
 	
@@ -48,8 +51,7 @@ public class DumpStatemachineVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitMethod(Method o) {
-		Statemachine m = o.getStateMachine();
-		
+		o.getStateMachine().accept(this);
 	}
 
 	@Override
@@ -245,6 +247,21 @@ public class DumpStatemachineVisitor implements SynthesijerAstVisitor{
 	public void visitPrimitivyTypeKind(PrimitiveTypeKind o) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void visitStatemachine(Statemachine o) {
+		for(State s: o.getStates()){
+			s.accept(this);
+		}
+	}
+
+	@Override
+	public void visitState(State o) {
+		dest.printf("%s [label=\"%s\"];\n", o.getId(), o.getId() + "\\n" + o.getDescription());
+		for(Transition t: o.getTransitions()){
+			if(t.getDestination() != null) dest.printf("%s -> %s;\n", o.getId(), t.getDestination().getId());
+		}
 	}
 
 }

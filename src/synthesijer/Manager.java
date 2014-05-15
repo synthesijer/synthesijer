@@ -32,6 +32,7 @@ public enum Manager {
 		makeCallGraph();
 		try{
 			makeStateMachine();
+			dumpStateMachine();
 			genHDL(OutputFormat.VHDL);
 			genHDL(OutputFormat.Verilog);
 		}catch(Exception e){
