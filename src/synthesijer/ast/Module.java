@@ -76,53 +76,21 @@ public class Module implements Scope, SynthesijerAstTree{
 		return methods;
 	}
 	
-	private ArrayList<StateMachine> statemachines = new ArrayList<StateMachine>();
-	
-	public Iterator<StateMachine> getStatemachinesIterator(){
-		return statemachines.iterator();
-	}
+	private StateMachine statemachine;
 	
 	public void genModuleStateMachine(){
 		genInitStateMachine();
 		for(Method m: methods){
-			StateMachine machine = new StateMachine(m.getName());
-			m.genStateMachine(machine);
-			statemachines.add(machine);
+			m.genStateMachine();
 		}
 	}
 
 	private void genInitStateMachine(){
-		StateMachine init = new StateMachine("module_variale_declararions");
-		statemachines.add(init);
-		State d = init.newState("init_end", true);
+		statemachine = new StateMachine("module_variale_declararions");
+		State d = statemachine.newState("init_end", true);
 		for(int i = variables.size(); i > 0; i--){
-			d = variables.get(i-1).genStateMachine(init, d, null, null, null);
+			d = variables.get(i-1).genStateMachine(statemachine, d, null, null, null);
 		}
-	}
-		
-	public HDLModule getHDLModule(){
-		HDLModule hm = new HDLModule(name, "clk", "reset");
-		for(VariableDecl v: variables){
-			v.genHDLSignal(hm);
-		}
-		ArrayList<String> methodIds = new ArrayList<String>();
-		methodIds.add(new String("methodId_IDLE"));
-		for(Method m: methods){
-			if(m.isConstructor()) continue;
-			methodIds.add(m.getUniqueName("methodID_"));
-		}
-		HDLType t = hm.newUserDefinedType("methodId", methodIds.toArray(new String[]{}), 0);
-		hm.newSignal("methodId", t);
-		for(Method method: methods){
-			method.generateHDL(hm);
-		}
-		for(Method method: methods){
-			method.generateHDL(hm);
-		}
-		for(StateMachine m: statemachines){
-			m.genHDLSequencer(hm);
-		}
-		return hm;
 	}
 	
 	public void accept(SynthesijerAstVisitor v){

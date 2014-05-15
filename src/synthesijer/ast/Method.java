@@ -30,6 +30,8 @@ public class Method implements Scope, SynthesijerAstTree{
 	private boolean noWaitFlag;
 	private boolean constructorFlag;
 	
+	private StateMachine stateMachine;
+	
 	private VariableDecl[] args;
 	private final BlockStatement body;
 	
@@ -56,6 +58,10 @@ public class Method implements Scope, SynthesijerAstTree{
 
 	public void setArgs(VariableDecl[] args){
 		this.args = args;
+	}
+	
+	public VariableDecl[] getArgs(){
+		return args;
 	}
 	
 	public void setUnsynthesizableFlag(boolean f){
@@ -135,8 +141,8 @@ public class Method implements Scope, SynthesijerAstTree{
 		else return name;
 	}
 	
-	public String getUniqueName(String prefix){
-		return prefix + name;
+	public String getUniqueName(){
+		return name;
 	}
 	
 	public Type getType(){
@@ -157,48 +163,18 @@ public class Method implements Scope, SynthesijerAstTree{
 		return parent.search(name);
 	}
 	
-	public void genStateMachine(StateMachine s){
-		State terminal = s.newState("function_exit", true);
-		body.genStateMachine(s, terminal, terminal, null, null);
+	public void genStateMachine(){
+		stateMachine = new StateMachine(getUniqueName());
+		State terminal = stateMachine.newState("function_exit", true);
+		body.genStateMachine(stateMachine, terminal, terminal, null, null);
+	}
+	
+	public StateMachine getStateMachine(){
+		return stateMachine;
 	}
 	
 	public void accept(SynthesijerAstVisitor v){
 		v.visitMethod(this);
 	}
-		
-	public void generateHDL(HDLModule m){
-		for(VariableDecl v: args){
-			v.genHDLPort(m);
-		}
-		genMethodReturnPort(m);
-		body.generateHDL(m);
-	}
-	
-	private HDLSignal hdlSignal = null;
-	public HDLSignal getHDLReturnSignal(HDLModule m, String name, HDLType t){
-		if(hdlSignal == null){
-			hdlSignal = m.newSignal(name, t);
-		}
-		return hdlSignal;
-	}
-	
-	public HDLSignal getHDLReturnSignal(){
-		return hdlSignal;
-	}
-	
-	private void genMethodReturnPort(HDLModule m){
-		if(type == PrimitiveTypeKind.VOID) return;
-		HDLType t = type.getHDLType();
-		if(type instanceof PrimitiveTypeKind){
-			m.newPort(name + "_return", HDLPort.DIR.OUT, t);
-		}else if(type instanceof ArrayType){
-			System.err.println("unsupported type: " + type);
-		}else if(type instanceof ComponentType){
-			System.err.println("unsupported type: " + type);
-		}else{
-			System.err.printf("unkonw type: %s(%s)\n", type, type.getClass());
-		}
-	}
-	
 
 }

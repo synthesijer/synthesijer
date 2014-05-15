@@ -41,11 +41,6 @@ public class WhileStatement extends Statement{
 		return s;
 	}
 
-	@Override
-	public void generateHDL(HDLModule m) {
-		body.generateHDL(m);
-	}
-
 	public void accept(SynthesijerAstVisitor v){
 		v.visitWhileStatement(this);
 	}

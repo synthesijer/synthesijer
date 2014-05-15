@@ -87,12 +87,6 @@ public class SwitchStatement extends Statement{
 				
 	}
 
-	@Override
-	public void generateHDL(HDLModule m) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void accept(SynthesijerAstVisitor v){
 		v.visitSwitchStatement(this);
 	}

@@ -33,15 +33,6 @@ public class ReturnStatement extends ExprContainStatement{
 		return state;
 	}
 
-	@Override
-	public void generateHDL(HDLModule m) {
-		if(expr != null){
-			HDLSignal sig = getScope().getMethod().getHDLReturnSignal();
-			String methodId = getScope().getMethod().getName();
-			sig.setAssignCondition(methodId, state.getBase(), state.getId(), expr.getHDLExprResult(m));
-		}
-	}
-
 	public void accept(SynthesijerAstVisitor v){
 		v.visitReturnStatement(this);
 	}

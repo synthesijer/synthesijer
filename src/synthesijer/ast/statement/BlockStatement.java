@@ -67,13 +67,6 @@ public class BlockStatement extends Statement implements Scope{
 		return parent.search(s);
 	}
 
-	@Override
-	public void generateHDL(HDLModule m) {
-		for(Statement s: statements){
-			s.generateHDL(m);
-		}
-	}
-	
 	public void accept(SynthesijerAstVisitor v){
 		v.visitBlockStatement(this);
 	}

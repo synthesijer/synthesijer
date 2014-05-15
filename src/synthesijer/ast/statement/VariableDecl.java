@@ -60,25 +60,6 @@ public class VariableDecl extends ExprContainStatement{
 		}
 	}
 	
-	public void genHDLSignal(HDLModule m){
-		HDLSignal s = var.genHDLSignal(m);
-		if(var.getType() instanceof PrimitiveTypeKind){
-			if(init != null){ s.setResetValue(init.getHDLExprResult(m)); }
-		}else if(var.getType() instanceof ArrayType){
-		}else if(var.getType() instanceof ComponentType){
-		}else{
-		}
-	}
-
-	public void genHDLPort(HDLModule m){
-		var.genHDLPort(m, HDLPort.DIR.IN);
-	}
-
-	@Override
-	public void generateHDL(HDLModule m) {
-		genHDLSignal(m);
-	}
-
 	public void accept(SynthesijerAstVisitor v){
 		v.visitVariableDecl(this);
 	}

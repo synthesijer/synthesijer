@@ -52,11 +52,6 @@ public class IfStatement extends Statement{
 		return s;
 	}
 	
-	public void generateHDL(HDLModule m) {
-		thenPart.generateHDL(m);
-		if(elsePart != null) elsePart.generateHDL(m);
-	}
-
 	public void accept(SynthesijerAstVisitor v){
 		v.visitIfStatement(this);
 	}

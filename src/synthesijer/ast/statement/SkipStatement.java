@@ -17,10 +17,6 @@ public class SkipStatement extends Statement{
 		return dest;
 	}
 
-	@Override
-	public void generateHDL(HDLModule m) {
-	}
-	
 	public void accept(SynthesijerAstVisitor v){
 		v.visitSkipStatement(this);
 	}

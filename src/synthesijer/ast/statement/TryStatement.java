@@ -26,12 +26,7 @@ public class TryStatement extends Statement{
 	public State genStateMachine(StateMachine m, State dest, State terminal, State loopout, State loopCont){
 		return body.genStateMachine(m, dest, terminal, loopCont, loopCont);
 	}
-	
-	@Override
-	public void generateHDL(HDLModule m) {
-		body.generateHDL(m);
-	}
-	
+		
 	public void accept(SynthesijerAstVisitor v){
 		v.visitTryStatement(this);
 	}

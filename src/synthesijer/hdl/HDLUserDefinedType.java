@@ -58,9 +58,11 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 		return false;
 	}
 	
-	public void addItem(String s){
-		if(isDefined(s)) return;
-		items.add(new HDLValue(s, HDLPrimitiveType.genStringType()));
+	public HDLValue addItem(String s){
+		if(isDefined(s)) return null;
+		HDLValue v = new HDLValue(s, HDLPrimitiveType.genStringType());
+		items.add(v);
+		return v;
 	}
 		
 	@Override

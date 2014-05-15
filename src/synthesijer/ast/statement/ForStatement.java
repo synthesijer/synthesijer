@@ -100,16 +100,6 @@ public class ForStatement extends Statement implements Scope {
 		return d;
 	}
 	
-	public void generateHDL(HDLModule m) {
-		for(Statement s: initializations){
-			s.generateHDL(m);
-		}
-		body.generateHDL(m);
-		for(Statement s: updates){
-			s.generateHDL(m);
-		}
-	}
-
 	public void accept(SynthesijerAstVisitor v){
 		v.visitForStatement(this);
 	}

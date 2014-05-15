@@ -18,7 +18,5 @@ public abstract class Statement implements SynthesijerAstTree{
 	}
 	
 	abstract public State genStateMachine(StateMachine m, State dest, State funcOut, State loopOut, State loopCont);
-	
-	abstract public void generateHDL(HDLModule m);
 
 }

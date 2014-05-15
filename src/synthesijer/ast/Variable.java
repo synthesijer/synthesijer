@@ -52,22 +52,5 @@ public class Variable{
 			return null;
 		}
 	}
-
-	public HDLPort genHDLPort(HDLModule m, HDLPort.DIR dir){
-		if(type instanceof PrimitiveTypeKind){
-			HDLType t = ((PrimitiveTypeKind)type).getHDLType();
-			HDLPort port = m.newPort(getUniqueName(), dir, t);
-			return port;
-		}else if(type instanceof ArrayType){
-			System.err.println("unsupported type: " + type);
-			return null;
-		}else if(type instanceof ComponentType){
-			System.err.println("unsupported type: " + type);
-			return null;
-		}else{
-			System.err.printf("unkonw type: %s(%s)\n", type, type.getClass());
-			return null;
-		}
-	}
 	
 }
