@@ -4,13 +4,6 @@ import java.util.Hashtable;
 
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.VariableDecl;
-import synthesijer.ast.type.ArrayType;
-import synthesijer.ast.type.ComponentType;
-import synthesijer.ast.type.PrimitiveTypeKind;
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLPort;
-import synthesijer.hdl.HDLSignal;
-import synthesijer.hdl.HDLType;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 
