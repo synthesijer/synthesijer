@@ -23,12 +23,8 @@ public class NewArray extends Expr{
 	public ArrayList<Expr> getDimExpr(){
 		return dimExpr;
 	}
-
-	public HDLExpr getHDLExprResult(HDLModule m){
-		return null;
-	}
-
-	public void accept(SynthesijerAstVisitor v){
+	
+	public void accept(SynthesijerExprVisitor v){
 		v.visitNewArray(this);
 	}
 }

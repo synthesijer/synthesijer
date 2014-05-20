@@ -2,10 +2,6 @@ package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
-import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLPrimitiveType;
 
 public class FieldAccess extends Expr{
 	
@@ -31,13 +27,8 @@ public class FieldAccess extends Expr{
 	public Ident getIdent(){
 		return ident;
 	}
-		
-	public HDLExpr getHDLExprResult(HDLModule m){
-		return m.newSignal(String.format("%s_%s", selected, ident), HDLPrimitiveType.genVectorType(32));
-	}
 	
-	
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerExprVisitor v){
 		v.visitFieldAccess(this);
 	}
 

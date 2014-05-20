@@ -1,6 +1,7 @@
 package synthesijer.hdl;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import synthesijer.hdl.expr.HDLValue;
 
@@ -10,6 +11,7 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 	private final String base;
 	private final int defaultIndex;
 	private final ArrayList<HDLValue> items = new ArrayList<HDLValue>();
+	private final Hashtable<String, HDLValue> itemTable = new Hashtable<String, HDLValue>();
 	private final KIND kind;
 	
 	HDLUserDefinedType(String base, String[] items, int defaultIndex) {
@@ -50,14 +52,13 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 	}
 	
 	private boolean isDefined(String s){
-		for(HDLValue v: items){
-			if(v.getValue().equals(s)){
-				return true;
-			}
-		}
-		return false;
+		return itemTable.containsKey(s);
 	}
-	
+
+	private HDLValue getValueOfID(String s){
+		return itemTable.get(s);
+	}
+
 	public HDLValue addItem(String s){
 		if(isDefined(s)) return null;
 		HDLValue v = new HDLValue(s, HDLPrimitiveType.genStringType());

@@ -8,6 +8,7 @@ public class Statemachine {
 	
 	private int stateIdCounter;
 	private final String base;
+	private State entryState;
 	
 	public Statemachine(String base){
 		this.base = base;
@@ -27,6 +28,14 @@ public class Statemachine {
 	
 	public State[] getStates(){
 		return states.toArray(new State[]{});
+	}
+	
+	public void setEntryState(State s){
+		entryState = s;
+	}
+	
+	public State getEntryState(){
+		return entryState;
 	}
 	
 	public void accept(StatemachineVisitor v){

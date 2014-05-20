@@ -30,6 +30,10 @@ public class ReturnStatement extends ExprContainStatement{
 		state.addTransition(terminal);
 		return state;
 	}
+	
+	public State getState(){
+		return state;
+	}
 
 	public void accept(SynthesijerAstVisitor v){
 		v.visitReturnStatement(this);

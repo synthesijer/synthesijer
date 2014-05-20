@@ -2,11 +2,6 @@ package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
-import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLPrimitiveType;
-import synthesijer.hdl.expr.HDLValue;
 
 public class Literal extends Expr{
 	
@@ -120,15 +115,7 @@ public class Literal extends Expr{
 		}
 	}
 	
-	private HDLPrimitiveType getHDLValueType(){
-		return HDLPrimitiveType.genUnkonwType();
-	}
-	
-	public HDLExpr getHDLExprResult(HDLModule m){
-		return new HDLValue(getValueAsStr(), getHDLValueType());
-	}
-
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerExprVisitor v){
 		v.visitLitral(this);
 	}
 }

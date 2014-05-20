@@ -159,7 +159,8 @@ public class Method implements Scope, SynthesijerAstTree{
 	public void genStateMachine(){
 		stateMachine = new Statemachine(getUniqueName());
 		State terminal = stateMachine.newState("function_exit", true);
-		body.genStateMachine(stateMachine, terminal, terminal, null, null);
+		State s = body.genStateMachine(stateMachine, terminal, terminal, null, null);
+		stateMachine.setEntryState(s);
 	}
 	
 	public Statemachine getStateMachine(){

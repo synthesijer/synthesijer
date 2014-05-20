@@ -83,16 +83,6 @@ public class HDLSignal implements HDLTree, HDLExpr{
 		return assignAlwaysExpr;
 	}
 	
-	public void setAssignCondition(String methodId, String stateKey, String stateId, String phaseKey, String phaseId, HDLExpr value){
-		AssignmentCondition c = new AssignmentCondition(methodId, stateKey, stateId, phaseKey, phaseId, value);
-		conditions.add(c);
-	}
-
-	public void setAssignCondition(String methodId, String stateKey, String stateId, HDLExpr value){
-		AssignmentCondition c = new AssignmentCondition(methodId, stateKey, stateId, null, null, value);
-		conditions.add(c);
-	}
-	
 	public AssignmentCondition[] getConditions(){
 		return conditions.toArray(new AssignmentCondition[]{});
 	}
@@ -120,37 +110,17 @@ public class HDLSignal implements HDLTree, HDLExpr{
 		private final HDLSequencer.SequencerState s;
 		private final HDLExpr value;
 		
-		AssignmentCondition(String methodId, String stateKey, String stateId, String phaseKey, String phaseId, HDLExpr value){
-			s = null;
-			this.methodId = methodId;
-			this.stateKey = stateKey;
-			this.stateId = stateId;
-			this.phaseKey = phaseKey;
-			this.phaseId = phaseId;
-			this.value = value;
-		}
-		
 		public AssignmentCondition(HDLSequencer.SequencerState s, HDLExpr value) {
 			this.s = s;
 			this.value = value;
 		}
 		
 		public String getCondExprAsVHDL(){
-//			if(phaseKey != null){
-//				return String.format("methodId = %s and %s = %s and %s = %s", methodId, stateKey, stateId, phaseKey, phaseId);
-//			}else{
-//				return String.format("methodId = %s and %s = %s", methodId, stateKey, stateId);
-//			}
-			return s.getKey().getName() + " = " + s.getStateId(); 
+			return s.getKey().getName() + " = " + s.getStateId().getValue(); 
 		}
 
 		public String getCondExprAsVerilogHDL(){
-//			if(phaseKey != null){
-//				return String.format("methodId == %s && %s == %s && %s == %s", methodId, stateKey, stateId, phaseKey, phaseId);
-//			}else{
-//				return String.format("methodId == %s && %s == %s", methodId, stateKey, stateId);
-//			}
-			return s.getKey().getName() + " == " + s.getStateId(); 
+			return s.getKey().getName() + " == " + s.getStateId().getValue(); 
 		}
 		
 		public HDLExpr getValue(){

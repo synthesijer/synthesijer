@@ -1,9 +1,9 @@
 package synthesijer.ast;
 
-import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLModule;
+import synthesijer.ast.expr.SynthesijerExprVisitor;
 
-public abstract class Expr implements SynthesijerAstTree{
+
+public abstract class Expr{
 	
 	public enum TERM {LEFT, RIGHT};
 	
@@ -17,6 +17,6 @@ public abstract class Expr implements SynthesijerAstTree{
 		return scope;
 	}
 	
-	abstract public HDLExpr getHDLExprResult(HDLModule m);
+	abstract public void accept(SynthesijerExprVisitor v);
 	
 }

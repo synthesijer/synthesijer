@@ -33,11 +33,7 @@ public class NewClassExpr extends Expr{
 		return params;
 	}
 
-	public HDLExpr getHDLExprResult(HDLModule m){
-		return null;
-	}
-
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerExprVisitor v){
 		v.visitNewClassExpr(this);
 	}
 }

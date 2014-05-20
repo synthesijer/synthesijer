@@ -3,7 +3,7 @@ package synthesijer.hdl;
 import java.util.ArrayList;
 
 import synthesijer.SynthesijerUtils;
-import synthesijer.hdl.expr.HDLCombinationExpr;
+import synthesijer.hdl.expr.HDLValue;
 
 public class HDLSequencer implements HDLTree{
 	
@@ -19,8 +19,8 @@ public class HDLSequencer implements HDLTree{
 		this.module = module;
 		this.stateType = module.newUserDefinedType(key, null, 0);
 		this.stateKey = module.newSignal(key, stateType);
-		this.idle = new SequencerState(stateKey, stateKey.getName() + "_IDLE");
-		stateType.addItem(stateKey.getName() + "_IDLE");
+		HDLValue idleId = stateType.addItem(stateKey.getName() + "_IDLE");
+		this.idle = new SequencerState(stateKey, idleId);
 		states = new ArrayList<SequencerState>();
 		states.add(idle);
 	}
@@ -38,9 +38,9 @@ public class HDLSequencer implements HDLTree{
 	}
 	
 	public SequencerState addSequencerState(String id){
-		SequencerState s = new SequencerState(stateKey, id);
+		HDLValue value = stateType.addItem(id);
+		SequencerState s = new SequencerState(stateKey, value);
 		states.add(s);
-		stateType.addItem(id);
 		return s;
 	}
 	
@@ -65,14 +65,14 @@ public class HDLSequencer implements HDLTree{
 		private ArrayList<StateTransitCondition> transitions = new ArrayList<StateTransitCondition>();
 		
 		private final HDLSignal key;
-		private final String id;
+		private final HDLValue id;
 		
-		public SequencerState(HDLSignal key, String id){
+		public SequencerState(HDLSignal key, HDLValue id){
 			this.key = key;
 			this.id = id;
 		}
 		
-		public String getStateId(){
+		public HDLValue getStateId(){
 			return id;
 		}
 		
@@ -82,7 +82,6 @@ public class HDLSequencer implements HDLTree{
 		
 		public void addStateTransit(HDLExpr expr, SequencerState d){
 			transitions.add(new StateTransitCondition(key, id, expr, d));
-			stateType.addItem(id);
 			if(expr == null) return;
 			if(expr.getType().isBit()) return;
 			SynthesijerUtils.error(String.format("%s is not allowed, only bit type is allowd", expr));
@@ -90,7 +89,6 @@ public class HDLSequencer implements HDLTree{
 
 		public void addStateTransit(SequencerState dest){
 			transitions.add(new StateTransitCondition(key, id, null, dest));
-			stateType.addItem(id);
 		}
 
 		public ArrayList<StateTransitCondition> getTransitions(){
@@ -101,11 +99,11 @@ public class HDLSequencer implements HDLTree{
 	
 	public class StateTransitCondition{
 		final HDLSignal stateKey;
-		final String stateId;
+		final HDLValue stateId;
 		final HDLExpr cond;
 		final SequencerState destState;
 		
-		StateTransitCondition(HDLSignal stateKey, String stateId, HDLExpr cond, SequencerState dest){
+		StateTransitCondition(HDLSignal stateKey, HDLValue stateId, HDLExpr cond, SequencerState dest){
 			this.stateKey = stateKey;
 			this.stateId = stateId;
 			this.cond = cond;
@@ -130,6 +128,10 @@ public class HDLSequencer implements HDLTree{
 				s = String.format("%s == 1'b1", cond.getResultExpr().getVHDL());
 			}
 			return s;
+		}
+		
+		public boolean hasCondition(){
+			return (cond != null);
 		}
 	}
 

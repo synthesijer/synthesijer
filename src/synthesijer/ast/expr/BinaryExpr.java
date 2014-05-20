@@ -3,11 +3,6 @@ package synthesijer.ast.expr;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
-import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLPrimitiveType;
-import synthesijer.hdl.HDLSignal;
 
 public class BinaryExpr extends Expr{
 	
@@ -41,13 +36,8 @@ public class BinaryExpr extends Expr{
 	public Op getOp(){
 		return this.op;
 	}
-		
-	public HDLExpr getHDLExprResult(HDLModule m){
-		HDLSignal id = m.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
-		return id;
-	}
 	
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerExprVisitor v){
 		v.visitBinaryExpr(this);
 	}
 }

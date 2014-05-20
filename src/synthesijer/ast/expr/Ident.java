@@ -2,10 +2,6 @@ package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
-import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.HDLModule;
-import synthesijer.hdl.HDLPrimitiveType;
 
 public class Ident extends Expr{
 	
@@ -23,11 +19,7 @@ public class Ident extends Expr{
 		return symbol;
 	}
 	
-	public HDLExpr getHDLExprResult(HDLModule m){
-		return m.newSignal(symbol, HDLPrimitiveType.genVectorType(32));
-	}
-
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerExprVisitor v){
 		v.visitIdent(this);
 	}
 

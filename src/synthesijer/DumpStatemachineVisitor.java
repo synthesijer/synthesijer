@@ -5,19 +5,6 @@ import java.io.PrintWriter;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.ast.expr.ArrayAccess;
-import synthesijer.ast.expr.AssignExpr;
-import synthesijer.ast.expr.AssignOp;
-import synthesijer.ast.expr.BinaryExpr;
-import synthesijer.ast.expr.FieldAccess;
-import synthesijer.ast.expr.Ident;
-import synthesijer.ast.expr.Literal;
-import synthesijer.ast.expr.MethodInvocation;
-import synthesijer.ast.expr.NewArray;
-import synthesijer.ast.expr.NewClassExpr;
-import synthesijer.ast.expr.ParenExpr;
-import synthesijer.ast.expr.TypeCast;
-import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
@@ -76,84 +63,6 @@ public class DumpStatemachineVisitor implements SynthesijerAstVisitor, Statemach
 		for(Transition t: o.getTransitions()){
 			if(t.getDestination() != null) dest.printf("%s -> %s;\n", o.getId(), t.getDestination().getId());
 		}
-	}
-
-	@Override
-	public void visitArrayAccess(ArrayAccess o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitAssignExpr(AssignExpr o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitAssignOp(AssignOp o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitBinaryExpr(BinaryExpr o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitFieldAccess(FieldAccess o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitIdent(Ident o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitLitral(Literal o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitMethodInvocation(MethodInvocation o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitNewArray(NewArray o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitNewClassExpr(NewClassExpr o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitParenExpr(ParenExpr o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitTypeCast(TypeCast o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitUnaryExpr(UnaryExpr o) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

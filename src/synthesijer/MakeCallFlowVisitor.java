@@ -17,6 +17,7 @@ import synthesijer.ast.expr.MethodInvocation;
 import synthesijer.ast.expr.NewArray;
 import synthesijer.ast.expr.NewClassExpr;
 import synthesijer.ast.expr.ParenExpr;
+import synthesijer.ast.expr.SynthesijerExprVisitor;
 import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.statement.BlockStatement;
@@ -38,7 +39,7 @@ import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
-public class MakeCallFlowVisitor implements SynthesijerAstVisitor{
+public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerExprVisitor{
 
 	@Override
 	public void visitMethod(Method o) {
