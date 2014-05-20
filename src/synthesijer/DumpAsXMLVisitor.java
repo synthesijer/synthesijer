@@ -372,7 +372,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 	}
 
 	@Override
-	public void visitPrimitivyTypeKind(PrimitiveTypeKind o) {
+	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
 		dest.printf("<type kind=\"primitive\" name=\"%s\"/>\n", o.toString());
 	}
 

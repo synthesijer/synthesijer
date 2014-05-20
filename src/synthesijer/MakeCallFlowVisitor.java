@@ -267,7 +267,7 @@ public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerEx
 	}
 
 	@Override
-	public void visitPrimitivyTypeKind(PrimitiveTypeKind o) {
+	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
 		// nothing to do
 	}
 

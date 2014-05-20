@@ -3,13 +3,14 @@ package synthesijer.ast.statement;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.hdl.HDLModule;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 
 public class ExprStatement extends ExprContainStatement{
 	
 	private final Expr expr;
+	
+	private State state;
 	
 	public ExprStatement(Scope scope, Expr expr){
 		super(scope);
@@ -24,11 +25,12 @@ public class ExprStatement extends ExprContainStatement{
 		State s = m.newState("expr");
 		s.setBody(this);
 		s.addTransition(dest);
+		state = s;
 		return s;
 	}
-
-	public void generateHDL(HDLModule m) {
-		
+	
+	public State getState(){
+		return state;
 	}
 
 	public void accept(SynthesijerAstVisitor v){

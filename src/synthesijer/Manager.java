@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import synthesijer.ast.Module;
+import synthesijer.ast2hdl.GenerateHDLModuleVisitor;
 import synthesijer.hdl.HDLModule;
 
 public enum Manager {

@@ -59,6 +59,6 @@ public interface SynthesijerAstVisitor{
 
 	public void visitMySelfType(MySelfType o);
 
-	public void visitPrimitivyTypeKind(PrimitiveTypeKind o);
+	public void visitPrimitiveTypeKind(PrimitiveTypeKind o);
 
 }

@@ -50,6 +50,6 @@ public enum PrimitiveTypeKind implements Type{
 	}
 
 	public void accept(SynthesijerAstVisitor v){
-		v.visitPrimitivyTypeKind(this);
+		v.visitPrimitiveTypeKind(this);
 	}
 }

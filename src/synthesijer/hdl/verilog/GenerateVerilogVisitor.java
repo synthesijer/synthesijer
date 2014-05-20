@@ -178,9 +178,9 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		if(o.getConditions().length > 0){
 			String sep = "";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
-				HDLUtils.println(dest, offset+2, String.format("%s if (%s) begin", sep, c.getCondExprAsVerilogHDL()));
+				HDLUtils.println(dest, offset+2, String.format("%sif (%s) begin", sep, c.getCondExprAsVerilogHDL()));
 				HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), c.getValue().getVerilogHDL()));
-				sep = "end else";
+				sep = "end else ";
 			}
 			HDLUtils.println(dest, offset+2, String.format("end"));
 		}

@@ -102,11 +102,6 @@ public class HDLSignal implements HDLTree, HDLExpr{
 	}
 	
 	public class AssignmentCondition{
-		String methodId;
-		String stateKey;
-		String stateId;
-		String phaseKey;
-		String phaseId;
 		private final HDLSequencer.SequencerState s;
 		private final HDLExpr value;
 		
