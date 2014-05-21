@@ -83,7 +83,10 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	public void visitMethod(Method o) {
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
-			if(t != null) module.newPort(v.getName(), HDLPort.DIR.IN, t);
+			if(t != null){
+				HDLPort p = module.newPort(o.getName() + "_" + v.getName(), HDLPort.DIR.IN, t);
+				variableTable.put(v.getName(), p.getSignal());
+			}
 		}
 		HDLType t = getHDLType(o.getType());
 		if(t != null){
@@ -150,47 +153,12 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		// TODO Auto-generated method stub
 		
 	}
-	
-	public void genExprStatement(AssignExpr expr){
-		System.out.println(expr);
-	}
-
-	public void genExprStatement(State state, AssignOp expr){
-		HDLSignal signal = getHDLSignal((Ident)(expr.getLhs()));
-		GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this);
-		expr.accept(v);
-		signal.setAssign(stateTable.get(state), v.getResult());
-	}
-	
-	public void genExprStatement(UnaryExpr expr){
-		// TODO
-	}
-
-	public void genExprStatement(MethodInvocation expr){
-		// TODO
-	}
-	
-	public void genExprStatement(ArrayAccess expr){
-		// TODO
-	}
 
 	@Override
 	public void visitExprStatement(ExprStatement o) {
-		State s = o.getState();
 		Expr expr = o.getExpr();
-		if(expr instanceof AssignExpr){
-			genExprStatement((AssignExpr)expr);
-		}else if(expr instanceof AssignOp){
-			genExprStatement(s, (AssignOp)expr);
-		}else if(expr instanceof UnaryExpr){
-			genExprStatement((UnaryExpr)expr);
-		}else if(expr instanceof MethodInvocation){
-			genExprStatement((MethodInvocation)expr);
-		}else if(expr instanceof ArrayAccess){
-			genExprStatement((ArrayAccess)expr);
-		}else{
-			System.err.printf("unknown to handle: %s(%s)\n" + o, o.getClass());
-		}
+		GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
+		expr.accept(v);
 	}
 
 	@Override
@@ -217,7 +185,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		if(o.getExpr() != null){
 			HDLPort p = methodReturnTable.get(o.getScope().getMethod());
 			HDLSequencer.SequencerState state = stateTable.get(o.getState());
-			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this);
+			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, state);
 			o.getExpr().accept(v);
 			p.getSignal().setAssign(state, v.getResult());
 		}
@@ -230,7 +198,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitSwitchStatement(SwitchStatement o) {
-		GenerateHDLExprVisitor selector = new GenerateHDLExprVisitor(this);
+		GenerateHDLExprVisitor selector = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 		o.getSelector().accept(selector);
 		for(Elem e: o.getElements()){
 			e.accept(this);
@@ -266,7 +234,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		HDLSignal s = module.newSignal(var.getUniqueName(), t);
 		variableTable.put(var.getName(), s);
 		if(o.getInitExpr() != null){
-			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this);
+			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);
 			s.setResetValue(v.getResult());
 		}

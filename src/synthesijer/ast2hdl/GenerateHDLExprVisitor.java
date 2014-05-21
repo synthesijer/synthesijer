@@ -1,5 +1,6 @@
 package synthesijer.ast2hdl;
 
+import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
@@ -18,22 +19,32 @@ import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPrimitiveType;
+import synthesijer.hdl.HDLSequencer;
+import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.expr.HDLValue;
 
 public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		
 	private final GenerateHDLModuleVisitor parent;
+	private final HDLSequencer.SequencerState state;
 	
 	private HDLExpr result;
 	
-	public GenerateHDLExprVisitor(GenerateHDLModuleVisitor parent){
+	public GenerateHDLExprVisitor(GenerateHDLModuleVisitor parent, HDLSequencer.SequencerState state){
 		this.parent = parent;
+		this.state = state;
 	}
 	
 	public HDLExpr getResult(){
 		return result;
 	}
 	
+	private HDLExpr stepIn(Expr expr){
+		GenerateHDLExprVisitor visitor = new GenerateHDLExprVisitor(parent, state);
+		expr.accept(visitor);
+		return visitor.getResult();
+	}
+
 	@Override
 	public void visitArrayAccess(ArrayAccess o) {
 		if(o.getIndexed() instanceof Ident){
@@ -46,9 +57,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
-		GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent);
-		o.getLhs().accept(v);
-		result = v.getResult();
+		result = stepIn(o.getLhs());
 	}
 	
 	private HDLOp convOp(Op op){
@@ -75,17 +84,16 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitAssignOp(AssignOp o) {
-		GenerateHDLExprVisitor lhsVisitor = new GenerateHDLExprVisitor(parent);
-		GenerateHDLExprVisitor rhsVisitor = new GenerateHDLExprVisitor(parent);
-		HDLOp op = convOp(o.getOp());
-		o.getLhs().accept(lhsVisitor);
-		o.getRhs().accept(rhsVisitor);
-		result = parent.module.newExpr(op, lhsVisitor.getResult(), rhsVisitor.getResult());
+		result = parent.module.newExpr(convOp(o.getOp()), stepIn(o.getLhs()), stepIn(o.getRhs()));
 	}
-	
+		
 	@Override
 	public void visitBinaryExpr(BinaryExpr o) {
-		result = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
+		HDLExpr lhs = stepIn(o.getLhs());
+		HDLExpr rhs = stepIn(o.getRhs());
+		HDLSignal sig = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
+		sig.setAssign(state, parent.module.newExpr(convOp(o.getOp()), lhs, rhs));
+		result = sig;
 	}
 	
 	@Override
@@ -95,13 +103,27 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitIdent(Ident o) {
-		result = parent.module.newSignal(o.getSymbol(), HDLPrimitiveType.genVectorType(32));
+		result = parent.getHDLSignal(o.getSymbol());
+	}
+	
+	private HDLPrimitiveType convToHDLType(Literal.LITERAL_KIND kind){
+		switch(kind){
+		case BOOLEAN: return HDLPrimitiveType.genBitType();
+		case BYTE:    return HDLPrimitiveType.genSignedType(8);
+		case CHAR:    return HDLPrimitiveType.genVectorType(16);
+		case SHORT:   return HDLPrimitiveType.genSignedType(16);
+		case INT:     return HDLPrimitiveType.genSignedType(32);
+		case LONG:    return HDLPrimitiveType.genSignedType(64);
+		case DOUBLE:  return HDLPrimitiveType.genVectorType(64);
+		case FLOAT:   return HDLPrimitiveType.genVectorType(32);
+		case STRING:  return HDLPrimitiveType.genStringType();
+		default: return HDLPrimitiveType.genUnkonwType();
+		}
 	}
 	
 	@Override
 	public void visitLitral(Literal o) {
-		HDLPrimitiveType t = HDLPrimitiveType.genUnkonwType();
-		result = new HDLValue(o.getValueAsStr(), t);
+		result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getKind()));
 	}
 	
 	@Override
@@ -122,16 +144,12 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitParenExpr(ParenExpr o) {
-		GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent);
-		o.getExpr().accept(v);
-		result = v.getResult();
+		result = stepIn(o.getExpr());
 	}
 	
 	@Override
 	public void visitTypeCast(TypeCast o) {
-		GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent);
-		o.getExpr().accept(v);
-		result = v.getResult();
+		result = stepIn(o.getExpr());
 	}
 	
 	@Override

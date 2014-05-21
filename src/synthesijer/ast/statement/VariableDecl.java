@@ -43,15 +43,22 @@ public class VariableDecl extends ExprContainStatement{
 		return init;
 	}
 	
+	private State state;
+	
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		if(init != null){
 			State s = m.newState("var_init");
 			s.setBody(this);
 			s.addTransition(dest);
-			return s;
+			state = s;
 		}else{
-			return dest;
+			state = dest;
 		}
+		return state;
+	}
+	
+	public State getState(){
+		return state;
 	}
 	
 	public void accept(SynthesijerAstVisitor v){

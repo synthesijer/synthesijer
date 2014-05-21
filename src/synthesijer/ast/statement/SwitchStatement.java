@@ -37,6 +37,8 @@ public class SwitchStatement extends Statement{
 		return elements;
 	}
 	
+	private State state;
+	
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State d = dest;
 		State[] stats = new State[elements.size()];
@@ -48,7 +50,12 @@ public class SwitchStatement extends Statement{
 		for(int i = 0; i < elements.size(); i++){
 			s.addTransition(stats[i], selector, elements.get(i).getPattern());	
 		}
+		state = s;
 		return s;
+	}
+	
+	public State getState(){
+		return state;
 	}
 	
 	public class Elem implements SynthesijerAstTree{
