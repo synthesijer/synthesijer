@@ -101,10 +101,10 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	public void visitBinaryExpr(BinaryExpr o) {
 		HDLExpr lhs = stepIn(o.getLhs());
 		HDLExpr rhs = stepIn(o.getRhs());
-//		HDLSignal sig = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
-//		sig.setAssign(null, parent.module.newExpr(convOp(o.getOp()), lhs, rhs));
-//		result = sig;
-		result = parent.module.newExpr(convOp(o.getOp()), lhs, rhs);
+		HDLSignal sig = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
+		sig.setAssign(null, parent.module.newExpr(convOp(o.getOp()), lhs, rhs));
+		result = sig;
+//		result = parent.module.newExpr(convOp(o.getOp()), lhs, rhs);
 	}
 	
 	@Override
