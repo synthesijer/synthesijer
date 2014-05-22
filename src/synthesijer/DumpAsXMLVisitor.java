@@ -51,7 +51,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 	public void visitModule(Module o){
 		dest.printf("<module name=\"%s\">\n", o.getName());
 		dest.println("<variables>");
-		for(VariableDecl v: o.getVariables()){ v.accept(this); }
+		for(VariableDecl v: o.getVariableDecls()){ v.accept(this); }
 		dest.println("</variables>");
 		dest.println("<methods>");
 		for(Method m: o.getMethods()){ m.accept(this); }

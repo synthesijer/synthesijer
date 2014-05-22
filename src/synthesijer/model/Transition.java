@@ -27,6 +27,18 @@ public class Transition {
 	public State getDestination(){
 		return destination;
 	}
+	
+	public Expr getCondition(){
+		return condition;
+	}
+	
+	public Expr getPattern(){
+		return pattern;
+	}
+	
+	public boolean getFlag(){
+		return flag;
+	}
 
 	public String toString(){
 		return String.format("Transion: dest=%s, condition=%s, flag=%s, pattern=%s", destination, condition, flag, pattern);

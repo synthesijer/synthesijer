@@ -35,6 +35,11 @@ public class Method implements Scope, SynthesijerAstTree{
 		this.name = name;
 		this.type = type;
 		this.body = new BlockStatement(this);
+		parent.addScope(this);
+	}
+	
+	public void addScope(Scope s){
+		parent.addScope(s);
 	}
 	
 	public Scope getParentScope(){
@@ -148,6 +153,10 @@ public class Method implements Scope, SynthesijerAstTree{
 		
 	public void addVariableDecl(VariableDecl v){
 		varTable.put(v.getVariable().getName(), v.getVariable());
+	}
+	
+	public Variable[] getVariables(){
+		return varTable.values().toArray(new Variable[]{});
 	}
 	
 	public Variable search(String name){

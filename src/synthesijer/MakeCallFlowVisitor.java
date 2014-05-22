@@ -48,7 +48,7 @@ public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerEx
 
 	@Override
 	public void visitModule(Module o) {
-		for(VariableDecl v: o.getVariables()){
+		for(VariableDecl v: o.getVariableDecls()){
 			v.accept(this);
 		}
 		for(Method m: o.getMethods()){

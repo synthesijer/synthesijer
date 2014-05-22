@@ -23,8 +23,13 @@ public class BlockStatement extends Statement implements Scope{
 	public BlockStatement(Scope scope){
 		super(scope);
 		this.parent = scope;
+		parent.addScope(this);
 	}
 	
+	public void addScope(Scope s){
+		parent.addScope(s);
+	}
+
 	public Scope getParentScope(){
 		return parent;
 	}
@@ -60,6 +65,10 @@ public class BlockStatement extends Statement implements Scope{
 		varTable.put(v.getVariable().getName(), v.getVariable());
 	}
 	
+	public Variable[] getVariables(){
+		return varTable.values().toArray(new Variable[]{});
+	}
+
 	public Variable search(String s){
 		Variable v = varTable.get(s);
 		if(v != null) return v;

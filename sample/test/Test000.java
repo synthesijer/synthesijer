@@ -10,4 +10,10 @@ public class Test000{
 		return x + y;
 	}
 	
+	public int acc2(int num, int y){
+		for(int i = 0; i < num; i++){
+			x += y;
+		}
+		return x;
+	}
 }

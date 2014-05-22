@@ -5,16 +5,11 @@ import java.util.Hashtable;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
+import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
-import synthesijer.ast.expr.ArrayAccess;
-import synthesijer.ast.expr.AssignExpr;
-import synthesijer.ast.expr.AssignOp;
-import synthesijer.ast.expr.Ident;
-import synthesijer.ast.expr.MethodInvocation;
-import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
@@ -45,47 +40,29 @@ import synthesijer.model.State;
 
 public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
-	final GenerateHDLModuleVisitor parent;
 	final HDLModule module;
 	final Hashtable<State, HDLSequencer.SequencerState> stateTable;
-	final Hashtable<Method, HDLPort> methodReturnTable;
-	
-	final Hashtable<String, HDLSignal> variableTable = new Hashtable<String, HDLSignal>();
+	private final Hashtable<Method, HDLPort> methodReturnTable;
+	private final Hashtable<Variable, HDLSignal> variableTable = new Hashtable<Variable, HDLSignal>();
+	private final Hashtable<Method, HDLValue> methodIdTable = new Hashtable<Method, HDLValue>();
 	
 	public GenerateHDLModuleVisitor(HDLModule m){
-		this(null, m);
-	}
-
-	private GenerateHDLModuleVisitor(GenerateHDLModuleVisitor parent, HDLModule m){
 		this.module = m;
-		this.parent = parent;
-		if(parent == null){
-			this.stateTable = new Hashtable<State, HDLSequencer.SequencerState>();
-			this.methodReturnTable = new Hashtable<Method, HDLPort>();
-		}else{
-			this.stateTable = parent.stateTable;
-			this.methodReturnTable = parent.methodReturnTable;
-		}
+		this.stateTable = new Hashtable<State, HDLSequencer.SequencerState>();
+		this.methodReturnTable = new Hashtable<Method, HDLPort>();
 	}
 	
-	private HDLSignal getHDLSignal(Ident id){
-		return getHDLSignal(id.getSymbol());
+	public HDLSignal getHDLSignal(Variable v){
+		return variableTable.get(v);
 	}
 	
-	public HDLSignal getHDLSignal(String name){
-		HDLSignal sig = variableTable.get(name);
-		if(sig != null) return sig;
-		if(parent != null) return parent.getHDLSignal(name);
-		return null;
-	}
-
 	@Override
 	public void visitMethod(Method o) {
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
 			if(t != null){
 				HDLPort p = module.newPort(o.getName() + "_" + v.getName(), HDLPort.DIR.IN, t);
-				variableTable.put(v.getName(), p.getSignal());
+				variableTable.put(v.getVariable(), p.getSignal());
 			}
 		}
 		HDLType t = getHDLType(o.getType());
@@ -113,12 +90,22 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			return null;
 		}
 	}
-
-	private Hashtable<Method, HDLValue> methodIdTable = new Hashtable<Method, HDLValue>();
+	
+	private void genVariableTable(Scope s){
+		for(Variable v: s.getVariables()){
+			HDLType t = getHDLType(v.getType());
+			if(t == null) continue;
+			HDLSignal sig = module.newSignal(v.getUniqueName(), t);
+			variableTable.put(v, sig);
+		}			
+	}
 	
 	@Override
 	public void visitModule(Module o) {
-		for(VariableDecl v: o.getVariables()){
+		for(Scope s: o.getScope()){
+			genVariableTable(s);
+		}
+		for(VariableDecl v: o.getVariableDecls()){
 			v.accept(this);
 		}
 		HDLUserDefinedType type = module.newUserDefinedType("methodId", new String[]{"IDLE"}, 0);		
@@ -135,10 +122,8 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitBlockStatement(BlockStatement o) {
-		// new scope
-		GenerateHDLModuleVisitor visitor = new GenerateHDLModuleVisitor(this, module);
 		for(Statement s: o.getStatements()){
-			s.accept(visitor); 
+			s.accept(this); 
 		}
 	}
 
@@ -163,14 +148,12 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitForStatement(ForStatement o) {
-		// local visitor for "for"
-		GenerateHDLModuleVisitor visitor = new GenerateHDLModuleVisitor(this, module);
 		for(Statement s: o.getInitializations()){
-			s.accept(visitor);
+			s.accept(this);
 		}
-		o.getBody().accept(visitor);
+		o.getBody().accept(this);
 		for(Statement s: o.getUpdates()){
-			s.accept(visitor);
+			s.accept(this);
 		}
 	}
 
@@ -214,10 +197,8 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitSynchronizedBlock(SynchronizedBlock o) {
-		// new scope
-		GenerateHDLModuleVisitor visitor = new GenerateHDLModuleVisitor(this, module);
 		for(Statement s: o.getStatements()){
-			s.accept(visitor);
+			s.accept(this);
 		}
 	}
 
@@ -229,10 +210,11 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
 		Variable var = o.getVariable();
-		HDLType t = getHDLType(var.getType());
-		if(t == null) return;
-		HDLSignal s = module.newSignal(var.getUniqueName(), t);
-		variableTable.put(var.getName(), s);
+//		HDLType t = getHDLType(var.getType());
+//		if(t == null) return;
+//		HDLSignal s = module.newSignal(var.getUniqueName(), t);
+//		variableTable.put(var, s);
+		HDLSignal s = variableTable.get(var);
 		if(o.getInitExpr() != null){
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);

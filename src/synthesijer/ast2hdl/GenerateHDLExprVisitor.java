@@ -2,6 +2,7 @@ package synthesijer.ast2hdl;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
+import synthesijer.ast.Variable;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
@@ -54,12 +55,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 		}
 	}
-	
-	@Override
-	public void visitAssignExpr(AssignExpr o) {
-		result = stepIn(o.getLhs());
-	}
-	
+		
 	private HDLOp convOp(Op op){
 		switch(op){
 		case PLUS : return HDLOp.ADD;
@@ -83,17 +79,32 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	}
 	
 	@Override
+	public void visitAssignExpr(AssignExpr o) {
+		HDLExpr expr = stepIn(o.getRhs());
+		Ident id = (Ident)o.getLhs();
+		HDLSignal sig = parent.getHDLSignal(o.getScope().search(id.getSymbol()));
+		sig.setAssign(state, expr);
+		result = expr;
+	}
+	
+	@Override
 	public void visitAssignOp(AssignOp o) {
-		result = parent.module.newExpr(convOp(o.getOp()), stepIn(o.getLhs()), stepIn(o.getRhs()));
+		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), stepIn(o.getLhs()), stepIn(o.getRhs()));
+		Ident id = (Ident)o.getLhs();
+		HDLSignal sig = parent.getHDLSignal(o.getScope().search(id.getSymbol()));
+		System.out.println(state);
+		sig.setAssign(state, expr);
+		result = expr;
 	}
 		
 	@Override
 	public void visitBinaryExpr(BinaryExpr o) {
 		HDLExpr lhs = stepIn(o.getLhs());
 		HDLExpr rhs = stepIn(o.getRhs());
-		HDLSignal sig = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
-		sig.setAssign(state, parent.module.newExpr(convOp(o.getOp()), lhs, rhs));
-		result = sig;
+//		HDLSignal sig = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
+//		sig.setAssign(null, parent.module.newExpr(convOp(o.getOp()), lhs, rhs));
+//		result = sig;
+		result = parent.module.newExpr(convOp(o.getOp()), lhs, rhs);
 	}
 	
 	@Override
@@ -103,7 +114,8 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitIdent(Ident o) {
-		result = parent.getHDLSignal(o.getSymbol());
+		Variable v = o.getScope().search(o.getSymbol());
+		result = parent.getHDLSignal(v);
 	}
 	
 	private HDLPrimitiveType convToHDLType(Literal.LITERAL_KIND kind){

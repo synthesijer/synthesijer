@@ -14,9 +14,10 @@ public class Module implements Scope, SynthesijerAstTree{
 	private Hashtable<String, String> importTable;
 	
 	private Hashtable<String, Method> methodTable = new Hashtable<String, Method>();
-	private Hashtable<String, VariableDecl> variableTable = new Hashtable<String, VariableDecl>();
+	private Hashtable<String, Variable> variableTable = new Hashtable<String, Variable>();
 	private ArrayList<Method> methods = new ArrayList<Method>();
 	private ArrayList<VariableDecl> variables = new ArrayList<VariableDecl>();
+	private ArrayList<Scope> scopes = new ArrayList<Scope>();
 	
 	private Statemachine statemachine;
 	
@@ -27,7 +28,16 @@ public class Module implements Scope, SynthesijerAstTree{
 	public Module(Scope parent, String name, Hashtable<String, String> importTable){
 		this.parent = parent;
 		this.name = name;
-		this.importTable = importTable; 
+		this.importTable = importTable;
+		scopes.add(this);
+	}
+	
+	public void addScope(Scope s){
+		scopes.add(s);
+	}
+	
+	public Scope[] getScope(){
+		return scopes.toArray(new Scope[]{});
 	}
 	
 	public String getName(){
@@ -39,9 +49,9 @@ public class Module implements Scope, SynthesijerAstTree{
 	}
 	
 	public Variable search(String name){
-		VariableDecl decl = variableTable.get(name);
-		if(decl != null)
-			return decl.getVariable();
+		Variable var = variableTable.get(name);
+		if(var != null)
+			return var;
 		if(parent != null)
 			return parent.search(name);
 		return null;
@@ -61,12 +71,16 @@ public class Module implements Scope, SynthesijerAstTree{
 	}
 	
 	public void addVariableDecl(VariableDecl v){
-		variableTable.put(v.getName(), v);
+		variableTable.put(v.getName(), v.getVariable());
 		variables.add(v);
 	}
 	
-	public ArrayList<VariableDecl> getVariables(){
-		return variables;
+	public VariableDecl[] getVariableDecls(){
+		return variables.toArray(new VariableDecl[]{});
+	}
+
+	public Variable[] getVariables(){
+		return variableTable.values().toArray(new Variable[]{});
 	}
 
 	public ArrayList<Method> getMethods(){

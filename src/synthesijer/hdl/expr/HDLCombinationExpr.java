@@ -138,5 +138,5 @@ public class HDLCombinationExpr implements HDLExpr{
 		}
 		return list.toArray(new HDLSignal[]{});
 	}
-
+	
 }

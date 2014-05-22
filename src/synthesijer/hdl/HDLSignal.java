@@ -1,4 +1,4 @@
-	package synthesijer.hdl;
+package synthesijer.hdl;
 
 import java.util.ArrayList;
 

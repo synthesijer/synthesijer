@@ -159,7 +159,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 					sep = "end else ";
 					cnt++;
 				}else{
-					HDLUtils.println(dest, offset, String.format("%s <= %s;", s.getKey().getName(), s.getTransitions().get(0).getDestState().getStateId().getVerilogHDL()));
+					HDLUtils.println(dest, offset, String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId().getVerilogHDL()));
 				}
 			}
 			if(cnt > 0){

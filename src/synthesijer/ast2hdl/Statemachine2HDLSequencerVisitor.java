@@ -21,6 +21,26 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 		this.req = req;
 		this.busy = busy;
 	}
+	
+	private void addStateTransition(HDLSequencer.SequencerState ss, Transition t){
+		if(t.getCondition() == null){
+			ss.addStateTransit(parent.stateTable.get(t.getDestination()));
+		}else{
+			HDLExpr expr0, expr1;
+			if(t.getPattern() != null){
+				GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, null);
+				t.getPattern().accept(v);
+				expr1 = v.getResult();
+			}else{
+				expr1 = t.getFlag() ? HDLConstant.HIGH : HDLConstant.LOW;
+			}
+			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, null);
+			t.getCondition().accept(v);
+			expr0 = v.getResult();
+			HDLExpr expr = parent.module.newExpr(HDLOp.EQ, expr0, expr1);
+			ss.addStateTransit(expr, parent.stateTable.get(t.getDestination()));
+		}
+	}
 
 	@Override
 	public void visitStatemachine(Statemachine o) {
@@ -30,8 +50,8 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 		}
 		for(State s: o.getStates()){
 			HDLSequencer.SequencerState ss = parent.stateTable.get(s);
-			for(Transition c: s.getTransitions()){
-				ss.addStateTransit(parent.stateTable.get(c.getDestination()));
+			for(Transition t: s.getTransitions()){
+				addStateTransition(ss, t);
 			}
 			if(s.isTerminate()){
 				ss.addStateTransit(hs.getIdleState());
