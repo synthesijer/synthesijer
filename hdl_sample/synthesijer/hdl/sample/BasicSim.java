@@ -13,10 +13,9 @@ import synthesijer.hdl.expr.HDLConstant;
 
 class BasicSim extends HDLSimModule{
 	
-	public BasicSim(HDLModule m, String name) {
+	public BasicSim(HDLModule target, String name) {
 		super(name);
 	
-		HDLInstance inst = newModuleInstance(m, "U");
 		HDLSignal clk = newSignal("clk", HDLPrimitiveType.genBitType());
 		HDLSignal reset = newSignal("reset", HDLPrimitiveType.genBitType());
 		HDLSignal counter = newSignal("counter", HDLPrimitiveType.genSignedType(32));
@@ -39,11 +38,19 @@ class BasicSim extends HDLSimModule{
 		reset.setResetValue(HDLConstant.LOW);
 		reset.setAssign(ss, newExpr(HDLOp.IF, newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, 3), newExpr(HDLOp.LT, counter, 8)), HDLConstant.HIGH, HDLConstant.LOW));
 		
-		inst.getSignalForPort("clk").setAssign(null, clk);
-		inst.getSignalForPort("reset").setAssign(null, reset);
+		if(target != null){
+			HDLInstance inst = newModuleInstance(target, "U");
+			inst.getSignalForPort("clk").setAssign(null, clk);
+			inst.getSignalForPort("reset").setAssign(null, reset);
+		}
 		
 		HDLUtils.generate(this, HDLUtils.VHDL);
 		HDLUtils.generate(this, HDLUtils.Verilog);
 	}
+	
+	public static void main(String[] args){
+		new BasicSim(null, "sim");
+	}
+	
 			
 }
