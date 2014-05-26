@@ -50,6 +50,7 @@ public class HDLModule implements HDLTree{
 		return name;
 	}
 	
+
 	public HDLPort newPort(String name, HDLPort.DIR dir, HDLType type){
 		HDLPort port = new HDLPort(this, name, dir, type);
 		ports.add(port);

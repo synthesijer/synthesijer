@@ -68,10 +68,12 @@ public enum Manager {
 			HDLModule top = new HDLModule(m.getName(), "clk", "reset");
 			m.accept(new GenerateHDLModuleVisitor(top));
 			if(format == OutputFormat.VHDL){
+				System.out.printf("Output VHDL: %s.vhd\n", m.getName());
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.vhd", m.getName())), true); 
 				top.genVHDL(dest);
 				dest.close();
 			}else{
+				System.out.printf("Output Verilog HDL: %s.v\n", m.getName());
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.v", m.getName())), true); 
 				top.genVerilogHDL(dest);
 				dest.close();

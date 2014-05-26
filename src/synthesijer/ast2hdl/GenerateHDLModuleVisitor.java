@@ -58,6 +58,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	@Override
 	public void visitMethod(Method o) {
+		if(o.isConstructor()) return; // skip 
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
 			if(t != null){
@@ -103,6 +104,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitModule(Module o) {
 		for(Scope s: o.getScope()){
+			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port. 
 			genVariableTable(s);
 		}
 		for(VariableDecl v: o.getVariableDecls()){

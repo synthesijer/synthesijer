@@ -15,9 +15,13 @@ public class HDLPort implements HDLTree{
 		this.name = name;
 		this.dir = dir;
 		this.type = type;
-		this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.REGISTER);
+		if(dir == DIR.OUT){
+			this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.REGISTER);
+		}else{
+			this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.WIRE);
+		}
 	}
-	
+
 	public String getName(){
 		return name;
 	}
