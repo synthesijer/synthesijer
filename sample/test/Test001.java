@@ -1,4 +1,4 @@
-public class Test000{
+public class Test001{
 	
 	int x = 0;
 	public int acc(int y){
