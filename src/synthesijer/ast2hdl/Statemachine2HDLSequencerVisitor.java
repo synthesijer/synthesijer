@@ -23,7 +23,6 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 	}
 	
 	private void addStateTransition(HDLSequencer.SequencerState ss, Transition t){
-		System.out.println(t);
 		if(t.getCondition() == null){
 			ss.addStateTransit(parent.stateTable.get(t.getDestination()));
 		}else{

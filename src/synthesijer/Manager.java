@@ -48,8 +48,9 @@ public enum Manager {
 		try{
 			makeStateMachine();
 			dumpStateMachine();
-			genHDL(OutputFormat.VHDL);
-			genHDL(OutputFormat.Verilog);
+			genHDL();
+			output(OutputFormat.VHDL);
+			output(OutputFormat.Verilog);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -79,23 +80,29 @@ public enum Manager {
 	
 	enum OutputFormat { Verilog, VHDL; };
 		
-	public void genHDL(OutputFormat format) throws FileNotFoundException{
+	public void genHDL(){
 		
 		for(Module m: entries.values()){
 			HDLModule top = moduleTable.get(m.getName());
 			m.accept(new GenerateHDLModuleVisitor(top));
+		}
+	}
+	
+	public void output(OutputFormat format) throws FileNotFoundException{
+		for(HDLModule m: moduleTable.values()){
 			if(format == OutputFormat.VHDL){
 				System.out.printf("Output VHDL: %s.vhd\n", m.getName());
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.vhd", m.getName())), true); 
-				top.genVHDL(dest);
+				m.genVHDL(dest);
 				dest.close();
 			}else{
 				System.out.printf("Output Verilog HDL: %s.v\n", m.getName());
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.v", m.getName())), true); 
-				top.genVerilogHDL(dest);
+				m.genVerilogHDL(dest);
 				dest.close();
 			}
 		}
+		
 	}
 
 	public void dumpAsXML(PrintWriter dest){

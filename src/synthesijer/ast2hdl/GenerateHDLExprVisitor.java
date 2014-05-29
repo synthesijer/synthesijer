@@ -1,5 +1,7 @@
 package synthesijer.ast2hdl;
 
+import javax.management.RuntimeErrorException;
+
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Variable;
@@ -18,10 +20,13 @@ import synthesijer.ast.expr.SynthesijerExprVisitor;
 import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.hdl.HDLExpr;
+import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
+import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLVariable;
+import synthesijer.hdl.expr.HDLConstant;
 import synthesijer.hdl.expr.HDLValue;
 
 public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
@@ -86,8 +91,22 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			Ident id = (Ident)lhs;
 			HDLVariable sig = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			sig.setAssign(state, expr);
+		}else if(lhs instanceof ArrayAccess){
+			ArrayAccess aa = (ArrayAccess)lhs;
+			Ident id = (Ident)aa.getIndexed();
+			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+			HDLInstance inst = (HDLInstance)var;
+			// address
+			HDLSignal addr = inst.getSignalForPort("address"); // see synthsijer.lib.BlockRAM
+			addr.setAssign(state, stepIn(aa.getIndex()));
+			// write-enable
+			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
+			we.setAssign(state, HDLConstant.HIGH);
+			// data
+			HDLSignal din = inst.getSignalForPort("din"); // see synthsijer.lib.BlockRAM
+			din.setAssign(state, expr);
 		}else{
-			// TODO
+			throw new RuntimeException("unsupported yet.");
 		}
 		result = expr;
 	}
@@ -113,7 +132,11 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
-		result = parent.module.newSignal(String.format("%s_%s", o.getSelected(), o.getIdent()), HDLPrimitiveType.genVectorType(32));
+		Ident id = (Ident)o.getSelected();
+		HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+		HDLInstance inst = (HDLInstance)var;
+		HDLSignal sig = inst.getSignalForPort(o.getIdent().getSymbol());
+		result = sig.getResultExpr();
 	}
 	
 	@Override

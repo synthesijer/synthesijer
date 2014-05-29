@@ -42,6 +42,10 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
 		HDLUtils.nl(dest);
+		for(HDLInstance.Pair pair: o.getPairs()){
+			genSignalRegisterProcess(pair.signal);
+		}
+		HDLUtils.nl(dest);
 	}
 
 	@Override
