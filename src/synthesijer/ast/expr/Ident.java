@@ -23,4 +23,7 @@ public class Ident extends Expr{
 		v.visitIdent(this);
 	}
 
+	public String toString(){
+		return String.format("Ident::(%s)", symbol); 
+	}
 }

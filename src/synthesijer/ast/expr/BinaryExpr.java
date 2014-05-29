@@ -40,4 +40,8 @@ public class BinaryExpr extends Expr{
 	public void accept(SynthesijerExprVisitor v){
 		v.visitBinaryExpr(this);
 	}
+	
+	public String toString(){
+		return String.format("BinaryExpr::(%s %s %s)", op, lhs, rhs); 
+	}
 }

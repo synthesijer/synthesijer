@@ -2,7 +2,9 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
-public class HDLInstance implements HDLTree{
+import synthesijer.hdl.HDLSequencer.SequencerState;
+
+public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	
 	private final HDLModule module;
 	private final String name;
@@ -63,6 +65,48 @@ public class HDLInstance implements HDLTree{
 		public final HDLSignal signal;
 		public final HDLPort port;
 		Pair(HDLSignal signal, HDLPort port){this.signal = signal; this.port = port;}
+	}
+
+	@Override
+	public void setAssign(SequencerState s, HDLExpr expr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setResetValue(HDLExpr s) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getVHDL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getVerilogHDL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HDLExpr getResultExpr() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HDLType getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HDLSignal[] getSrcSignals() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

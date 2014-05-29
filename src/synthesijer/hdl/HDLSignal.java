@@ -2,7 +2,7 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
-public class HDLSignal implements HDLTree, HDLExpr{
+public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 	
 	private final HDLModule module;
 	private final String name;
@@ -52,6 +52,7 @@ public class HDLSignal implements HDLTree, HDLExpr{
 		return module;
 	}
 	
+	@Override
 	public void setResetValue(HDLExpr s){
 		this.resetValue = s;
 	}
@@ -64,6 +65,7 @@ public class HDLSignal implements HDLTree, HDLExpr{
 		}
 	}
 	
+	@Override
 	public void setAssign(HDLSequencer.SequencerState s, HDLExpr expr){
 		if(s != null){
 			AssignmentCondition c = new AssignmentCondition(s, expr);

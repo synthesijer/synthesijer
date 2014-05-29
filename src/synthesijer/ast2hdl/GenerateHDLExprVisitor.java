@@ -21,7 +21,7 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
-import synthesijer.hdl.HDLSignal;
+import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLValue;
 
 public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
@@ -81,9 +81,14 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
 		HDLExpr expr = stepIn(o.getRhs());
-		Ident id = (Ident)o.getLhs();
-		HDLSignal sig = parent.getHDLSignal(o.getScope().search(id.getSymbol()));
-		sig.setAssign(state, expr);
+		Expr lhs = o.getLhs();
+		if(lhs instanceof Ident){
+			Ident id = (Ident)lhs;
+			HDLVariable sig = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+			sig.setAssign(state, expr);
+		}else{
+			// TODO
+		}
 		result = expr;
 	}
 	
@@ -91,7 +96,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	public void visitAssignOp(AssignOp o) {
 		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), stepIn(o.getLhs()), stepIn(o.getRhs()));
 		Ident id = (Ident)o.getLhs();
-		HDLSignal sig = parent.getHDLSignal(o.getScope().search(id.getSymbol()));
+		HDLVariable sig = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 		sig.setAssign(state, expr);
 		result = expr;
 	}
@@ -114,7 +119,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitIdent(Ident o) {
 		Variable v = o.getScope().search(o.getSymbol());
-		result = parent.getHDLSignal(v);
+		result = parent.getHDLVariable(v);
 	}
 	
 	private HDLPrimitiveType convToHDLType(Literal.LITERAL_KIND kind){

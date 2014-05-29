@@ -2,6 +2,7 @@ package synthesijer.ast2hdl;
 
 import java.util.Hashtable;
 
+import synthesijer.Manager;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
@@ -32,9 +33,9 @@ import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
-import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUserDefinedType;
+import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.model.State;
 
@@ -43,7 +44,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	final HDLModule module;
 	final Hashtable<State, HDLSequencer.SequencerState> stateTable;
 	private final Hashtable<Method, HDLPort> methodReturnTable;
-	private final Hashtable<Variable, HDLSignal> variableTable = new Hashtable<Variable, HDLSignal>();
+	private final Hashtable<Variable, HDLVariable> variableTable = new Hashtable<Variable, HDLVariable>();
 	private final Hashtable<Method, HDLValue> methodIdTable = new Hashtable<Method, HDLValue>();
 	
 	public GenerateHDLModuleVisitor(HDLModule m){
@@ -52,7 +53,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		this.methodReturnTable = new Hashtable<Method, HDLPort>();
 	}
 	
-	public HDLSignal getHDLSignal(Variable v){
+	public HDLVariable getHDLVariable(Variable v){
 		return variableTable.get(v);
 	}
 	
@@ -81,7 +82,6 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		if(type instanceof PrimitiveTypeKind){
 			return ((PrimitiveTypeKind)type).getHDLType();
 		}else if(type instanceof ArrayType){
-			System.err.println("unsupported type: " + type);
 			return null;
 		}else if(type instanceof ComponentType){
 			System.err.println("unsupported type: " + type);
@@ -92,12 +92,22 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		}
 	}
 	
-	private void genVariableTable(Scope s){
+	private HDLVariable genHDLVariable(Variable v){
+		Type t = v.getType();
+		if(t instanceof PrimitiveTypeKind){
+			HDLType t0 = getHDLType(v.getType());
+			return module.newSignal(v.getUniqueName(), t0);
+		}else if(t instanceof ArrayType){
+			return module.newModuleInstance(Manager.INSTANCE.searchHDLModule("BlockRAM"), v.getName()); 
+		}else{
+			return null;
+		}
+	}
+	
+	private void genVariableTables(Scope s){
 		for(Variable v: s.getVariables()){
-			HDLType t = getHDLType(v.getType());
-			if(t == null) continue;
-			HDLSignal sig = module.newSignal(v.getUniqueName(), t);
-			variableTable.put(v, sig);
+			HDLVariable var = genHDLVariable(v);
+			variableTable.put(v, var);
 		}			
 	}
 	
@@ -105,7 +115,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	public void visitModule(Module o) {
 		for(Scope s: o.getScope()){
 			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port. 
-			genVariableTable(s);
+			genVariableTables(s);
 		}
 		for(VariableDecl v: o.getVariableDecls()){
 			v.accept(this);
@@ -212,11 +222,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
 		Variable var = o.getVariable();
-//		HDLType t = getHDLType(var.getType());
-//		if(t == null) return;
-//		HDLSignal s = module.newSignal(var.getUniqueName(), t);
-//		variableTable.put(var, s);
-		HDLSignal s = variableTable.get(var);
+		HDLVariable s = variableTable.get(var);
 		if(o.getInitExpr() != null){
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);

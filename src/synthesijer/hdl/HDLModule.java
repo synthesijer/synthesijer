@@ -117,7 +117,7 @@ public class HDLModule implements HDLTree{
 		exprs.add(expr);
 		return expr;
 	}
-
+	
 	public HDLSignal[] getSignals(){
 		return signals.toArray(new HDLSignal[]{});
 	}

@@ -53,46 +53,42 @@ public class JCExprVisitor extends Visitor{
 		tmp.setIdent(that.toString());
 		expr = tmp;
 	}
+	
+	private Expr stepIn(JCExpression expr){
+		JCExprVisitor visitor = new JCExprVisitor(scope);
+		expr.accept(visitor);
+		return visitor.getExpr();
+	}
 		
 	public void visitBinary(JCBinary that){
 		BinaryExpr tmp = new BinaryExpr(scope);
-		JCExprVisitor lhsVisitor = new JCExprVisitor(scope);
-		JCExprVisitor rhsVisitor = new JCExprVisitor(scope);
-		that.lhs.accept(lhsVisitor);
-		that.lhs.accept(rhsVisitor);
-		tmp.setLhs(lhsVisitor.getExpr());
-		tmp.setRhs(rhsVisitor.getExpr());
+		Expr lhs = stepIn(that.lhs);
+		tmp.setLhs(lhs);
+		Expr rhs = stepIn(that.rhs);
+		tmp.setRhs(rhs);
 		tmp.setOp(Op.getOp(that.operator.name.toString()));
 		expr = tmp;
 	}
 	
 	public void visitUnary(JCUnary that){
 		UnaryExpr tmp = new UnaryExpr(scope);
-		JCExprVisitor visitor = new JCExprVisitor(scope);
-		that.arg.accept(visitor);
 		tmp.setOp(Op.getOp(that.operator.name.toString()));
-		tmp.setArg(visitor.getExpr());
+		tmp.setArg(stepIn(that.arg));
 		expr = tmp;
 	}
 	
 	public void visitApply(JCMethodInvocation that){
 		MethodInvocation tmp = new MethodInvocation(scope);
-		JCExprVisitor selector = new JCExprVisitor(scope);
-		that.getMethodSelect().accept(selector);
-		tmp.setMethod(selector.getExpr());
+		tmp.setMethod(stepIn(that.getMethodSelect()));
 		for(JCExpression param: that.args){
-			JCExprVisitor arg = new JCExprVisitor(scope);
-			param.accept(arg);
-			tmp.addParameter(arg.getExpr());
+			tmp.addParameter(stepIn(param));
 		}
 		expr = tmp;
 	}
 	
 	public void visitSelect(JCFieldAccess that){
 		FieldAccess tmp = new FieldAccess(scope);
-		JCExprVisitor visitor = new JCExprVisitor(scope);
-		that.selected.accept(visitor);
-		tmp.setSelected(visitor.getExpr());
+		tmp.setSelected(stepIn(that.selected));
 		Ident id = new Ident(scope);
 		id.setIdent(that.name.toString());
 		tmp.setIdent(id);
@@ -117,31 +113,15 @@ public class JCExprVisitor extends Visitor{
 	
 	public void visitAssign(JCAssign that){
 		AssignExpr tmp = new AssignExpr(scope);
-		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.lhs.accept(visitor);
-			tmp.setLhs(visitor.getExpr());
-		}
-		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.rhs.accept(visitor);
-			tmp.setRhs(visitor.getExpr());
-		}
+		tmp.setLhs(stepIn(that.lhs));
+		tmp.setRhs(stepIn(that.rhs));
 		expr = tmp;
 	}
 	
 	public void visitAssignop(JCAssignOp that){
 		AssignOp tmp = new AssignOp(scope);
-		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.lhs.accept(visitor);
-			tmp.setLhs(visitor.getExpr());
-		}
-		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.rhs.accept(visitor);
-			tmp.setRhs(visitor.getExpr());
-		}
+		tmp.setLhs(stepIn(that.lhs));
+		tmp.setRhs(stepIn(that.rhs));
 		tmp.setOp(Op.getOp(that.operator.name.toString()));
 		expr = tmp;
 	}
@@ -149,9 +129,7 @@ public class JCExprVisitor extends Visitor{
 	public void visitNewArray(JCNewArray that){
 		NewArray tmp = new NewArray(scope);
 		for(JCExpression dim: that.dims){
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			dim.accept(visitor);
-			tmp.addDimExpr(visitor.getExpr());
+			tmp.addDimExpr(stepIn(dim));
 		}
 		expr = tmp;
 	}
@@ -159,31 +137,23 @@ public class JCExprVisitor extends Visitor{
 	public void visitIndexed(JCArrayAccess that){
 		ArrayAccess tmp = new ArrayAccess(scope);
 		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.indexed.accept(visitor);
-			tmp.setIndexed(visitor.getExpr());
+			tmp.setIndexed(stepIn(that.indexed));
 		}
 		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.index.accept(visitor);
-			tmp.setIndex(visitor.getExpr());
+			tmp.setIndex(stepIn(that.index));
 		}
 		expr = tmp;
 	}
 	
 	public void visitTypeCast(JCTypeCast that){
 		TypeCast tmp = new TypeCast(scope);
-		JCExprVisitor visitor = new JCExprVisitor(scope);
-		that.expr.accept(visitor);
-		tmp.setExpr(visitor.getExpr());
+		tmp.setExpr(stepIn(that.expr));
 		expr = tmp;
 	}
 	
 	public void visitParens(JCParens that){
 		ParenExpr tmp = new ParenExpr(scope);
-		JCExprVisitor visitor = new JCExprVisitor(scope);
-		that.expr.accept(visitor);
-		tmp.setExpr(visitor.getExpr());
+		tmp.setExpr(stepIn(that.expr));
 		expr = tmp;
 	}
 
@@ -191,9 +161,7 @@ public class JCExprVisitor extends Visitor{
 		NewClassExpr tmp = new NewClassExpr(scope);
 		tmp.setClassName(that.constructor.owner.toString());
 		for(JCExpression arg: that.args){
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			arg.accept(visitor);
-			tmp.addParam(visitor.getExpr());
+			tmp.addParam(stepIn(arg));
 		}
 		expr = tmp;
 	}

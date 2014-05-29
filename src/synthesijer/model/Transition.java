@@ -10,7 +10,7 @@ public class Transition {
 	private final boolean flag;
 	
 	public Transition(State dest, Expr expr, boolean flag){
-		this(dest, expr, false, null);
+		this(dest, expr, flag, null);
 	}
 
 	public Transition(State dest, Expr expr, Expr pat){
