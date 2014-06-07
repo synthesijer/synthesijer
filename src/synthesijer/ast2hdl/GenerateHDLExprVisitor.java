@@ -57,7 +57,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			HDLInstance inst = (HDLInstance)var;
 			// address
-			HDLSignal addr = inst.getSignalForPort("address"); // see synthsijer.lib.BlockRAM
+			HDLSignal addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
 			addr.setAssign(state, stepIn(aa.getIndex()));
 			// write-enable
 			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
@@ -106,7 +106,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			HDLInstance inst = (HDLInstance)var;
 			// address
-			HDLSignal addr = inst.getSignalForPort("address"); // see synthsijer.lib.BlockRAM
+			HDLSignal addr = inst.getSignalForPort("waddress"); // see synthsijer.lib.BlockRAM
 			addr.setAssign(state, stepIn(aa.getIndex()));
 			// write-enable
 			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM

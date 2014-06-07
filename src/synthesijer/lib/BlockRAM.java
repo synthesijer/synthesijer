@@ -7,12 +7,13 @@ import synthesijer.hdl.HDLPrimitiveType;
 public class BlockRAM extends HDLModule{
 	
 	public BlockRAM(){
-		super("dualportram", "clk", "reset");
-		newPort("length", DIR.OUT, HDLPrimitiveType.genSignedType(32));
-		newPort("address", DIR.IN, HDLPrimitiveType.genSignedType(32));
-		newPort("din", DIR.IN, HDLPrimitiveType.genSignedType(32));
-		newPort("dout", DIR.OUT, HDLPrimitiveType.genSignedType(32));
-		newPort("we", DIR.IN, HDLPrimitiveType.genBitType());
+		super("simple_dualportram", "clk", "reset");
+		newPort("length",   DIR.OUT, HDLPrimitiveType.genSignedType(32));
+		newPort("waddress", DIR.IN,  HDLPrimitiveType.genSignedType(32));
+		newPort("raddress", DIR.IN,  HDLPrimitiveType.genSignedType(32));
+		newPort("din",      DIR.IN,  HDLPrimitiveType.genSignedType(32));
+		newPort("dout",     DIR.OUT, HDLPrimitiveType.genSignedType(32));
+		newPort("we",       DIR.IN,  HDLPrimitiveType.genBitType());
 	}
 
 }
