@@ -68,7 +68,7 @@ public class HDLCombinationExpr implements HDLExpr{
 			case IF:
 				return getPriorType(args[1].getType(), args[2].getType());
 			default:
-				return HDLPrimitiveType.genUnkonwType();
+				return HDLPrimitiveType.genUnknowType();
 			}
 			
 		}

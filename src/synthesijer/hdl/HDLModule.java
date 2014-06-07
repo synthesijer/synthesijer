@@ -22,24 +22,36 @@ public class HDLModule implements HDLTree{
 	private ArrayList<HDLInstance> submodules = new ArrayList<HDLInstance>();
 	private ArrayList<HDLExpr> exprs = new ArrayList<HDLExpr>();
 	
-	public HDLModule(String name, String sysClkName, String sysResetName){
+	private HDLPort sysClk; 
+	private HDLPort sysReset; 
+	
+	public HDLModule(String name, String sysClkName, String sysResetName, boolean syncFlag){
 		this.name = name;
 		this.sysClkName = sysClkName;
 		this.sysResetName = sysResetName;
-		if(sysClkName != null){
-			newPort(sysClkName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		if(syncFlag){
+			sysClk = newPort(sysClkName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		}
-		if(sysResetName != null){
-			newPort(sysResetName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		if(syncFlag){
+			sysReset = newPort(sysResetName, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		}
-		syncronousFlag = true;
+		syncronousFlag = syncFlag;
+	}
+	
+	public HDLModule(String name, String sysClkName, String sysResetName){
+		this(name, sysClkName, sysResetName, true);
 	}
 	
 	HDLModule(String name){
-		this.name = name;
-		this.sysClkName = "";
-		this.sysResetName = "";
-		syncronousFlag = false;
+		this(name, "", "", false);
+	}
+	
+	public HDLPort getSysClk(){
+		return sysClk;
+	}
+
+	public HDLPort getSysReset(){
+		return sysReset;
 	}
 
 	public boolean isSynchronous(){

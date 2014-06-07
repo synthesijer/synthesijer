@@ -42,10 +42,6 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
 		HDLUtils.nl(dest);
-		for(HDLInstance.Pair pair: o.getPairs()){
-			genSignalRegisterProcess(pair.signal);
-		}
-		HDLUtils.nl(dest);
 	}
 
 	@Override
@@ -102,6 +98,30 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, String.format("always begin"));
 	}
 	
+	private void genSyncSequencerSwitch(HDLSequencer o, int offset){
+		if(o.getStates().size() > 0){
+			HDLUtils.println(dest, offset, String.format("case (%s)", o.getStateKey().getName()));
+
+			for(HDLSequencer.SequencerState s: o.getStates()){
+				HDLUtils.println(dest, offset+2, String.format("%s : begin", s.getStateId().getVerilogHDL()));
+				
+				if(s.hasDelay()){
+					HDLUtils.println(dest, offset+4, String.format("if (%s >= %d) begin", o.getDelayCounter().getName(), s.getConstantDelay()));
+					HDLUtils.println(dest, offset+6, String.format("%s <= 32'h0;", o.getDelayCounter().getName()));
+					genStateTransition(dest, offset+6, s);
+					HDLUtils.println(dest, offset+4, String.format("end else begin"));
+					HDLUtils.println(dest, offset+6, String.format("%s <= %s + 1;", o.getDelayCounter().getName(), o.getDelayCounter().getName()));
+					HDLUtils.println(dest, offset+4, String.format("end"));
+				}else{
+					genStateTransition(dest, offset+4, s);
+				}
+
+				HDLUtils.println(dest, offset+2, String.format("end"));
+			}
+			HDLUtils.println(dest, offset, String.format("endcase"));
+		}
+	}
+	
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
 		// reset
 		HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b1) begin", o.getModule().getSysResetName()));
@@ -109,17 +129,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		
 		HDLUtils.println(dest, offset+2, String.format("end else begin"));
 		
-		// state-machine body
-		if(o.getStates().size() > 0){
-			HDLUtils.println(dest, offset+4, String.format("case (%s)", o.getStateKey().getName()));
-
-			for(HDLSequencer.SequencerState s: o.getStates()){
-				HDLUtils.println(dest, offset+6, String.format("%s : begin", s.getStateId().getVerilogHDL()));
-				genStateTransition(dest, offset+8, s);
-				HDLUtils.println(dest, offset+6, String.format("end"));
-			}
-			HDLUtils.println(dest, offset+4, String.format("endcase"));
-		}
+		genSyncSequencerSwitch(o, offset+4);
 		
 		HDLUtils.println(dest, offset+2, String.format("end"));
 	}
@@ -186,6 +196,10 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 				HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), c.getValue().getVerilogHDL()));
 				sep = "end else ";
 			}
+			if(o.hasDefaultValue()){
+				HDLUtils.println(dest, offset+2, String.format("end else begin"));
+				HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getDefaultValue().getVerilogHDL()));
+			}
 			HDLUtils.println(dest, offset+2, String.format("end"));
 		}
 		HDLUtils.println(dest, offset, String.format("end"));
@@ -244,6 +258,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 			genSignalRegisterProcess(o);
 		}else if(o.isAssignAlways()){
 			HDLUtils.println(dest, offset, String.format("assign %s = %s;", o.getName(), o.getAssignAlwaysExpr().getResultExpr().getVerilogHDL()));
+			HDLUtils.nl(dest);
 		}
 	}
 

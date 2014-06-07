@@ -13,6 +13,8 @@ import synthesijer.hdl.expr.HDLConstant;
 
 class BasicSim extends HDLSimModule{
 	
+	HDLInstance inst;
+	
 	public BasicSim(HDLModule target, String name) {
 		super(name);
 	
@@ -39,7 +41,7 @@ class BasicSim extends HDLSimModule{
 		reset.setAssign(ss, newExpr(HDLOp.IF, newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, 3), newExpr(HDLOp.LT, counter, 8)), HDLConstant.HIGH, HDLConstant.LOW));
 		
 		if(target != null){
-			HDLInstance inst = newModuleInstance(target, "U");
+			inst = newModuleInstance(target, "U");
 			inst.getSignalForPort("clk").setAssign(null, clk);
 			inst.getSignalForPort("reset").setAssign(null, reset);
 		}

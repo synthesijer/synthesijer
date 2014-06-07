@@ -2,7 +2,6 @@ package synthesijer.ast.type;
 
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
-import synthesijer.hdl.HDLPrimitiveType;
 
 public class ArrayType implements Type{
 	
@@ -16,11 +15,6 @@ public class ArrayType implements Type{
 		return elemType;
 	}
 	
-	public HDLPrimitiveType getHDLType(){
-		System.err.println("unsupported type: " + this);
-		return null;
-	}
-
 	public void accept(SynthesijerAstVisitor v){
 		v.visitArrayType(this);
 	}

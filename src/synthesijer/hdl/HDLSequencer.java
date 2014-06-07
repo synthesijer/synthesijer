@@ -3,6 +3,7 @@ package synthesijer.hdl;
 import java.util.ArrayList;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.hdl.expr.HDLConstant;
 import synthesijer.hdl.expr.HDLValue;
 
 public class HDLSequencer implements HDLTree{
@@ -15,16 +16,20 @@ public class HDLSequencer implements HDLTree{
 	private SequencerState idle;
 	private int timestep = -1;
 	
+	private final HDLSignal delayCounter; 
+
 	public HDLSequencer(HDLModule module, String key){
 		this.module = module;
 		this.stateType = module.newUserDefinedType(key, null, 0);
 		this.stateKey = module.newSignal(key, stateType);
 		HDLValue idleId = stateType.addItem(stateKey.getName() + "_IDLE");
-		this.idle = new SequencerState(stateKey, idleId);
+		this.idle = new SequencerState(this, stateKey, idleId);
 		states = new ArrayList<SequencerState>();
 		states.add(idle);
+		delayCounter = module.newSignal(key + "_delay", HDLPrimitiveType.genSignedType(32), HDLSignal.ResourceKind.REGISTER);
+		delayCounter.setDefaultValue(HDLConstant.INTEGER_ZERO);
 	}
-		
+	
 	public void setTransitionTime(int step){
 		this.timestep = step;
 	}
@@ -39,7 +44,7 @@ public class HDLSequencer implements HDLTree{
 	
 	public SequencerState addSequencerState(String id){
 		HDLValue value = stateType.addItem(id);
-		SequencerState s = new SequencerState(stateKey, value);
+		SequencerState s = new SequencerState(this, stateKey, value);
 		states.add(s);
 		return s;
 	}
@@ -60,14 +65,20 @@ public class HDLSequencer implements HDLTree{
 		return idle;
 	}
 	
+	public HDLSignal getDelayCounter(){
+		return delayCounter;
+	}
+	
 	public class SequencerState{
 		
 		private ArrayList<StateTransitCondition> transitions = new ArrayList<StateTransitCondition>();
 		
 		private final HDLSignal key;
 		private final HDLValue id;
-		
-		public SequencerState(HDLSignal key, HDLValue id){
+				
+		int constantDelay = 0;
+
+		public SequencerState(HDLSequencer seq, HDLSignal key, HDLValue id){
 			this.key = key;
 			this.id = id;
 		}
@@ -79,7 +90,7 @@ public class HDLSequencer implements HDLTree{
 		public HDLSignal getKey(){
 			return key;
 		}
-		
+
 		public void addStateTransit(HDLExpr expr, SequencerState d){
 			transitions.add(new StateTransitCondition(key, id, expr, d));
 			if(expr == null) return;
@@ -95,6 +106,18 @@ public class HDLSequencer implements HDLTree{
 			return transitions;
 		}
 		
+		public void setConstantDelay(int v){
+			constantDelay = v;
+		}
+		
+		public int getConstantDelay(){
+			return constantDelay;
+		}
+		
+		public boolean hasDelay(){
+			return (constantDelay > 0);
+		}
+		
 	}
 	
 	public class StateTransitCondition{
@@ -102,7 +125,7 @@ public class HDLSequencer implements HDLTree{
 		final HDLValue stateId;
 		final HDLExpr cond;
 		final SequencerState destState;
-		
+				
 		StateTransitCondition(HDLSignal stateKey, HDLValue stateId, HDLExpr cond, SequencerState dest){
 			this.stateKey = stateKey;
 			this.stateId = stateId;

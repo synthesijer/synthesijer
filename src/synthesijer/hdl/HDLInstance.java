@@ -27,7 +27,8 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		for(Pair pair: pairs){ module.rmSignal(pair.signal); }
 		pairs.clear();
 		for(HDLPort p: submodule.getPorts()){
-			HDLSignal s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), HDLSignal.ResourceKind.WIRE);
+			HDLSignal.ResourceKind k = p.isOutput() ? HDLSignal.ResourceKind.WIRE : HDLSignal.ResourceKind.REGISTER;
+			HDLSignal s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
 			pairs.add(new Pair(s, p));
 		}
 	}
@@ -75,6 +76,12 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 
 	@Override
 	public void setResetValue(HDLExpr s) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDefaultValue(HDLExpr s) {
 		// TODO Auto-generated method stub
 		
 	}

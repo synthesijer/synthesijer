@@ -10,6 +10,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 	private ResourceKind kind;
 	
 	private HDLExpr resetValue;
+	private HDLExpr defaultValue;
 	
 	private ArrayList<AssignmentCondition> conditions = new ArrayList<AssignmentCondition>();
 	
@@ -28,7 +29,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 		this.name = name;
 		this.type = type;
 		this.kind = kind;
-		resetValue = null;
+		defaultValue = null;
 		assignAlwaysFlag = false;
 	}
 	
@@ -56,7 +57,12 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 	public void setResetValue(HDLExpr s){
 		this.resetValue = s;
 	}
-	
+
+	@Override
+	public void setDefaultValue(HDLExpr s){
+		this.defaultValue = s;
+	}
+
 	public HDLExpr getResetValue(){
 		if(resetValue != null){
 			return resetValue;
@@ -64,7 +70,15 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 			return type.getDefaultValue();
 		}
 	}
-	
+
+	public boolean hasDefaultValue(){
+		return defaultValue != null;
+	}
+
+	public HDLExpr getDefaultValue(){
+		return defaultValue;
+	}
+
 	@Override
 	public void setAssign(HDLSequencer.SequencerState s, HDLExpr expr){
 		if(s != null){

@@ -49,7 +49,7 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		return new HDLPrimitiveType(KIND.VECTOR, width);
 	}
 		
-	public static HDLPrimitiveType genUnkonwType(){
+	public static HDLPrimitiveType genUnknowType(){
 		return new HDLPrimitiveType(KIND.UNKNOWN, 0);
 	}
 

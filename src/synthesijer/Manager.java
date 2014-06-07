@@ -15,10 +15,10 @@ public enum Manager {
 	INSTANCE;
 	
 	private Hashtable<String, Module> entries = new Hashtable<String, Module>();
-	private Hashtable<String, HDLModule> moduleTable = new Hashtable<String, HDLModule>();
-	
+	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<String, HDLModuleInfo>();
+		
 	private Manager(){
-		addHDLModule("BlockRAM", new BlockRAM());
+		addHDLModule("BlockRAM", new BlockRAM(), false);
 	}
 
 	public void addModule(Module m){
@@ -28,15 +28,19 @@ public enum Manager {
 	}
 	
 	public void addHDLModule(String name, HDLModule hm){
-		moduleTable.put(name, hm);
+		moduleTable.put(name, new HDLModuleInfo(hm));
 	}
-	
+
+	public void addHDLModule(String name, HDLModule hm, boolean synthesisFlag){
+		moduleTable.put(name, new HDLModuleInfo(hm, synthesisFlag));
+	}
+
 	public Module searchModule(String name){
 		return entries.get(name);
 	}
 
 	public HDLModule searchHDLModule(String name){
-		return moduleTable.get(name);
+		return moduleTable.get(name).hm;
 	}
 
 	public boolean hasModule(String key){
@@ -83,22 +87,23 @@ public enum Manager {
 	public void genHDL(){
 		
 		for(Module m: entries.values()){
-			HDLModule top = moduleTable.get(m.getName());
+			HDLModule top = moduleTable.get(m.getName()).hm;
 			m.accept(new GenerateHDLModuleVisitor(top));
 		}
 	}
 	
 	public void output(OutputFormat format) throws FileNotFoundException{
-		for(HDLModule m: moduleTable.values()){
+		for(Module m: entries.values()){
+			HDLModule hm = moduleTable.get(m.getName()).hm;
 			if(format == OutputFormat.VHDL){
 				System.out.printf("Output VHDL: %s.vhd\n", m.getName());
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.vhd", m.getName())), true); 
-				m.genVHDL(dest);
+				hm.genVHDL(dest);
 				dest.close();
 			}else{
 				System.out.printf("Output Verilog HDL: %s.v\n", m.getName());
 				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.v", m.getName())), true); 
-				m.genVerilogHDL(dest);
+				hm.genVerilogHDL(dest);
 				dest.close();
 			}
 		}
@@ -115,5 +120,16 @@ public enum Manager {
 		dest.printf("</modules>\n");
 	}
 	
+	private class HDLModuleInfo{
+		public final HDLModule hm; 
+		public final boolean sysnthesisFlag;
+		public HDLModuleInfo(HDLModule hm, boolean synthesisFlag) {
+			this.hm = hm;
+			this.sysnthesisFlag = synthesisFlag;
+		}
+		public HDLModuleInfo(HDLModule hm){
+			this(hm, true);
+		}
+	}	
 
 }

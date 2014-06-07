@@ -48,7 +48,7 @@ public enum HDLConstant implements HDLLiteral{
 			return HDLPrimitiveType.genBitType();
 		case INTEGER_ZERO:
 			return HDLPrimitiveType.genVectorType(-1);
-		default: return HDLPrimitiveType.genUnkonwType();
+		default: return HDLPrimitiveType.genUnknowType();
 		}
 	}
 

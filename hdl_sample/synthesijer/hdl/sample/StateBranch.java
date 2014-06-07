@@ -1,11 +1,11 @@
 package synthesijer.hdl.sample;
 
-import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
+import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLConstant;
 
@@ -31,6 +31,10 @@ public class StateBranch extends HDLModule{
 	public static void main(String... args){
 		StateBranch m = new StateBranch();
 		BasicSim sim = new BasicSim(m, m.getName() + "_sim");
+		
+		HDLSignal sig = sim.getModuleInstances()[0].getSignalForPort("sel");
+		sig.setAssign(null, HDLConstant.HIGH);
+		
 		HDLUtils.generate(m, HDLUtils.VHDL);
 		HDLUtils.generate(sim, HDLUtils.VHDL);
 		HDLUtils.generate(m, HDLUtils.Verilog);

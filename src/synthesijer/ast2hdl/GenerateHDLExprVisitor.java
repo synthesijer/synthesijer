@@ -1,7 +1,5 @@
 package synthesijer.ast2hdl;
 
-import javax.management.RuntimeErrorException;
-
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Variable;
@@ -54,8 +52,19 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitArrayAccess(ArrayAccess o) {
 		if(o.getIndexed() instanceof Ident){
-			String rdata = ((Ident)o.getIndexed()).getSymbol() + "_rdata";
-			result = parent.module.newSignal(rdata, HDLPrimitiveType.genVectorType(32));
+			ArrayAccess aa = (ArrayAccess)o;
+			Ident id = (Ident)aa.getIndexed();
+			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+			HDLInstance inst = (HDLInstance)var;
+			// address
+			HDLSignal addr = inst.getSignalForPort("address"); // see synthsijer.lib.BlockRAM
+			addr.setAssign(state, stepIn(aa.getIndex()));
+			// write-enable
+			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
+			we.setAssign(state, HDLConstant.LOW);
+			// data
+			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
+			state.setConstantDelay(2);
 		}else{
 			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 		}
@@ -102,6 +111,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			// write-enable
 			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
 			we.setAssign(state, HDLConstant.HIGH);
+			we.setDefaultValue(HDLConstant.LOW);
 			// data
 			HDLSignal din = inst.getSignalForPort("din"); // see synthsijer.lib.BlockRAM
 			din.setAssign(state, expr);
@@ -156,7 +166,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		case DOUBLE:  return HDLPrimitiveType.genVectorType(64);
 		case FLOAT:   return HDLPrimitiveType.genVectorType(32);
 		case STRING:  return HDLPrimitiveType.genStringType();
-		default: return HDLPrimitiveType.genUnkonwType();
+		default: return HDLPrimitiveType.genUnknowType();
 		}
 	}
 	

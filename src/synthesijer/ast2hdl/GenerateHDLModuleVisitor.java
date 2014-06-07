@@ -29,6 +29,7 @@ import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
@@ -77,28 +78,17 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, req, busy));
 		o.getBody().accept(this);
 	}
-	
-	private HDLType getHDLType(Type type){
-		if(type instanceof PrimitiveTypeKind){
-			return ((PrimitiveTypeKind)type).getHDLType();
-		}else if(type instanceof ArrayType){
-			return null;
-		}else if(type instanceof ComponentType){
-			System.err.println("unsupported type: " + type);
-			return null;
-		}else{
-			System.err.printf("unkonw type: %s(%s)\n", type, type.getClass());
-			return null;
-		}
-	}
-	
+		
 	private HDLVariable genHDLVariable(Variable v){
 		Type t = v.getType();
 		if(t instanceof PrimitiveTypeKind){
 			HDLType t0 = getHDLType(v.getType());
 			return module.newSignal(v.getUniqueName(), t0);
 		}else if(t instanceof ArrayType){
-			return module.newModuleInstance(Manager.INSTANCE.searchHDLModule("BlockRAM"), v.getName()); 
+			HDLInstance inst = module.newModuleInstance(Manager.INSTANCE.searchHDLModule("BlockRAM"), v.getName());
+			inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
+			inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
+			return inst;
 		}else{
 			return null;
 		}
@@ -258,5 +248,49 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private HDLPrimitiveType getHDLType(PrimitiveTypeKind t){
+		switch(t){
+		case BOOLEAN: return HDLPrimitiveType.genBitType(); 
+		case BYTE: return HDLPrimitiveType.genSignedType(8); 
+		case CHAR: return HDLPrimitiveType.genVectorType(16);
+		case SHORT: return HDLPrimitiveType.genSignedType(16);
+		case INT: return HDLPrimitiveType.genSignedType(32);
+		case LONG: return HDLPrimitiveType.genSignedType(64);
+		case FLOAT: return HDLPrimitiveType.genVectorType(32);
+		case DOUBLE: return HDLPrimitiveType.genVectorType(64);
+		default: return null; // return HDLPrimitiveType.genUnknowType();
+		}
+	}
+	
+	private HDLType getHDLType(Type type){
+		if(type instanceof PrimitiveTypeKind){
+			return getHDLType((PrimitiveTypeKind)type);
+		}else if(type instanceof ArrayType){
+			return getHDLType((ArrayType)type);
+		}else if(type instanceof ComponentType){
+			return getHDLType((ComponentType)type);
+		}else if(type instanceof MySelfType){
+			return getHDLType((MySelfType)type);
+		}else{
+			return null;
+		}
+	}
 
+	private HDLPrimitiveType getHDLType(MySelfType t){
+		System.err.println("unsupported type: " + t);
+		return null;
+	}
+	
+	private HDLPrimitiveType getHDLType(ComponentType t){
+		System.err.println("unsupported type: " + t);
+		return null;
+	}
+	
+	private HDLPrimitiveType getHDLType(ArrayType t){
+		System.err.println("unsupported type: " + t);
+		return null;
+	}
+
+	
 }
