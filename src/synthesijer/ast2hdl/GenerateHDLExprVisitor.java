@@ -64,7 +64,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			we.setAssign(state, HDLConstant.LOW);
 			// data
 			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
-			state.setConstantDelay(2);
+			state.setMaxConstantDelay(2);
 		}else{
 			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 		}

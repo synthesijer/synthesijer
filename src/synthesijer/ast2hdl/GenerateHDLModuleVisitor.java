@@ -2,6 +2,8 @@ package synthesijer.ast2hdl;
 
 import java.util.Hashtable;
 
+import javax.management.RuntimeErrorException;
+
 import synthesijer.Manager;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
@@ -89,8 +91,14 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
 			inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
 			return inst;
+		}else if(t instanceof ComponentType){
+			ComponentType c = (ComponentType)t;
+			HDLInstance inst = module.newModuleInstance(Manager.INSTANCE.searchHDLModule(c.getName()), v.getName());
+			inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
+			inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
+			return inst;
 		}else{
-			return null;
+			throw new RuntimeException("unsupported type: " + t);
 		}
 	}
 	
@@ -104,7 +112,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitModule(Module o) {
 		for(Scope s: o.getScope()){
-			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port. 
+//			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port. 
 			genVariableTables(s);
 		}
 		for(VariableDecl v: o.getVariableDecls()){
@@ -213,6 +221,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	public void visitVariableDecl(VariableDecl o) {
 		Variable var = o.getVariable();
 		HDLVariable s = variableTable.get(var);
+		System.out.println(var.getName());
 		if(o.getInitExpr() != null){
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);

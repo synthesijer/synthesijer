@@ -106,8 +106,10 @@ public class HDLSequencer implements HDLTree{
 			return transitions;
 		}
 		
-		public void setConstantDelay(int v){
-			constantDelay = v;
+		public void setMaxConstantDelay(int v){
+			if(constantDelay < v){
+				constantDelay = v;
+			}
 		}
 		
 		public int getConstantDelay(){
