@@ -19,4 +19,6 @@ public abstract class Expr{
 	
 	abstract public void accept(SynthesijerExprVisitor v);
 	
+	abstract public boolean isConstant();
+	
 }

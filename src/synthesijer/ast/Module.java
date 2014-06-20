@@ -3,6 +3,7 @@ package synthesijer.ast;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import synthesijer.CompileState;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
@@ -30,7 +31,7 @@ public class Module implements Scope, SynthesijerAstTree{
 		this.name = name;
 		this.importTable = importTable;
 		scopes.add(this);
-	}
+	}	
 	
 	public void addScope(Scope s){
 		scopes.add(s);

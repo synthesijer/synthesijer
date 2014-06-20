@@ -33,4 +33,10 @@ public class NewClassExpr extends Expr{
 	public void accept(SynthesijerExprVisitor v){
 		v.visitNewClassExpr(this);
 	}
+
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
+
 }

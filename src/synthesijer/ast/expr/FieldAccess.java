@@ -32,4 +32,8 @@ public class FieldAccess extends Expr{
 		v.visitFieldAccess(this);
 	}
 
+	@Override
+	public boolean isConstant() {
+		return false; // TODO
+	}
 }

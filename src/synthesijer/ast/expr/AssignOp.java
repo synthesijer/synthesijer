@@ -41,4 +41,8 @@ public class AssignOp extends Expr{
 		v.visitAssignOp(this);
 	}
 
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
 }

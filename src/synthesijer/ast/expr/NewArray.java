@@ -24,4 +24,10 @@ public class NewArray extends Expr{
 	public void accept(SynthesijerExprVisitor v){
 		v.visitNewArray(this);
 	}
+
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
+
 }

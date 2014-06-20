@@ -28,4 +28,8 @@ public class Variable{
 		}
 	}
 	
+	public String toString(){
+		return "Varialble: " + getUniqueName();
+	}
+	
 }

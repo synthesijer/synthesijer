@@ -26,4 +26,9 @@ public class Ident extends Expr{
 	public String toString(){
 		return String.format("Ident::(%s)", symbol); 
 	}
+	
+	@Override
+	public boolean isConstant() {
+		return false; // TODO
+	}
 }

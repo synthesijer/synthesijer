@@ -36,7 +36,7 @@ public class VariableDecl extends ExprContainStatement{
 	}
 	
 	public boolean hasInitExpr(){
-		return (init != null);
+		return init != null && init.isConstant();
 	}
 	
 	public Expr getInitExpr(){
@@ -46,7 +46,7 @@ public class VariableDecl extends ExprContainStatement{
 	private State state;
 	
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
-		if(init != null){
+		if(hasInitExpr()){
 			State s = m.newState("var_init");
 			s.setBody(this);
 			s.addTransition(dest);
@@ -63,6 +63,10 @@ public class VariableDecl extends ExprContainStatement{
 	
 	public void accept(SynthesijerAstVisitor v){
 		v.visitVariableDecl(this);
+	}
+	
+	public String toString(){
+		return "VariableDecl: " + var; 
 	}
 	
 }

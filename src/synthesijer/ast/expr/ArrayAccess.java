@@ -31,5 +31,10 @@ public class ArrayAccess extends Expr{
 		v.visitArrayAccess(this);
 	}
 
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
+
 }
 

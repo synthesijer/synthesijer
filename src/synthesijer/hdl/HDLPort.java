@@ -62,7 +62,11 @@ public class HDLPort implements HDLTree{
 		}
 	}
 
-
+	public String toString(){
+		return String.format("HDLPort: %s dir=%s, type=%s", name, dir, type);
+	}
+	
+	
 	@Override
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLPort(this);

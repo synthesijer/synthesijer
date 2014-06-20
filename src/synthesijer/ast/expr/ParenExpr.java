@@ -23,4 +23,8 @@ public class ParenExpr extends Expr{
 		v.visitParenExpr(this);
 	}
 
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
 }

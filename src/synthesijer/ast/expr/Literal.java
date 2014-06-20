@@ -118,4 +118,10 @@ public class Literal extends Expr{
 	public void accept(SynthesijerExprVisitor v){
 		v.visitLitral(this);
 	}
+	
+	@Override
+	public boolean isConstant() {
+		return true;
+	}
+
 }

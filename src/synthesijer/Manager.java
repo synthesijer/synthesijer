@@ -18,29 +18,34 @@ public enum Manager {
 	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<String, HDLModuleInfo>();
 		
 	private Manager(){
-		addHDLModule("BlockRAM", new BlockRAM(), false);
+		addHDLModule("BlockRAM", null, new BlockRAM(), false);
 	}
-
+	
 	public void addModule(Module m){
 		if(hasModule(m.getName())) return;
 		entries.put(m.getName(), m);
-		addHDLModule(m.getName(), new HDLModule(m.getName(), "clk", "reset"));
+		addHDLModule(m.getName(), m, new HDLModule(m.getName(), "clk", "reset"));
 	}
 	
-	public void addHDLModule(String name, HDLModule hm){
-		moduleTable.put(name, new HDLModuleInfo(hm));
+	private void addHDLModule(String name, Module m, HDLModule hm){
+		moduleTable.put(name, new HDLModuleInfo(m, hm));
 	}
 
-	public void addHDLModule(String name, HDLModule hm, boolean synthesisFlag){
-		moduleTable.put(name, new HDLModuleInfo(hm, synthesisFlag));
+	private void addHDLModule(String name, Module m, HDLModule hm, boolean synthesisFlag){
+		moduleTable.put(name, new HDLModuleInfo(m, hm, synthesisFlag));
 	}
 
 	public Module searchModule(String name){
 		return entries.get(name);
 	}
 
-	public HDLModule searchHDLModule(String name){
-		return moduleTable.get(name).hm;
+	public HDLModuleInfo searchHDLModuleInfo(String name){
+		return moduleTable.get(name);
+	}
+
+	public boolean isGeneratedHDLModule(String name){
+		HDLModuleInfo info = moduleTable.get(name);
+		return !info.sysnthesisFlag || !info.state.isBefore(CompileState.GENERATE_HDL);
 	}
 
 	public boolean hasModule(String key){
@@ -52,7 +57,7 @@ public enum Manager {
 		try{
 			makeStateMachine();
 			dumpStateMachine();
-			genHDL();
+			genHDLAll();
 			output(OutputFormat.VHDL);
 			output(OutputFormat.Verilog);
 		}catch(Exception e){
@@ -84,11 +89,16 @@ public enum Manager {
 	
 	enum OutputFormat { Verilog, VHDL; };
 		
-	public void genHDL(){
-		
+	public void genHDLAll(){
 		for(Module m: entries.values()){
-			HDLModule top = moduleTable.get(m.getName()).hm;
-			m.accept(new GenerateHDLModuleVisitor(top));
+			genHDL(searchHDLModuleInfo(m.getName()));
+		}
+	}
+	
+	public void genHDL(HDLModuleInfo info){
+		if(info.state.isBefore(CompileState.GENERATE_HDL)){
+			info.m.accept(new GenerateHDLModuleVisitor(info.hm));
+			info.state = CompileState.GENERATE_HDL;
 		}
 	}
 	
@@ -120,15 +130,28 @@ public enum Manager {
 		dest.printf("</modules>\n");
 	}
 	
-	private class HDLModuleInfo{
+	public class HDLModuleInfo{
+		public final Module m;
 		public final HDLModule hm; 
 		public final boolean sysnthesisFlag;
-		public HDLModuleInfo(HDLModule hm, boolean synthesisFlag) {
+		private CompileState state;
+		public HDLModuleInfo(Module m, HDLModule hm, boolean synthesisFlag) {
+			this.m = m;
 			this.hm = hm;
 			this.sysnthesisFlag = synthesisFlag;
+			this.state = CompileState.INITIALIZE;
 		}
-		public HDLModuleInfo(HDLModule hm){
-			this(hm, true);
+		
+		public HDLModuleInfo(Module m, HDLModule hm){
+			this(m, hm, true);
+		}
+		
+		public void setCompileState(CompileState s){
+			state = s;
+		}
+		
+		public CompileState getCompileState(){
+			return state;
 		}
 	}	
 

@@ -44,4 +44,9 @@ public class BinaryExpr extends Expr{
 	public String toString(){
 		return String.format("BinaryExpr::(%s %s %s)", op, lhs, rhs); 
 	}
+	
+	@Override
+	public boolean isConstant() {
+		return rhs.isConstant() && lhs.isConstant();
+	}
 }

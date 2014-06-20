@@ -43,4 +43,8 @@ public class MethodInvocation extends Expr{
 		v.visitMethodInvocation(this);
 	}
 
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
 }

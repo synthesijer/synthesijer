@@ -119,8 +119,12 @@ public class HDLModule implements HDLTree{
 		return submodules.toArray(new HDLInstance[]{});
 	}
 		
-	private int getExprUniqueId(){
-		return exprs.size() + 1;
+	private int uniqId = 1;
+	
+	public int getExprUniqueId(){
+		int tmp = uniqId;
+		uniqId++;
+		return tmp;
 	}
 		
 	public HDLExpr newExpr(HDLOp op, HDLExpr arg0, HDLExpr arg1){

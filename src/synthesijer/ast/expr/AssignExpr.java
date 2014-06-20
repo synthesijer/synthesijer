@@ -31,4 +31,8 @@ public class AssignExpr extends Expr{
 		v.visitAssignExpr(this);
 	}
 	
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
 }

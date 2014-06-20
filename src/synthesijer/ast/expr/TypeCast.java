@@ -23,4 +23,9 @@ public class TypeCast extends Expr{
 		v.visitTypeCast(this);
 	}
 
+	@Override
+	public boolean isConstant() {
+		return expr.isConstant();
+	}
+
 }

@@ -1,5 +1,6 @@
 package synthesijer.ast2hdl;
 
+import scala.reflect.macros.internal.macroImpl;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Variable;
@@ -177,7 +178,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitMethodInvocation(MethodInvocation o) {
-		result = parent.module.newSignal(o.getMethodName() + "_return_value", HDLPrimitiveType.genVectorType(32));
+		result = parent.module.newSignal(String.format("%s_return_value_%04d", o.getMethodName(), parent.module.getExprUniqueId()), HDLPrimitiveType.genVectorType(32));
 	}
 	
 	@Override

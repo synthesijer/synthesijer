@@ -56,6 +56,15 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		return null;
 	}
 	
+	public String toString(){
+		String s = "";
+		s += "HDLInstance : " + name + "\n";
+		for(HDLPort p: submodule.getPorts()){
+			s += " " + p + "\n";
+		}
+		return s;
+	}
+	
 
 	@Override
 	public void accept(HDLTreeVisitor v) {

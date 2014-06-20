@@ -32,4 +32,10 @@ public class UnaryExpr extends Expr{
 	public void accept(SynthesijerExprVisitor v){
 		v.visitUnaryExpr(this);
 	}
+
+	@Override
+	public boolean isConstant() {
+		return arg.isConstant();
+	}
+
 }

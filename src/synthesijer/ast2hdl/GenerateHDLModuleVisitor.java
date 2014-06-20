@@ -2,8 +2,7 @@ package synthesijer.ast2hdl;
 
 import java.util.Hashtable;
 
-import javax.management.RuntimeErrorException;
-
+import synthesijer.CompileState;
 import synthesijer.Manager;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
@@ -66,6 +65,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
 			if(t != null){
+				System.out.println(v);
 				HDLPort p = module.newPort(o.getName() + "_" + v.getName(), HDLPort.DIR.IN, t);
 				variableTable.put(v.getVariable(), p.getSignal());
 			}
@@ -77,6 +77,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		}
 		HDLPort req = module.newPort(o.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort busy = module.newPort(o.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+		genVariableTables(o);
 		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, req, busy));
 		o.getBody().accept(this);
 	}
@@ -87,13 +88,18 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			HDLType t0 = getHDLType(v.getType());
 			return module.newSignal(v.getUniqueName(), t0);
 		}else if(t instanceof ArrayType){
-			HDLInstance inst = module.newModuleInstance(Manager.INSTANCE.searchHDLModule("BlockRAM"), v.getName());
+			Manager.HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM");
+			HDLInstance inst = module.newModuleInstance(info.hm, v.getName());
 			inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
 			inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
 			return inst;
 		}else if(t instanceof ComponentType){
 			ComponentType c = (ComponentType)t;
-			HDLInstance inst = module.newModuleInstance(Manager.INSTANCE.searchHDLModule(c.getName()), v.getName());
+			Manager.HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(c.getName());
+			if(info.getCompileState().isBefore(CompileState.GENERATE_HDL)){
+				Manager.INSTANCE.genHDL(info);
+			}
+			HDLInstance inst = module.newModuleInstance(info.hm, v.getName());
 			inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
 			inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
 			return inst;
@@ -104,6 +110,8 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	private void genVariableTables(Scope s){
 		for(Variable v: s.getVariables()){
+			System.out.println("genVariableTable: " + v);
+			if(variableTable.containsKey(v)) continue; // skip
 			HDLVariable var = genHDLVariable(v);
 			variableTable.put(v, var);
 		}			
@@ -112,7 +120,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitModule(Module o) {
 		for(Scope s: o.getScope()){
-//			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port. 
+			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port. 
 			genVariableTables(s);
 		}
 		for(VariableDecl v: o.getVariableDecls()){
@@ -221,8 +229,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	public void visitVariableDecl(VariableDecl o) {
 		Variable var = o.getVariable();
 		HDLVariable s = variableTable.get(var);
-		System.out.println(var.getName());
-		if(o.getInitExpr() != null){
+		if(o.hasInitExpr()){
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);
 			s.setResetValue(v.getResult());
