@@ -36,4 +36,8 @@ public class FieldAccess extends Expr{
 	public boolean isConstant() {
 		return false; // TODO
 	}
+	
+	public String toString(){
+		return "FieldAccess: " + ident;
+	}
 }

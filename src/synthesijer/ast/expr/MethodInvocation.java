@@ -47,4 +47,8 @@ public class MethodInvocation extends Expr{
 	public boolean isConstant() {
 		return false;
 	}
+	
+	public String toString(){
+		return "MethodInvocation::(" + method + ")";
+	}
 }

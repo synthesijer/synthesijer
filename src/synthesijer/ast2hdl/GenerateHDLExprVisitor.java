@@ -1,6 +1,5 @@
 package synthesijer.ast2hdl;
 
-import scala.reflect.macros.internal.macroImpl;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Variable;
@@ -143,6 +142,9 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
+		System.out.println("visitFieldAccess:" + o);
+
+
 		Ident id = (Ident)o.getSelected();
 		HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 		HDLInstance inst = (HDLInstance)var;
@@ -178,6 +180,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitMethodInvocation(MethodInvocation o) {
+		System.out.println("visitMethodInvocation:" + o);
 		result = parent.module.newSignal(String.format("%s_return_value_%04d", o.getMethodName(), parent.module.getExprUniqueId()), HDLPrimitiveType.genVectorType(32));
 	}
 	
@@ -204,7 +207,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
-		result = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
+		result = parent.module.newSignal("unaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
 	}
 	
 }
