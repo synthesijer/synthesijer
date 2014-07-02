@@ -33,6 +33,7 @@ public class MethodInvocation extends Expr{
 	public String getMethodName(){
 		if(method instanceof Ident){
 			return ((Ident)method).getSymbol();
+		
 		}else if(method instanceof FieldAccess){
 			return ((FieldAccess)method).getIdent().getSymbol();
 		}
