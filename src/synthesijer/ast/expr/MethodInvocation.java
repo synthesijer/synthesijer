@@ -36,6 +36,10 @@ public class MethodInvocation extends Expr{
 		return params;
 	}
 	
+	public void setParameter(int index, Expr expr){
+		params.set(index, expr);
+	}
+	
 	public String getMethodName(){
 		if(method instanceof Ident){
 			return ((Ident)method).getSymbol();

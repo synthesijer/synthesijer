@@ -292,16 +292,17 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 		ExprStatement stmt = new ExprStatement(block.scope, assign);
 		return stmt;
 	}
-
+	
 	@Override
 	public void visitBinaryExpr(BinaryExpr o) {
+		o.getLhs().accept(this);
+		o.getRhs().accept(this);
+		
 		// replacement of lhs
 		if(o.getLhs().isVariable() == false){
 			Ident ident = genTempIdent(o.getType());
 			block.newList.add(genTempAssignStatement(ident, o.getLhs()));
 			o.setLhs(ident);
-		}else{
-			o.getLhs().accept(this);
 		}
 		
 		// replacement of rhs
@@ -309,9 +310,8 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 			Ident ident = genTempIdent(o.getType());
 			block.newList.add(genTempAssignStatement(ident, o.getRhs()));
 			o.setRhs(ident);
-		}else{
-			o.getRhs().accept(this);
 		}
+		
 	}
 
 	@Override
@@ -334,9 +334,16 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitMethodInvocation(MethodInvocation o) {
-		for(Expr expr: o.getParameters()){
+		for(int i = 0; i < o.getParameters().size(); i++){
+			Expr expr = o.getParameters().get(i);
+
 			if(expr.isVariable()) continue;
 			expr.accept(this);
+			if(expr.isVariable() == false){
+				Ident ident = genTempIdent(o.getType());
+				block.newList.add(genTempAssignStatement(ident, expr));
+				o.setParameter(i, ident);
+			}
 		}
 	}
 
