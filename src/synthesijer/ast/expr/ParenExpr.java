@@ -2,6 +2,7 @@ package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
 
 public class ParenExpr extends Expr{
 	
@@ -25,6 +26,17 @@ public class ParenExpr extends Expr{
 
 	@Override
 	public boolean isConstant() {
-		return false;
+		return expr.isConstant();
 	}
+	
+	@Override
+	public boolean isVariable() {
+		return expr.isVariable();
+	}
+	
+	@Override
+	public Type getType() {
+		return expr.getType();
+	}
+	
 }

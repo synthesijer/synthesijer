@@ -149,28 +149,4 @@ public class DumpStatemachineVisitor implements SynthesijerAstVisitor, Statemach
 		
 	}
 
-	@Override
-	public void visitArrayType(ArrayType o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitComponentType(ComponentType o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitMySelfType(MySelfType o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

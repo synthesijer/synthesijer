@@ -52,8 +52,19 @@ public enum Manager {
 		return entries.contains(key);
 	}
 	
-	public void generate(){
+	public void preprocess(){
 		makeCallGraph();
+		doGenSimplifiedAst(new IdentifierGenerator());
+	}
+		
+	private void doGenSimplifiedAst(IdentifierGenerator idGenerator){
+		for(Module m: entries.values()){
+			GenSimplifiedAstVisitor v = new GenSimplifiedAstVisitor(idGenerator);
+			m.accept(v);
+		}
+	}
+	
+	public void generate(){
 		try{
 			makeStateMachine();
 			dumpStateMachine();

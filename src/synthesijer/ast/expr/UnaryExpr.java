@@ -3,6 +3,7 @@ package synthesijer.ast.expr;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
 
 public class UnaryExpr extends Expr{
 	
@@ -36,6 +37,15 @@ public class UnaryExpr extends Expr{
 	@Override
 	public boolean isConstant() {
 		return arg.isConstant();
+	}
+	
+	@Override
+	public boolean isVariable() {
+		return arg.isVariable();
+	}
+
+	public Type getType(){
+		return arg.getType();
 	}
 
 }

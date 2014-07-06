@@ -1,6 +1,6 @@
 package synthesijer.ast.type;
 
-import synthesijer.ast.SynthesijerAstVisitor;
+import synthesijer.ast.SynthesijerAstTypeVisitor;
 import synthesijer.ast.Type;
 
 public class ArrayType implements Type{
@@ -15,7 +15,7 @@ public class ArrayType implements Type{
 		return elemType;
 	}
 	
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerAstTypeVisitor v){
 		v.visitArrayType(this);
 	}
 

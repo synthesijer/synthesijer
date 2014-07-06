@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
+import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class NewClassExpr extends Expr{
 	
@@ -37,6 +39,16 @@ public class NewClassExpr extends Expr{
 	@Override
 	public boolean isConstant() {
 		return false;
+	}
+
+	@Override
+	public boolean isVariable() {
+		return false;
+	}
+	
+	@Override
+	public Type getType() {
+		return PrimitiveTypeKind.DECLARED;
 	}
 
 }

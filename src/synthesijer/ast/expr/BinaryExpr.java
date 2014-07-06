@@ -3,6 +3,7 @@ package synthesijer.ast.expr;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
 
 public class BinaryExpr extends Expr{
 	
@@ -49,4 +50,18 @@ public class BinaryExpr extends Expr{
 	public boolean isConstant() {
 		return rhs.isConstant() && lhs.isConstant();
 	}
+	
+	@Override
+	public boolean isVariable() {
+		return lhs.isVariable() && rhs.isVariable();
+	}
+	
+	@Override
+	public Type getType(){
+		Type r = rhs.getType();
+		Type l = lhs.getType();
+//		return r.isPrimary(l) ? r : l; // select primary type
+		return r;
+	}
+
 }

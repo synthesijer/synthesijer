@@ -6,6 +6,7 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstTypeVisitor;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
@@ -39,7 +40,7 @@ import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
-public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprVisitor{
+public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprVisitor, SynthesijerAstTypeVisitor{
 	
 	private final PrintWriter dest;
 	

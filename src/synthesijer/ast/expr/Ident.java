@@ -2,6 +2,8 @@ package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 
 public class Ident extends Expr{
 	
@@ -29,6 +31,17 @@ public class Ident extends Expr{
 	
 	@Override
 	public boolean isConstant() {
-		return false; // TODO
+		return false;
 	}
+	
+	@Override
+	public boolean isVariable() {
+		return true;
+	}
+	
+	public Type getType(){
+		Variable v = getScope().search(symbol);
+		return v.getType();
+	}
+
 }

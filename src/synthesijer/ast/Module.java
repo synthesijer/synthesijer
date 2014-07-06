@@ -71,6 +71,10 @@ public class Module implements Scope, SynthesijerAstTree{
 		methods.add(m);
 	}
 	
+	public Method searchMethod(String name){
+		return methodTable.get(name);
+	}
+	
 	public void addVariableDecl(VariableDecl v){
 		variableTable.put(v.getName(), v.getVariable());
 		variables.add(v);

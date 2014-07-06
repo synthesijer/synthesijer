@@ -43,7 +43,7 @@ public class JCExprVisitor extends Visitor{
 	public JCExprVisitor(Scope scope){
 		this.scope = scope;
 	}
-	
+
 	public Expr getExpr(){
 		return expr;
 	}
@@ -59,7 +59,7 @@ public class JCExprVisitor extends Visitor{
 		expr.accept(visitor);
 		return visitor.getExpr();
 	}
-		
+			
 	public void visitBinary(JCBinary that){
 		BinaryExpr tmp = new BinaryExpr(scope);
 		Expr lhs = stepIn(that.lhs);

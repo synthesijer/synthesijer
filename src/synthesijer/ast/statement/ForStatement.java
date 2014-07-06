@@ -30,6 +30,10 @@ public class ForStatement extends Statement implements Scope {
 		addScope(this);
 	}
 	
+	public void replaceInitializations(ArrayList<Statement> newList){
+		initializations = newList;
+	}
+	
 	public void addScope(Scope s){
 		parent.addScope(s);
 	}

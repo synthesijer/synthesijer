@@ -10,7 +10,9 @@ public class Main {
 		openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
 		int err = compiler.compile(args);
 		if(err == 0){
-			dump("dump.xml");
+			dump("dump000.xml");
+			Manager.INSTANCE.preprocess();
+			dump("dump001.xml");
 			Manager.INSTANCE.generate();
 		}
 		System.exit(err);

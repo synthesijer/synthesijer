@@ -251,24 +251,4 @@ public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerEx
 		o.getBody().accept(this);
 	}
 
-	@Override
-	public void visitArrayType(ArrayType o) {
-		// nothing to do 
-	}
-
-	@Override
-	public void visitComponentType(ComponentType o) {
-		// nothing to do
-	}
-
-	@Override
-	public void visitMySelfType(MySelfType o) {
-		// nothing to do
-	}
-
-	@Override
-	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
-		// nothing to do
-	}
-
 }

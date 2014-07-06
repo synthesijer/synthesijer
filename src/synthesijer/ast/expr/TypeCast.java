@@ -2,6 +2,7 @@ package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
 
 public class TypeCast extends Expr{
 	
@@ -26,6 +27,15 @@ public class TypeCast extends Expr{
 	@Override
 	public boolean isConstant() {
 		return expr.isConstant();
+	}
+	
+	@Override
+	public boolean isVariable() {
+		return expr.isVariable();
+	}
+	
+	public Type getType(){
+		return expr.getType();
 	}
 
 }

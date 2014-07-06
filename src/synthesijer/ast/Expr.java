@@ -21,4 +21,8 @@ public abstract class Expr{
 	
 	abstract public boolean isConstant();
 	
+	abstract public boolean isVariable();
+	
+	abstract public Type getType();
+	
 }

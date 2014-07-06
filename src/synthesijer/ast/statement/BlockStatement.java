@@ -48,6 +48,10 @@ public class BlockStatement extends Statement implements Scope{
 		}
 	}
 	
+	public void replaceStatements(ArrayList<Statement> newList){
+		statements = newList;
+	}
+	
 	public ArrayList<Statement> getStatements(){
 		return statements;
 	}

@@ -2,6 +2,8 @@ package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
+import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class Literal extends Expr{
 	
@@ -123,5 +125,26 @@ public class Literal extends Expr{
 	public boolean isConstant() {
 		return true;
 	}
+	
+	@Override
+	public boolean isVariable() {
+		return true;
+	}
 
+	@Override
+	public Type getType(){
+		switch(kind){
+		case BOOLEAN: return PrimitiveTypeKind.BOOLEAN;
+		case BYTE:    return PrimitiveTypeKind.BYTE;
+		case CHAR:    return PrimitiveTypeKind.CHAR;
+		case SHORT:   return PrimitiveTypeKind.SHORT;
+		case INT:     return PrimitiveTypeKind.INT;
+		case LONG:    return PrimitiveTypeKind.LONG;
+		case DOUBLE:  return PrimitiveTypeKind.DOUBLE;
+		case FLOAT:   return PrimitiveTypeKind.FLOAT;
+		case NULL:    return PrimitiveTypeKind.VOID;
+		default: return PrimitiveTypeKind.UNDEFIEND;
+		}
+	}
+	
 }

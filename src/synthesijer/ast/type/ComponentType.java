@@ -1,6 +1,6 @@
 package synthesijer.ast.type;
 
-import synthesijer.ast.SynthesijerAstVisitor;
+import synthesijer.ast.SynthesijerAstTypeVisitor;
 import synthesijer.ast.Type;
 
 public class ComponentType implements Type{
@@ -15,7 +15,7 @@ public class ComponentType implements Type{
 		return name;
 	}
 	
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerAstTypeVisitor v){
 		v.visitComponentType(this);
 	}
 }

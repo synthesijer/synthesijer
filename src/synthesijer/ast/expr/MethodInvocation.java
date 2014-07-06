@@ -1,9 +1,15 @@
 package synthesijer.ast.expr;
 
+
+
 import java.util.ArrayList;
 
+import synthesijer.Manager;
 import synthesijer.ast.Expr;
+import synthesijer.ast.Method;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
+import synthesijer.ast.type.ComponentType;
 
 public class MethodInvocation extends Expr{
 	
@@ -25,7 +31,7 @@ public class MethodInvocation extends Expr{
 	public Expr getMethod(){
 		return method;
 	}
-	
+		
 	public ArrayList<Expr> getParameters(){
 		return params;
 	}
@@ -52,4 +58,21 @@ public class MethodInvocation extends Expr{
 	public String toString(){
 		return "MethodInvocation::(" + method + ")";
 	}
+	
+	@Override
+	public boolean isVariable() {
+		return false;
+	}
+
+	@Override
+	public Type getType() {
+		if(method instanceof Ident){ // local method
+			return method.getType();
+		}else{
+			ComponentType type = (ComponentType)(method.getType());
+			Method m = Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+			return m.getType();
+		}
+	}
+
 }

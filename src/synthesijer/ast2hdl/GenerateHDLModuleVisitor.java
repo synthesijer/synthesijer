@@ -242,30 +242,6 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	public void visitWhileStatement(WhileStatement o) {
 		o.getBody().accept(this);
 	}
-
-	@Override
-	public void visitArrayType(ArrayType o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitComponentType(ComponentType o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitMySelfType(MySelfType o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	private HDLPrimitiveType getHDLType(PrimitiveTypeKind t){
 		switch(t){

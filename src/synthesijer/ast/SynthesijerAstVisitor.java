@@ -53,12 +53,4 @@ public interface SynthesijerAstVisitor{
 
 	public void visitWhileStatement(WhileStatement o);
 
-	public void visitArrayType(ArrayType o);
-
-	public void visitComponentType(ComponentType o);
-
-	public void visitMySelfType(MySelfType o);
-
-	public void visitPrimitiveTypeKind(PrimitiveTypeKind o);
-
 }

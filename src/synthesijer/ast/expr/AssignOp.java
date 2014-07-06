@@ -3,6 +3,7 @@ package synthesijer.ast.expr;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
 
 public class AssignOp extends Expr{
 	
@@ -44,5 +45,15 @@ public class AssignOp extends Expr{
 	@Override
 	public boolean isConstant() {
 		return false;
+	}
+	
+	@Override
+	public boolean isVariable() {
+		return false;
+	}
+
+	@Override
+	public Type getType(){
+		return lhs.getType();
 	}
 }
