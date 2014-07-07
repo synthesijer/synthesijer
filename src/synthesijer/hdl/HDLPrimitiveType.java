@@ -85,5 +85,9 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLType(this);
 	}
+	
+	public String toString(){
+		return "HDLPrimitiveType:" + kind;
+	}
 
 }

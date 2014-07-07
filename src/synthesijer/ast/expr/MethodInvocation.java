@@ -67,6 +67,11 @@ public class MethodInvocation extends Expr{
 	public boolean isVariable() {
 		return false;
 	}
+	
+	public Method getTargetMethod(){
+		ComponentType type = (ComponentType)(method.getType());
+		return Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+	}
 
 	@Override
 	public Type getType() {

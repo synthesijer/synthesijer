@@ -78,6 +78,10 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 	public HDLExpr getDefaultValue(){
 		return defaultValue;
 	}
+	
+	public String toString(){
+		return String.format("HDLSignal:: name=%s, type=%s, kind=%s", name, type, kind);
+	}
 
 	@Override
 	public void setAssign(HDLSequencer.SequencerState s, HDLExpr expr){

@@ -1,6 +1,7 @@
 package synthesijer.ast2hdl;
 
 import synthesijer.ast.Expr;
+import synthesijer.ast.Method;
 import synthesijer.ast.Op;
 import synthesijer.ast.Variable;
 import synthesijer.ast.expr.ArrayAccess;
@@ -17,6 +18,7 @@ import synthesijer.ast.expr.ParenExpr;
 import synthesijer.ast.expr.SynthesijerExprVisitor;
 import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.expr.UnaryExpr;
+import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLOp;
@@ -142,8 +144,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
-		System.out.println("visitFieldAccess:" + o);
-
+		//System.out.println("visitFieldAccess:" + o);
 
 		Ident id = (Ident)o.getSelected();
 		HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
@@ -180,8 +181,62 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitMethodInvocation(MethodInvocation o) {
-		System.out.println("visitMethodInvocation:" + o);
-		result = parent.module.newSignal(String.format("%s_return_value_%04d", o.getMethodName(), parent.module.getExprUniqueId()), HDLPrimitiveType.genVectorType(32));
+
+		HDLInstance inst = null;
+		Method method = null;
+		if(o.getMethod() instanceof Ident){ // local method
+			throw new RuntimeException("Unsupported local method invocation:" + o.getMethod());
+		}else if(o.getMethod() instanceof FieldAccess){
+			FieldAccess fa = (FieldAccess)o.getMethod();
+			if(fa.getSelected() instanceof Ident == false){
+				throw new RuntimeException("Unsupported mulit-link method invocation: " + o.getMethod());
+			}
+			Ident id = (Ident)(fa.getSelected());
+			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+			inst = (HDLInstance)var;
+			method = o.getTargetMethod();
+		}else{
+			throw new RuntimeException("Unsupported method invocation: " + o.getMethod());
+		}
+		
+		for(int i = 0; i < o.getParameters().size(); i++){
+			String arg = o.getMethodName() + "_" + method.getArgs()[i].getVariable().getName();
+			HDLSignal s = inst.getSignalForPort(arg);
+			s.setAssign(state, stepIn(o.getParameters().get(i)));
+		}
+		
+		HDLSignal s = inst.getSignalForPort(o.getMethodName() + "_req");
+		s.setAssign(state, HDLConstant.HIGH);
+		s.setDefaultValue(HDLConstant.LOW);
+		
+		if(o.getMethod().getType() != PrimitiveTypeKind.VOID){
+			result = inst.getSignalForPort(o.getMethodName() + "_return");
+		}else{
+			result = null;
+		}
+
+/*
+		if(o.getIndexed() instanceof Ident){
+			
+			ArrayAccess aa = (ArrayAccess)o;
+			Ident id = (Ident)aa.getIndexed();
+			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+			HDLInstance inst = (HDLInstance)var;
+			// address
+			HDLSignal addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
+			addr.setAssign(state, stepIn(aa.getIndex()));
+			// write-enable
+			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
+			we.setAssign(state, HDLConstant.LOW);
+			// data
+			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
+			state.setMaxConstantDelay(2);
+		}else{
+			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
+		}
+*/
+		
+		//result = parent.module.newSignal(String.format("%s_return_value_%04d", o.getMethodName(), parent.module.getExprUniqueId()), HDLPrimitiveType.genVectorType(32));
 	}
 	
 	@Override

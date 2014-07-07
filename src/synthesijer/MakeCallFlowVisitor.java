@@ -36,8 +36,6 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
-import synthesijer.ast.type.MySelfType;
-import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerExprVisitor{
 

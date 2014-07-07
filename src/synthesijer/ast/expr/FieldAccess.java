@@ -1,13 +1,9 @@
 package synthesijer.ast.expr;
 
-import javax.management.RuntimeErrorException;
-
-import synthesijer.Manager;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
-import synthesijer.ast.type.ComponentType;
 
 public class FieldAccess extends Expr{
 	

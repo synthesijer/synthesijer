@@ -287,7 +287,6 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 	private Statement genTempAssignStatement(Ident ident, Expr expr){
 		AssignExpr assign = new AssignExpr(block.scope);
 		assign.setLhs(ident);
-		System.out.println("fefe: " + expr);
 		assign.setRhs(expr);
 		ExprStatement stmt = new ExprStatement(block.scope, assign);
 		return stmt;
@@ -340,7 +339,7 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 			if(expr.isVariable()) continue;
 			expr.accept(this);
 			if(expr.isVariable() == false){
-				Ident ident = genTempIdent(o.getType());
+				Ident ident = genTempIdent(expr.getType());
 				block.newList.add(genTempAssignStatement(ident, expr));
 				o.setParameter(i, ident);
 			}

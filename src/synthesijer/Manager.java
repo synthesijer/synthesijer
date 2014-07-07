@@ -53,8 +53,8 @@ public enum Manager {
 	}
 	
 	public void preprocess(){
-		makeCallGraph();
 		doGenSimplifiedAst(new IdentifierGenerator());
+		//makeCallGraph();
 	}
 		
 	private void doGenSimplifiedAst(IdentifierGenerator idGenerator){

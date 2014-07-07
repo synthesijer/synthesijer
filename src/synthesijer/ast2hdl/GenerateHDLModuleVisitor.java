@@ -65,7 +65,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
 			if(t != null){
-				System.out.println(v);
+				//System.out.println(v);
 				HDLPort p = module.newPort(o.getName() + "_" + v.getName(), HDLPort.DIR.IN, t);
 				variableTable.put(v.getVariable(), p.getSignal());
 			}
@@ -110,7 +110,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	private void genVariableTables(Scope s){
 		for(Variable v: s.getVariables()){
-			System.out.println("genVariableTable: " + v);
+			//System.out.println("genVariableTable: " + v);
 			if(variableTable.containsKey(v)) continue; // skip
 			HDLVariable var = genHDLVariable(v);
 			variableTable.put(v, var);
