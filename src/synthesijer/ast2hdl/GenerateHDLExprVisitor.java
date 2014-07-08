@@ -144,8 +144,6 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
-		//System.out.println("visitFieldAccess:" + o);
-
 		Ident id = (Ident)o.getSelected();
 		HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 		HDLInstance inst = (HDLInstance)var;
@@ -176,7 +174,6 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitLitral(Literal o) {
-		System.out.println(o);
 		result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getKind()));
 	}
 	

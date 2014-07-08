@@ -230,14 +230,9 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		Variable var = o.getVariable();
 		HDLVariable s = variableTable.get(var);
 		if(o.hasInitExpr()){
-			System.out.println(o);
-			System.out.println(o.getState());
-			System.out.println(o.getInitExpr().getClass());
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);
-			System.out.println(v.getResult());
 			if(v.getResult() != null){
-				System.out.println(v.getResult());
 				s.setAssign(stateTable.get(o.getState()), v.getResult());
 			}
 			if(o.getInitExpr().isConstant()){

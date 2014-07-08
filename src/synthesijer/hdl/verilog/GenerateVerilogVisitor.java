@@ -108,6 +108,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 				if(s.hasExitCondition()){
 					HDLUtils.println(dest, offset+4, String.format("if (%s) begin", s.getExitConditionAsVerilogHDL()));
 					HDLUtils.println(dest, offset+6, String.format("%s <= 32'h0;", o.getDelayCounter().getName()));
+			 		HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getDelayCounter().getName(), o.getDelayCounter().getDefaultValue().getVerilogHDL()));
 					genStateTransition(dest, offset+6, s);
 					HDLUtils.println(dest, offset+4, String.format("end else begin"));
 					HDLUtils.println(dest, offset+6, String.format("%s <= %s + 1;", o.getDelayCounter().getName(), o.getDelayCounter().getName()));
