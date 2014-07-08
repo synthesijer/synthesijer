@@ -100,8 +100,8 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			HDLUtils.println(dest, offset, String.format("case (%s) is", o.getStateKey().getName()));
 			for(HDLSequencer.SequencerState s: o.getStates()){
 				HDLUtils.println(dest, offset+2, String.format("when %s => ", s.getStateId().getVHDL()));
-				if(s.hasDelay()){
-					HDLUtils.println(dest, offset+4, String.format("if %s >= %d then", o.getDelayCounter().getName(), s.getConstantDelay()));
+				if(s.hasExitCondition()){
+					HDLUtils.println(dest, offset+4, String.format("if %s then", s.getExitConditionAsVHDL()));
 					HDLUtils.println(dest, offset+6, String.format("%s <= (others => '0');", o.getDelayCounter().getName()));
 					genStateTransition(dest, offset+6, s);
 					HDLUtils.println(dest, offset+4, String.format("else"));

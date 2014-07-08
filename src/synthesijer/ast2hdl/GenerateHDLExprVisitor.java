@@ -25,6 +25,7 @@ import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
+import synthesijer.hdl.HDLSignal.ResourceKind;
 import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLConstant;
 import synthesijer.hdl.expr.HDLValue;
@@ -205,38 +206,27 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			s.setAssign(state, stepIn(o.getParameters().get(i)));
 		}
 		
-		HDLSignal s = inst.getSignalForPort(o.getMethodName() + "_req");
-		s.setAssign(state, HDLConstant.HIGH);
-		s.setDefaultValue(HDLConstant.LOW);
+		HDLSignal req = inst.getSignalForPort(o.getMethodName() + "_req");
+		req.setAssign(state, 0, HDLConstant.HIGH);
+		req.setDefaultValue(HDLConstant.LOW);
+
 		
 		if(o.getMethod().getType() != PrimitiveTypeKind.VOID){
 			result = inst.getSignalForPort(o.getMethodName() + "_return");
 		}else{
 			result = null;
 		}
+		HDLSignal busy = inst.getSignalForPort(o.getMethodName() + "_busy");
+		HDLSignal flag = parent.module.newSignal(String.format("%s_%04d", busy.getName(), parent.module.getExprUniqueId()), HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.WIRE);
+		flag.setAssign(null,
+				parent.module.newExpr(HDLOp.EQ,
+						parent.module.newExpr(HDLOp.AND,
+								parent.module.newExpr(HDLOp.EQ, busy, HDLConstant.LOW),
+								parent.module.newExpr(HDLOp.EQ, req, HDLConstant.LOW)),
+								HDLConstant.HIGH));
+		state.setMaxConstantDelay(1);
+		state.setStateExitFlag(flag);
 
-/*
-		if(o.getIndexed() instanceof Ident){
-			
-			ArrayAccess aa = (ArrayAccess)o;
-			Ident id = (Ident)aa.getIndexed();
-			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
-			HDLInstance inst = (HDLInstance)var;
-			// address
-			HDLSignal addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
-			addr.setAssign(state, stepIn(aa.getIndex()));
-			// write-enable
-			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
-			we.setAssign(state, HDLConstant.LOW);
-			// data
-			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
-			state.setMaxConstantDelay(2);
-		}else{
-			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
-		}
-*/
-		
-		//result = parent.module.newSignal(String.format("%s_return_value_%04d", o.getMethodName(), parent.module.getExprUniqueId()), HDLPrimitiveType.genVectorType(32));
 	}
 	
 	@Override

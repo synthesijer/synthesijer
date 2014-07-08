@@ -75,12 +75,19 @@ public class HDLSequencer implements HDLTree{
 		
 		private final HDLSignal key;
 		private final HDLValue id;
+		private final HDLSequencer seq;
 				
-		int constantDelay = 0;
-
+		private int constantDelay = 0;
+		private HDLSignal exitFlag = null;
+		
 		public SequencerState(HDLSequencer seq, HDLSignal key, HDLValue id){
 			this.key = key;
 			this.id = id;
+			this.seq = seq;
+		}
+		
+		public HDLSequencer getSequencer(){
+			return seq;
 		}
 		
 		public HDLValue getStateId(){
@@ -116,10 +123,39 @@ public class HDLSequencer implements HDLTree{
 			return constantDelay;
 		}
 		
-		public boolean hasDelay(){
-			return (constantDelay > 0);
+		public void setStateExitFlag(HDLSignal expr){
+			this.exitFlag = expr;
 		}
 		
+		public String getExitConditionAsVHDL(){
+			String s = "";
+			String sep = "";
+			if(constantDelay > 0){
+				s += String.format("%s >= %d", seq.getDelayCounter().getName(), getConstantDelay());
+				sep = " and ";
+			}
+			if(exitFlag != null){
+				s += sep + String.format("%s = '1'", exitFlag.getVHDL());
+			}
+			return s;
+		}
+
+		public String getExitConditionAsVerilogHDL(){
+			String s = "";
+			String sep = "";
+			if(constantDelay > 0){
+				s += String.format("%s >= %d", seq.getDelayCounter().getName(), getConstantDelay());
+				sep = " && ";
+			}
+			if(exitFlag != null){
+				s += sep + String.format("%s == 1'b1", exitFlag.getVerilogHDL());
+			}
+			return s;
+		}
+
+		public boolean hasExitCondition(){
+			return (exitFlag != null) || (constantDelay > 0);
+		}
 	}
 	
 	public class StateTransitCondition{

@@ -94,7 +94,19 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 			assignAlwaysExpr = expr;
 		}
 	}
-	
+
+	@Override
+	public void setAssign(HDLSequencer.SequencerState s, int counter, HDLExpr expr){
+		if(s != null){
+			AssignmentCondition c = new AssignmentCondition(s, counter, expr);
+			conditions.add(c);
+		}else{
+			kind = ResourceKind.WIRE; // change resource kind to allow using "assign" statement
+			assignAlwaysFlag = true;
+			assignAlwaysExpr = expr;
+		}
+	}
+
 	public boolean isAssignAlways(){
 		return assignAlwaysFlag;
 	}
@@ -124,18 +136,32 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 	public class AssignmentCondition{
 		private final HDLSequencer.SequencerState s;
 		private final HDLExpr value;
+		private final int count;
 		
 		public AssignmentCondition(HDLSequencer.SequencerState s, HDLExpr value) {
+			this(s, -1, value);
+		}
+
+		public AssignmentCondition(HDLSequencer.SequencerState s, int count, HDLExpr value) {
 			this.s = s;
 			this.value = value;
+			this.count = count;
 		}
-		
+
 		public String getCondExprAsVHDL(){
-			return s.getKey().getName() + " = " + s.getStateId().getValue(); 
+			if(count < 0){
+				return String.format("%s = %s", s.getKey().getName(), s.getStateId().getValue());
+			}else{
+				return String.format("%s = %s and %s = %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
+			}
 		}
 
 		public String getCondExprAsVerilogHDL(){
-			return s.getKey().getName() + " == " + s.getStateId().getValue(); 
+			if(count < 0){
+				return String.format("%s == %s", s.getKey().getName(), s.getStateId().getValue());
+			}else{
+				return String.format("%s == %s && %s == %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
+			}
 		}
 		
 		public HDLExpr getValue(){

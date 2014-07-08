@@ -84,6 +84,12 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	}
 
 	@Override
+	public void setAssign(SequencerState s, int count, HDLExpr expr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
 	public void setResetValue(HDLExpr s) {
 		// TODO Auto-generated method stub
 		
