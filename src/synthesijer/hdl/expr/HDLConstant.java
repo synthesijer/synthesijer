@@ -9,6 +9,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 public enum HDLConstant implements HDLLiteral{
 	
 	INTEGER_ZERO("(others => '0')", "0"),
+	INTEGER_ONE("1", "1"),
 	BOOLEAN_TRUE("true", "1'b1"),
 	BOOLEAN_FALSE("false", "1'b0"),
 	LOW("'0'", "1'b0"),

@@ -47,5 +47,9 @@ public class UnaryExpr extends Expr{
 	public Type getType(){
 		return arg.getType();
 	}
+	
+	public String toString(){
+		return String.format("UnaryExpr::(%s %s)", op, arg); 
+	}
 
 }

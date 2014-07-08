@@ -26,7 +26,7 @@ public class HDLValue implements HDLLiteral{
 		case VECTOR:
 		case SIGNED:
 			String v = String.format("%064x", Long.parseLong(value));
-			return String.format("X\"%s\"", v.substring(v.length()-1-type.getWidth()/4, v.length()-1));
+			return String.format("X\"%s\"", v.substring(v.length()-type.getWidth()/4, v.length()));
 		case BIT :
 			if(value.equals("true")){
 				return "'1'";
@@ -48,7 +48,7 @@ public class HDLValue implements HDLLiteral{
 		case VECTOR:
 		case SIGNED:
 			String v = String.format("%064x", Long.parseLong(value));
-			return String.format("%d'h%s", type.getWidth(), v.substring(v.length()-1-type.getWidth()/4, v.length()-1));
+			return String.format("%d'h%s", type.getWidth(), v.substring(v.length()-type.getWidth()/4, v.length()));
 		case BIT:
 			if(value.equals("true")){
 				return "1'b1";

@@ -25,7 +25,6 @@ import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
-import synthesijer.hdl.HDLSignal.ResourceKind;
 import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLConstant;
 import synthesijer.hdl.expr.HDLValue;
@@ -252,7 +251,19 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
-		result = parent.module.newSignal("unaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
+		switch(o.getOp()){
+		case INC:
+		case DEC:
+			break;
+		default:
+			throw new RuntimeException("unsupported unary expr: " + o);
+		}
+
+		HDLExpr arg = stepIn(o.getArg());
+		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), arg, HDLConstant.INTEGER_ONE);
+		HDLVariable sig = (HDLVariable)arg;
+		sig.setAssign(state, expr);
+		result = expr;
 	}
 	
 }

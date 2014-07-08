@@ -2,7 +2,7 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity simpledualportram is
+entity simple_dualportram is
   
   generic (
     DEPTH : integer := 10;
@@ -21,9 +21,9 @@ entity simpledualportram is
     din      : in  signed(WIDTH-1 downto 0)
     );
 
-end simpledualportram;
+end simple_dualportram;
 
-architecture RTL of simpledualportram is
+architecture RTL of simple_dualportram is
 
   type ram_type is array (WORDS-1 downto 0) of std_logic_vector (WIDTH-1 downto 0);
   signal RAM: ram_type;
