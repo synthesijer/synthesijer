@@ -176,6 +176,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitLitral(Literal o) {
+		System.out.println(o);
 		result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getKind()));
 	}
 	

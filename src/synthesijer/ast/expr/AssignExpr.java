@@ -46,4 +46,8 @@ public class AssignExpr extends Expr{
 	public Type getType(){
 		return lhs.getType();
 	}
+	
+	public String toString(){
+		return String.format("Assign::(assign %s %s)", lhs, rhs); 
+	}
 }
