@@ -46,7 +46,9 @@ public class IfStatement extends Statement{
 		s.addTransition(t, condition, true);
 		if(elsePart != null){
 			State e =  elsePart.genStateMachine(m, dest, terminal, loopout, loopCont);
-			e.addTransition(t, condition, false);
+			s.addTransition(e, condition, false);
+		}else{
+			s.addTransition(dest, condition, false);
 		}
 		return s;
 	}
