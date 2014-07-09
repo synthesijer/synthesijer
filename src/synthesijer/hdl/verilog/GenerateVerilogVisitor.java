@@ -57,10 +57,11 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	
 	@Override
 	public void visitHDLInstance(HDLInstance o) {
-		HDLUtils.println(dest, offset, String.format("%s %s", o.getSubModule().getName(), o.getName()));
+		HDLUtils.println(dest, offset, o.getSubModule().getName());
 		if(o.getSubModule().getParameters().length > 0){
 			genParameterMap(o);
 		}
+		HDLUtils.println(dest, offset, o.getName());
 		genPortMap(o);
 		HDLUtils.nl(dest);
 	}
@@ -171,6 +172,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		// reset
 		HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b1) begin", o.getModule().getSysResetName()));
 		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getStateKey().getName(), o.getIdleState().getStateId().getVerilogHDL()));
+		HDLUtils.println(dest, offset+4, String.format("%s <= 32'h0;", o.getDelayCounter().getName()));
 		
 		HDLUtils.println(dest, offset+2, String.format("end else begin"));
 		
