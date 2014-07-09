@@ -14,7 +14,7 @@ import synthesijer.ast.type.ComponentType;
 public class MethodInvocation extends Expr{
 	
 	private Expr method;
-	private ArrayList<Expr> params = new ArrayList<Expr>();
+	private ArrayList<Expr> params = new ArrayList<>();
 	
 	public MethodInvocation(Scope scope){
 		super(scope);

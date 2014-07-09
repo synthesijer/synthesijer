@@ -9,7 +9,7 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class NewArray extends Expr{
 	
-	private ArrayList<Expr> dimExpr = new ArrayList<Expr>();
+	private ArrayList<Expr> dimExpr = new ArrayList<>();
 	
 	public NewArray(Scope scope){
 		super(scope);

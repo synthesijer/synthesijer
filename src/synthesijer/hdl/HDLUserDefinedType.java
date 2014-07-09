@@ -10,8 +10,8 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 
 	private final String base;
 	private final int defaultIndex;
-	private final ArrayList<HDLValue> items = new ArrayList<HDLValue>();
-	private final Hashtable<String, HDLValue> itemTable = new Hashtable<String, HDLValue>();
+	private final ArrayList<HDLValue> items = new ArrayList<>();
+	private final Hashtable<String, HDLValue> itemTable = new Hashtable<>();
 	private final KIND kind;
 	
 	HDLUserDefinedType(String base, String[] items, int defaultIndex) {

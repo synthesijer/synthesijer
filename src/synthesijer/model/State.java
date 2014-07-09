@@ -14,7 +14,7 @@ public class State {
 	
 	private ExprContainStatement body;
 	
-	ArrayList<Transition> transitions = new ArrayList<Transition>();
+	ArrayList<Transition> transitions = new ArrayList<>();
 	
 	State(Statemachine m, int id, String desc, boolean terminate){
 		this.machine = m;

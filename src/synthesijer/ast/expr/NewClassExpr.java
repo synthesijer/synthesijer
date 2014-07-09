@@ -10,7 +10,7 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 public class NewClassExpr extends Expr{
 	
 	private String clazz;
-	private ArrayList<Expr> params = new ArrayList<Expr>();
+	private ArrayList<Expr> params = new ArrayList<>();
 	
 	public NewClassExpr(Scope scope){
 		super(scope);

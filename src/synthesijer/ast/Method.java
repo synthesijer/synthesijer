@@ -28,7 +28,7 @@ public class Method implements Scope, SynthesijerAstTree{
 	private VariableDecl[] args;
 	private final BlockStatement body;
 	
-	private Hashtable<String, Variable> varTable = new Hashtable<String, Variable>();	
+	private Hashtable<String, Variable> varTable = new Hashtable<>();	
 	
 	public Method(Scope parent, String name, Type type){
 		this.parent = parent;

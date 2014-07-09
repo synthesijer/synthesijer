@@ -138,7 +138,7 @@ public class GenSimplifiedAstVisitor implements SynthesijerAstVisitor {
 class GenSimplifiedAstBlockVisitor implements SynthesijerAstVisitor{
 	
 	final IdentifierGenerator idGenerator;
-	final ArrayList<Statement> newList = new ArrayList<Statement>();
+	final ArrayList<Statement> newList = new ArrayList<>();
 	final Scope scope;
 	
 	public GenSimplifiedAstBlockVisitor(Scope scope, IdentifierGenerator idGenerator){

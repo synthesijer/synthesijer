@@ -13,7 +13,7 @@ import synthesijer.model.Statemachine;
 public class SwitchStatement extends Statement{
 
 	private Expr selector;
-	private ArrayList<Elem> elements = new ArrayList<Elem>();
+	private ArrayList<Elem> elements = new ArrayList<>();
 	
 	public SwitchStatement(Scope scope){
 		super(scope);
@@ -61,7 +61,7 @@ public class SwitchStatement extends Statement{
 	public class Elem implements SynthesijerAstTree{
 		
 		private final Expr pat;
-		private ArrayList<Statement> statements = new ArrayList<Statement>();
+		private ArrayList<Statement> statements = new ArrayList<>();
 		
 		private Elem(Expr pat){
 			this.pat = pat;

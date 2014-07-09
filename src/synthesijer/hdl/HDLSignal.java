@@ -12,7 +12,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 	private HDLExpr resetValue;
 	private HDLExpr defaultValue;
 	
-	private ArrayList<AssignmentCondition> conditions = new ArrayList<AssignmentCondition>();
+	private ArrayList<AssignmentCondition> conditions = new ArrayList<>();
 	
 	private boolean assignAlwaysFlag;
 	private HDLExpr assignAlwaysExpr;
@@ -121,7 +121,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
 	
 	@Override
 	public HDLSignal[] getSrcSignals(){
-		ArrayList<HDLSignal> list = new ArrayList<HDLSignal>();
+		ArrayList<HDLSignal> list = new ArrayList<>();
 		for(AssignmentCondition c: conditions){
 			if(!list.contains(c.getStateKey())){
 				list.add(c.getStateKey());

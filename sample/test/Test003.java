@@ -9,6 +9,10 @@ public class Test003 {
 		t.set(1, 50);
 		t.set(3, t.get(0) + t.get(1));
 		t.set(t.get(0), t.get(1));
+		t.get(t.get(0));
+		t.get(3);
+		t.get(1);
+		t.get(0);
 	}
 
 }

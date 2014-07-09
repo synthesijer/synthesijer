@@ -15,12 +15,12 @@ public class HDLModule implements HDLTree{
 	private final String sysResetName;
 	private final boolean syncronousFlag;
 	
-	private ArrayList<HDLPort> ports = new ArrayList<HDLPort>();
-	private ArrayList<HDLSignal> signals = new ArrayList<HDLSignal>();
-	private ArrayList<HDLSequencer> sequencer = new ArrayList<HDLSequencer>();
-	private ArrayList<HDLUserDefinedType> usertype = new ArrayList<HDLUserDefinedType>();
-	private ArrayList<HDLInstance> submodules = new ArrayList<HDLInstance>();
-	private ArrayList<HDLExpr> exprs = new ArrayList<HDLExpr>();
+	private ArrayList<HDLPort> ports = new ArrayList<>();
+	private ArrayList<HDLSignal> signals = new ArrayList<>();
+	private ArrayList<HDLSequencer> sequencer = new ArrayList<>();
+	private ArrayList<HDLUserDefinedType> usertype = new ArrayList<>();
+	private ArrayList<HDLInstance> submodules = new ArrayList<>();
+	private ArrayList<HDLExpr> exprs = new ArrayList<>();
 	
 	private HDLPort sysClk; 
 	private HDLPort sysReset; 

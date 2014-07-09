@@ -46,13 +46,13 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	final HDLModule module;
 	final Hashtable<State, HDLSequencer.SequencerState> stateTable;
 	private final Hashtable<Method, HDLPort> methodReturnTable;
-	private final Hashtable<Variable, HDLVariable> variableTable = new Hashtable<Variable, HDLVariable>();
-	private final Hashtable<Method, HDLValue> methodIdTable = new Hashtable<Method, HDLValue>();
+	private final Hashtable<Variable, HDLVariable> variableTable = new Hashtable<>();
+	private final Hashtable<Method, HDLValue> methodIdTable = new Hashtable<>();
 	
 	public GenerateHDLModuleVisitor(HDLModule m){
 		this.module = m;
-		this.stateTable = new Hashtable<State, HDLSequencer.SequencerState>();
-		this.methodReturnTable = new Hashtable<Method, HDLPort>();
+		this.stateTable = new Hashtable<>();
+		this.methodReturnTable = new Hashtable<>();
 	}
 	
 	public HDLVariable getHDLVariable(Variable v){

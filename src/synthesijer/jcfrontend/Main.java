@@ -25,7 +25,7 @@ public class Main {
 			SynthesijerUtils.warn(decl.sym.toString() + " is skipped.");
 			return;
 		}
-		Hashtable<String, String> importTable = new Hashtable<String, String>();
+		Hashtable<String, String> importTable = new Hashtable<>();
 		for(Symbol s: env.outer.info.getLocalElements()){
 			importTable.put(s.name.toString(), s.toString());
 		}

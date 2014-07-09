@@ -1,7 +1,7 @@
 package synthesijer;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 
@@ -14,8 +14,8 @@ public enum Manager {
 	
 	INSTANCE;
 	
-	private Hashtable<String, Module> entries = new Hashtable<String, Module>();
-	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<String, HDLModuleInfo>();
+	private Hashtable<String, Module> entries = new Hashtable<>();
+	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<>();
 		
 	private Manager(){
 		addHDLModule("BlockRAM", null, new BlockRAM(), false);
@@ -65,15 +65,11 @@ public enum Manager {
 	}
 	
 	public void generate(){
-		try{
-			makeStateMachine();
-			dumpStateMachine();
-			genHDLAll();
-			output(OutputFormat.VHDL);
-			output(OutputFormat.Verilog);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+		makeStateMachine();
+		dumpStateMachine();
+		genHDLAll();
+		output(OutputFormat.VHDL);
+		output(OutputFormat.Verilog);
 	}
 	
 	public void makeCallGraph(){
@@ -89,11 +85,13 @@ public enum Manager {
 		}
 	}
 	
-	public void dumpStateMachine() throws FileNotFoundException{
+	public void dumpStateMachine(){
 		for(Module m: entries.values()){
-			PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s_statemachine.dot", m.getName())), true);
-			m.accept(new DumpStatemachineVisitor(dest));
-			dest.close();
+			try(PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s_statemachine.dot", m.getName())), true)){
+				m.accept(new DumpStatemachineVisitor(dest));
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -113,19 +111,23 @@ public enum Manager {
 		}
 	}
 	
-	public void output(OutputFormat format) throws FileNotFoundException{
+	public void output(OutputFormat format){
 		for(Module m: entries.values()){
 			HDLModule hm = moduleTable.get(m.getName()).hm;
 			if(format == OutputFormat.VHDL){
 				System.out.printf("Output VHDL: %s.vhd\n", m.getName());
-				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.vhd", m.getName())), true); 
-				hm.genVHDL(dest);
-				dest.close();
+				try(PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.vhd", m.getName())), true)){ 
+					hm.genVHDL(dest);
+				}catch(IOException e){
+					e.printStackTrace();
+				}
 			}else{
 				System.out.printf("Output Verilog HDL: %s.v\n", m.getName());
-				PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.v", m.getName())), true); 
-				hm.genVerilogHDL(dest);
-				dest.close();
+				try(PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.v", m.getName())), true)){ 
+					hm.genVerilogHDL(dest);
+				}catch(IOException e){
+					e.printStackTrace();
+				}
 			}
 		}
 		

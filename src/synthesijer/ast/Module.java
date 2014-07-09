@@ -14,11 +14,11 @@ public class Module implements Scope, SynthesijerAstTree{
 	private final String name;
 	private Hashtable<String, String> importTable;
 	
-	private Hashtable<String, Method> methodTable = new Hashtable<String, Method>();
-	private Hashtable<String, Variable> variableTable = new Hashtable<String, Variable>();
-	private ArrayList<Method> methods = new ArrayList<Method>();
-	private ArrayList<VariableDecl> variables = new ArrayList<VariableDecl>();
-	private ArrayList<Scope> scopes = new ArrayList<Scope>();
+	private Hashtable<String, Method> methodTable = new Hashtable<>();
+	private Hashtable<String, Variable> variableTable = new Hashtable<>();
+	private ArrayList<Method> methods = new ArrayList<>();
+	private ArrayList<VariableDecl> variables = new ArrayList<>();
+	private ArrayList<Scope> scopes = new ArrayList<>();
 	
 	private Statemachine statemachine;
 	

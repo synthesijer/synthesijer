@@ -24,7 +24,7 @@ public class HDLSequencer implements HDLTree{
 		this.stateKey = module.newSignal(key, stateType);
 		HDLValue idleId = stateType.addItem(stateKey.getName() + "_IDLE");
 		this.idle = new SequencerState(this, stateKey, idleId);
-		states = new ArrayList<SequencerState>();
+		states = new ArrayList<>();
 		states.add(idle);
 		delayCounter = module.newSignal(key + "_delay", HDLPrimitiveType.genSignedType(32), HDLSignal.ResourceKind.REGISTER);
 		delayCounter.setDefaultValue(HDLConstant.INTEGER_ZERO);
@@ -71,7 +71,7 @@ public class HDLSequencer implements HDLTree{
 	
 	public class SequencerState{
 		
-		private ArrayList<StateTransitCondition> transitions = new ArrayList<StateTransitCondition>();
+		private ArrayList<StateTransitCondition> transitions = new ArrayList<>();
 		
 		private final HDLSignal key;
 		private final HDLValue id;

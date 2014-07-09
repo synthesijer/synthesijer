@@ -17,12 +17,12 @@ public class ForStatement extends Statement implements Scope {
 
 	private Scope parent;
 	
-	private ArrayList<Statement> initializations = new ArrayList<Statement>();
+	private ArrayList<Statement> initializations = new ArrayList<>();
 	private Expr condition;
-	private ArrayList<Statement> updates = new ArrayList<Statement>();
+	private ArrayList<Statement> updates = new ArrayList<>();
 	private Statement body;
 	
-	private Hashtable<String, Variable> varTable = new Hashtable<String, Variable>();
+	private Hashtable<String, Variable> varTable = new Hashtable<>();
 
 	public ForStatement(Scope scope) {
 		super(scope);

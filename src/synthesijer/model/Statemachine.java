@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Statemachine {
 	
-	private ArrayList<State> states = new ArrayList<State>();
+	private ArrayList<State> states = new ArrayList<>();
 	
 	private int stateIdCounter;
 	private final String base;

@@ -132,7 +132,7 @@ public class HDLCombinationExpr implements HDLExpr{
 
 	@Override
 	public HDLSignal[] getSrcSignals() {
-		ArrayList<HDLSignal> list = new ArrayList<HDLSignal>();
+		ArrayList<HDLSignal> list = new ArrayList<>();
 		for(HDLExpr arg: args){
 			getSrcSignals(list, arg);
 		}

@@ -14,11 +14,11 @@ import synthesijer.model.Statemachine;
 
 public class BlockStatement extends Statement implements Scope{
 	
-	private ArrayList<Statement> statements = new ArrayList<Statement>();
+	private ArrayList<Statement> statements = new ArrayList<>();
 	
 	private final Scope parent;
 	
-	private Hashtable<String, Variable> varTable = new Hashtable<String, Variable>();
+	private Hashtable<String, Variable> varTable = new Hashtable<>();
 	
 	public BlockStatement(Scope scope){
 		super(scope);

@@ -38,9 +38,7 @@ public class HDLUtils {
 	
 	public static void generate(HDLModule m, Format f){
 		String ext = f == Format.VHDL ? ".vhd" : ".v";
-		PrintWriter dest = null;
-		try{
-			dest = new PrintWriter(new FileOutputStream(new File(m.getName() + ext)), true);
+		try(PrintWriter dest = new PrintWriter(new FileOutputStream(new File(m.getName() + ext)), true)){
 			if(f == Format.VHDL){
 				m.genVHDL(dest);
 			}else{
@@ -48,8 +46,6 @@ public class HDLUtils {
 			}
 		}catch(IOException e){
 			SynthesijerUtils.error(e.toString());
-		}finally{
-			if(dest != null) dest.close();
 		}
 	}
 

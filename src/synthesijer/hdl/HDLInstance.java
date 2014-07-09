@@ -10,7 +10,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	private final String name;
 	private final HDLModule submodule;
 	
-	private ArrayList<Pair> pairs = new ArrayList<Pair>();
+	private ArrayList<Pair> pairs = new ArrayList<>();
 	
 	HDLInstance(HDLModule module, String name, HDLModule submodule){
 		this.module = module;
