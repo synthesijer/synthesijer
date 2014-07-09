@@ -52,7 +52,10 @@ public class VariableDecl extends ExprContainStatement{
 			s.addTransition(dest);
 			state = s;
 		}else{
-			state = dest;
+			State s = m.newState("var_decl");
+			s.setBody(this);
+			s.addTransition(dest);
+			state = s;
 		}
 		return state;
 	}
