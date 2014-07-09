@@ -16,6 +16,12 @@ public class BubbleSort{
     return ar[id];
   }
 
+  public void check(){
+	for(int i = 0; i < ar.length; i++){
+		int v = ar[i];
+	}
+  }
+
   public synchronized void test(){
     int tmp;
     int max_i = ar.length - 1;

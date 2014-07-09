@@ -2,6 +2,7 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
+import openjdk.com.sun.tools.javac.util.Pair;
 import synthesijer.hdl.HDLSequencer.SequencerState;
 
 public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
@@ -10,13 +11,17 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	private final String name;
 	private final HDLModule submodule;
 	
-	private ArrayList<Pair> pairs = new ArrayList<>();
+	private ArrayList<PortPair> pairs = new ArrayList<>();
+	private ArrayList<ParamPair> params = new ArrayList<>();
 	
 	HDLInstance(HDLModule module, String name, HDLModule submodule){
 		this.module = module;
 		this.name = name;
 		this.submodule = submodule;
 		genPortSignals();
+		for(HDLParameter param: submodule.getParameters()){
+			params.add(new ParamPair(param, null));
+		}
 	}
 	
 	private String getAbsoluteName(String n){
@@ -24,12 +29,12 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	}
 	
 	private void genPortSignals(){
-		for(Pair pair: pairs){ module.rmSignal(pair.signal); }
+		for(PortPair pair: pairs){ module.rmSignal(pair.signal); }
 		pairs.clear();
 		for(HDLPort p: submodule.getPorts()){
 			HDLSignal.ResourceKind k = p.isOutput() ? HDLSignal.ResourceKind.WIRE : HDLSignal.ResourceKind.REGISTER;
 			HDLSignal s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
-			pairs.add(new Pair(s, p));
+			pairs.add(new PortPair(s, p));
 		}
 	}
 	
@@ -45,17 +50,28 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		return submodule;
 	}
 	
-	public ArrayList<Pair> getPairs(){
+	public ArrayList<PortPair> getPairs(){
 		return pairs;
 	}
 	
 	public HDLSignal getSignalForPort(String name){
-		for(Pair pair: pairs){
+		for(PortPair pair: pairs){
 			if(pair.port.getName().equals(name)) return pair.signal;
 		}
 		return null;
 	}
 	
+	public ParamPair getParameterPair(String name){
+		for(ParamPair pair: params){
+			if(pair.param.getName().equals(name)) return pair;
+		}
+		return null;
+	}
+
+	public ArrayList<ParamPair> getParameterPairs(){
+		return params;
+	}
+
 	public String toString(){
 		String s = "";
 		s += "HDLInstance : " + name + "\n";
@@ -71,10 +87,22 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		v.visitHDLInstance(this);
 	}
 	
-	public class Pair{
+	public class PortPair{
 		public final HDLSignal signal;
 		public final HDLPort port;
-		Pair(HDLSignal signal, HDLPort port){this.signal = signal; this.port = port;}
+		PortPair(HDLSignal signal, HDLPort port){this.signal = signal; this.port = port;}
+	}
+	
+	public class ParamPair{
+		public final HDLParameter param;
+		private String value;
+		ParamPair(HDLParameter param, String value){this.param = param; this.value = value;}
+		public void setValue(String value){
+			this.value = value;
+		}
+		public String getValue(){
+			return value;
+		}
 	}
 
 	@Override

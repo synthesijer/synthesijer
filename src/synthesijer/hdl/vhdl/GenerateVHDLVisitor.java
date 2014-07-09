@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
+import synthesijer.hdl.HDLInstance.ParamPair;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLParameter;
@@ -34,9 +35,14 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	private void genGenericMap(HDLInstance o){
 		HDLUtils.println(dest, offset, String.format("generic map("));
 		String sep = "";
-		for(HDLParameter param: o.getSubModule().getParameters()){
-			HDLUtils.print(dest, 0, sep);
-			HDLUtils.print(dest, offset+2, String.format("%s => %s", param.getName(), param.getValue()));
+		for(ParamPair pair: o.getParameterPairs()){
+			if(pair.getValue() != null){
+				HDLUtils.print(dest, 0, sep);
+				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.getValue()));
+			}else{
+				HDLUtils.print(dest, 0, sep);
+				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.param.getValue()));
+			}
 			sep = ",\n";
 		}
 		HDLUtils.println(dest, 0, "");
@@ -46,7 +52,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	private void genPortMap(HDLInstance o){
 		HDLUtils.println(dest, offset, String.format("port map("));
 		String sep = "";
-		for(HDLInstance.Pair pair: o.getPairs()){
+		for(HDLInstance.PortPair pair: o.getPairs()){
 			HDLUtils.print(dest, 0, sep);
 			HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.port.getName(), pair.signal.getName()));
 			sep = ",\n";

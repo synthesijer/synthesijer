@@ -12,6 +12,8 @@ import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
+import synthesijer.ast.expr.Literal;
+import synthesijer.ast.expr.NewArray;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
@@ -31,6 +33,7 @@ import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLInstance;
+import synthesijer.hdl.HDLInstance.ParamPair;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
@@ -251,12 +254,23 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		if(o.hasInitExpr()){
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);
-			System.out.println(o + "<-" + o.getExpr() + "@" + o.getState());
+			//System.out.println(o + "<-" + o.getExpr() + "@" + o.getState());
 			if(v.getResult() != null){
 				s.setAssign(stateTable.get(o.getState()), v.getResult());
 			}
 			if(o.getInitExpr().isConstant()){
 				s.setResetValue(v.getResult());
+			}
+			if(o.getType() instanceof ArrayType){
+				// TODO
+				ArrayType type = (ArrayType)(o.getType());
+				NewArray init = (NewArray)(o.getInitExpr());
+				Literal value = (Literal)(init.getDimExpr().get(0));
+				HDLInstance inst = (HDLInstance)s;
+				inst.getParameterPair("WORDS").setValue(value.getValueAsStr());
+				int dims = Integer.valueOf(value.getValueAsStr());
+				int depth = (int)Math.ceil(Math.log(dims) / Math.log(2.0));
+				inst.getParameterPair("DEPTH").setValue(String.valueOf(depth));
 			}
 		}
 	}

@@ -18,11 +18,12 @@ public enum Manager {
 	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<>();
 		
 	private Manager(){
-		addHDLModule("BlockRAM1",  null, new BlockRAM(1), false);
-		addHDLModule("BlockRAM8",  null, new BlockRAM(8), false);
-		addHDLModule("BlockRAM16", null, new BlockRAM(16), false);
-		addHDLModule("BlockRAM32", null, new BlockRAM(32), false);
-		addHDLModule("BlockRAM64", null, new BlockRAM(64), false);
+		// TODO
+		addHDLModule("BlockRAM1",  null, new BlockRAM(1, 10, 1024), false);
+		addHDLModule("BlockRAM8",  null, new BlockRAM(8, 10, 1024), false);
+		addHDLModule("BlockRAM16", null, new BlockRAM(16, 10, 1024), false);
+		addHDLModule("BlockRAM32", null, new BlockRAM(32, 10, 1024), false);
+		addHDLModule("BlockRAM64", null, new BlockRAM(64, 10, 1024), false);
 	}
 	
 	public void addModule(Module m){

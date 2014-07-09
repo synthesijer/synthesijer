@@ -4,7 +4,9 @@ public class BubbleSortSim implements Runnable{
         
   public void run(){
     p.init();
+    p.check();
     p.test();
+    p.check();
   }
 
 }
