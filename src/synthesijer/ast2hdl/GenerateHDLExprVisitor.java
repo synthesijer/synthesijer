@@ -3,6 +3,7 @@ package synthesijer.ast2hdl;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Op;
+import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
@@ -19,6 +20,7 @@ import synthesijer.ast.expr.SynthesijerExprVisitor;
 import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.ast.type.StringType;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLOp;
@@ -26,7 +28,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLVariable;
-import synthesijer.hdl.expr.HDLConstant;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 
 public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
@@ -63,7 +65,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			addr.setAssign(state, stepIn(aa.getIndex()));
 			// write-enable
 			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
-			we.setAssign(state, HDLConstant.LOW);
+			we.setAssign(state, HDLPreDefinedConstant.LOW);
 			// data
 			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
 			state.setMaxConstantDelay(2);
@@ -112,8 +114,8 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			addr.setAssign(state, stepIn(aa.getIndex()));
 			// write-enable
 			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
-			we.setAssign(state, HDLConstant.HIGH);
-			we.setDefaultValue(HDLConstant.LOW);
+			we.setAssign(state, HDLPreDefinedConstant.HIGH);
+			we.setDefaultValue(HDLPreDefinedConstant.LOW);
 			// data
 			HDLSignal din = inst.getSignalForPort("din"); // see synthsijer.lib.BlockRAM
 			din.setAssign(state, expr);
@@ -157,24 +159,29 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		result = parent.getHDLVariable(v);
 	}
 	
-	private HDLPrimitiveType convToHDLType(Literal.LITERAL_KIND kind){
-		switch(kind){
-		case BOOLEAN: return HDLPrimitiveType.genBitType();
-		case BYTE:    return HDLPrimitiveType.genSignedType(8);
-		case CHAR:    return HDLPrimitiveType.genVectorType(16);
-		case SHORT:   return HDLPrimitiveType.genSignedType(16);
-		case INT:     return HDLPrimitiveType.genSignedType(32);
-		case LONG:    return HDLPrimitiveType.genSignedType(64);
-		case DOUBLE:  return HDLPrimitiveType.genVectorType(64);
-		case FLOAT:   return HDLPrimitiveType.genVectorType(32);
-		case STRING:  return HDLPrimitiveType.genStringType();
-		default: return HDLPrimitiveType.genUnknowType();
+	private HDLPrimitiveType convToHDLType(Type type){
+		if(type instanceof PrimitiveTypeKind){
+			switch((PrimitiveTypeKind)type){
+			case BOOLEAN: return HDLPrimitiveType.genBitType();
+			case BYTE:    return HDLPrimitiveType.genSignedType(8);
+			case CHAR:    return HDLPrimitiveType.genVectorType(16);
+			case SHORT:   return HDLPrimitiveType.genSignedType(16);
+			case INT:     return HDLPrimitiveType.genSignedType(32);
+			case LONG:    return HDLPrimitiveType.genSignedType(64);
+			case DOUBLE:  return HDLPrimitiveType.genVectorType(64);
+			case FLOAT:   return HDLPrimitiveType.genVectorType(32);
+			default: return HDLPrimitiveType.genUnknowType();
+			}
+		}else if(type instanceof StringType){
+			return HDLPrimitiveType.genStringType();
+		}else{
+			return HDLPrimitiveType.genUnknowType();
 		}
 	}
 	
 	@Override
 	public void visitLitral(Literal o) {
-		result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getKind()));
+		result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getType()));
 	}
 	
 	@Override
@@ -204,8 +211,8 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		}
 		
 		HDLSignal req = inst.getSignalForPort(o.getMethodName() + "_req");
-		req.setAssign(state, 0, HDLConstant.HIGH);
-		req.setDefaultValue(HDLConstant.LOW);
+		req.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
+		req.setDefaultValue(HDLPreDefinedConstant.LOW);
 
 		
 		if(o.getMethod().getType() != PrimitiveTypeKind.VOID){
@@ -218,9 +225,9 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		flag.setAssign(null,
 				parent.module.newExpr(HDLOp.EQ,
 						parent.module.newExpr(HDLOp.AND,
-								parent.module.newExpr(HDLOp.EQ, busy, HDLConstant.LOW),
-								parent.module.newExpr(HDLOp.EQ, req, HDLConstant.LOW)),
-								HDLConstant.HIGH));
+								parent.module.newExpr(HDLOp.EQ, busy, HDLPreDefinedConstant.LOW),
+								parent.module.newExpr(HDLOp.EQ, req, HDLPreDefinedConstant.LOW)),
+								HDLPreDefinedConstant.HIGH));
 		state.setMaxConstantDelay(1);
 		state.setStateExitFlag(flag);
 
@@ -258,7 +265,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		}
 
 		HDLExpr arg = stepIn(o.getArg());
-		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), arg, HDLConstant.INTEGER_ONE);
+		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), arg, HDLPreDefinedConstant.INTEGER_ONE);
 		HDLVariable sig = (HDLVariable)arg;
 		sig.setAssign(state, expr);
 		result = expr;

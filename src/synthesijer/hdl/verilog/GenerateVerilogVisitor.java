@@ -6,6 +6,7 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLParameter;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
@@ -30,9 +31,20 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, str);
 	}
 
-	@Override
-	public void visitHDLInstance(HDLInstance o) {
-		HDLUtils.println(dest, offset, String.format("%s %s(", o.getSubModule().getName(), o.getName()));
+	private void genParameterMap(HDLInstance o){
+		HDLUtils.println(dest, offset, String.format("#("));
+		String sep = "";
+		for(HDLParameter p: o.getSubModule().getParameters()){
+			dest.print(sep);
+			HDLUtils.print(dest, offset+2, String.format(".%s(%s)", p.getName(), p.getValue()));
+			sep = ",\n";
+		}
+		HDLUtils.println(dest, 0, "");
+		HDLUtils.println(dest, offset, ")");
+	}
+
+	private void genPortMap(HDLInstance o){
+		HDLUtils.println(dest, offset, String.format("("));
 		String sep = "";
 		for(HDLInstance.Pair pair: o.getPairs()){
 			HDLUtils.print(dest, 0, sep);
@@ -41,6 +53,15 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
+	}
+	
+	@Override
+	public void visitHDLInstance(HDLInstance o) {
+		HDLUtils.println(dest, offset, String.format("%s %s", o.getSubModule().getName(), o.getName()));
+		if(o.getSubModule().getParameters().length > 0){
+			genParameterMap(o);
+		}
+		genPortMap(o);
 		HDLUtils.nl(dest);
 	}
 
@@ -50,10 +71,19 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		
 	}
 
-	@Override
-	public void visitHDLModule(HDLModule o) {
-		
-		HDLUtils.println(dest, offset, String.format("module %s (", o.getName()));
+	private void genParameterList(HDLModule o){
+		HDLUtils.println(dest, offset, String.format("#("));
+		String sep = "";
+		for(HDLParameter p: o.getParameters()){
+			dest.print(sep);
+			p.accept(new GenerateVerilogDefVisitor(dest, offset+2));
+			sep = ",\n";
+		}
+		HDLUtils.println(dest, offset, "\n)");
+	}
+
+	private void genPortList(HDLModule o){
+		HDLUtils.println(dest, offset, String.format("("));
 		String sep = "";
 		for(HDLPort p: o.getPorts()){
 			dest.print(sep);
@@ -61,6 +91,16 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 			sep = ",\n";
 		}
 		HDLUtils.println(dest, offset, "\n);");
+	}
+	
+	@Override
+	public void visitHDLModule(HDLModule o) {
+		
+		HDLUtils.println(dest, offset, String.format("module %s", o.getName()));
+		if(o.getParameters().length > 0){
+			genParameterList(o);
+		}
+		genPortList(o);
 		HDLUtils.nl(dest);
 		
 		// definitions
@@ -88,6 +128,10 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 			HDLUtils.println(dest, offset, String.format("assign %s = %s;", o.getSignal().getName(), o.getName()));
 		}
 		o.getSignal().accept(this);
+	}
+	
+	@Override
+	public void visitHDLParameter(HDLParameter o) {
 	}
 
 	private void genSyncSequencerHeader(HDLSequencer o, int offset){

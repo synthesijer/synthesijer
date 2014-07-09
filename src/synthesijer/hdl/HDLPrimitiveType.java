@@ -1,6 +1,6 @@
 package synthesijer.hdl;
 
-import synthesijer.hdl.expr.HDLConstant;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 
 /**
  * In order to make an instance of this class, use builder method.
@@ -55,9 +55,9 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 
 	public HDLLiteral getDefaultValue(){
 		if(kind == KIND.VECTOR || kind == KIND.SIGNED){
-			return HDLConstant.INTEGER_ZERO;
+			return HDLPreDefinedConstant.INTEGER_ZERO;
 		}else if(kind == KIND.BIT){
-			return HDLConstant.LOW;
+			return HDLPreDefinedConstant.LOW;
 		}else{
 			return null;
 		}
@@ -68,6 +68,7 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		case VECTOR: return String.format("std_logic_vector(%d-1 downto 0)", width);
 		case BIT:    return String.format("std_logic");
 		case SIGNED: return String.format("signed(%d-1 downto 0)", width);
+		case INTEGER: return "integer";
 		default: return "UNKNOWN";
 		}
 	}
@@ -77,6 +78,7 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		case VECTOR: return String.format("[%d-1 : 0]", width);
 		case BIT:    return String.format("");
 		case SIGNED: return String.format("signed [%d-1 : 0]", width);
+		case INTEGER: return "";
 		default: return "UNKNOWN";
 		}
 	}

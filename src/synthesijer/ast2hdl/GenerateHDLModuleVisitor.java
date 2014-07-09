@@ -62,6 +62,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitMethod(Method o) {
 		if(o.isConstructor()) return; // skip 
+		if(o.isUnsynthesizable()) return; // skip 
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
 			if(t != null){
@@ -81,6 +82,28 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, req, busy));
 		o.getBody().accept(this);
 	}
+	
+	private HDLVariable genHDLVariable(Variable v, ArrayType t){
+		Manager.HDLModuleInfo info = null;
+		Type t0 = t.getElemType();
+		if(t0 instanceof PrimitiveTypeKind == false){
+			throw new RuntimeException("unsupported type: " + t);
+		}
+		switch((PrimitiveTypeKind)t0){
+		case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM1");  break;
+		case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM8");  break;
+		case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM16"); break;
+		case INT:     info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM32"); break;
+		case LONG:    info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM64"); break;
+		case FLOAT:   info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM32"); break;
+		case DOUBLE:  info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM64"); break;
+		default: throw new RuntimeException("unsupported type: " + t);
+		}
+		HDLInstance inst = module.newModuleInstance(info.hm, v.getName());
+		inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
+		inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
+		return inst;
+	}
 		
 	private HDLVariable genHDLVariable(Variable v){
 		Type t = v.getType();
@@ -88,11 +111,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			HDLType t0 = getHDLType(v.getType());
 			return module.newSignal(v.getUniqueName(), t0);
 		}else if(t instanceof ArrayType){
-			Manager.HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM");
-			HDLInstance inst = module.newModuleInstance(info.hm, v.getName());
-			inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
-			inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
-			return inst;
+			return genHDLVariable(v, (ArrayType)t);
 		}else if(t instanceof ComponentType){
 			ComponentType c = (ComponentType)t;
 			Manager.HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(c.getName());

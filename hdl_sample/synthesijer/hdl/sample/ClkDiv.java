@@ -8,7 +8,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLUtils;
-import synthesijer.hdl.expr.HDLConstant;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 
 public class ClkDiv extends HDLModule{
 	
@@ -22,12 +22,12 @@ public class ClkDiv extends HDLModule{
 		HDLSequencer seq = newSequencer("main");
 		HDLSequencer.SequencerState s0 = seq.addSequencerState("S0");
 		seq.getIdleState().addStateTransit(s0);
-		c.setAssign(seq.getIdleState(), HDLConstant.INTEGER_ZERO);
+		c.setAssign(seq.getIdleState(), HDLPreDefinedConstant.INTEGER_ZERO);
 		
 		HDLExpr cond = newExpr(HDLOp.EQ, div.getSignal(), c);
 		
-		c.setAssign(s0, newExpr(HDLOp.IF, cond, newExpr(HDLOp.ADD, c, 1), HDLConstant.INTEGER_ZERO));
-		clk_out.getSignal().setAssign(s0, newExpr(HDLOp.IF, cond, HDLConstant.BOOLEAN_TRUE, HDLConstant.BOOLEAN_FALSE));
+		c.setAssign(s0, newExpr(HDLOp.IF, cond, newExpr(HDLOp.ADD, c, 1), HDLPreDefinedConstant.INTEGER_ZERO));
+		clk_out.getSignal().setAssign(s0, newExpr(HDLOp.IF, cond, HDLPreDefinedConstant.BOOLEAN_TRUE, HDLPreDefinedConstant.BOOLEAN_FALSE));
 	}
 	
 	public static void main(String[] args){

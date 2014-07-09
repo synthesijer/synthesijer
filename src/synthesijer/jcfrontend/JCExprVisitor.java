@@ -20,6 +20,7 @@ import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
+import synthesijer.ast.Type;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
@@ -33,6 +34,7 @@ import synthesijer.ast.expr.NewClassExpr;
 import synthesijer.ast.expr.ParenExpr;
 import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.expr.UnaryExpr;
+import synthesijer.ast.type.ArrayType;
 
 public class JCExprVisitor extends Visitor{
 	
@@ -104,17 +106,31 @@ public class JCExprVisitor extends Visitor{
 		case DOUBLE_LITERAL:  tmp.setValue((double)(that.getValue()));  break;
 		case FLOAT_LITERAL:   tmp.setValue((float)(that.getValue()));   break;
 		case LONG_LITERAL:    tmp.setValue((long)(that.getValue()));    break;
-		case NULL_LITERAL:    tmp.setValue(Literal.LITERAL_KIND.NULL);  break;
 		case STRING_LITERAL:  tmp.setValue((String)(that.getValue()));  break;
-		default: tmp.setValue(Literal.LITERAL_KIND.UNKNOWN);            break;
+		case NULL_LITERAL:    tmp.setNull(); break;
+		default: tmp.setUndefined(); break;
 		}
 		expr = tmp;
+	}
+	
+	private void setForceTypeCast(Expr lhs, Expr rhs){
+		if(rhs instanceof Literal == false) return;
+		Type ltype, rtype;
+		ltype = lhs.getType();
+		while(ltype instanceof ArrayType){
+			ltype = ((ArrayType)ltype).getElemType();
+		}
+		rtype = rhs.getType();
+		if(ltype == rtype) return;
+		//System.out.printf("JCExprVisitor: RHS is casted into %s from %s\n", ltype, rtype);
+		((Literal)rhs).castType(ltype);
 	}
 	
 	public void visitAssign(JCAssign that){
 		AssignExpr tmp = new AssignExpr(scope);
 		tmp.setLhs(stepIn(that.lhs));
 		tmp.setRhs(stepIn(that.rhs));
+		setForceTypeCast(tmp.getLhs(), tmp.getRhs());
 		expr = tmp;
 	}
 	

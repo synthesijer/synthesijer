@@ -18,7 +18,11 @@ public enum Manager {
 	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<>();
 		
 	private Manager(){
-		addHDLModule("BlockRAM", null, new BlockRAM(), false);
+		addHDLModule("BlockRAM1",  null, new BlockRAM(1), false);
+		addHDLModule("BlockRAM8",  null, new BlockRAM(8), false);
+		addHDLModule("BlockRAM16", null, new BlockRAM(16), false);
+		addHDLModule("BlockRAM32", null, new BlockRAM(32), false);
+		addHDLModule("BlockRAM64", null, new BlockRAM(64), false);
 	}
 	
 	public void addModule(Module m){
@@ -106,8 +110,8 @@ public enum Manager {
 	
 	public void genHDL(HDLModuleInfo info){
 		if(info.state.isBefore(CompileState.GENERATE_HDL)){
-			info.m.accept(new GenerateHDLModuleVisitor(info.hm));
 			info.state = CompileState.GENERATE_HDL;
+			info.m.accept(new GenerateHDLModuleVisitor(info.hm));
 		}
 	}
 	

@@ -6,6 +6,7 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLParameter;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
@@ -34,6 +35,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLInstance(HDLInstance o) {
 		HDLUtils.println(dest, offset, String.format("component %s", o.getSubModule().getName()));
+		if(o.getSubModule().getParameters().length > 0){
+			genGenericList(dest, offset+2, o.getSubModule().getParameters());
+		}
 		genPortList(dest, offset+2, o.getSubModule().getPorts());
 		HDLUtils.println(dest, offset, String.format("end component %s;", o.getSubModule().getName()));
 	}
@@ -44,6 +48,18 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		
 	}
 	
+	private void genGenericList(PrintWriter dest, int offset, HDLParameter[] params){
+		HDLUtils.println(dest, offset, "generic (");
+		String sep = "";
+		for(HDLParameter p: params){
+			dest.print(sep);
+			p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			sep = ";\n";
+		}
+		HDLUtils.println(dest, 0, "");
+		HDLUtils.println(dest, offset, ");");
+	}
+
 	private void genPortList(PrintWriter dest, int offset, HDLPort[] ports){
 		HDLUtils.println(dest, offset, "port (");
 		String sep = "";
@@ -83,6 +99,11 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLPort(HDLPort o) {
 		HDLUtils.print(dest, offset, String.format("%s : %s %s", o.getName(), o.getDir().getVHDL(), o.getType().getVHDL()));
+	}
+
+	@Override
+	public void visitHDLParameter(HDLParameter o) {
+		HDLUtils.print(dest, offset, String.format("%s : %s := %s", o.getName(), o.getType().getVHDL(), o.getDefaultValue()));
 	}
 
 	@Override

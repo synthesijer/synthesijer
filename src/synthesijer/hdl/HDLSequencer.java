@@ -3,7 +3,7 @@ package synthesijer.hdl;
 import java.util.ArrayList;
 
 import synthesijer.SynthesijerUtils;
-import synthesijer.hdl.expr.HDLConstant;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 
 public class HDLSequencer implements HDLTree{
@@ -27,7 +27,7 @@ public class HDLSequencer implements HDLTree{
 		states = new ArrayList<>();
 		states.add(idle);
 		delayCounter = module.newSignal(key + "_delay", HDLPrimitiveType.genSignedType(32), HDLSignal.ResourceKind.REGISTER);
-		delayCounter.setDefaultValue(HDLConstant.INTEGER_ZERO);
+		delayCounter.setDefaultValue(HDLPreDefinedConstant.INTEGER_ZERO);
 	}
 	
 	public void setTransitionTime(int step){

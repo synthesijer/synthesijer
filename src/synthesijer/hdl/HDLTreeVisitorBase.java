@@ -36,6 +36,11 @@ public class HDLTreeVisitorBase implements HDLTreeVisitor{
 	}
 
 	@Override
+	public void visitHDLParameter(HDLParameter o) {
+		visitHDLTree(o);
+	}
+
+	@Override
 	public void visitHDLSequencer(HDLSequencer o) {
 		visitHDLTree(o);
 	}

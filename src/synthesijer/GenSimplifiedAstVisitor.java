@@ -204,7 +204,9 @@ class GenSimplifiedAstBlockVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitReturnStatement(ReturnStatement o) {
-		o.getExpr().accept(new GenSimplifiedAstExprVisitor(this));
+		if(o.getExpr() != null){
+			o.getExpr().accept(new GenSimplifiedAstExprVisitor(this));
+		}
 		newList.add(o);
 	}
 
@@ -238,7 +240,9 @@ class GenSimplifiedAstBlockVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
-		o.getInitExpr().accept(new GenSimplifiedAstExprVisitor(this));
+		if(o.hasInitExpr()){
+			o.getInitExpr().accept(new GenSimplifiedAstExprVisitor(this));
+		}
 		newList.add(o);
 	}	
 

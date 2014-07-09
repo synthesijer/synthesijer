@@ -21,6 +21,7 @@ public class HDLModule implements HDLTree{
 	private ArrayList<HDLUserDefinedType> usertype = new ArrayList<>();
 	private ArrayList<HDLInstance> submodules = new ArrayList<>();
 	private ArrayList<HDLExpr> exprs = new ArrayList<>();
+	private ArrayList<HDLParameter> parameters = new ArrayList<>();
 	
 	private HDLPort sysClk; 
 	private HDLPort sysReset; 
@@ -61,7 +62,16 @@ public class HDLModule implements HDLTree{
 	public String getName(){
 		return name;
 	}
+		
+	public HDLParameter newParameter(String name, HDLPrimitiveType type, String defaultValue, String value){
+		HDLParameter param = new HDLParameter(name, type, defaultValue, value);
+		parameters.add(param);
+		return param;
+	}
 	
+	public HDLParameter[] getParameters(){
+		return parameters.toArray(new HDLParameter[]{});
+	}
 
 	public HDLPort newPort(String name, HDLPort.DIR dir, HDLType type){
 		HDLPort port = new HDLPort(this, name, dir, type);

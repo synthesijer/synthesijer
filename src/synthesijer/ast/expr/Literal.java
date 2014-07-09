@@ -4,22 +4,9 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
 import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.ast.type.StringType;
 
 public class Literal extends Expr{
-	
-	public enum LITERAL_KIND {
-		BOOLEAN,
-		BYTE,
-		CHAR,
-		SHORT,
-		INT,
-		LONG,
-		DOUBLE,
-		FLOAT,
-		STRING,
-		NULL,
-		UNKNOWN
-	};
 	
 	private boolean valueBoolean;
 	private byte valueByte;
@@ -31,92 +18,126 @@ public class Literal extends Expr{
 	private float valueFloat;
 	private String valueStr;
 		
-	private LITERAL_KIND kind;
+	private Type type = PrimitiveTypeKind.UNDEFIEND;
 	private int width;
 	
 	public Literal(Scope scope){
 		super(scope);
 	}
 	
-	public LITERAL_KIND getKind(){
-		return kind;
+	public Type getType(){
+		return type;
 	}
-		
+	
 	public void setValue(boolean value){
-		this.kind = LITERAL_KIND.BOOLEAN;
+		this.type = PrimitiveTypeKind.BOOLEAN;
 		this.valueBoolean = value;
 		this.width = 1;
 	}
 	
 	public void setValue(byte value){
-		this.kind = LITERAL_KIND.BYTE;
+		this.type = PrimitiveTypeKind.BYTE;
 		this.valueByte = value;
 		this.width = 8;
 	}
 	
 	public void setValue(char value){
-		this.kind = LITERAL_KIND.CHAR;
+		this.type = PrimitiveTypeKind.CHAR;
 		this.valueChar = value;
 		this.width = 16;
 	}
 	
 	public void setValue(short value){
-		this.kind = LITERAL_KIND.SHORT;
+		this.type = PrimitiveTypeKind.SHORT;
 		this.valueShort = value;
 		this.width = 16;
 	}
 	
 	public void setValue(int value){
-		this.kind = LITERAL_KIND.INT;
+		this.type = PrimitiveTypeKind.INT;
 		this.valueInt = value;
 		this.width = 32;
 	}
 	
 	public void setValue(long value){
-		this.kind = LITERAL_KIND.LONG;
+		this.type = PrimitiveTypeKind.LONG;
 		this.valueLong = value;
 		this.width = 64;
 	}
 	
 	public void setValue(double value){
-		this.kind = LITERAL_KIND.DOUBLE;
+		this.type = PrimitiveTypeKind.DOUBLE;
 		this.valueDouble = value;
 		this.width = 64;
 	}
 	
 	public void setValue(float value){
-		this.kind = LITERAL_KIND.FLOAT;
+		this.type = PrimitiveTypeKind.FLOAT;
 		this.valueFloat = value;
 		this.width = 32;
 	}
 	
 	public void setValue(String value){
-		this.kind = LITERAL_KIND.STRING;
+		this.type = new StringType();
 		this.valueStr = value;
 		this.width = 0;
 	}
 
-	public void setValue(LITERAL_KIND kind){
-		this.kind = kind;
+	public void setNull(){
+		this.type = PrimitiveTypeKind.NULL;
+		this.valueStr = null;
+		this.width = 0;
+	}
+	
+	public void setUndefined(){
+		this.type = PrimitiveTypeKind.UNDEFIEND;
+		this.valueStr = null;
 		this.width = 0;
 	}
 
 	public String getValueAsStr(){
-		switch(kind){
-		case BOOLEAN: return String.valueOf(valueBoolean);
-		case BYTE:    return String.valueOf(valueByte);
-		case CHAR:    return String.valueOf(valueChar);
-		case SHORT:   return String.valueOf(valueShort);
-		case INT:     return String.valueOf(valueInt);
-		case LONG:    return String.valueOf(valueLong);
-		case DOUBLE:  return String.valueOf(valueDouble);
-		case FLOAT:   return String.valueOf(valueFloat);
-		case STRING:  return valueStr;
-		case NULL:    return "NULL";
-		default: return "UNKNOWN";
+		if(type instanceof PrimitiveTypeKind){
+			switch((PrimitiveTypeKind)type){
+			case BOOLEAN: return String.valueOf(valueBoolean);
+			case BYTE:    return String.valueOf(valueByte);
+			case CHAR:    return String.valueOf(valueChar);
+			case SHORT:   return String.valueOf(valueShort);
+			case INT:     return String.valueOf(valueInt);
+			case LONG:    return String.valueOf(valueLong);
+			case DOUBLE:  return String.valueOf(valueDouble);
+			case FLOAT:   return String.valueOf(valueFloat);
+			case NULL:    return "NULL";
+			default: return "UNKNOWN";
+			}
+		}else if(type instanceof StringType){
+			return valueStr;
+		}else{
+			return "UNKNOWN";
 		}
 	}
-	
+
+	public void castType(Type newType){
+		if(newType instanceof PrimitiveTypeKind){
+			switch((PrimitiveTypeKind)newType){
+			case BOOLEAN: valueBoolean = Boolean.valueOf(getValueAsStr()); break;
+			case BYTE:    valueByte    = Byte.valueOf(getValueAsStr()); break;
+			case CHAR:    valueChar    = (char)(Integer.valueOf(getValueAsStr()) & 0x0000FFFF); break;
+			case SHORT:   valueShort   = Short.valueOf(getValueAsStr()); break;
+			case INT:     valueInt     = Integer.valueOf(getValueAsStr()); break;
+			case LONG:    valueLong    = Long.valueOf(getValueAsStr()); break;
+			case DOUBLE:  valueDouble  = Double.valueOf(getValueAsStr()); break;
+			case FLOAT:   valueFloat   = Float.valueOf(getValueAsStr()); break;
+			case NULL:    valueStr     = null; break;
+			default: throw new RuntimeException(String.format("cannot cast from %s into %s", type, newType));
+			}
+		}else if(newType instanceof StringType){
+			valueStr = getValueAsStr();
+		}else{
+			throw new RuntimeException(String.format("cannot cast from %s into %s", type, newType));
+		}
+		type = newType;
+	}
+
 	public void accept(SynthesijerExprVisitor v){
 		v.visitLitral(this);
 	}
@@ -131,20 +152,8 @@ public class Literal extends Expr{
 		return true;
 	}
 
-	@Override
-	public Type getType(){
-		switch(kind){
-		case BOOLEAN: return PrimitiveTypeKind.BOOLEAN;
-		case BYTE:    return PrimitiveTypeKind.BYTE;
-		case CHAR:    return PrimitiveTypeKind.CHAR;
-		case SHORT:   return PrimitiveTypeKind.SHORT;
-		case INT:     return PrimitiveTypeKind.INT;
-		case LONG:    return PrimitiveTypeKind.LONG;
-		case DOUBLE:  return PrimitiveTypeKind.DOUBLE;
-		case FLOAT:   return PrimitiveTypeKind.FLOAT;
-		case NULL:    return PrimitiveTypeKind.VOID;
-		default: return PrimitiveTypeKind.UNDEFIEND;
-		}
+	public String toString(){
+		return "Literal:" + getValueAsStr() + "@" + getType();
 	}
 	
 }

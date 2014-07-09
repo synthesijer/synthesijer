@@ -6,6 +6,7 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLParameter;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
@@ -30,9 +31,20 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, str);
 	}
 
-	@Override
-	public void visitHDLInstance(HDLInstance o) {
-		HDLUtils.println(dest, offset, String.format("%s : %s port map(", o.getName(), o.getSubModule().getName()));
+	private void genGenericMap(HDLInstance o){
+		HDLUtils.println(dest, offset, String.format("generic map("));
+		String sep = "";
+		for(HDLParameter param: o.getSubModule().getParameters()){
+			HDLUtils.print(dest, 0, sep);
+			HDLUtils.print(dest, offset+2, String.format("%s => %s", param.getName(), param.getValue()));
+			sep = ",\n";
+		}
+		HDLUtils.println(dest, 0, "");
+		HDLUtils.println(dest, offset, ")");
+	}
+
+	private void genPortMap(HDLInstance o){
+		HDLUtils.println(dest, offset, String.format("port map("));
 		String sep = "";
 		for(HDLInstance.Pair pair: o.getPairs()){
 			HDLUtils.print(dest, 0, sep);
@@ -41,6 +53,15 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
+	}
+
+	@Override
+	public void visitHDLInstance(HDLInstance o) {
+		HDLUtils.println(dest, offset, String.format("%s : %s", o.getName(), o.getSubModule().getName()));
+		if(o.getSubModule().getParameters().length > 0){
+			genGenericMap(o);
+		}
+		genPortMap(o);
 		HDLUtils.nl(dest);
 	}
 
@@ -85,6 +106,11 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getSignal().getName(), o.getName()));
 		}
 		o.getSignal().accept(this);
+	}
+
+	@Override
+	public void visitHDLParameter(HDLParameter o) {
+		// nothing to do
 	}
 
 	private void genSyncSequencerHeader(HDLSequencer o, int offset){

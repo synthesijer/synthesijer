@@ -4,7 +4,7 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSequencer;
-import synthesijer.hdl.expr.HDLConstant;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 import synthesijer.model.StatemachineVisitor;
@@ -32,7 +32,7 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 				t.getPattern().accept(v);
 				expr1 = v.getResult();
 			}else{
-				expr1 = t.getFlag() ? HDLConstant.HIGH : HDLConstant.LOW;
+				expr1 = t.getFlag() ? HDLPreDefinedConstant.HIGH : HDLPreDefinedConstant.LOW;
 			}
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, null);
 			t.getCondition().accept(v);
@@ -57,14 +57,14 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 				ss.addStateTransit(hs.getIdleState());
 			}
 		}
-		HDLExpr kickExpr = parent.module.newExpr(HDLOp.EQ, req.getSignal(), HDLConstant.HIGH);
+		HDLExpr kickExpr = parent.module.newExpr(HDLOp.EQ, req.getSignal(), HDLPreDefinedConstant.HIGH);
 		HDLSequencer.SequencerState entryState = parent.stateTable.get(o.getEntryState()); 
 		hs.getIdleState().addStateTransit(kickExpr, entryState);
 		busy.getSignal().setAssign(null,
 				parent.module.newExpr(HDLOp.IF,
 						parent.module.newExpr(HDLOp.EQ, hs.getStateKey(), hs.getIdleState().getStateId()),
-						HDLConstant.LOW,
-						HDLConstant.HIGH));
+						HDLPreDefinedConstant.LOW,
+						HDLPreDefinedConstant.HIGH));
 	}
 	
 	@Override

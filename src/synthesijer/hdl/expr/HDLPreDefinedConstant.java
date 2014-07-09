@@ -6,7 +6,7 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
 import synthesijer.hdl.HDLPrimitiveType;
 
-public enum HDLConstant implements HDLLiteral{
+public enum HDLPreDefinedConstant implements HDLLiteral{
 	
 	INTEGER_ZERO("(others => '0')", "0"),
 	INTEGER_ONE("1", "1"),
@@ -17,7 +17,7 @@ public enum HDLConstant implements HDLLiteral{
 	
 	private final String vhdl, verilog;
 	
-	private HDLConstant(String vhdl, String verilog){
+	private HDLPreDefinedConstant(String vhdl, String verilog){
 		this.vhdl = vhdl;
 		this.verilog = verilog;
 	}

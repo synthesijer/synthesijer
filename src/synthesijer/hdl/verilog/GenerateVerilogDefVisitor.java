@@ -6,11 +6,12 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLParameter;
 import synthesijer.hdl.HDLPort;
+import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
-import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
 
@@ -53,6 +54,11 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLPort(HDLPort o) {
 		HDLUtils.print(dest, offset, String.format("%s %s %s", o.getDir().getVerilogHDL(), o.getType().getVerilogHDL(), o.getName()));
+	}
+
+	@Override
+	public void visitHDLParameter(HDLParameter o) {
+		HDLUtils.print(dest, offset, String.format("parameter %s = %s", o.getName(), o.getDefaultValue()));
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLUtils;
-import synthesijer.hdl.expr.HDLConstant;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 
 public class StateBranch extends HDLModule{
 	
@@ -21,11 +21,11 @@ public class StateBranch extends HDLModule{
 		idle.addStateTransit(s0);
 		HDLSequencer.SequencerState s1 = s.addSequencerState("s1");
 		HDLSequencer.SequencerState s2 = s.addSequencerState("s2");
-		s0.addStateTransit(newExpr(HDLOp.EQ, sel.getSignal(), HDLConstant.HIGH), s1);
-		s0.addStateTransit(newExpr(HDLOp.EQ, sel.getSignal(), HDLConstant.LOW), s2);
-		q.getSignal().setAssign(idle, HDLConstant.LOW);
-		q.getSignal().setAssign(s1, HDLConstant.HIGH);
-		q.getSignal().setAssign(s2, HDLConstant.LOW);
+		s0.addStateTransit(newExpr(HDLOp.EQ, sel.getSignal(), HDLPreDefinedConstant.HIGH), s1);
+		s0.addStateTransit(newExpr(HDLOp.EQ, sel.getSignal(), HDLPreDefinedConstant.LOW), s2);
+		q.getSignal().setAssign(idle, HDLPreDefinedConstant.LOW);
+		q.getSignal().setAssign(s1, HDLPreDefinedConstant.HIGH);
+		q.getSignal().setAssign(s2, HDLPreDefinedConstant.LOW);
 	}
 	
 	public static void main(String... args){
@@ -33,7 +33,7 @@ public class StateBranch extends HDLModule{
 		BasicSim sim = new BasicSim(m, m.getName() + "_sim");
 		
 		HDLSignal sig = sim.getModuleInstances()[0].getSignalForPort("sel");
-		sig.setAssign(null, HDLConstant.HIGH);
+		sig.setAssign(null, HDLPreDefinedConstant.HIGH);
 		
 		HDLUtils.generate(m, HDLUtils.VHDL);
 		HDLUtils.generate(sim, HDLUtils.VHDL);

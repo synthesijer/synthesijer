@@ -9,7 +9,7 @@ import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLSimModule;
 import synthesijer.hdl.HDLUtils;
-import synthesijer.hdl.expr.HDLConstant;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 
 class BasicSim extends HDLSimModule{
 	
@@ -30,15 +30,15 @@ class BasicSim extends HDLSimModule{
 		ss.addStateTransit(s0);
 		s0.addStateTransit(ss);
 		
-		clk.setAssign(ss, HDLConstant.LOW);
-		clk.setAssign(s0, HDLConstant.HIGH);
+		clk.setAssign(ss, HDLPreDefinedConstant.LOW);
+		clk.setAssign(s0, HDLPreDefinedConstant.HIGH);
 		
 		HDLExpr expr = newExpr(HDLOp.ADD, counter, 1);
 		counter.setAssign(ss, expr);
 		counter.setAssign(s0, expr);
 		
-		reset.setResetValue(HDLConstant.LOW);
-		reset.setAssign(ss, newExpr(HDLOp.IF, newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, 3), newExpr(HDLOp.LT, counter, 8)), HDLConstant.HIGH, HDLConstant.LOW));
+		reset.setResetValue(HDLPreDefinedConstant.LOW);
+		reset.setAssign(ss, newExpr(HDLOp.IF, newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, 3), newExpr(HDLOp.LT, counter, 8)), HDLPreDefinedConstant.HIGH, HDLPreDefinedConstant.LOW));
 		
 		if(target != null){
 			inst = newModuleInstance(target, "U");

@@ -18,5 +18,9 @@ public class ArrayType implements Type{
 	public void accept(SynthesijerAstTypeVisitor v){
 		v.visitArrayType(this);
 	}
+	
+	public String toString(){
+		return "ArrayType::" + elemType;
+	}
 
 }

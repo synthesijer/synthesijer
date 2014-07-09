@@ -153,7 +153,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 	@Override
 	public void visitLitral(Literal o) {
 		dest.printf("<expr kind=\"%s\" ", "Literal");
-		dest.printf("value=\"%s\" litral_kind=\"%s\"", o.getValueAsStr(), o.getKind());
+		dest.printf("value=\"%s\" type=\"%s\"", o.getValueAsStr(), o.getType());
 		dest.printf("/>");
 	}
 
