@@ -98,7 +98,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLPort(HDLPort o) {
-		System.out.println(o);
+		//System.out.println(o);
 		HDLUtils.print(dest, offset, String.format("%s : %s %s", o.getName(), o.getDir().getVHDL(), o.getType().getVHDL()));
 	}
 

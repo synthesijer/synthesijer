@@ -111,6 +111,12 @@ public class HDLModule implements HDLTree{
 		return expr;
 	}
 
+	public HDLExpr newExpr(HDLOp op, HDLExpr arg){
+		HDLExpr expr = new HDLCombinationExpr(this, getExprUniqueId(), op, arg);
+		exprs.add(expr);
+		return expr;
+	}
+
 	public HDLExpr newExpr(HDLOp op, HDLSignal arg0, int value){
 		return newExpr(op, arg0, new HDLValue(String.valueOf(value), HDLPrimitiveType.genIntegerType()));
 	}

@@ -91,6 +91,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		case LEQ : return HDLOp.LEQ;
 		case INC : return HDLOp.ADD;
 		case DEC : return HDLOp.SUB;
+		case LNOT : return HDLOp.NOT;
 		default:
 			return HDLOp.UNDEFINED;
 		}
@@ -186,6 +187,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitLitral(Literal o) {
 		result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getType()));
+		//System.out.println(o + " -> " + result);
 	}
 	
 	@Override
@@ -261,12 +263,15 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
 		HDLExpr arg = stepIn(o.getArg());
-		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), arg, HDLPreDefinedConstant.INTEGER_ONE);
 		HDLVariable sig = (HDLVariable)arg;
-		result = expr;
+		HDLExpr expr;
 		if(o.getOp() == Op.INC || o.getOp() == Op.DEC){
+			expr = parent.module.newExpr(convOp(o.getOp()), arg, HDLPreDefinedConstant.INTEGER_ONE);
 			sig.setAssign(state, expr);
+		}else{
+			expr = parent.module.newExpr(convOp(o.getOp()), arg);
 		}
+		result = expr;
 	}
 	
 }

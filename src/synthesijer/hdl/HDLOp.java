@@ -7,6 +7,7 @@ public enum HDLOp {
 	AND(KIND.INFIX, "and", "&&"),
 	OR(KIND.INFIX, "or", "||"),
 	XOR(KIND.INFIX, "xor", "^"),
+	NOT(KIND.OTHER, "not", "~"),
 	EQ(KIND.COMP, "=", "=="),
 	LT(KIND.COMP, "<", "<"),
 	GT(KIND.COMP, ">", ">"),

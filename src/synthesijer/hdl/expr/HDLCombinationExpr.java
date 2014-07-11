@@ -24,6 +24,7 @@ public class HDLCombinationExpr implements HDLExpr{
 		this.args = args;
 		HDLType type = decideExprType(op, this.args);
 		result = m.newSignal(String.format("tmp_%04d", uid), type, HDLSignal.ResourceKind.WIRE);
+		//System.out.println(this);
 	}
 	
 	public HDLType getType(){
@@ -63,6 +64,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			return HDLPrimitiveType.genBitType();
 		}else{
 			switch(op){
+			case NOT:
+				return args[0].getType();
 			case REF:
 				return HDLPrimitiveType.genBitType();
 			case IF:
@@ -78,15 +81,25 @@ public class HDLCombinationExpr implements HDLExpr{
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLExpr(this);
 	}
+	
+	public String toString(){
+		return "HDLCombination::(" + op + " " + getArgsString(args) + ")";
+	}
 
 	@Override
 	public String getVHDL() {
 		if(op.isInfix()){
 			return String.format("%s %s %s", args[0].getResultExpr().getVHDL(), op.getVHDL(), args[1].getResultExpr().getVHDL());
 		}else if(op.isCompare()){
-			return String.format("'1' when %s %s %s else '0'", args[0].getResultExpr().getVHDL(), op.getVHDL(), args[1].getResultExpr().getVHDL());
+			if(args[0] instanceof HDLValue && args[0].getType().isBit()){
+				return String.format("%s and %s", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
+			}else{
+				return String.format("'1' when %s %s %s else '0'", args[0].getResultExpr().getVHDL(), op.getVHDL(), args[1].getResultExpr().getVHDL());
+			}
 		}else{
 			switch(op){
+			case NOT:
+				return String.format("%s %s", op.getVHDL(), args[0].getResultExpr().getVHDL());
 			case REF:
 				return String.format("%s(%s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			case IF:
@@ -105,6 +118,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			return String.format("%s %s %s ? 1'b1 : 1'b0", args[0].getResultExpr().getVerilogHDL(), op.getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 		}else{
 			switch(op){
+			case NOT:
+				return String.format("%s%s", op.getVerilogHDL(), args[0].getResultExpr().getVHDL());
 			case REF:
 				return String.format("%s[%s]", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 			case IF:
