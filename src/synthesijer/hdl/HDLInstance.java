@@ -61,6 +61,13 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		return null;
 	}
 	
+	public HDLSignal getSignalForPort(HDLPort port){
+		for(PortPair pair: pairs){
+			if(pair.port.getName().equals(port.getName())) return pair.signal;
+		}
+		return null;
+	}
+	
 	public ParamPair getParameterPair(String name){
 		for(ParamPair pair: params){
 			if(pair.param.getName().equals(name)) return pair;

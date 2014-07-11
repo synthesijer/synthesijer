@@ -4,33 +4,25 @@ import java.io.IOException;
 import synthesijer.hdl.*;
 import synthesijer.hdl.expr.*;
 
-public class led_top extends HDLModule{
-	
-	public led_top(){
-		super("led_top", "clk", "reset");
-		HDLPort q = newPort("q", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
-		
-                HDLInstance inst = newModuleInstance(new led_skel(), "U");
-                inst.getSignalForPort("clk").setAssign(null, getSysClk().getSignal());
-                inst.getSignalForPort("reset").setAssign(null, newExpr(HDLOp.NOT, getSysReset().getSignal()));
-                inst.getSignalForPort("run_req").setAssign(null, HDLPreDefinedConstant.HIGH);
-                q.getSignal().setAssign(null, inst.getSignalForPort("field_flag_output"));
-
-	}
+public class led_top{
 	
 	public static void main(String... args) throws IOException{
-		led_top obj = new led_top();
+		HDLModule led_top = new HDLModule("led_top", "clk", "reset");
+		HDLPort q = led_top.newPort("q", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+
+		HDLModule led = new HDLModule("led", "clk", "reset");
+		HDLPort run_req = led.newPort("run_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		HDLPort run_busy = led.newPort("run_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+		HDLPort out = led.newPort("field_flag_output", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+                HDLInstance inst = led_top.newModuleInstance(led, "U");
+
+                inst.getSignalForPort("clk").setAssign(null, led_top.getSysClk().getSignal());
+                inst.getSignalForPort("reset").setAssign(null, led_top.newExpr(HDLOp.NOT, led_top.getSysReset().getSignal()));
+                inst.getSignalForPort(run_req).setAssign(null, HDLPreDefinedConstant.HIGH); // always high to start immediately
+                q.getSignal().setAssign(null, inst.getSignalForPort(out));
 		
-		HDLUtils.generate(obj, HDLUtils.VHDL);
-		HDLUtils.generate(obj, HDLUtils.Verilog);
+		HDLUtils.generate(led_top, HDLUtils.VHDL);
+		HDLUtils.generate(led_top, HDLUtils.Verilog);
 	}
 }
 
-class led_skel extends HDLModule{
-	public led_skel(){
-		super("led", "clk", "reset");
-		newPort("run_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
-		newPort("run_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
-		newPort("field_flag_output", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
-	}
-}
