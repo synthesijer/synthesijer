@@ -255,7 +255,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);
 			//System.out.println(o + "<-" + o.getExpr() + "@" + o.getState());
-			if(v.getResult() != null){
+			if(v.getResult() != null && stateTable.get(o.getState()) != null){
 				s.setAssign(stateTable.get(o.getState()), v.getResult());
 			}
 			if(o.getInitExpr().isConstant()){
