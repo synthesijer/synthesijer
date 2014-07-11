@@ -2,7 +2,6 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
-import openjdk.com.sun.tools.javac.util.Pair;
 import synthesijer.hdl.HDLSequencer.SequencerState;
 
 public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
