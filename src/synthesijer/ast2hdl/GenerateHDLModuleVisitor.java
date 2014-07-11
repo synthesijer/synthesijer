@@ -33,9 +33,9 @@ import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLInstance;
-import synthesijer.hdl.HDLInstance.ParamPair;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
+import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLType;
@@ -272,6 +272,13 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 				int depth = (int)Math.ceil(Math.log(dims) / Math.log(2.0));
 				inst.getParameterPair("DEPTH").setValue(String.valueOf(depth));
 			}
+		}
+		
+		if(o.getScope() instanceof Module && var.getType() instanceof PrimitiveTypeKind){ // added an accessor for the member variable.
+			System.out.print("global:" + o);
+			System.out.println("  " + s.getType());
+			HDLPort port = module.newPort("field_" + o.getName() + "_output", DIR.OUT, s.getType());
+			port.getSignal().setAssign(null, s);
 		}
 	}
 

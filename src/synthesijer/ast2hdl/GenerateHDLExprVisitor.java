@@ -146,10 +146,14 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
+		//System.out.println(o);
 		Ident id = (Ident)o.getSelected();
 		HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 		HDLInstance inst = (HDLInstance)var;
 		HDLSignal sig = inst.getSignalForPort(o.getIdent().getSymbol());
+		if(sig == null){
+			sig = inst.getSignalForPort("field_" + o.getIdent().getSymbol() + "_output");
+		}
 		result = sig.getResultExpr();
 	}
 	
@@ -256,19 +260,13 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
-		switch(o.getOp()){
-		case INC:
-		case DEC:
-			break;
-		default:
-			throw new RuntimeException("unsupported unary expr: " + o);
-		}
-
 		HDLExpr arg = stepIn(o.getArg());
 		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), arg, HDLPreDefinedConstant.INTEGER_ONE);
 		HDLVariable sig = (HDLVariable)arg;
-		sig.setAssign(state, expr);
 		result = expr;
+		if(o.getOp() == Op.INC || o.getOp() == Op.DEC){
+			sig.setAssign(state, expr);
+		}
 	}
 	
 }
