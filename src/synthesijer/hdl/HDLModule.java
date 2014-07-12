@@ -2,6 +2,7 @@ package synthesijer.hdl;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 import synthesijer.hdl.expr.HDLCombinationExpr;
 import synthesijer.hdl.expr.HDLValue;
@@ -43,7 +44,7 @@ public class HDLModule implements HDLTree{
 		this(name, sysClkName, sysResetName, true);
 	}
 	
-	HDLModule(String name){
+	public HDLModule(String name){
 		this(name, "", "", false);
 	}
 	
@@ -73,10 +74,14 @@ public class HDLModule implements HDLTree{
 		return parameters.toArray(new HDLParameter[]{});
 	}
 
-	public HDLPort newPort(String name, HDLPort.DIR dir, HDLType type){
-		HDLPort port = new HDLPort(this, name, dir, type);
+	public HDLPort newPort(String name, HDLPort.DIR dir, HDLType type, EnumSet<HDLPort.OPTION> opt){
+		HDLPort port = new HDLPort(this, name, dir, type, opt);
 		ports.add(port);
 		return port;
+	}
+	
+	public HDLPort newPort(String name, HDLPort.DIR dir, HDLType type){
+		return newPort(name, dir, type, EnumSet.noneOf(HDLPort.OPTION.class));
 	}
 	
 	public HDLPort[] getPorts(){

@@ -16,6 +16,7 @@ public enum HDLOp {
 	NEQ(KIND.COMP, "/=", "!="),
 	REF(KIND.OTHER),
 	IF(KIND.OTHER),
+	CONCAT(KIND.OTHER),
 	UNDEFINED(KIND.OTHER);
 
 	enum KIND{

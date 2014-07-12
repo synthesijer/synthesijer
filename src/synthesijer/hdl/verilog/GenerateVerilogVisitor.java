@@ -56,7 +56,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		String sep = "";
 		for(HDLInstance.PortPair pair: o.getPairs()){
 			HDLUtils.print(dest, 0, sep);
-			HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.port.getName(), pair.signal.getName()));
+			HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.port.getName(), pair.item.getName()));
 			sep = ",\n";
 		}
 		HDLUtils.println(dest, 0, "");
@@ -131,6 +131,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLPort(HDLPort o) {
+		if(o.isSet(HDLPort.OPTION.NO_SIG)) return; // nothing to do
 		if(o.isOutput()){
 			HDLUtils.println(dest, offset, String.format("assign %s = %s;", o.getName(), o.getSignal().getName()));
 		}else{

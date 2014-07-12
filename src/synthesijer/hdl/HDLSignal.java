@@ -2,7 +2,7 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
-public class HDLSignal implements HDLTree, HDLExpr, HDLVariable{
+public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem{
 	
 	private final HDLModule module;
 	private final String name;

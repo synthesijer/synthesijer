@@ -57,6 +57,10 @@ public class HDLCombinationExpr implements HDLExpr{
 		return s;
 	}
 	
+	private HDLType getConcatType(HDLPrimitiveType t0, HDLPrimitiveType t1){
+		return HDLPrimitiveType.genVectorType(t0.getWidth() + t1.getWidth());
+	}
+	
 	private HDLType decideExprType(HDLOp op, HDLExpr[] args){
 		if(op.isInfix()){
 			return getPriorType(args[0].getType(), args[1].getType());
@@ -70,6 +74,8 @@ public class HDLCombinationExpr implements HDLExpr{
 				return HDLPrimitiveType.genBitType();
 			case IF:
 				return getPriorType(args[1].getType(), args[2].getType());
+			case CONCAT:
+				return getConcatType((HDLPrimitiveType)args[0].getType(), (HDLPrimitiveType)args[1].getType());
 			default:
 				return HDLPrimitiveType.genUnknowType();
 			}
@@ -104,6 +110,8 @@ public class HDLCombinationExpr implements HDLExpr{
 				return String.format("%s(%s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			case IF:
 				return String.format("%s when %s = '1' else %s", args[1].getResultExpr().getVHDL(), args[0].getResultExpr().getVHDL(), args[2].getResultExpr().getVHDL());
+			case CONCAT:
+				return String.format("%s & %s", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			default:
 				return "(" + op + " " + getArgsString(args) + ")"; 
 			}
@@ -124,6 +132,8 @@ public class HDLCombinationExpr implements HDLExpr{
 				return String.format("%s[%s]", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 			case IF:
 				return String.format("%s == 1'b1 ? %s : %s", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL(), args[2].getResultExpr().getVerilogHDL());
+			case CONCAT:
+				return String.format("{%s, %s}", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			default:
 				return "(" + op + " " + getArgsString(args) + ")";
 			}

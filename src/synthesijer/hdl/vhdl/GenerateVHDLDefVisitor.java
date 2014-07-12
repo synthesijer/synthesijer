@@ -8,6 +8,7 @@ import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLParameter;
 import synthesijer.hdl.HDLPort;
+import synthesijer.hdl.HDLPort.OPTION;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
@@ -88,7 +89,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLInstance i: o.getModuleInstances()){ i.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
 		for(HDLPort p: o.getPorts()){
-			p.getSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			if(p.isSet(OPTION.NO_SIG) == false){
+				p.getSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			}
 		}
 		HDLUtils.nl(dest);
 		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }

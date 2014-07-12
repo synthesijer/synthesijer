@@ -1,7 +1,9 @@
 package synthesijer.hdl;
 
+import java.util.EnumSet;
 
-public class HDLPort implements HDLTree{
+
+public class HDLPort implements HDLTree, HDLPortPairItem{
 	
 	private final String name;
 		
@@ -11,15 +13,27 @@ public class HDLPort implements HDLTree{
 	
 	private final HDLSignal sig;
 	
-	HDLPort(HDLModule m, String name, DIR dir, HDLType type){
+	private final EnumSet<OPTION> options;
+	
+	HDLPort(HDLModule m, String name, DIR dir, HDLType type, EnumSet<OPTION> opt){
 		this.name = name;
 		this.dir = dir;
 		this.type = type;
-		if(dir == DIR.OUT){
-			this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.REGISTER);
+		options = opt;
+		
+		if(options.contains(OPTION.NO_SIG) == false){
+			if(dir == DIR.OUT){
+				this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.REGISTER);
+			}else{
+				this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.WIRE);
+			}
 		}else{
-			this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.WIRE);
+			sig = null;
 		}
+	}
+	
+	public boolean isSet(OPTION opt){
+		return options.contains(opt);
 	}
 
 	public String getName(){
@@ -60,6 +74,10 @@ public class HDLPort implements HDLTree{
 		public String getVerilogHDL(){
 			return verilog;
 		}
+	}
+
+	public enum OPTION {
+		NO_SIG
 	}
 
 	public String toString(){

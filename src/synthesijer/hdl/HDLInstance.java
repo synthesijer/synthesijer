@@ -2,6 +2,7 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLSequencer.SequencerState;
 
 public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
@@ -27,14 +28,34 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		return this.name + "_" + n;
 	}
 	
-	private void genPortSignals(){
-		for(PortPair pair: pairs){ module.rmSignal(pair.signal); }
+	private void clearPortPair(){
+		for(PortPair pair: pairs){
+			if(pair.item instanceof HDLSignal) module.rmSignal((HDLSignal)(pair.item));
+		}
 		pairs.clear();
+	}
+	
+	private void genPortSignals(){
+		clearPortPair();
 		for(HDLPort p: submodule.getPorts()){
+			if(p.isSet(HDLPort.OPTION.NO_SIG)) continue;
 			HDLSignal.ResourceKind k = p.isOutput() ? HDLSignal.ResourceKind.WIRE : HDLSignal.ResourceKind.REGISTER;
 			HDLSignal s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
 			pairs.add(new PortPair(s, p));
 		}
+	}
+	
+	public void addPortPair(HDLPortPairItem item, HDLPort port){
+		pairs.add(new PortPair(item, port));
+	}
+	
+	public void rmPortPair(PortPair pair){
+		if(pair == null){
+			SynthesijerUtils.warn("not specified remove pair, nothing to do.");
+			return;
+		}
+		pairs.remove(pair);
+		if(pair.item instanceof HDLSignal) module.rmSignal((HDLSignal)pair.item);
 	}
 	
 	public void update(){
@@ -52,17 +73,24 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	public ArrayList<PortPair> getPairs(){
 		return pairs;
 	}
-	
+
+	public PortPair getPortPair(HDLPort port){
+		for(PortPair pair: pairs){
+			if(pair.port.getName().equals(port.getName())) return pair;
+		}
+		return null;
+	}
+
 	public HDLSignal getSignalForPort(String name){
 		for(PortPair pair: pairs){
-			if(pair.port.getName().equals(name)) return pair.signal;
+			if(pair.port.getName().equals(name) && pair.item instanceof HDLSignal) return (HDLSignal)pair.item;
 		}
 		return null;
 	}
 	
 	public HDLSignal getSignalForPort(HDLPort port){
 		for(PortPair pair: pairs){
-			if(pair.port.getName().equals(port.getName())) return pair.signal;
+			if(pair.port.getName().equals(port.getName()) && pair.item instanceof HDLSignal) return (HDLSignal)pair.item;
 		}
 		return null;
 	}
@@ -94,9 +122,9 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	}
 	
 	public class PortPair{
-		public final HDLSignal signal;
+		public final HDLPortPairItem item;
 		public final HDLPort port;
-		PortPair(HDLSignal signal, HDLPort port){this.signal = signal; this.port = port;}
+		PortPair(HDLPortPairItem item, HDLPort port){this.item = item; this.port = port;}
 	}
 	
 	public class ParamPair{
