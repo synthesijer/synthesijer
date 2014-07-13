@@ -9,17 +9,17 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	
 	private final HDLModule module;
 	private final String name;
-	private final HDLModule submodule;
+	private final HDLModule target;
 	
 	private ArrayList<PortPair> pairs = new ArrayList<>();
 	private ArrayList<ParamPair> params = new ArrayList<>();
 	
-	HDLInstance(HDLModule module, String name, HDLModule submodule){
+	HDLInstance(HDLModule module, String name, HDLModule target){
 		this.module = module;
 		this.name = name;
-		this.submodule = submodule;
+		this.target = target;
 		genPortSignals();
-		for(HDLParameter param: submodule.getParameters()){
+		for(HDLParameter param: target.getParameters()){
 			params.add(new ParamPair(param, null));
 		}
 	}
@@ -37,7 +37,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	
 	private void genPortSignals(){
 		clearPortPair();
-		for(HDLPort p: submodule.getPorts()){
+		for(HDLPort p: target.getPorts()){
 			if(p.isSet(HDLPort.OPTION.NO_SIG)) continue;
 			HDLSignal.ResourceKind k = p.isOutput() ? HDLSignal.ResourceKind.WIRE : HDLSignal.ResourceKind.REGISTER;
 			HDLSignal s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
@@ -67,7 +67,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	}
 	
 	public HDLModule getSubModule(){
-		return submodule;
+		return target;
 	}
 	
 	public ArrayList<PortPair> getPairs(){
@@ -109,7 +109,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	public String toString(){
 		String s = "";
 		s += "HDLInstance : " + name + "\n";
-		for(HDLPort p: submodule.getPorts()){
+		for(HDLPort p: target.getPorts()){
 			s += " " + p + "\n";
 		}
 		return s;
