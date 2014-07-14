@@ -4,12 +4,13 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
+import synthesijer.SynthesijerComponent;
 import synthesijer.hdl.expr.HDLCombinationExpr;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.verilog.GenerateVerilogVisitor;
 import synthesijer.hdl.vhdl.GenerateVHDLVisitor;
 
-public class HDLModule implements HDLTree{
+public class HDLModule implements HDLTree, SynthesijerComponent{
 	
 	private final String name;
 	private final String sysClkName;
@@ -64,8 +65,8 @@ public class HDLModule implements HDLTree{
 		return name;
 	}
 		
-	public HDLParameter newParameter(String name, HDLPrimitiveType type, String defaultValue, String value){
-		HDLParameter param = new HDLParameter(name, type, defaultValue, value);
+	public HDLParameter newParameter(String name, HDLPrimitiveType type, String defaultValue){
+		HDLParameter param = new HDLParameter(name, type, defaultValue, defaultValue);
 		parameters.add(param);
 		return param;
 	}

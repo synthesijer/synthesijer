@@ -1,5 +1,7 @@
 package synthesijer.ast2hdl;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Hashtable;
 
 import synthesijer.CompileState;
@@ -14,6 +16,7 @@ import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
 import synthesijer.ast.expr.Literal;
 import synthesijer.ast.expr.NewArray;
+import synthesijer.ast.expr.NewClassExpr;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
@@ -38,6 +41,7 @@ import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
+import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLVariable;
@@ -247,6 +251,34 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		o.getBody().accept(this);
 	}
 
+	// TODO, experimental code
+	private void newArrayInst(HDLInstance inst, ArrayType type, NewArray init){
+		Literal value = (Literal)(init.getDimExpr().get(0));
+		inst.getParameterPair("WORDS").setValue(value.getValueAsStr());
+		int dims = Integer.valueOf(value.getValueAsStr());
+		int depth = (int)Math.ceil(Math.log(dims) / Math.log(2.0));
+		inst.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+	}
+	
+	// TODO, experimental code
+	private void newModuleInst(HDLInstance inst, NewClassExpr expr){
+		NewArray param = (NewArray)(expr.getParameters().get(0));
+		ArrayList<Expr> elem = param.getElems();
+		for(int i = 0; i < elem.size()/2; i ++){
+			String key = ((Literal)elem.get(2*i)).getValueAsStr();
+			String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
+			inst.getParameterPair(key).setValue(value);
+		}
+		for(HDLPort p: inst.getSubModule().getPorts()){
+			if(p.isSet(HDLPort.OPTION.EXPORT)){
+				HDLSignal s0 = inst.getSignalForPort(p);
+				HDLPort p0 = module.newPort(s0.getName(), p.getDir(), p.getType(), EnumSet.of(HDLPort.OPTION.EXPORT, HDLPort.OPTION.NO_SIG));
+				inst.rmPortPair(inst.getPortPair(p));
+				inst.addPortPair(p0, p);
+			}
+		}
+	}
+	
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
 		Variable var = o.getVariable();
@@ -262,15 +294,9 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 				s.setResetValue(v.getResult());
 			}
 			if(o.getType() instanceof ArrayType){
-				// TODO
-				ArrayType type = (ArrayType)(o.getType());
-				NewArray init = (NewArray)(o.getInitExpr());
-				Literal value = (Literal)(init.getDimExpr().get(0));
-				HDLInstance inst = (HDLInstance)s;
-				inst.getParameterPair("WORDS").setValue(value.getValueAsStr());
-				int dims = Integer.valueOf(value.getValueAsStr());
-				int depth = (int)Math.ceil(Math.log(dims) / Math.log(2.0));
-				inst.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+				newArrayInst((HDLInstance)s, (ArrayType)o.getType(), (NewArray)o.getInitExpr());
+			}else if(o.getType() instanceof ComponentType){
+				newModuleInst((HDLInstance)s, (NewClassExpr)(o.getInitExpr()));
 			}
 		}
 		

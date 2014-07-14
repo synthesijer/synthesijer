@@ -10,6 +10,7 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 public class NewArray extends Expr{
 	
 	private ArrayList<Expr> dimExpr = new ArrayList<>();
+	private ArrayList<Expr> elemExpr = new ArrayList<>();
 	
 	public NewArray(Scope scope){
 		super(scope);
@@ -25,6 +26,14 @@ public class NewArray extends Expr{
 	
 	public void accept(SynthesijerExprVisitor v){
 		v.visitNewArray(this);
+	}
+	
+	public void addElem(Expr expr){
+		elemExpr.add(expr);
+	}
+	
+	public ArrayList<Expr> getElems(){
+		return elemExpr;
 	}
 
 	@Override

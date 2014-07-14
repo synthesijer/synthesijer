@@ -77,7 +77,8 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 	}
 
 	public enum OPTION {
-		NO_SIG
+		NO_SIG,
+		EXPORT
 	}
 
 	public String toString(){

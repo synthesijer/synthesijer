@@ -3,6 +3,8 @@ package synthesijer;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import synthesijer.ast.Module;
@@ -16,6 +18,7 @@ public enum Manager {
 	
 	private Hashtable<String, Module> entries = new Hashtable<>();
 	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<>();
+	private ArrayList<String> userHDLModules = new ArrayList<>();
 		
 	private Manager(){
 		// TODO
@@ -24,6 +27,10 @@ public enum Manager {
 		addHDLModule("BlockRAM16", null, new BlockRAM(16, 10, 1024), false);
 		addHDLModule("BlockRAM32", null, new BlockRAM(32, 10, 1024), false);
 		addHDLModule("BlockRAM64", null, new BlockRAM(64, 10, 1024), false);
+	}
+	
+	public void registUserHDLModule(String name){
+		userHDLModules.add(name);
 	}
 	
 	public void addModule(Module m){
@@ -45,7 +52,8 @@ public enum Manager {
 	}
 
 	public HDLModuleInfo searchHDLModuleInfo(String name){
-		return moduleTable.get(name);
+		HDLModuleInfo info = moduleTable.get(name);
+		return info;
 	}
 
 	public boolean isGeneratedHDLModule(String name){
@@ -59,7 +67,28 @@ public enum Manager {
 	
 	public void preprocess(){
 		doGenSimplifiedAst(new IdentifierGenerator());
+		loadUserHDLModules();
 		//makeCallGraph();
+	}
+	
+	private void loadUserHDLModules(){
+		for(String s: userHDLModules){
+			try {
+				Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
+				
+				Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
+				Object obj = ct.newInstance(new Object[]{new String[]{}});
+				if(!(obj instanceof HDLModule)){
+					System.err.printf("unsupported type: %s (%s)", obj, obj.getClass());
+					System.exit(0);
+				}
+				HDLModuleInfo info = new HDLModuleInfo(null, (HDLModule)obj, false);
+				info.state = CompileState.GENERATE_HDL;
+				moduleTable.put(s, info);
+			}catch(Exception e){
+				throw new RuntimeException(e);
+			}
+		}
 	}
 		
 	private void doGenSimplifiedAst(IdentifierGenerator idGenerator){

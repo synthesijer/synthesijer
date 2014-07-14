@@ -56,6 +56,7 @@ public class JCFrontendUtils {
 	}
 	
 	public static boolean isImplemented(List<JCExpression> implementing, String key){
+		System.out.println(implementing);
 		for(JCExpression expr: implementing){
 			if(expr instanceof JCIdent){
 				JCIdent ident = (JCIdent) expr; 

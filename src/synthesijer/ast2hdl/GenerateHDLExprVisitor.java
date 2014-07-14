@@ -120,8 +120,15 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			// data
 			HDLSignal din = inst.getSignalForPort("din"); // see synthsijer.lib.BlockRAM
 			din.setAssign(state, expr);
+		}else if(lhs instanceof FieldAccess){
+			HDLExpr l = stepIn(lhs);
+			if(l instanceof HDLSignal){
+				((HDLSignal)l).setAssign(state, expr);
+			}else{
+				throw new RuntimeException("unsupported yet: " + o);
+			}
 		}else{
-			throw new RuntimeException("unsupported yet.");
+			throw new RuntimeException("unsupported yet: " + o);
 		}
 		result = expr;
 	}

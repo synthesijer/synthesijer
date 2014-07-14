@@ -35,6 +35,7 @@ import synthesijer.ast.expr.ParenExpr;
 import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.type.ArrayType;
+import synthesijer.ast.type.ComponentType;
 
 public class JCExprVisitor extends Visitor{
 	
@@ -117,11 +118,13 @@ public class JCExprVisitor extends Visitor{
 		if(rhs instanceof Literal == false) return;
 		Type ltype, rtype;
 		ltype = lhs.getType();
+		if(ltype instanceof ComponentType == true) return; // TODO
 		while(ltype instanceof ArrayType){
 			ltype = ((ArrayType)ltype).getElemType();
 		}
 		rtype = rhs.getType();
 		if(ltype == rtype) return;
+		SynthesijerUtils.dump(lhs.getClass());
 		//System.out.printf("JCExprVisitor: RHS is casted into %s from %s\n", ltype, rtype);
 		((Literal)rhs).castType(ltype);
 	}
@@ -146,6 +149,9 @@ public class JCExprVisitor extends Visitor{
 		NewArray tmp = new NewArray(scope);
 		for(JCExpression dim: that.dims){
 			tmp.addDimExpr(stepIn(dim));
+		}
+		for(JCExpression expr: that.elems){
+			tmp.addElem(stepIn(expr));
 		}
 		expr = tmp;
 	}

@@ -3,7 +3,6 @@ package synthesijer.ast;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import synthesijer.CompileState;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
@@ -13,6 +12,8 @@ public class Module implements Scope, SynthesijerAstTree{
 	private final Scope parent;
 	private final String name;
 	private Hashtable<String, String> importTable;
+	private final String extending;
+	private final ArrayList<String> implementing;
 	
 	private Hashtable<String, Method> methodTable = new Hashtable<>();
 	private Hashtable<String, Variable> variableTable = new Hashtable<>();
@@ -22,14 +23,16 @@ public class Module implements Scope, SynthesijerAstTree{
 	
 	private Statemachine statemachine;
 	
-	public Module(String name, Hashtable<String, String> importTable){
-		this(null, name, importTable);
+	public Module(String name, Hashtable<String, String> importTable, String extending, ArrayList<String> implementing){
+		this(null, name, importTable, extending, implementing);
 	}
 
-	public Module(Scope parent, String name, Hashtable<String, String> importTable){
+	public Module(Scope parent, String name, Hashtable<String, String> importTable, String extending, ArrayList<String> implementing){
 		this.parent = parent;
 		this.name = name;
 		this.importTable = importTable;
+		this.extending = extending;
+		this.implementing = implementing;
 		scopes.add(this);
 	}	
 	
