@@ -124,7 +124,7 @@ public class JCExprVisitor extends Visitor{
 		}
 		rtype = rhs.getType();
 		if(ltype == rtype) return;
-		SynthesijerUtils.dump(lhs.getClass());
+		//SynthesijerUtils.dump(lhs.getClass());
 		//System.out.printf("JCExprVisitor: RHS is casted into %s from %s\n", ltype, rtype);
 		((Literal)rhs).castType(ltype);
 	}
@@ -150,8 +150,10 @@ public class JCExprVisitor extends Visitor{
 		for(JCExpression dim: that.dims){
 			tmp.addDimExpr(stepIn(dim));
 		}
-		for(JCExpression expr: that.elems){
-			tmp.addElem(stepIn(expr));
+		if(that.elems != null){
+			for(JCExpression expr: that.elems){
+				tmp.addElem(stepIn(expr));
+			}
 		}
 		expr = tmp;
 	}

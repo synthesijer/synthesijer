@@ -262,6 +262,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	// TODO, experimental code
 	private void newModuleInst(HDLInstance inst, NewClassExpr expr){
+		if(expr.getParameters().size() == 0) return;
 		NewArray param = (NewArray)(expr.getParameters().get(0));
 		ArrayList<Expr> elem = param.getElems();
 		for(int i = 0; i < elem.size()/2; i ++){
