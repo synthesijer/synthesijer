@@ -13,7 +13,7 @@ public class RS232C_TX_Wrapper extends HDLModule{
 	
 	public boolean wr;
 	public boolean ready;
-	public char din;
+	public byte din;
 	
 	public RS232C_TX_Wrapper(String... args){
 		super("rs232c_tx", "clk", "reset");

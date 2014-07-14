@@ -8,7 +8,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 public class RS232C_RX_Wrapper extends HDLModule{
 	
 	public boolean rd;
-	public char dout;
+	public byte dout;
 	
 	public RS232C_RX_Wrapper(String... args){
 		super("rs232c_rx", "clk", "reset");
