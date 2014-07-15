@@ -35,8 +35,12 @@ public interface HDLType {
 
 	}
 
+
 	public KIND getKind();
-	
+
 	public boolean isBit();
+	public boolean isVector();
+	public boolean isSigned();
+	public boolean isInteger();
 	
 }

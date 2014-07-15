@@ -5,7 +5,7 @@ all: exstick microboard hdl
 hdl: $(SOURCE)
 	java -cp ../../bin:. synthesijer.Main $(SOURCE)
 
-exstick_top: EchoTestTop.java 
+exstick: EchoTestTop.java 
 	javac -cp ../../bin:. EchoTestTop.java
 	java -cp ../../bin:. EchoTestTop
 

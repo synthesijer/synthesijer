@@ -2,6 +2,7 @@ package synthesijer.hdl.vhdl;
 
 import java.io.PrintWriter;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLInstance.ParamPair;
@@ -28,7 +29,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLExpr(HDLExpr o) {
-		String str = String.format("%s <= %s;", o.getResultExpr().getVHDL(), o.getVHDL());
+		String str = String.format("%s <= %s;", o.getResultExpr().getVHDL(), adjustTypeFor((HDLSignal)o.getResultExpr(), o));
 		HDLUtils.println(dest, offset, str);
 	}
 
@@ -221,19 +222,19 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
 		HDLUtils.println(dest, offset+2, String.format("if %s = '1' then", o.getModule().getSysResetName()));
 		if(o.getResetValue() != null){
-			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getResetValue().getVHDL()));
+			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getResetValue())));
 		}
 		HDLUtils.println(dest, offset+2, String.format("else"));
 		if(o.getConditions().length > 0){
 			String sep = "if";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset+4, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
-				HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getName(), c.getValue().getVHDL()));
+				HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, c.getValue())));
 				sep = "elsif";
 			}
 			if(o.hasDefaultValue()){
 				HDLUtils.println(dest, offset+4, String.format("else"));
-				HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getName(), o.getDefaultValue().getVHDL()));
+				HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getName(), adjustTypeFor(o,  o.getDefaultValue())));
 			}
 			HDLUtils.println(dest, offset+4, String.format("end if;"));
 		}else{
@@ -245,12 +246,12 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
 	private void genAsyncProcess(HDLSignal o, int offset){
 		if(o.getConditions().length == 1){
-			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getConditions()[0].getValue().getVHDL()));
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getConditions()[0].getValue())));
 		}else if(o.getConditions().length > 1){
 			String sep = "if";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
-				HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getName(), c.getValue().getVHDL()));
+				HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, c.getValue())));
 				sep = "elsif";
 			}
 			HDLUtils.println(dest, offset, String.format("end if;"));
@@ -288,14 +289,32 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, "end process;");
 		HDLUtils.nl(dest);
 	}
-		
+	
+	private String adjustTypeFor(HDLSignal dest, HDLExpr expr){
+		if(expr instanceof HDLLiteral) return expr.getVHDL();
+		if(dest.getType().getKind() == expr.getType().getKind()){
+			return expr.getVHDL();
+		}else{
+			if(dest.getType().isBit()){
+				return String.format("std_logic(%s)", expr.getVHDL());
+			}else if(dest.getType().isVector()){
+				return String.format("std_logic_vector(%s)", expr.getVHDL());
+			}else if(dest.getType().isSigned()){
+				return String.format("signed(%s)", expr.getVHDL());
+			}else{
+				SynthesijerUtils.error("cannot assign:" + dest + " <- " + expr);
+				throw new RuntimeException("cannot assign:" + dest + " <- " + expr);
+			}
+		}
+	}
+	
 	@Override
 	public void visitHDLSignal(HDLSignal o) {
 		if(o.isRegister() && !o.isAssignAlways()){
 			if(o.getConditions().length == 0) return;
 			genSignalRegisterProcess(o);
 		}else if(o.isAssignAlways()){
-			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getAssignAlwaysExpr().getResultExpr().getVHDL()));
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignAlwaysExpr().getResultExpr())));
 			HDLUtils.nl(dest);
 		}
 	}

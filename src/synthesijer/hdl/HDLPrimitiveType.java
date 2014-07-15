@@ -25,8 +25,24 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		return kind == KIND.BIT;
 	}
 	
+	public boolean isSigned(){
+		return kind == KIND.SIGNED;
+	}
+	
+	public boolean isVector(){
+		return kind == KIND.VECTOR;
+	}
+	
+	public boolean isInteger(){
+		return kind == KIND.INTEGER;
+	}
+	
 	public int getWidth(){
 		return width;
+	}
+	
+	public boolean isEqualKind(HDLPrimitiveType t){
+		return kind == t.kind;
 	}
 	
 	public static HDLPrimitiveType genBitType(){

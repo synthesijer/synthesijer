@@ -38,4 +38,22 @@ public class HDLInstanceType implements HDLType{
 		return false;
 	}
 
+	@Override
+	public boolean isVector() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isSigned() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isInteger() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
