@@ -172,6 +172,7 @@ public class JCExprVisitor extends Visitor{
 	public void visitTypeCast(JCTypeCast that){
 		TypeCast tmp = new TypeCast(scope);
 		tmp.setExpr(stepIn(that.expr));
+		tmp.setTargetType(TypeBuilder.genType(that.getType()));
 		expr = tmp;
 	}
 	

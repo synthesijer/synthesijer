@@ -7,6 +7,7 @@ import synthesijer.ast.Type;
 public class TypeCast extends Expr{
 	
 	private Expr expr;
+	private Type targetType;
 	
 	public TypeCast(Scope scope){
 		super(scope);
@@ -18,6 +19,10 @@ public class TypeCast extends Expr{
 
 	public Expr getExpr(){
 		return expr;
+	}
+	
+	public void setTargetType(Type t){
+		this.targetType = t;
 	}
 
 	public void accept(SynthesijerExprVisitor v){
@@ -35,7 +40,8 @@ public class TypeCast extends Expr{
 	}
 	
 	public Type getType(){
-		return expr.getType();
+		//return expr.getType();
+		return targetType;
 	}
 
 }

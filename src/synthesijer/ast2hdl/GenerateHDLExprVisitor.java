@@ -193,7 +193,8 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitLitral(Literal o) {
-		result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getType()));
+		//result = new HDLValue(o.getValueAsStr(), convToHDLType(o.getType()));
+		result = parent.module.newExpr(HDLOp.ID, new HDLValue(o.getValueAsStr(), convToHDLType(o.getType())));
 		//System.out.println(o + " -> " + result);
 	}
 	
@@ -264,7 +265,26 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitTypeCast(TypeCast o) {
-		result = stepIn(o.getExpr());
+		HDLExpr expr = stepIn(o.getExpr());
+		
+		HDLPrimitiveType target = convToHDLType(o.getType());
+		HDLPrimitiveType given = (HDLPrimitiveType)(expr.getType());
+		
+		if(target.getWidth() == given.getWidth()){
+			result = expr; // as is
+		}else{
+			//HDLSignal tmp = parent.module.newSignal("cast_tmp_" + this.hashCode(), given, HDLSignal.ResourceKind.WIRE);
+			//tmp.setAssign(null, expr);
+			//HDLSignal cast = parent.module.newSignal("cast_result_" + this.hashCode(), target, HDLSignal.ResourceKind.WIRE);
+
+			if(target.getWidth() > given.getWidth()){
+				result = parent.module.newExpr(HDLOp.PADINGHEAD, expr, new HDLValue(String.valueOf(target.getWidth()-given.getWidth()), HDLPrimitiveType.genIntegerType()));
+			}else{
+				result = parent.module.newExpr(HDLOp.DROPHEAD, expr, new HDLValue(String.valueOf(given.getWidth()-target.getWidth()), HDLPrimitiveType.genIntegerType()));
+			}
+			//result = cast;
+		}
+		//System.out.println(result);
 	}
 	
 	@Override
