@@ -91,16 +91,25 @@ public class HDLCombinationExpr implements HDLExpr{
 	public String toString(){
 		return "HDLCombination::(" + op + " " + getArgsString(args) + ")";
 	}
+	
+	// TODO experimental code
+	private String convType(HDLExpr expr){
+		if(expr.getType().isVector()){
+			return String.format("signed(%s)", expr.getVHDL());
+		}else{
+			return expr.getVHDL();
+		}
+	}
 
 	@Override
 	public String getVHDL() {
 		if(op.isInfix()){
-			return String.format("%s %s %s", args[0].getResultExpr().getVHDL(), op.getVHDL(), args[1].getResultExpr().getVHDL());
+			return String.format("%s %s %s", convType(args[0].getResultExpr()), op.getVHDL(), convType(args[1].getResultExpr()));
 		}else if(op.isCompare()){
 			if(args[0] instanceof HDLValue && args[0].getType().isBit()){
 				return String.format("%s and %s", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			}else{
-				return String.format("'1' when %s %s %s else '0'", args[0].getResultExpr().getVHDL(), op.getVHDL(), args[1].getResultExpr().getVHDL());
+				return String.format("'1' when %s %s %s else '0'", convType(args[0].getResultExpr()), op.getVHDL(), convType(args[1].getResultExpr()));
 			}
 		}else{
 			switch(op){
