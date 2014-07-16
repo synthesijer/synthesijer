@@ -16,6 +16,7 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 
 public class GenerateVHDLVisitor implements HDLTreeVisitor{
@@ -293,6 +294,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	
 	private String adjustTypeFor(HDLSignal dest, HDLExpr expr){
 		if(expr instanceof HDLValue) return expr.getVHDL();
+		if(expr instanceof HDLPreDefinedConstant) return expr.getVHDL();
 		if(dest.getType().getKind() == expr.getType().getKind()){
 			return expr.getVHDL();
 		}else{
