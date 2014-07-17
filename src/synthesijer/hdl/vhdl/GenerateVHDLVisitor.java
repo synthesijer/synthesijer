@@ -1,6 +1,7 @@
 package synthesijer.hdl.vhdl;
 
 import java.io.PrintWriter;
+import java.util.Hashtable;
 
 import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;

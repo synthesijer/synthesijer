@@ -1,6 +1,7 @@
 package synthesijer.hdl.vhdl;
 
 import java.io.PrintWriter;
+import java.util.Hashtable;
 
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
@@ -86,7 +87,15 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		// architecture
 		HDLUtils.println(dest, offset, String.format("architecture RTL of %s is", o.getName()));
 		HDLUtils.nl(dest);
-		for(HDLInstance i: o.getModuleInstances()){ i.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
+		
+		Hashtable<String, Boolean> componentFlags = new Hashtable<>();
+		for(HDLInstance i: o.getModuleInstances()){
+			if(componentFlags.containsKey(i.getSubModule().getName())) continue; // already			
+			i.accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			System.out.println(i.getSubModule().getName());
+			componentFlags.put(i.getSubModule().getName(), true);
+		}
+		
 		HDLUtils.nl(dest);
 		for(HDLPort p: o.getPorts()){
 			if(p.isSet(OPTION.NO_SIG) == false){
