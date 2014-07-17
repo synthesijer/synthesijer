@@ -24,10 +24,18 @@ public class HDLValue implements HDLLiteral{
 	public String getVHDL() {
 		switch(type.getKind()){
 		case VECTOR:
-		case SIGNED:
-			String v = String.format("%064x", Long.parseLong(value));
-			//System.out.printf("%s => %s => %s\n", value, v, v.substring(v.length()-type.getWidth()/4, v.length()));
-			return String.format("X\"%s\"", v.substring(v.length()-type.getWidth()/4, v.length()));
+		case SIGNED: {
+			if(type.getWidth()%4 == 0){
+				String v = String.format("%016x", Long.parseLong(value));
+				//System.out.printf("%s => %s => %s\n", value, v, v.substring(v.length()-type.getWidth()/4, v.length()));
+				return String.format("X\"%s\"", v.substring(v.length()-type.getWidth()/4, v.length()));
+			}else{
+				String v = "";
+				for(int i = 0; i < 64; i++){ v += "0"; }
+				v += Long.toBinaryString(Long.parseLong(value));
+				return String.format("\"%s\"", v.substring(v.length()-type.getWidth(), v.length()));
+			}
+		}
 		case BIT :
 			if(value.equals("true")){
 				return "'1'";
@@ -47,9 +55,17 @@ public class HDLValue implements HDLLiteral{
 	public String getVerilogHDL() {
 		switch(type.getKind()){
 		case VECTOR:
-		case SIGNED:
-			String v = String.format("%064x", Long.parseLong(value));
-			return String.format("%d'h%s", type.getWidth(), v.substring(v.length()-type.getWidth()/4, v.length()));
+		case SIGNED:{
+			if(type.getWidth()%4 == 0){
+				String v = String.format("%064x", Long.parseLong(value));
+				return String.format("%d'h%s", type.getWidth(), v.substring(v.length()-type.getWidth()/4, v.length()));
+			}else{
+				String v = "";
+				for(int i = 0; i < 64; i++){ v += "0"; }
+				v += Long.toBinaryString(Long.parseLong(value));
+				return String.format("%d'b%s", type.getWidth(), v.substring(v.length()-type.getWidth(), v.length()));
+			}
+		}
 		case BIT:
 			if(value.equals("true")){
 				return "1'b1";
