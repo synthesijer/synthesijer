@@ -4,6 +4,7 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSequencer;
+import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
@@ -14,11 +15,13 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 	
 	private final GenerateHDLModuleVisitor parent;
 	private final HDLPort req;
+	private final HDLSignal req_local;
 	private final HDLPort busy;
 	
-	public Statemachine2HDLSequencerVisitor(GenerateHDLModuleVisitor parent, HDLPort req, HDLPort busy) {
+	public Statemachine2HDLSequencerVisitor(GenerateHDLModuleVisitor parent, HDLPort req, HDLSignal req_local, HDLPort busy) {
 		this.parent = parent;
 		this.req = req;
+		this.req_local = req_local;
 		this.busy = busy;
 	}
 	
@@ -57,7 +60,10 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 				ss.addStateTransit(hs.getIdleState());
 			}
 		}
-		HDLExpr kickExpr = parent.module.newExpr(HDLOp.EQ, req.getSignal(), HDLPreDefinedConstant.HIGH);
+		HDLExpr kickExpr = parent.module.newExpr(
+				HDLOp.OR,
+				parent.module.newExpr(HDLOp.EQ, req.getSignal(), HDLPreDefinedConstant.HIGH),
+				parent.module.newExpr(HDLOp.EQ, req_local, HDLPreDefinedConstant.HIGH));
 		HDLSequencer.SequencerState entryState = parent.stateTable.get(o.getEntryState()); 
 		hs.getIdleState().addStateTransit(kickExpr, entryState);
 		busy.getSignal().setAssign(null,

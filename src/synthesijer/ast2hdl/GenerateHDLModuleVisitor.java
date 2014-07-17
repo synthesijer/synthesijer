@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 import synthesijer.CompileState;
 import synthesijer.Manager;
+import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
@@ -45,6 +46,7 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLVariable;
+import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.model.State;
 
@@ -64,12 +66,12 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	public HDLVariable getHDLVariable(Variable v){
 		return variableTable.get(v);
-	}
+	}	
 	
 	@Override
 	public void visitMethod(Method o) {
 		if(o.isConstructor()) return; // skip 
-		if(o.isUnsynthesizable()) return; // skip 
+		if(o.isUnsynthesizable()) return; // skip
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
 			if(t != null){
@@ -85,9 +87,14 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		}
 		HDLPort req = module.newPort(o.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort busy = module.newPort(o.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+		HDLSignal req_local = module.newSignal(o.getName() + "_req_local", HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.REGISTER);
+		req_local.setDefaultValue(HDLPreDefinedConstant.LOW);
 		genVariableTables(o);
-		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, req, busy));
+		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, req, req_local, busy));
 		o.getBody().accept(this);
+		if(isThreadStart(o)){ genThreadStart(o); }
+		if(isThreadJoin(o)){ genThreadJoin(o); }
+		if(isThreadYield(o)){ genThreadYield(o); }
 	}
 	
 	private HDLVariable genHDLVariable(Variable v, ArrayType t){
@@ -357,5 +364,33 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		return null;
 	}
 
+	private boolean isThreadStart(Method o){
+		return (o.getName().equals("start")) && ((Module)o.getParentScope()).getExtending().equals("Thread");
+	}
+	private boolean isThreadJoin(Method o){
+		return (o.getName().equals("join")) && ((Module)o.getParentScope()).getExtending().equals("Thread");
+	}
+	private boolean isThreadYield(Method o){
+		return (o.getName().equals("yield")) && ((Module)o.getParentScope()).getExtending().equals("Thread");
+	}
 	
+	// TODO experimental
+	private void genThreadStart(Method o){
+		HDLSequencer seq = module.getSequencer("S_start");
+		HDLSignal s = module.getSignal("run_req_local");
+		if(module.getSignal("run_req_local") == null){
+			SynthesijerUtils.error("run() is not defined in " + ((Module)(o.getParentScope())).getName());
+			System.exit(0);
+		}
+		s.setAssign(seq.getIdleState(), module.getPort("start_req").getSignal());
+	}
+	
+	// TODO experimental
+	private void genThreadJoin(Method o){
+		module.getPort("join_busy").getSignal().setAssign(null, module.getPort("run_busy").getSignal());
+	}
+	
+	private void genThreadYield(Method o){
+		
+	}
 }

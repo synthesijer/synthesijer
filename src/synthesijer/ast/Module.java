@@ -52,6 +52,10 @@ public class Module implements Scope, SynthesijerAstTree{
 		return parent;
 	}
 	
+	public String getExtending(){
+		return extending;
+	}
+	
 	public Variable search(String name){
 		Variable var = variableTable.get(name);
 		if(var != null)

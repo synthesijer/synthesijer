@@ -1,6 +1,5 @@
 package synthesijer.jcfrontend;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -12,8 +11,9 @@ import openjdk.com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
 import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
+import synthesijer.ast.Method;
 import synthesijer.ast.Module;
-import synthesijer.hdl.HDLModule;
+import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class Main {
 	
@@ -63,12 +63,26 @@ public class Main {
 		Module module = new Module(decl.sym.toString(), importTable, extending, implementing);		
 		JCTopVisitor visitor = new JCTopVisitor(module);
 		decl.accept(visitor);
+		
+		if(extending != null && extending.equals("Thread")){ //TODO experimental
+			addThread(module);
+		}
+
 		if(syntheisizeFlag){
-			Manager.INSTANCE.addModule(module);
+			Manager.INSTANCE.addModule(module);			
 		}else{
 			Manager.INSTANCE.registUserHDLModule(decl.sym.toString());
 		}
 	}
 
-
+	// TODO experimental
+	private static void addThread(Module m){
+		Method start = new Method(m, "start", PrimitiveTypeKind.VOID);
+		m.addMethod(start);
+		Method join = new Method(m, "join", PrimitiveTypeKind.VOID);
+		m.addMethod(join);
+		Method yield = new Method(m, "yield", PrimitiveTypeKind.VOID);
+		m.addMethod(yield);
+	}
+	
 }

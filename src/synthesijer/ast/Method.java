@@ -36,6 +36,7 @@ public class Method implements Scope, SynthesijerAstTree{
 		this.type = type;
 		this.body = new BlockStatement(this);
 		parent.addScope(this);
+		args = new VariableDecl[]{}; // dummy
 	}
 	
 	public void addScope(Scope s){

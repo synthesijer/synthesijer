@@ -88,6 +88,13 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	public HDLPort[] getPorts(){
 		return ports.toArray(new HDLPort[]{});
 	}
+	
+	public HDLPort getPort(String name){
+		for(HDLPort port: ports){
+			if(port.getName().equals(name)) return port;
+		}
+		return null;
+	}
 
 	public HDLSignal newSignal(String name, HDLType type, HDLSignal.ResourceKind kind){
 		HDLSignal sig = new HDLSignal(this, name, type, kind);
@@ -99,6 +106,13 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		HDLSignal sig = new HDLSignal(this, name, type, HDLSignal.ResourceKind.REGISTER);
 		signals.add(sig);
 		return sig;
+	}
+	
+	public HDLSignal getSignal(String name){
+		for(HDLSignal sig: signals){
+			if(sig.getName().equals(name)) return sig;
+		}
+		return null;
 	}
 	
 	public void rmSignal(HDLSignal sig){
@@ -176,6 +190,13 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	
 	public HDLSequencer[] getSequencers(){
 		return sequencer.toArray(new HDLSequencer[]{});
+	}
+	
+	public HDLSequencer getSequencer(String name){
+		for(HDLSequencer s: sequencer){
+			if(s.getStateKey().getName().equals(name)) return s;
+		}
+		return null;
 	}
 	
 	public void genVHDL(PrintWriter dest){
