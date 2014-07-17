@@ -149,12 +149,12 @@ public class HDLCombinationExpr implements HDLExpr{
 			case PADDINGHEAD:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				HDLPrimitiveType t1 = (HDLPrimitiveType)decideExprType(op, args);
-				return String.format("(%d downto %d => %s(%d)) & %s", t1.getWidth(), t0.getWidth(), args[0].getResultExpr().getVHDL(), t0.getWidth()-1, args[0].getResultExpr().getVHDL());
+				return String.format("(%d-1 downto %d => %s(%d)) & %s", t1.getWidth(), t0.getWidth(), args[0].getResultExpr().getVHDL(), t0.getWidth()-1, args[0].getResultExpr().getVHDL());
 			}
 			case PADDINGHEAD_ZERO:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				HDLPrimitiveType t1 = (HDLPrimitiveType)decideExprType(op, args);
-				return String.format("(%d downto %d => '0') & %s", t1.getWidth(), t0.getWidth(), args[0].getResultExpr().getVHDL(), t0.getWidth()-1, args[0].getResultExpr().getVHDL());
+				return String.format("(%d-1 downto %d => '0') & %s", t1.getWidth(), t0.getWidth(), args[0].getResultExpr().getVHDL(), t0.getWidth()-1, args[0].getResultExpr().getVHDL());
 			}
 			case ID:
 				return args[0].getResultExpr().getVHDL();
