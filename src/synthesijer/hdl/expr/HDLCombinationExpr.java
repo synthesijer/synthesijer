@@ -66,7 +66,11 @@ public class HDLCombinationExpr implements HDLExpr{
 	}
 	
 	private HDLType getPaddingHeadType(HDLPrimitiveType t, HDLValue v){
-		return HDLPrimitiveType.genSignedType(t.getWidth()+Integer.parseInt(v.getValue()));
+		if(t.isSigned()){
+			return HDLPrimitiveType.genSignedType(t.getWidth()+Integer.parseInt(v.getValue()));
+		}else{
+			return HDLPrimitiveType.genVectorType(t.getWidth()+Integer.parseInt(v.getValue()));
+		}
 	}
 	
 	private HDLType decideExprType(HDLOp op, HDLExpr[] args){
@@ -86,7 +90,8 @@ public class HDLCombinationExpr implements HDLExpr{
 				return getConcatType((HDLPrimitiveType)args[0].getType(), (HDLPrimitiveType)args[1].getType());
 			case DROPHEAD:
 				return getDropHeadType((HDLPrimitiveType)args[0].getType(), (HDLValue)args[1]);
-			case PADINGHEAD:
+			case PADDINGHEAD:
+			case PADDINGHEAD_ZERO:
 				return getPaddingHeadType((HDLPrimitiveType)args[0].getType(), (HDLValue)args[1]);
 			case ID:
 				return args[0].getType();
@@ -108,6 +113,8 @@ public class HDLCombinationExpr implements HDLExpr{
 	
 	// TODO experimental code
 	private String convType(HDLExpr expr){
+		if(expr instanceof HDLPreDefinedConstant) return expr.getVHDL();
+		if(expr instanceof HDLValue) return expr.getVHDL();
 		if(expr.getType().isVector()){
 			return String.format("signed(%s)", expr.getVHDL());
 		}else{
@@ -139,9 +146,15 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				return String.format("%s(%d - %s - 1 downto 0)", args[0].getResultExpr().getVHDL(), t.getWidth(), args[1].getResultExpr().getVHDL());
 			}
-			case PADINGHEAD:{
-				HDLPrimitiveType t = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				return String.format("(others => %s(%d) & %s", args[0].getResultExpr().getVHDL(), t.getWidth()-1, args[0].getResultExpr().getVHDL());
+			case PADDINGHEAD:{
+				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
+				HDLPrimitiveType t1 = (HDLPrimitiveType)decideExprType(op, args);
+				return String.format("(%d downto %d => %s(%d)) & %s", t1.getWidth(), t0.getWidth(), args[0].getResultExpr().getVHDL(), t0.getWidth()-1, args[0].getResultExpr().getVHDL());
+			}
+			case PADDINGHEAD_ZERO:{
+				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
+				HDLPrimitiveType t1 = (HDLPrimitiveType)decideExprType(op, args);
+				return String.format("(%d downto %d => '0') & %s", t1.getWidth(), t0.getWidth(), args[0].getResultExpr().getVHDL(), t0.getWidth()-1, args[0].getResultExpr().getVHDL());
 			}
 			case ID:
 				return args[0].getResultExpr().getVHDL();
@@ -151,14 +164,14 @@ public class HDLCombinationExpr implements HDLExpr{
 		}
 	}
 
-	private String getPaddingBit(String key, int idx, int len){
+	private String getPaddingBitInVerilog(String key, int idx, int len){
 		String s = "";
 		for(int i = 0; i < len; i++){
 			s += key + "[" + (idx-1) + "], ";
 		}
 		return s;
 	}
-	
+
 	@Override
 	public String getVerilogHDL() {
 		if(op.isInfix()){
@@ -179,10 +192,15 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				return String.format("%s(%d - %s - 1 downto 0)", args[0].getResultExpr().getVerilogHDL(), t.getWidth(), args[1].getResultExpr().getVerilogHDL());
 			}
-			case PADINGHEAD:{
+			case PADDINGHEAD:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				HDLPrimitiveType t1 = (HDLPrimitiveType)decideExprType(op, args);
-				return String.format("{%s%s}", getPaddingBit(args[0].getResultExpr().getVerilogHDL(), t0.getWidth(), t1.getWidth()), args[0].getResultExpr().getVerilogHDL());
+				return String.format("{%s%s}", getPaddingBitInVerilog(args[0].getResultExpr().getVerilogHDL(), t0.getWidth(), t1.getWidth()-t0.getWidth()), args[0].getResultExpr().getVerilogHDL());
+			}
+			case PADDINGHEAD_ZERO:{
+				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
+				HDLPrimitiveType t1 = (HDLPrimitiveType)decideExprType(op, args);
+				return String.format("{%d'b0, %s}", t1.getWidth()-t0.getWidth(), args[0].getResultExpr().getVerilogHDL());
 			}
 			case ID:
 				return args[0].getResultExpr().getVerilogHDL();

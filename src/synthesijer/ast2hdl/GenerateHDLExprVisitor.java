@@ -278,7 +278,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			//HDLSignal cast = parent.module.newSignal("cast_result_" + this.hashCode(), target, HDLSignal.ResourceKind.WIRE);
 
 			if(target.getWidth() > given.getWidth()){
-				result = parent.module.newExpr(HDLOp.PADINGHEAD, expr, new HDLValue(String.valueOf(target.getWidth()-given.getWidth()), HDLPrimitiveType.genIntegerType()));
+				result = parent.module.newExpr(HDLOp.PADDINGHEAD, expr, new HDLValue(String.valueOf(target.getWidth()-given.getWidth()), HDLPrimitiveType.genIntegerType()));
 			}else{
 				result = parent.module.newExpr(HDLOp.DROPHEAD, expr, new HDLValue(String.valueOf(given.getWidth()-target.getWidth()), HDLPrimitiveType.genIntegerType()));
 			}
