@@ -20,7 +20,7 @@ public class ForStatement extends Statement implements Scope {
 	private ArrayList<Statement> initializations = new ArrayList<>();
 	private Expr condition;
 	private ArrayList<Statement> updates = new ArrayList<>();
-	private Statement body;
+	private BlockStatement body;
 	
 	private Hashtable<String, Variable> varTable = new Hashtable<>();
 
@@ -74,7 +74,7 @@ public class ForStatement extends Statement implements Scope {
 		return updates;
 	}
 
-	public void setBody(Statement s) {
+	public void setBody(BlockStatement s) {
 		this.body = s;
 	}
 	

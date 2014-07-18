@@ -10,7 +10,7 @@ import synthesijer.model.Statemachine;
 public class WhileStatement extends Statement{
 	
 	private Expr condition;
-	private Statement body;
+	private BlockStatement body;
 	
 	public WhileStatement(Scope scope){
 		super(scope);
@@ -24,7 +24,7 @@ public class WhileStatement extends Statement{
 		return condition;
 	}
 	
-	public void setBody(Statement body){
+	public void setBody(BlockStatement body){
 		this.body = body;
 	}
 	

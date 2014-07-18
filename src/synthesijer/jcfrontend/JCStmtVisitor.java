@@ -5,6 +5,7 @@ import openjdk.com.sun.tools.javac.tree.JCTree.JCBlock;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCBreak;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCCase;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCContinue;
+import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCForLoop;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCIf;
@@ -49,22 +50,34 @@ public class JCStmtVisitor extends Visitor{
 		return stmt;
 	}
 	
+	private Statement stepIn(JCTree that, Scope scope){
+		JCStmtVisitor visitor = new JCStmtVisitor(scope);
+		that.accept(visitor);
+		return visitor.getStatement();
+	}
+	
+	private Expr stepIn(JCExpression that, Scope scope){
+		JCExprVisitor visitor = new JCExprVisitor(scope);
+		that.accept(visitor);
+		return visitor.getExpr();
+	}
+	
+	private BlockStatement wrapBlockStatement(Statement stmt){
+		if(stmt instanceof BlockStatement){
+			return (BlockStatement)stmt;
+		}else{
+			BlockStatement block = new BlockStatement(stmt.getScope());
+			block.addStatement(stmt);
+			return block;
+		}
+	}
+	
 	public void visitIf(JCIf that){
 		IfStatement tmp = new IfStatement(scope);
-		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.cond.accept(visitor);
-			tmp.setCondition(visitor.getExpr());
-		}
-		{
-			JCStmtVisitor visitor = new JCStmtVisitor(scope);
-			that.thenpart.accept(visitor);
-			tmp.setThenPart(visitor.getStatement());
-		}
+		tmp.setCondition(stepIn(that.cond, scope));
+		tmp.setThenPart(wrapBlockStatement(stepIn(that.thenpart, scope)));
 		if(that.elsepart != null){
-			JCStmtVisitor visitor = new JCStmtVisitor(scope);
-			that.elsepart.accept(visitor);
-			tmp.setThenPart(visitor.getStatement());
+			tmp.setElsePart(wrapBlockStatement(stepIn(that.elsepart, scope)));
 		}
 		stmt = tmp;
 	}
@@ -72,40 +85,20 @@ public class JCStmtVisitor extends Visitor{
 	public void visitForLoop(JCForLoop that){
 		ForStatement tmp = new ForStatement(scope);
 		for(JCStatement s: that.init){
-			JCStmtVisitor visitor = new JCStmtVisitor(tmp);
-			s.accept(visitor);
-			tmp.addInitialize(visitor.getStatement());
+			tmp.addInitialize(stepIn(s, scope));
 		}
-		{
-			JCExprVisitor visitor = new JCExprVisitor(tmp);
-			that.cond.accept(visitor);
-			tmp.setCondition(visitor.getExpr());
-		}
+		tmp.setCondition(stepIn(that.cond, tmp));
 		for(JCStatement s: that.step){
-			JCStmtVisitor visitor = new JCStmtVisitor(tmp);
-			s.accept(visitor);
-			tmp.addUpdate(visitor.getStatement());
+			tmp.addUpdate(stepIn(s, tmp));
 		}
-		{
-			JCStmtVisitor visitor = new JCStmtVisitor(tmp);
-			that.body.accept(visitor);
-			tmp.setBody(visitor.getStatement());
-		}
+		tmp.setBody(wrapBlockStatement(stepIn(that.body, tmp)));
 		stmt = tmp;
 	}
 	
 	public void visitWhileLoop(JCWhileLoop that){
 		WhileStatement tmp = new WhileStatement(scope);
-		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.cond.accept(visitor);
-			tmp.setCondition(visitor.getExpr());
-		}
-		{
-			JCStmtVisitor visitor = new JCStmtVisitor(scope);
-			that.body.accept(visitor);
-			tmp.setBody(visitor.getStatement());
-		}
+		tmp.setCondition(stepIn(that.cond, scope));
+		tmp.setBody(wrapBlockStatement(stepIn(that.body, scope)));
 		stmt = tmp;
 	}
 	

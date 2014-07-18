@@ -10,7 +10,7 @@ import synthesijer.model.Statemachine;
 public class IfStatement extends Statement{
 	
 	private Expr condition;
-	private Statement thenPart, elsePart;
+	private BlockStatement thenPart, elsePart;
 	
 	public IfStatement(Scope scope){
 		super(scope);
@@ -20,11 +20,11 @@ public class IfStatement extends Statement{
 		condition = expr;
 	}
 	
-	public void setThenPart(Statement s){
+	public void setThenPart(BlockStatement s){
 		thenPart = s;
 	}
 	
-	public void setElsePart(Statement s){
+	public void setElsePart(BlockStatement s){
 		elsePart = s;
 	}
 
