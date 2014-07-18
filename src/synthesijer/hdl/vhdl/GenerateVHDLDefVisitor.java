@@ -92,7 +92,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLInstance i: o.getModuleInstances()){
 			if(componentFlags.containsKey(i.getSubModule().getName())) continue; // already			
 			i.accept(new GenerateVHDLDefVisitor(dest, offset+2));
-			System.out.println(i.getSubModule().getName());
+			//System.out.println(i.getSubModule().getName());
 			componentFlags.put(i.getSubModule().getName(), true);
 		}
 		

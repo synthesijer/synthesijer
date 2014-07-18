@@ -50,7 +50,7 @@ public class BlockStatement extends Statement implements Scope{
 	
 	public void replaceStatements(ArrayList<Statement> newList){
 		statements = newList;
-		System.out.println(" replace -> #" + statements.size());
+		//System.out.println(" replace -> #" + statements.size());
 	}
 	
 	public ArrayList<Statement> getStatements(){
