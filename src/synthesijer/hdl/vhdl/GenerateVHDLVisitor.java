@@ -204,13 +204,19 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			String sep = "if";
 			int cnt = 0;
 			for(HDLSequencer.StateTransitCondition c: s.getTransitions()){
+				String str = String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId().getVHDL());
 				if(c.hasCondition()){
 					HDLUtils.println(dest, offset, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
-					HDLUtils.println(dest, offset+2, String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId().getVHDL()));
+					HDLUtils.println(dest, offset+2, str);
 					sep = "elsif";
 					cnt++;
 				}else{
-					HDLUtils.println(dest, offset, String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId().getVHDL()));
+					if(cnt == 0){
+						HDLUtils.println(dest, offset, str);
+					}else{
+						HDLUtils.println(dest, offset, "else");
+						HDLUtils.println(dest, offset+2, str);
+					}
 				}
 			}
 			if(cnt > 0){

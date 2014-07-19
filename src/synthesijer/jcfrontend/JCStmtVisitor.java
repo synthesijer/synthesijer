@@ -161,14 +161,10 @@ public class JCStmtVisitor extends Visitor{
 			if(c.pat != null){
 				elem = tmp.newElement(stepIn(c.pat, scope));
 			}else{
-				Literal l = new Literal(scope);
-				l.setValue(true);
-				elem = tmp.newElement(l);
+				elem = tmp.getDefaultElement();
 			}
 			for(JCStatement s: c.stats){
-				JCStmtVisitor v = new JCStmtVisitor(scope);
-				s.accept(v);
-				elem.addStatement(v.getStatement());
+				elem.addStatement(stepIn(s, scope));
 			}
 		}
 		stmt = tmp;

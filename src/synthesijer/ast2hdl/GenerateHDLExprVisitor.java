@@ -28,6 +28,7 @@ import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
+import synthesijer.hdl.HDLSignal.ResourceKind;
 import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
@@ -232,9 +233,10 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		for(int i = 0; i < o.getParameters().size(); i++){
 			String arg = o.getMethodName() + "_" + method.getArgs()[i].getVariable().getName();
 			HDLSignal s = inst.getSignalForPort(arg);
-			s.setAssign(state, stepIn(o.getParameters().get(i)));
+			s.setAssign(state, 0, stepIn(o.getParameters().get(i)));
 		}
-		
+
+		// method request
 		HDLSignal req;
 		if(localFlag){
 			req = parent.module.getSignal(o.getMethodName() + "_req_local");
@@ -244,16 +246,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		req.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 		req.setDefaultValue(HDLPreDefinedConstant.LOW);
 
-		if(method.getType() == PrimitiveTypeKind.VOID){
-			result = null;
-		}else{
-			if(localFlag){
-				result = parent.module.getPort(o.getMethodName() + "_return").getSignal();
-			}else{
-				result = inst.getSignalForPort(o.getMethodName() + "_return");
-			}
-		}
-		
+		// method busy, to wait for method execution
 		HDLSignal busy;
 		if(localFlag){
 			busy = parent.module.getPort(o.getMethodName() + "_busy").getSignal();
@@ -269,7 +262,16 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 								HDLPreDefinedConstant.HIGH));
 		state.setMaxConstantDelay(1);
 		state.setStateExitFlag(flag);
-
+		
+		if(method.getType() == PrimitiveTypeKind.VOID){
+			result = null;
+		}else{
+			if(localFlag){
+				result = parent.module.getPort(o.getMethodName() + "_return").getSignal();
+			}else{
+				result = inst.getSignalForPort(o.getMethodName() + "_return");
+			}
+		}
 	}
 	
 	@Override

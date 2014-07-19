@@ -14,6 +14,7 @@ public class SwitchStatement extends Statement{
 
 	private Expr selector;
 	private ArrayList<Elem> elements = new ArrayList<>();
+	private final Elem defaultElem = new Elem(null);
 	
 	public SwitchStatement(Scope scope){
 		super(scope);
@@ -32,7 +33,11 @@ public class SwitchStatement extends Statement{
 		elements.add(elem);
 		return elem;
 	}
-	
+
+	public Elem getDefaultElement(){
+		return defaultElem;
+	}
+
 	public ArrayList<Elem> getElements(){
 		return elements;
 	}
@@ -46,10 +51,11 @@ public class SwitchStatement extends Statement{
 			d = elements.get(i-1).genStateMachine(m, d, terminal, dest, loopCont);
 			stats[i-1] = d;
 		}
-		State s = m.newState("swithc_selector");
+		State s = m.newState("switch_selector");
 		for(int i = 0; i < elements.size(); i++){
-			s.addTransition(stats[i], selector, elements.get(i).getPattern());	
+			s.addTransition(stats[i], selector, elements.get(i).getPattern());
 		}
+		s.addTransition(defaultElem.genStateMachine(m, dest, terminal, dest, loopCont));
 		state = s;
 		return s;
 	}

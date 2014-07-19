@@ -16,4 +16,28 @@ public class Test001{
 		}
 		return x;
 	}
+	
+	public int switch_test(int x){
+	    int value = 0;
+	    switch(x){
+		case 0:
+			return 10;
+		case 1:
+			return 3 + 4;
+		case 2:
+		{
+			int i = 100;
+			int j = 200;
+			return i + j;
+		}
+		case 3:
+			value = 100;
+			break;
+		default:
+			value = 200;
+		}
+		return value;
+	}
+
+	
 }

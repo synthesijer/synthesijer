@@ -15,7 +15,6 @@ import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
-import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.Literal;
 import synthesijer.ast.expr.NewArray;
 import synthesijer.ast.expr.NewClassExpr;
@@ -47,7 +46,6 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLVariable;
-import synthesijer.hdl.expr.HDLCombinationExpr;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.model.State;
@@ -243,6 +241,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		for(Elem e: o.getElements()){
 			e.accept(this);
 		}
+		o.getDefaultElement().accept(this);
 	}
 
 	@Override

@@ -108,6 +108,12 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		return sig;
 	}
 	
+	public HDLSignal newTmpSignal(HDLType type, HDLSignal.ResourceKind kind){
+		HDLSignal sig = new HDLSignal(this, String.format("tmp_%04d", getExprUniqueId()), type, kind);
+		signals.add(sig);
+		return sig;
+	}
+
 	public HDLSignal getSignal(String name){
 		for(HDLSignal sig: signals){
 			if(sig.getName().equals(name)) return sig;
