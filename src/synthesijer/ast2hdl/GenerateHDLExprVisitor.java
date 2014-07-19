@@ -64,7 +64,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			HDLInstance inst = (HDLInstance)var;
 			// address
 			HDLSignal addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
-			addr.setAssign(state, stepIn(aa.getIndex()));
+			addr.setAssign(state, 0, stepIn(aa.getIndex()));
 			// write-enable
 			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
 			we.setAssign(state, HDLPreDefinedConstant.LOW);
