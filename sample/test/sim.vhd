@@ -7,8 +7,6 @@ end sim;
 
 architecture RTL of sim is
 
-
-
   signal clk : std_logic := '0';
   signal reset : std_logic := '0';
   signal counter : signed(32-1 downto 0) := (others => '0');
@@ -41,6 +39,15 @@ architecture RTL of sim is
     main_busy : out std_logic
   );
  end component Test001Sim;
+
+ component Test003
+  port (
+    clk : in std_logic;
+    reset : in std_logic;
+    test_req : in std_logic;
+    test_busy : out std_logic
+  );
+ end component Test003;
 
  signal run_req, run_busy: std_logic;
 begin
@@ -101,6 +108,14 @@ begin
     reset => reset,
     main_req => '1',
     main_busy => open
+  );
+
+ U003: Test003
+  port map(
+    clk => clk,
+    reset => reset,
+    test_req => '1',
+    test_busy => open
   );
 
 end RTL;

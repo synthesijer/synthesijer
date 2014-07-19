@@ -17,4 +17,12 @@ public class Test002 {
 		return a[i];
 	}
 
+	public int switch_test(int x){
+		switch(x){
+		case 0: return a[0];
+		case 1: return a[1];
+		case 2: return a[2];
+		default: return a[3];
+		}
+	}
 }
