@@ -39,4 +39,8 @@ public class ParenExpr extends Expr{
 		return expr.getType();
 	}
 	
+	public String toString(){
+		return "ParenExpr(" + expr + ")";
+	}
+	
 }

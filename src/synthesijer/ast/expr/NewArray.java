@@ -2,9 +2,11 @@ package synthesijer.ast.expr;
 
 import java.util.ArrayList;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class NewArray extends Expr{
@@ -17,7 +19,13 @@ public class NewArray extends Expr{
 	}
 
 	public void addDimExpr(Expr expr){
-		dimExpr.add(expr);
+		if(expr instanceof Literal){
+			dimExpr.add(expr);
+		}else{
+			String sym = ((Ident)expr).getSymbol();
+			Variable var = getScope().search(sym);
+			dimExpr.add(var.getInitExpr());
+		}
 	}
 
 	public ArrayList<Expr> getDimExpr(){

@@ -1,5 +1,6 @@
 package synthesijer.ast2hdl;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Op;
@@ -68,7 +69,11 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			we.setAssign(state, HDLPreDefinedConstant.LOW);
 			// data
 			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
-			state.setMaxConstantDelay(2);
+			if(state != null){
+				state.setMaxConstantDelay(2);
+			}else{
+				SynthesijerUtils.warn("Array acceess in non-state region is not supported yet: " + o.getIndexed() + "[" + o.getIndex() + "]");
+			}
 		}else{
 			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 		}
@@ -92,7 +97,11 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		case INC : return HDLOp.ADD;
 		case DEC : return HDLOp.SUB;
 		case LNOT : return HDLOp.NOT;
+		case ARITH_RSHIFT : return HDLOp.ARITH_RSHIFT;
+		case LOGIC_RSHIFT : return HDLOp.LOGIC_RSHIFT;
+		case LSHIFT : return HDLOp.LSHIFT;
 		default:
+			SynthesijerUtils.warn("undefined op:" + op);
 			return HDLOp.UNDEFINED;
 		}
 	}
@@ -203,8 +212,10 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 
 		HDLInstance inst = null;
 		Method method = null;
+		boolean localFlag = false;
 		if(o.getMethod() instanceof Ident){ // local method
-			throw new RuntimeException("Unsupported local method invocation:" + o.getMethod());
+			method = o.getTargetMethod();
+			localFlag = true;
 		}else if(o.getMethod() instanceof FieldAccess){
 			FieldAccess fa = (FieldAccess)o.getMethod();
 			if(fa.getSelected() instanceof Ident == false){
@@ -224,17 +235,31 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			s.setAssign(state, stepIn(o.getParameters().get(i)));
 		}
 		
-		HDLSignal req = inst.getSignalForPort(o.getMethodName() + "_req");
+		HDLSignal req;
+		if(localFlag){
+			req = parent.module.getSignal(o.getMethodName() + "_req_local");
+		}else{
+			req = inst.getSignalForPort(o.getMethodName() + "_req");
+		}
 		req.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 		req.setDefaultValue(HDLPreDefinedConstant.LOW);
 
-		
-		if(o.getMethod().getType() != PrimitiveTypeKind.VOID){
-			result = inst.getSignalForPort(o.getMethodName() + "_return");
-		}else{
+		if(method.getType() == PrimitiveTypeKind.VOID){
 			result = null;
+		}else{
+			if(localFlag){
+				result = parent.module.getPort(o.getMethodName() + "_return").getSignal();
+			}else{
+				result = inst.getSignalForPort(o.getMethodName() + "_return");
+			}
 		}
-		HDLSignal busy = inst.getSignalForPort(o.getMethodName() + "_busy");
+		
+		HDLSignal busy;
+		if(localFlag){
+			busy = parent.module.getPort(o.getMethodName() + "_busy").getSignal();
+		}else{
+			busy = inst.getSignalForPort(o.getMethodName() + "_busy");
+		}
 		HDLSignal flag = parent.module.newSignal(String.format("%s_%04d", busy.getName(), parent.module.getExprUniqueId()), HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.WIRE);
 		flag.setAssign(null,
 				parent.module.newExpr(HDLOp.EQ,

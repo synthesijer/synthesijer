@@ -5,11 +5,13 @@ public class Variable{
 	private final String name;
 	private final Type type;
 	private final Method method;
+	private final Expr init;
 	
-	public Variable(String n, Type t, Method method){
+	public Variable(String n, Type t, Method method, Expr init){
 		this.name = n;
 		this.type = t;
 		this.method = method;
+		this.init = init;
 	}
 	
 	public String getName(){
@@ -18,6 +20,10 @@ public class Variable{
 	
 	public Type getType(){
 		return type;
+	}
+	
+	public Expr getInitExpr(){
+		return init;
 	}
 	
 	public String getUniqueName(){

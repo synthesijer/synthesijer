@@ -15,6 +15,7 @@ import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
+import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.Literal;
 import synthesijer.ast.expr.NewArray;
 import synthesijer.ast.expr.NewClassExpr;
@@ -46,6 +47,7 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLVariable;
+import synthesijer.hdl.expr.HDLCombinationExpr;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.model.State;
@@ -129,6 +131,10 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		}else if(t instanceof ComponentType){
 			ComponentType c = (ComponentType)t;
 			Manager.HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(c.getName());
+			if(info == null){
+				SynthesijerUtils.error(c.getName() + " is not found.");
+				System.exit(0);
+			}
 			if(info.getCompileState().isBefore(CompileState.GENERATE_HDL)){
 				Manager.INSTANCE.genHDL(info);
 			}
@@ -260,11 +266,15 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 
 	// TODO, experimental code
 	private void newArrayInst(HDLInstance inst, ArrayType type, NewArray init){
-		Literal value = (Literal)(init.getDimExpr().get(0));
-		inst.getParameterPair("WORDS").setValue(value.getValueAsStr());
-		int dims = Integer.valueOf(value.getValueAsStr());
-		int depth = (int)Math.ceil(Math.log(dims) / Math.log(2.0));
-		inst.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+		if(init.getDimExpr().get(0) instanceof Literal){
+			Literal value = (Literal)(init.getDimExpr().get(0));
+			inst.getParameterPair("WORDS").setValue(value.getValueAsStr());
+			int dims = Integer.valueOf(value.getValueAsStr());
+			int depth = (int)Math.ceil(Math.log(dims) / Math.log(2.0));
+			inst.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+		}else{
+			throw new RuntimeException("not supported to generate array with non-literal dimension");
+		}
 	}
 	
 	// TODO, experimental code
@@ -275,6 +285,10 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		for(int i = 0; i < elem.size()/2; i ++){
 			String key = ((Literal)elem.get(2*i)).getValueAsStr();
 			String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
+			if(inst.getParameterPair(key) == null){
+				SynthesijerUtils.error(key + " is not defined in " + inst.getSubModule().getName());
+				System.exit(0);
+			}
 			inst.getParameterPair(key).setValue(value);
 		}
 		for(HDLPort p: inst.getSubModule().getPorts()){

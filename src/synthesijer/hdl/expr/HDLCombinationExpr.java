@@ -93,6 +93,10 @@ public class HDLCombinationExpr implements HDLExpr{
 			case PADDINGHEAD:
 			case PADDINGHEAD_ZERO:
 				return getPaddingHeadType((HDLPrimitiveType)args[0].getType(), (HDLValue)args[1]);
+			case ARITH_RSHIFT:
+			case LOGIC_RSHIFT:
+			case LSHIFT:
+				return args[0].getType();
 			case ID:
 				return args[0].getType();
 			default:

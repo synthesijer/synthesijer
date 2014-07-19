@@ -23,6 +23,7 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.Type;
+import synthesijer.ast.expr.Literal;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
@@ -154,15 +155,16 @@ public class JCStmtVisitor extends Visitor{
 	
 	public void visitSwitch(JCSwitch that){
 		SwitchStatement tmp = new SwitchStatement(scope);
-		{
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.selector.accept(visitor);
-			tmp.setSelector(visitor.getExpr());
-		}
+		tmp.setSelector(stepIn(that.selector, scope));
 		for(JCCase c: that.cases){
-			JCExprVisitor visitor = new JCExprVisitor(scope);
-			c.pat.accept(visitor);
-			SwitchStatement.Elem elem = tmp.newElement(visitor.getExpr());
+			SwitchStatement.Elem elem;
+			if(c.pat != null){
+				elem = tmp.newElement(stepIn(c.pat, scope));
+			}else{
+				Literal l = new Literal(scope);
+				l.setValue(true);
+				elem = tmp.newElement(l);
+			}
 			for(JCStatement s: c.stats){
 				JCStmtVisitor v = new JCStmtVisitor(scope);
 				s.accept(v);

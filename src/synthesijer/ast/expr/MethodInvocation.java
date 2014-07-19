@@ -1,10 +1,9 @@
 package synthesijer.ast.expr;
 
-
-
 import java.util.ArrayList;
 
 import synthesijer.Manager;
+import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Scope;
@@ -69,8 +68,12 @@ public class MethodInvocation extends Expr{
 	}
 	
 	public Method getTargetMethod(){
-		ComponentType type = (ComponentType)(method.getType());
-		return Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+		if(method instanceof FieldAccess){
+			ComponentType type = (ComponentType)(method.getType());
+			return Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+		}else{
+			return getScope().getModule().searchMethod(getMethodName());
+		}
 	}
 
 	@Override

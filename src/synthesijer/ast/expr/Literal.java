@@ -100,7 +100,7 @@ public class Literal extends Expr{
 			switch((PrimitiveTypeKind)type){
 			case BOOLEAN: return String.valueOf(valueBoolean);
 			case BYTE:    return String.valueOf(valueByte);
-			case CHAR:    return String.valueOf(valueChar);
+			case CHAR:    return String.valueOf((int)valueChar);
 			case SHORT:   return String.valueOf(valueShort);
 			case INT:     return String.valueOf(valueInt);
 			case LONG:    return String.valueOf(valueLong);
