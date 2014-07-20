@@ -62,7 +62,11 @@ public class HDLCombinationExpr implements HDLExpr{
 	}
 	
 	private HDLType getDropHeadType(HDLPrimitiveType t, HDLValue v){
-		return HDLPrimitiveType.genSignedType(t.getWidth()-Integer.parseInt(v.getValue()));
+		if(t.isVector()){
+			return HDLPrimitiveType.genVectorType(t.getWidth()-Integer.parseInt(v.getValue()));
+		}else{
+			return HDLPrimitiveType.genSignedType(t.getWidth()-Integer.parseInt(v.getValue()));
+		}
 	}
 	
 	private HDLType getPaddingHeadType(HDLPrimitiveType t, HDLValue v){

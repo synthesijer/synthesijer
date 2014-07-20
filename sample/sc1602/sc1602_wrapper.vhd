@@ -52,8 +52,6 @@ architecture RTL of sc1602_wrapper is
 
 begin
 
-  cWrWe(0) <= pWrWe;
-
   U: sc1602if
     generic map(
       CLKWAIT => CLKWAIT
@@ -65,12 +63,12 @@ begin
       pLCD_DB  => pLCD_DB,
       pLCD_RW  => pLCD_RW,
       pLED     => open,
-      pReq    => req,
-      pBusy   => busy,
-      pWrData => data_din,
-      pWrAddr => data_waddress(6 downto 0),
-      pWrWe   => data_we,
-      pReset  => reset
+      pReq     => req,
+      pBusy    => busy,
+      pWrData  => data_din,
+      pWrAddr  => data_waddress(6 downto 0),
+      pWrWe(0) => data_we,
+      pReset   => reset
       );
 
 end RTL;
