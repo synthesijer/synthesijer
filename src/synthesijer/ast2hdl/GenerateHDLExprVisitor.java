@@ -57,26 +57,37 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitArrayAccess(ArrayAccess o) {
+		HDLSignal addr = null, we = null;
 		if(o.getIndexed() instanceof Ident){
-			ArrayAccess aa = (ArrayAccess)o;
-			Ident id = (Ident)aa.getIndexed();
+			Ident id = (Ident)o.getIndexed();
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			HDLInstance inst = (HDLInstance)var;
-			// address
-			HDLSignal addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
-			addr.setAssign(state, 0, stepIn(aa.getIndex()));
-			// write-enable
-			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
-			we.setAssign(state, HDLPreDefinedConstant.LOW);
-			// data
+			
+			addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
+			we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
 			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
-			if(state != null){
-				state.setMaxConstantDelay(2);
-			}else{
-				SynthesijerUtils.warn("Array acceess in non-state region is not supported yet: " + o.getIndexed() + "[" + o.getIndex() + "]");
-			}
+		}else if(o.getIndexed() instanceof FieldAccess){
+			FieldAccess fa = (FieldAccess)o.getIndexed();
+			Ident id = (Ident)(fa.getSelected());
+			Ident sym = fa.getIdent();
+			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+			HDLInstance inst = (HDLInstance)var;
+			addr = inst.getSignalForPort(sym.getSymbol() + "_raddress");
+			we = inst.getSignalForPort(sym.getSymbol() + "_we");
+			result = inst.getSignalForPort(sym.getSymbol() + "_dout");
+			System.out.println(addr);
+			System.out.println(we);
+			System.out.println(result);
 		}else{
-			throw new RuntimeException(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
+			SynthesijerUtils.error(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
+			System.exit(0);
+		}
+		addr.setAssign(state, 0, stepIn(o.getIndex()));
+		we.setAssign(state, HDLPreDefinedConstant.LOW);
+		if(state != null){
+			state.setMaxConstantDelay(2);
+		}else{
+			SynthesijerUtils.warn("Array acceess in non-state region is not supported yet: " + o.getIndexed() + "[" + o.getIndex() + "]");
 		}
 	}
 		
