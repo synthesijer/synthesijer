@@ -1,0 +1,18 @@
+NET clk             LOC = U23;
+NET reset           LOC = H10;
+
+NET obj_obj_pLCD_RW         LOC = AC14;
+NET obj_obj_pLCD_RS         LOC = T28;
+NET obj_obj_pLCD_E          LOC = AK12;
+NET obj_obj_pLCD_DB<0>      LOC = AD14;
+NET obj_obj_pLCD_DB<1>      LOC = AK11;
+NET obj_obj_pLCD_DB<2>      LOC = AJ11;
+NET obj_obj_pLCD_DB<3>      LOC = AE12;
+
+#NET pLCD_RW         LOC = AC14;
+#NET pLCD_RS         LOC = T28;
+#NET pLCD_E          LOC = AK12;
+#NET pLCD_DB<0>      LOC = AD14;
+#NET pLCD_DB<1>      LOC = AK11;
+#NET pLCD_DB<2>      LOC = AJ11;
+#NET pLCD_DB<3>      LOC = AE12;

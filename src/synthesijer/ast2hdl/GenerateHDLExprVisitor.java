@@ -117,19 +117,33 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			sig.setAssign(state, expr);
 		}else if(lhs instanceof ArrayAccess){
 			ArrayAccess aa = (ArrayAccess)lhs;
-			Ident id = (Ident)aa.getIndexed();
-			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
-			HDLInstance inst = (HDLInstance)var;
-			// address
-			HDLSignal addr = inst.getSignalForPort("waddress"); // see synthsijer.lib.BlockRAM
+			HDLSignal addr = null, we = null, din = null;
+			if(aa.getIndexed() instanceof Ident){
+				Ident id = (Ident)aa.getIndexed();
+				HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+				HDLInstance inst = (HDLInstance)var;
+				addr = inst.getSignalForPort("waddress"); // see synthsijer.lib.BlockRAM
+				we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
+				din = inst.getSignalForPort("din"); // see synthsijer.lib.BlockRAM
+			}else if(aa.getIndexed() instanceof FieldAccess){
+				FieldAccess fa = (FieldAccess)aa.getIndexed();
+				Ident id = (Ident)(fa.getSelected());
+				Ident sym = fa.getIdent();
+				HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+				HDLInstance inst = (HDLInstance)var;
+				addr = inst.getSignalForPort(sym.getSymbol() + "_waddress");
+				we = inst.getSignalForPort(sym.getSymbol() + "_we");
+				din = inst.getSignalForPort(sym.getSymbol() + "_din");
+			}else{
+				SynthesijerUtils.warn("Unsupported array access for non-Ident/FieldAccess: " + aa.getIndexed());
+				System.exit(0);
+			}
 			addr.setAssign(state, stepIn(aa.getIndex()));
-			// write-enable
-			HDLSignal we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
 			we.setAssign(state, HDLPreDefinedConstant.HIGH);
 			we.setDefaultValue(HDLPreDefinedConstant.LOW);
-			// data
-			HDLSignal din = inst.getSignalForPort("din"); // see synthsijer.lib.BlockRAM
 			din.setAssign(state, expr);
+			
+			
 		}else if(lhs instanceof FieldAccess){
 			HDLExpr l = stepIn(lhs);
 			if(l instanceof HDLSignal){
