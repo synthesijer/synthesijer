@@ -8,11 +8,11 @@ public class BF {
 	private byte[] data = new byte[ARRAYSIZE];
 	private int ptr, pc;
 
-	public void setProgram(byte[] src) {
-		for (int i = 0; i < src.length; i++) {
-			prog[i] = src[i];
-		}
-	}
+//	public void setProgram(byte[] src) {
+//		for (int i = 0; i < src.length; i++) {
+//			prog[i] = src[i];
+//		}
+//	}
 
 	public void startup() {
 		io.putchar((byte) '\n');
@@ -88,8 +88,6 @@ public class BF {
 
 	public boolean step() {
 		byte cmd = prog[pc];
-		// byte tmp = data[0];
-		// put_hex(tmp);
 		switch (cmd) {
 		case 0:
 			return false;

@@ -64,6 +64,10 @@ public class SwitchStatement extends Statement{
 		return state;
 	}
 	
+	public void accept(SynthesijerAstVisitor v){
+		v.visitSwitchStatement(this);
+	}
+
 	public class Elem implements SynthesijerAstTree{
 		
 		private final Expr pat;
@@ -97,10 +101,6 @@ public class SwitchStatement extends Statement{
 			v.visitSwitchCaseElement(this);
 		}
 				
-	}
-
-	public void accept(SynthesijerAstVisitor v){
-		v.visitSwitchStatement(this);
 	}
 	
 }

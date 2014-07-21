@@ -82,7 +82,10 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 	}
 
 	public String toString(){
-		return String.format("HDLPort: %s dir=%s, type=%s", name, dir, type);
+		String str = String.format("HDLPort: %s dir=%s, type=%s", name, dir, type);
+		if(isSet(OPTION.NO_SIG)) str += " ,NO_SIG";
+		if(isSet(OPTION.NO_SIG)) str += " ,EXPORT";
+		return str;
 	}
 	
 	

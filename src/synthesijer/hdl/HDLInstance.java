@@ -46,6 +46,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	}
 	
 	public void addPortPair(HDLPortPairItem item, HDLPort port){
+		//System.out.println("add:" + item);
 		pairs.add(new PortPair(item, port));
 	}
 	
@@ -88,9 +89,11 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		return null;
 	}
 	
-	public HDLSignal getSignalForPort(HDLPort port){
+	public HDLPortPairItem getPairItemForPort(HDLPort port){
+		//System.out.println("getSignalForPort:" + port);
 		for(PortPair pair: pairs){
-			if(pair.port.getName().equals(port.getName()) && pair.item instanceof HDLSignal) return (HDLSignal)pair.item;
+			//System.out.println("  pair:" + pair);
+			if(pair.port.getName().equals(port.getName())) return (HDLSignal)pair.item;
 		}
 		return null;
 	}

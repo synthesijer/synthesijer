@@ -23,7 +23,6 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.Type;
-import synthesijer.ast.expr.Literal;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;

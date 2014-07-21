@@ -66,7 +66,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLInstance(HDLInstance o) {
-		HDLUtils.println(dest, offset, String.format("%s : %s", o.getName(), o.getSubModule().getName()));
+		HDLUtils.println(dest, offset, String.format("inst_%s : %s", o.getName(), o.getSubModule().getName()));
 		if(o.getSubModule().getParameters().length > 0){
 			genGenericMap(o);
 		}

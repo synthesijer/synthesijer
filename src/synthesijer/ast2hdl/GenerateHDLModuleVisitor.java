@@ -40,6 +40,7 @@ import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPort.DIR;
+import synthesijer.hdl.HDLPortPairItem;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
@@ -278,24 +279,31 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	// TODO, experimental code
 	private void newModuleInst(HDLInstance inst, NewClassExpr expr){
-		if(expr.getParameters().size() == 0) return;
-		NewArray param = (NewArray)(expr.getParameters().get(0));
-		ArrayList<Expr> elem = param.getElems();
-		for(int i = 0; i < elem.size()/2; i ++){
-			String key = ((Literal)elem.get(2*i)).getValueAsStr();
-			String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
-			if(inst.getParameterPair(key) == null){
-				SynthesijerUtils.error(key + " is not defined in " + inst.getSubModule().getName());
-				System.exit(0);
+		if(expr.getParameters().size() > 0){
+			NewArray param = (NewArray)(expr.getParameters().get(0));
+			ArrayList<Expr> elem = param.getElems();
+			for(int i = 0; i < elem.size()/2; i ++){
+				String key = ((Literal)elem.get(2*i)).getValueAsStr();
+				String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
+				if(inst.getParameterPair(key) == null){
+					SynthesijerUtils.error(key + " is not defined in " + inst.getSubModule().getName());
+					System.exit(0);
+				}
+				inst.getParameterPair(key).setValue(value);
 			}
-			inst.getParameterPair(key).setValue(value);
 		}
 		for(HDLPort p: inst.getSubModule().getPorts()){
-			if(p.isSet(HDLPort.OPTION.EXPORT)){
-				HDLSignal s0 = inst.getSignalForPort(p);
+			if(p.isSet(HDLPort.OPTION.EXPORT) && !p.isSet(HDLPort.OPTION.NO_SIG)){
+				HDLPortPairItem s0 = inst.getPairItemForPort(p);
 				HDLPort p0 = module.newPort(s0.getName(), p.getDir(), p.getType(), EnumSet.of(HDLPort.OPTION.EXPORT, HDLPort.OPTION.NO_SIG));
 				inst.rmPortPair(inst.getPortPair(p));
 				inst.addPortPair(p0, p);
+				//System.out.println(p0 +" <-> "+p);
+			}else if(p.isSet(HDLPort.OPTION.EXPORT)){
+				//System.out.println(" ????"+p);
+				HDLPort p0 = module.newPort(inst.getName() + "_" + p.getName(), p.getDir(), p.getType(), EnumSet.of(HDLPort.OPTION.EXPORT, HDLPort.OPTION.NO_SIG));
+				inst.addPortPair(p0, p);
+				//System.out.println(p0 +" <-> "+p);
 			}
 		}
 	}
@@ -307,7 +315,6 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		if(o.hasInitExpr()){
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);
-			//System.out.println(o + "<-" + o.getExpr() + "@" + o.getState());
 			if(v.getResult() != null && stateTable.get(o.getState()) != null){
 				s.setAssign(stateTable.get(o.getState()), v.getResult());
 			}

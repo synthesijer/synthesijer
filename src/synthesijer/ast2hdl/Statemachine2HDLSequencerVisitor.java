@@ -31,13 +31,15 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 		}else{
 			HDLExpr expr0, expr1;
 			if(t.getPattern() != null){
-				GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, null);
+				//GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, null);
+				GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, ss);
 				t.getPattern().accept(v);
 				expr1 = v.getResult();
 			}else{
 				expr1 = t.getFlag() ? HDLPreDefinedConstant.HIGH : HDLPreDefinedConstant.LOW;
 			}
-			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, null);
+			//GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, null);
+			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(parent, ss);
 			t.getCondition().accept(v);
 			expr0 = v.getResult();
 			HDLExpr expr = parent.module.newExpr(HDLOp.EQ, expr0, expr1);
