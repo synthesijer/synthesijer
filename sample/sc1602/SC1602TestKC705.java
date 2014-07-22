@@ -40,7 +40,7 @@ public class SC1602TestKC705 {
 		inst.getSignalForPort("clk").setAssign(null, u_ibufds.getSignalForPort("O"));
 		inst.getSignalForPort("reset").setAssign(null, user_reset.getSignal());
 
-		inst.getSignalForPort(test_req).setAssign(null, HDLPreDefinedConstant.HIGH); // always high to start immediately
+		inst.getSignalForPort(test_req.getName()).setAssign(null, HDLPreDefinedConstant.HIGH); // always high to start immediately
 		inst.addPortPair(top_lcd_rs, lcd_rs);		
 		inst.addPortPair(top_lcd_e, lcd_e);		
 		inst.addPortPair(top_lcd_db, lcd_db);		

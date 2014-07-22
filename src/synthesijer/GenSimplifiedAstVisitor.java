@@ -38,6 +38,7 @@ import synthesijer.ast.statement.TryStatement;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 import synthesijer.ast.type.ArrayType;
+import synthesijer.ast.type.ComponentType;
 
 public class GenSimplifiedAstVisitor implements SynthesijerAstVisitor {
 	
@@ -278,7 +279,8 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
 		// replacement of rhs
-		if(o.getRhs().isVariable() == false){
+		if(o.getLhs().isVariable() == false && o.getRhs().isVariable() == false){
+			if(o.getType() instanceof ComponentType) return; // TODO
 			Ident ident = genTempIdent(o.getType());
 			block.newList.add(genTempAssignStatement(ident, o.getRhs()));
 			o.setRhs(ident);

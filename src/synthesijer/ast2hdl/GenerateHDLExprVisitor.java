@@ -74,9 +74,9 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			addr = inst.getSignalForPort(sym.getSymbol() + "_raddress");
 			we = inst.getSignalForPort(sym.getSymbol() + "_we");
 			result = inst.getSignalForPort(sym.getSymbol() + "_dout");
-			System.out.println(addr);
-			System.out.println(we);
-			System.out.println(result);
+			//System.out.println(addr);
+			//System.out.println(we);
+			//System.out.println(result);
 		}else{
 			SynthesijerUtils.error(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 			System.exit(0);

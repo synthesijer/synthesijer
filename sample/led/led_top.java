@@ -28,8 +28,8 @@ public class led_top{
 
        inst.getSignalForPort("clk").setAssign(null, led_top.getSysClk().getSignal());
        inst.getSignalForPort("reset").setAssign(null, led_top.newExpr(HDLOp.NOT, led_top.getSysReset().getSignal()));
-       inst.getSignalForPort(run_req).setAssign(null, HDLPreDefinedConstant.HIGH); // always high to start immediately
-       q.getSignal().setAssign(null, inst.getSignalForPort(out));
+       inst.getSignalForPort(run_req.getName()).setAssign(null, HDLPreDefinedConstant.HIGH); // always high to start immediately
+       q.getSignal().setAssign(null, inst.getSignalForPort(out.getName()));
 		
 		HDLUtils.generate(led_top, HDLUtils.VHDL);
 		HDLUtils.generate(led_top, HDLUtils.Verilog);

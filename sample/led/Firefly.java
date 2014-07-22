@@ -4,11 +4,7 @@ public class Firefly extends Thread{
   boolean flag = false;
   final int PERIOD = 500;
 
-//  public boolean get(){
-//    return flag;
-//  }
-
-  private void sleep(){
+  pivate void sleep(){
     for(int k = 0; k < 400; k++){ ; }
   }
 

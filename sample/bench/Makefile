@@ -1,14 +1,30 @@
-SOURCE = Prime.java PrimeSim.java BubbleSort.java BubbleSortSim.java
+SOURCES = Prime.java PrimeSim.java BubbleSort.java BubbleSortSim.java
+VHDL_SOURCES = $(SOURCES:.java=.vhd)
+VERILOG_SOURCES = $(SOURCES:.java=.v)
 
-all: $(SOURCE)
-	java -cp ../../bin synthesijer.Main $(SOURCE)
+all: build
 
-linux: $(SOURCE)
-	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 Prime.vhd PrimeSim.vhd primesim_top.vhd ../../lib/vhdl/simple_dualportram.vhd
-	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 BubbleSort.vhd BubbleSortSim.vhd bubblesortsim_top.vhd ../../lib/vhdl/simple_dualportram.vhd
+
+build: $(SOURCES)
+	java -cp ../../bin synthesijer.Main $(SOURCES)
+
+ghdl64: build primesim_top.vhd bubblesortsim_top.vhd
+	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) primesim_top.vhd bubblesortsim_top.vhd ../../lib/vhdl/simple_dualportram.vhd
 	ghdl -e -Wa,--32 -Wl,-m32 primesim_top
 	ghdl -e -Wa,--32 -Wl,-m32 bubblesortsim_top
 
-mac: $(SOURCE)
-	ghdl -a --std=93c --workdir=. bubblesortsim_top.vhd BubbleSort.vhd BubbleSortSim.vhd ../../lib/vhdl/simple_dualportram.vhd
-	ghdl -a --std=93c --workdir=. primesim_top.vhd Prime.vhd PrimeSim.vhd ../../lib/vhdl/simple_dualportram.vhd
+ghdl32: build
+	ghdl -a --std=93c --workdir=. $(VHDL_SOURCES) bubblesortsim_top.vhd primesim_top.vhd ../../lib/vhdl/simple_dualportram.vhd
+
+clean:
+	-rm -f *.class
+	-rm -f $(VHDL_SOURCES)
+	-rm -f $(VERILOG_SOURCES)
+	-rm -f *.xml
+	-rm -f *.dot
+	-rm -f *.o
+	-rm -f *.s
+	-rm -f *.vcd
+	-rm -f work-obj93.cf
+	-rm -f primesim_top 
+	-rm -f bubblesortsim_top
