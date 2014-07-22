@@ -64,10 +64,12 @@ public class JCExprVisitor extends Visitor{
 	}
 			
 	public void visitBinary(JCBinary that){
+		//System.out.println(that);
 		BinaryExpr tmp = new BinaryExpr(scope);
 		Expr lhs = stepIn(that.lhs);
 		tmp.setLhs(lhs);
 		Expr rhs = stepIn(that.rhs);
+		setForceTypeCast(lhs, rhs);
 		tmp.setRhs(rhs);
 		tmp.setOp(Op.getOp(that.operator.name.toString()));
 		expr = tmp;

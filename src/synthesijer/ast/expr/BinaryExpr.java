@@ -61,7 +61,7 @@ public class BinaryExpr extends Expr{
 		Type r = rhs.getType();
 		Type l = lhs.getType();
 //		return r.isPrimary(l) ? r : l; // select primary type
-		return r;
+		return l;
 	}
 
 }
