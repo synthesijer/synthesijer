@@ -41,6 +41,7 @@ public class IfStatement extends Statement{
 	}
 
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
+		//System.out.println(" *** begin of If::genStateMachine");
 		State t = thenPart.genStateMachine(m, dest, terminal, loopout, loopCont);
 		State s = m.newState("if_cond");
 		s.addTransition(t, condition, true);
@@ -50,6 +51,7 @@ public class IfStatement extends Statement{
 		}else{
 			s.addTransition(dest, condition, false);
 		}
+		//System.out.println(" *** end of If::genStateMachine");
 		return s;
 	}
 	

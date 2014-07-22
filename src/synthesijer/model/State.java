@@ -28,14 +28,17 @@ public class State {
 	}
 	
 	public void addTransition(State s){
+		//System.out.println("add:" + s);
 		transitions.add(new Transition(s, null, true));
 	}
 	
 	public void addTransition(State s, Expr cond, boolean flag){
+		//System.out.println("add:" + s);
 		transitions.add(new Transition(s, cond, flag));
 	}
 
 	public void addTransition(State s, Expr cond, Expr pat){
+		//System.out.println("add:" + s);
 		transitions.add(new Transition(s, cond, pat));
 	}
 	

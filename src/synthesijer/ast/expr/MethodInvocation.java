@@ -59,7 +59,12 @@ public class MethodInvocation extends Expr{
 	}
 	
 	public String toString(){
-		return "MethodInvocation::(" + method + ")";
+		String str = "MethodInvocation::(" + method;
+		for(Expr expr: params){
+			str += " " + expr; 
+		}
+		str += ")";
+		return str; 
 	}
 	
 	@Override

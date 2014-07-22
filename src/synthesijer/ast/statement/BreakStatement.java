@@ -15,6 +15,7 @@ public class BreakStatement extends Statement{
 	
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State s = m.newState("break");
+		//System.out.println("Break::genStateMachine:" + loopout);
 		s.addTransition(loopout);
 		return s;
 	}

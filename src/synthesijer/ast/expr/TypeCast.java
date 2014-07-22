@@ -43,5 +43,9 @@ public class TypeCast extends Expr{
 		//return expr.getType();
 		return targetType;
 	}
+	
+	public String toString(){
+		return String.format("(CAST %s::(%s)", targetType, expr);
+	}
 
 }

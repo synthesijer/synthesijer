@@ -1,5 +1,7 @@
 package synthesijer.ast2hdl;
 
+import synthesijer.SynthesijerUtils;
+import synthesijer.ast.SynthesijerAstTree;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPort;
@@ -27,7 +29,11 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 	
 	private void addStateTransition(HDLSequencer.SequencerState ss, Transition t){
 		if(t.getCondition() == null){
-			ss.addStateTransit(parent.stateTable.get(t.getDestination()));
+			if(t.getDestination() != null){
+				ss.addStateTransit(parent.stateTable.get(t.getDestination()));
+			}else{
+				SynthesijerUtils.warn(String.format("destination state missing from %s_%s", ss.getKey().getName(), ss.getStateId().getValue()));
+			}
 		}else{
 			HDLExpr expr0, expr1;
 			if(t.getPattern() != null){
@@ -56,6 +62,7 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 		for(State s: o.getStates()){
 			HDLSequencer.SequencerState ss = parent.stateTable.get(s);
 			for(Transition t: s.getTransitions()){
+				//System.out.println("state=" + s + " => " + t);
 				addStateTransition(ss, t);
 			}
 			if(s.isTerminate()){

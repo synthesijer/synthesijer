@@ -37,6 +37,7 @@ import synthesijer.ast.statement.SynchronizedBlock;
 import synthesijer.ast.statement.TryStatement;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
+import synthesijer.ast.type.ArrayType;
 
 public class GenSimplifiedAstVisitor implements SynthesijerAstVisitor {
 	
@@ -217,14 +218,20 @@ class GenSimplifiedAstBlockVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitSwitchStatement(SwitchStatement o) {
+		for(Elem elem: o.getElements()){
+			elem.accept(this);
+		}
 		newList.add(o);
 	}
 
 	@Override
 	public void visitSwitchCaseElement(Elem o) {
+		GenSimplifiedAstBlockVisitor v = new GenSimplifiedAstBlockVisitor(scope, idGenerator);
 		for(Statement stmt: o.getStatements()){
-			stmt.accept(this);
+			//System.out.println(stmt);
+			stmt.accept(v);
 		}
+		o.replaceStatements(v.newList);
 	}
 
 	@Override
@@ -270,8 +277,12 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
-		// TODO Auto-generated method stub
-		
+		// replacement of rhs
+		if(o.getRhs().isVariable() == false){
+			Ident ident = genTempIdent(o.getType());
+			block.newList.add(genTempAssignStatement(ident, o.getRhs()));
+			o.setRhs(ident);
+		}
 	}
 
 	@Override
@@ -281,10 +292,16 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 	}
 	
 	private Ident genTempIdent(Type type){
+		Type t;
+		if(type instanceof ArrayType){
+			t = ((ArrayType)type).getElemType();
+		}else{
+			t = type;
+		}
 		String name = String.format("tmp_%04d", block.idGenerator.id());
 		Ident ident = new Ident(block.scope);
 		ident.setIdent(name);
-		block.scope.addVariableDecl(new VariableDecl(block.scope, name, type, null));
+		block.scope.addVariableDecl(new VariableDecl(block.scope, name, t, null));
 		return ident;
 	}
 	
@@ -342,11 +359,11 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 
 			if(expr.isVariable()) continue;
 			expr.accept(this);
-			if(expr.isVariable() == false){
-				Ident ident = genTempIdent(expr.getType());
-				block.newList.add(genTempAssignStatement(ident, expr));
-				o.setParameter(i, ident);
-			}
+
+			Ident ident = genTempIdent(expr.getType());
+			block.newList.add(genTempAssignStatement(ident, expr));
+			o.setParameter(i, ident);
+			
 		}
 	}
 
@@ -370,8 +387,7 @@ class GenSimplifiedAstExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitTypeCast(TypeCast o) {
-		// TODO Auto-generated method stub
-		
+		o.getExpr().accept(this);
 	}
 
 	@Override

@@ -47,6 +47,7 @@ public class SwitchStatement extends Statement{
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State d = dest;
 		State[] stats = new State[elements.size()];
+		//System.out.println(" *** begin of switch::genStateMachine");
 		for(int i = elements.size(); i > 0; i--){
 			d = elements.get(i-1).genStateMachine(m, d, terminal, dest, loopCont);
 			stats[i-1] = d;
@@ -55,8 +56,10 @@ public class SwitchStatement extends Statement{
 		for(int i = 0; i < elements.size(); i++){
 			s.addTransition(stats[i], selector, elements.get(i).getPattern());
 		}
+		//System.out.println("Switch::genStateMachine:" + defaultElem.genStateMachine(m, dest, terminal, dest, loopCont));
 		s.addTransition(defaultElem.genStateMachine(m, dest, terminal, dest, loopCont));
 		state = s;
+		//System.out.println(" *** end of switch::genStateMachine");
 		return s;
 	}
 	
@@ -85,11 +88,20 @@ public class SwitchStatement extends Statement{
 			return statements;
 		}
 		
+		public void replaceStatements(ArrayList<Statement> newList){
+			statements = newList;
+			//System.out.println("--- replace ---");
+			//for(Statement s: statements){	System.out.println(s);}
+			//System.out.println("---------------");
+		}
+
 		public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
+			//System.out.println(" *** begin of SwitchElem::genStateMachine");
 			State d = dest;
 			for(int i = statements.size(); i > 0; i--){
 				d = statements.get(i-1).genStateMachine(m, d, terminal, loopout, loopCont);
 			}
+			//System.out.println(" *** end of SwitchElem::genStateMachine");
 			return d;
 		}
 		

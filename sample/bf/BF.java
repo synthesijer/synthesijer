@@ -100,18 +100,13 @@ public class BF {
 			ptr--;
 			break;
 		case '+':
-			//data[ptr] = (byte) (data[ptr] + 1);
-			tmp = data[ptr];
-			data[ptr] = (byte) (tmp + 1);
+			data[ptr] = (byte) (data[ptr] + 1);
 			break;
 		case '-':
-			//data[ptr] = (byte) (data[ptr] - 1);
-			tmp = data[ptr];
-			data[ptr] = (byte) (tmp - 1);
+			data[ptr] = (byte) (data[ptr] - 1);
 			break;
 		case '.':
-			byte ch = data[ptr];
-			io.putchar(ch);
+			io.putchar(data[ptr]);
 			break;
 		case ',':
 			data[ptr] = io.getchar();

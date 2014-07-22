@@ -2,6 +2,7 @@ package synthesijer.hdl.verilog;
 
 import java.io.PrintWriter;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLInstance.ParamPair;
@@ -254,7 +255,11 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 			String sep = "";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset+2, String.format("%sif (%s) begin", sep, c.getCondExprAsVerilogHDL()));
-				HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), c.getValue().getVerilogHDL()));
+				if(c.getValue() != null){
+					HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), c.getValue().getVerilogHDL()));
+				}else{
+					SynthesijerUtils.warn("Assignment value is not found for " + o.getName());
+				}
 				sep = "end else ";
 			}
 			if(o.hasDefaultValue()){

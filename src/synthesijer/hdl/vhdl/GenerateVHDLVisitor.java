@@ -237,7 +237,11 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			String sep = "if";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset+4, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
-				HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, c.getValue())));
+				if(c.getValue() != null){
+					HDLUtils.println(dest, offset+6, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, c.getValue())));
+				}else{
+					SynthesijerUtils.warn("Assignment value is not found for " + o.getName());
+				}
 				sep = "elsif";
 			}
 			if(o.hasDefaultValue()){
