@@ -28,18 +28,34 @@ architecture RTL of primesim_top is
     port (
       clk : in std_logic;
       reset : in std_logic;
+      field_finish_flag_output : out std_logic;
       run_req : in std_logic;
-      run_busy : out std_logic
+      run_busy : out std_logic;
+      start_req : in std_logic;
+      start_busy : out std_logic;
+      join_req : in std_logic;
+      join_busy : out std_logic;
+      yield_req : in std_logic;
+      yield_busy : out std_logic
       );
   end component primeSim;
+
+  signal finish_flag : std_logic := '0';
 
 begin
 
   U: PrimeSim port map(
     clk => clk,
     reset => reset,
+    field_finish_flag_output => finish_flag,
     run_req => '1',
-    run_busy => open
+    run_busy => open,
+    start_req => '0',
+    start_busy => open,
+    join_req => '0',
+    join_busy => open,
+    yield_req => '0',
+    yield_busy => open
     );
   
   tmp_0001 <= counter + 1;
@@ -82,6 +98,13 @@ begin
     end if;
   end process;
 
-
+  process(clk)
+  begin
+   if clk'event and clk = '1' then
+     if finish_flag = '1' then
+       assert (false) report "Simulation End!" severity failure;
+     end if;
+  end if;
+  end process;
 
 end RTL;

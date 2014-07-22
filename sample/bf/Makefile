@@ -2,7 +2,7 @@ SOURCES = BF.java HW.java IO.java RS232C_RX.java RS232C_TX.java rs232c.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 
-all: $(SOURCES)
+all: $(SOURCES) microboard
 	java -cp ../../bin:. synthesijer.Main $(SOURCES)
 
 microboard: MicroboardTop.java
