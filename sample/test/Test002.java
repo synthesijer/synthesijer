@@ -1,6 +1,8 @@
 
 public class Test002 {
 	
+	public static final int DEFAULT_VALUE = 0x20;
+
 	int[] a = new int[1024];
 	
 	public void init(){

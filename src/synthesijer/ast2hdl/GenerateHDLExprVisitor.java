@@ -1,8 +1,10 @@
 package synthesijer.ast2hdl;
 
+import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
+import synthesijer.ast.Module;
 import synthesijer.ast.Op;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
@@ -190,13 +192,21 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	public void visitFieldAccess(FieldAccess o) {
 		//System.out.println(o);
 		Ident id = (Ident)o.getSelected();
-		HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
-		HDLInstance inst = (HDLInstance)var;
-		HDLSignal sig = inst.getSignalForPort(o.getIdent().getSymbol());
-		if(sig == null){
-			sig = inst.getSignalForPort("field_" + o.getIdent().getSymbol() + "_output");
+		if(o.getScope().search(id.getSymbol()) != null){
+			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
+			HDLInstance inst = (HDLInstance)var;
+			HDLSignal sig = inst.getSignalForPort(o.getIdent().getSymbol());
+			if(sig == null){
+				sig = inst.getSignalForPort("field_" + o.getIdent().getSymbol() + "_output");
+			}
+			result = sig.getResultExpr();
+		}else{ // search global static field
+			Module m = Manager.INSTANCE.searchModule(id.getSymbol());
+			Variable v = m.search(o.getIdent().getSymbol());
+			if(v.isGlobalConstant()){
+				result = stepIn(v.getInitExpr());
+			}
 		}
-		result = sig.getResultExpr();
 	}
 	
 	@Override

@@ -181,6 +181,9 @@ public class JCStmtVisitor extends Visitor{
 			init = null;
 		}
 		VariableDecl tmp = new VariableDecl(scope, name, type, init);
+		if(JCFrontendUtils.isGlobalConstant(that.mods)){
+			tmp.setGlobalConstant(true);
+		}
 		scope.addVariableDecl(tmp);
 		stmt = tmp;
 	}
