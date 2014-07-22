@@ -22,9 +22,10 @@ public class HDLCombinationExpr implements HDLExpr{
 		this.uid = uid;
 		this.op = op;
 		this.args = args;
+		//System.out.println(this);
 		HDLType type = decideExprType(op, this.args);
 		result = m.newSignal(String.format("tmp_%04d", uid), type, HDLSignal.ResourceKind.WIRE);
-		System.out.println(result);
+		//System.out.println(result);
 	}
 	
 	public HDLType getType(){
@@ -36,8 +37,8 @@ public class HDLCombinationExpr implements HDLExpr{
 	}
 	
 	private HDLType getPriorType(HDLType t1, HDLType t2){
-		System.out.println(t1);
-		System.out.println(t2);
+		//System.out.println(t1);
+		//System.out.println(t2);
 		HDLType t = null;
 		if(t1.getKind().hasWdith() && t1.getKind().isPrimitive() && t2.getKind().hasWdith() && t2.getKind().isPrimitive()){
 			boolean signFlag = false;
