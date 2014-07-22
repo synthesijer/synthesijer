@@ -40,6 +40,7 @@ public class BF {
 		for (int i = 0; i < CODESIZE; i++) {
 			byte b;
 			b = io.getchar();
+			//io.putchar(b);
 			if (b == '\n' || b == '\r') {
 				prog[i] = (byte) 0;
 				break;
@@ -88,6 +89,7 @@ public class BF {
 
 	public boolean step() {
 		byte cmd = prog[pc];
+		byte tmp;
 		switch (cmd) {
 		case 0:
 			return false;
@@ -98,13 +100,18 @@ public class BF {
 			ptr--;
 			break;
 		case '+':
-			data[ptr] = (byte) (data[ptr] + 1);
+			//data[ptr] = (byte) (data[ptr] + 1);
+			tmp = data[ptr];
+			data[ptr] = (byte) (tmp + 1);
 			break;
 		case '-':
-			data[ptr] = (byte) (data[ptr] - 1);
+			//data[ptr] = (byte) (data[ptr] - 1);
+			tmp = data[ptr];
+			data[ptr] = (byte) (tmp - 1);
 			break;
 		case '.':
-			io.putchar(data[ptr]);
+			byte ch = data[ptr];
+			io.putchar(ch);
 			break;
 		case ',':
 			data[ptr] = io.getchar();
