@@ -55,7 +55,7 @@ public class BasicSim extends HDLSimModule{
 	}
 
 	protected HDLExpr during(int value0, int value1){
-		return newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, value0), newExpr(HDLOp.GT, counter, value1)); 
+		return newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, value0), newExpr(HDLOp.LT, counter, value1)); 
 	}
 	
 	public static void main(String... args){
