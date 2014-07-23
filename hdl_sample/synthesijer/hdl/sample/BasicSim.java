@@ -10,6 +10,7 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLSimModule;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
+import synthesijer.hdl.expr.HDLValue;
 
 public class BasicSim extends HDLSimModule{
 	
@@ -40,7 +41,7 @@ public class BasicSim extends HDLSimModule{
 		counter.setAssign(s0, expr);
 		
 		reset.setResetValue(HDLPreDefinedConstant.LOW);
-		reset.setAssign(ss, newExpr(HDLOp.IF, during(3, 8), HDLPreDefinedConstant.HIGH, HDLPreDefinedConstant.LOW));
+		reset.setAssign(ss, newExpr(HDLOp.IF, during(0, 8), HDLPreDefinedConstant.HIGH, HDLPreDefinedConstant.LOW));
 		
 		if(target != null){
 			inst = newModuleInstance(target, "U");
@@ -55,8 +56,17 @@ public class BasicSim extends HDLSimModule{
 	}
 
 	protected HDLExpr during(int value0, int value1){
-		return newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, value0), newExpr(HDLOp.LT, counter, value1)); 
+		return newExpr(HDLOp.AND, newExpr(HDLOp.GEQ, counter, value0), newExpr(HDLOp.LEQ, counter, value1)); 
 	}
+
+	protected HDLExpr delayPulse(HDLSequencer.SequencerState s, String name, HDLSignal flag, int value){
+		HDLSignal sig = newSignal(name, HDLPrimitiveType.genSignedType(32));
+		sig.setAssign(s, newExpr(HDLOp.IF, newExpr(HDLOp.AND, flag, newExpr(HDLOp.EQ, sig, 0)),
+				new HDLValue(String.valueOf(value), HDLPrimitiveType.genSignedType(32)),
+				newExpr(HDLOp.IF, newExpr(HDLOp.GT, sig, 0), newExpr(HDLOp.SUB, sig, 1), HDLPreDefinedConstant.VECTOR_ZERO)));
+		return newExpr(HDLOp.GT, sig, 0);
+	}
+
 	
 	public static void main(String... args){
 		BasicSim sim = new BasicSim(null, "sim");
