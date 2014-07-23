@@ -71,9 +71,11 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 
 	public HDLLiteral getDefaultValue(){
 		if(kind == KIND.VECTOR || kind == KIND.SIGNED){
-			return HDLPreDefinedConstant.INTEGER_ZERO;
+			return HDLPreDefinedConstant.VECTOR_ZERO;
 		}else if(kind == KIND.BIT){
 			return HDLPreDefinedConstant.LOW;
+		}else if(kind == KIND.INTEGER){
+			return HDLPreDefinedConstant.INTEGER_ZERO;
 		}else{
 			return null;
 		}

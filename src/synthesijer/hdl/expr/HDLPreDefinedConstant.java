@@ -8,7 +8,8 @@ import synthesijer.hdl.HDLPrimitiveType;
 
 public enum HDLPreDefinedConstant implements HDLLiteral{
 	
-	INTEGER_ZERO("(others => '0')", "0"),
+	VECTOR_ZERO("(others => '0')", "0"),
+	INTEGER_ZERO("0", "0"),
 	INTEGER_ONE("1", "1"),
 	BOOLEAN_TRUE("true", "1'b1"),
 	BOOLEAN_FALSE("false", "1'b0"),
@@ -47,7 +48,7 @@ public enum HDLPreDefinedConstant implements HDLLiteral{
 		case HIGH:
 		case LOW:
 			return HDLPrimitiveType.genBitType();
-		case INTEGER_ZERO:
+		case VECTOR_ZERO:
 			return HDLPrimitiveType.genVectorType(-1);
 		default: return HDLPrimitiveType.genUnknowType();
 		}
