@@ -1,4 +1,4 @@
-SOURCES = EchoTest.java RS232C_RX.java RS232C_TX.java ToUpper.java
+SOURCES = EchoTest.java RS232C_RX_Wrapper.java RS232C_TX_Wrapper.java ToUpper.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 

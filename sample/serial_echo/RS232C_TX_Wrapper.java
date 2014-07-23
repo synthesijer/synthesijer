@@ -9,13 +9,13 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 
-public class RS232C_TX extends HDLModule{
+public class RS232C_TX_Wrapper extends HDLModule{
 	
 	public boolean wr;
 	public boolean ready;
 	public byte din;
 	
-	public RS232C_TX(String... args){
+	public RS232C_TX_Wrapper(String... args){
 		super("rs232c_tx", "clk", "reset");
 		newParameter("sys_clk", HDLPrimitiveType.genIntegerType(), String.valueOf(25000000));
 		newParameter("rate", HDLPrimitiveType.genIntegerType(), String.valueOf(9600));

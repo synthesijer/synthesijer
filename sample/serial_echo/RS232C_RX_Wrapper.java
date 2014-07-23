@@ -5,12 +5,12 @@ import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
-public class RS232C_RX extends HDLModule{
+public class RS232C_RX_Wrapper extends HDLModule{
 	
 	public boolean rd;
 	public byte dout;
 	
-	public RS232C_RX(String... args){
+	public RS232C_RX_Wrapper(String... args){
 		super("rs232c_rx", "clk", "reset");
 		newParameter("sys_clk", HDLPrimitiveType.genIntegerType(), String.valueOf(25000000));
 		newParameter("rate", HDLPrimitiveType.genIntegerType(), String.valueOf(9600));
