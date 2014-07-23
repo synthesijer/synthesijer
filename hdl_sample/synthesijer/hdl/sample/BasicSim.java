@@ -11,21 +11,23 @@ import synthesijer.hdl.HDLSimModule;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 
-class BasicSim extends HDLSimModule{
+public class BasicSim extends HDLSimModule{
 	
-	HDLInstance inst;
+	protected HDLInstance inst;
+	protected HDLSignal counter;
+	protected HDLSequencer.SequencerState ss;
 	
 	public BasicSim(HDLModule target, String name) {
 		super(name);
 	
 		HDLSignal clk = newSignal("clk", HDLPrimitiveType.genBitType());
 		HDLSignal reset = newSignal("reset", HDLPrimitiveType.genBitType());
-		HDLSignal counter = newSignal("counter", HDLPrimitiveType.genSignedType(32));
+		counter = newSignal("counter", HDLPrimitiveType.genSignedType(32));
 	
 		HDLSequencer seq = newSequencer("main");
 		seq.setTransitionTime(10);
 		
-		HDLSequencer.SequencerState ss = seq.getIdleState();
+		ss = seq.getIdleState();
 		HDLSequencer.SequencerState s0 = seq.addSequencerState("S0");
 		ss.addStateTransit(s0);
 		s0.addStateTransit(ss);
@@ -38,20 +40,28 @@ class BasicSim extends HDLSimModule{
 		counter.setAssign(s0, expr);
 		
 		reset.setResetValue(HDLPreDefinedConstant.LOW);
-		reset.setAssign(ss, newExpr(HDLOp.IF, newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, 3), newExpr(HDLOp.LT, counter, 8)), HDLPreDefinedConstant.HIGH, HDLPreDefinedConstant.LOW));
+		reset.setAssign(ss, newExpr(HDLOp.IF, during(3, 8), HDLPreDefinedConstant.HIGH, HDLPreDefinedConstant.LOW));
 		
 		if(target != null){
 			inst = newModuleInstance(target, "U");
-			inst.getSignalForPort("clk").setAssign(null, clk);
-			inst.getSignalForPort("reset").setAssign(null, reset);
+			inst.getSignalForPort(target.getSysClkName()).setAssign(null, clk);
+			inst.getSignalForPort(target.getSysResetName()).setAssign(null, reset);
 		}
 		
-		HDLUtils.generate(this, HDLUtils.VHDL);
-		HDLUtils.generate(this, HDLUtils.Verilog);
 	}
 	
-	public static void main(String[] args){
-		new BasicSim(null, "sim");
+	protected HDLExpr after(int value){
+		return newExpr(HDLOp.GT, counter, value);
+	}
+
+	protected HDLExpr during(int value0, int value1){
+		return newExpr(HDLOp.AND, newExpr(HDLOp.GT, counter, value0), newExpr(HDLOp.GT, counter, value1)); 
+	}
+	
+	public static void main(String... args){
+		BasicSim sim = new BasicSim(null, "sim");
+		HDLUtils.generate(sim, HDLUtils.VHDL);
+		HDLUtils.generate(sim, HDLUtils.Verilog);
 	}
 	
 			
