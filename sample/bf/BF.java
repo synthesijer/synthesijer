@@ -8,12 +8,6 @@ public class BF {
 	private byte[] data = new byte[ARRAYSIZE];
 	private int ptr, pc;
 
-//	public void setProgram(byte[] src) {
-//		for (int i = 0; i < src.length; i++) {
-//			prog[i] = src[i];
-//		}
-//	}
-
 	public void startup() {
 		io.putchar((byte) '\n');
 		io.putchar((byte) 'B');
@@ -88,6 +82,11 @@ public class BF {
 	}
 
 	public boolean step() {
+//System.out.printf("[0]=%02x\n", data[0]);
+//System.out.printf("[1]=%02x\n", data[1]);
+//System.out.printf("[2]=%02x\n", data[2]);
+//System.out.printf("pc=%02x\n", pc);
+//System.out.printf("ptr=%02x\n", ptr);
 		byte cmd = prog[pc];
 		byte tmp;
 		switch (cmd) {
@@ -111,26 +110,29 @@ public class BF {
 		case ',':
 			data[ptr] = io.getchar();
 			break;
-		case '[':
+		case '[':{
+			int nlvl = 0;
 			if (data[ptr] == (byte) 0) {
 				while (true) {
 					pc++;
-					if (prog[pc] == ']') {
-						break;
-					}
+					if(prog[pc] == ']' && nlvl == 0) break;
+					if(prog[pc] == '[') nlvl++;
+					if(prog[pc] == ']') nlvl--;
 				}
 			}
 			break;
-		case ']':
-			if (data[ptr] != (byte) 0) {
-				while (true) {
-					pc--;
-					if (prog[pc] == '[') {
-						break;
-					}
-				}
+		}
+		case ']':{
+			int nlvl = 0;
+			while (true) {
+				pc--;
+				if(prog[pc] == '[' && nlvl == 0) break;
+				if(prog[pc] == ']') nlvl++;
+				if(prog[pc] == '[') nlvl--;
 			}
+			pc--;
 			break;
+		}
 		default:
 			break;
 		}
