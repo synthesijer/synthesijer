@@ -89,6 +89,7 @@ public class BF {
 //System.out.printf("ptr=%02x\n", ptr);
 		byte cmd = prog[pc];
 		byte tmp;
+		int nlvl = 0;
 		switch (cmd) {
 		case 0:
 			return false;
@@ -110,8 +111,7 @@ public class BF {
 		case ',':
 			data[ptr] = io.getchar();
 			break;
-		case '[':{
-			int nlvl = 0;
+		case '[':
 			if (data[ptr] == (byte) 0) {
 				while (true) {
 					pc++;
@@ -121,9 +121,7 @@ public class BF {
 				}
 			}
 			break;
-		}
-		case ']':{
-			int nlvl = 0;
+		case ']':
 			while (true) {
 				pc--;
 				if(prog[pc] == '[' && nlvl == 0) break;
@@ -132,7 +130,6 @@ public class BF {
 			}
 			pc--;
 			break;
-		}
 		default:
 			break;
 		}
