@@ -114,7 +114,12 @@ public class Module implements Scope, SynthesijerAstTree{
 		}
 	}
 	
-	public void accept(SynthesijerAstVisitor v){
+	public void accept(SynthesijerModuleVisitor v){
+		v.visitModule(this);
+	}
+
+	@Override
+	public void accept(SynthesijerAstVisitor v) {
 		v.visitModule(this);
 	}
 

@@ -14,16 +14,8 @@ import synthesijer.ast.statement.SynchronizedBlock;
 import synthesijer.ast.statement.TryStatement;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
-import synthesijer.ast.type.ArrayType;
-import synthesijer.ast.type.ComponentType;
-import synthesijer.ast.type.MySelfType;
-import synthesijer.ast.type.PrimitiveTypeKind;
 
-public interface SynthesijerAstVisitor{
-
-	public void visitMethod(Method o);
-
-	public void visitModule(Module o);
+public interface SynthesijerAstVisitor extends SynthesijerModuleVisitor, SynthesijerMethodVisitor{
 
 	public void visitBlockStatement(BlockStatement o);
 

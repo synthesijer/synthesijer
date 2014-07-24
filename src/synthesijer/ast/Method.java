@@ -177,7 +177,12 @@ public class Method implements Scope, SynthesijerAstTree{
 		return stateMachine;
 	}
 	
+	@Override
 	public void accept(SynthesijerAstVisitor v){
+		v.visitMethod(this);
+	}
+
+	public void accept(SynthesijerMethodVisitor v){
 		v.visitMethod(this);
 	}
 
