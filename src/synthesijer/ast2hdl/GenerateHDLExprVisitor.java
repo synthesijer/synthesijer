@@ -283,7 +283,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		// method busy, to wait for method execution
 		HDLSignal busy;
 		if(localFlag){
-			busy = parent.module.getPort(o.getMethodName() + "_busy").getSignal();
+			busy = parent.module.getSignal(o.getMethodName() + "_busy_sig");
 		}else{
 			busy = inst.getSignalForPort(o.getMethodName() + "_busy");
 		}

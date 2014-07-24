@@ -7,6 +7,7 @@ public class Variable{
 	private final Method method;
 	private final Expr init;
 	private boolean flagGlobalConstant;
+	private boolean flagPublic;
 	
 	public Variable(String n, Type t, Method method, Expr init){
 		this.name = n;
@@ -29,6 +30,14 @@ public class Variable{
 
 	public boolean isGlobalConstant(){
 		return flagGlobalConstant;
+	}
+
+	public void setPublic(boolean f){
+		flagPublic = f;
+	}
+
+	public boolean isPublic(){
+		return flagPublic;
 	}
 	
 	public Expr getInitExpr(){

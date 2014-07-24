@@ -13,6 +13,7 @@ public class VariableDecl extends ExprContainStatement{
 	private Variable var;
 	private final Expr init;
 	private boolean flagGlobalConstant;
+	private boolean flagPublic;
 	
 	public VariableDecl(Scope scope, String name, Type type, Expr init){
 		super(scope);
@@ -36,7 +37,16 @@ public class VariableDecl extends ExprContainStatement{
 	public boolean isGlobalConstant(){
 		return flagGlobalConstant;
 	}
+
+	public void setPublic(boolean f){
+		flagPublic = f;
+		var.setPublic(f);
+	}
 	
+	public boolean isPublic(){
+		return flagPublic;
+	}
+
 	public Variable getVariable(){
 		return var;
 	}

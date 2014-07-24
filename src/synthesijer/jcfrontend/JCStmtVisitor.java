@@ -184,6 +184,9 @@ public class JCStmtVisitor extends Visitor{
 		if(JCFrontendUtils.isGlobalConstant(that.mods)){
 			tmp.setGlobalConstant(true);
 		}
+		if(JCFrontendUtils.isPrivate(that.mods) == false){
+			tmp.setPublic(true);
+		}
 		scope.addVariableDecl(tmp);
 		stmt = tmp;
 	}

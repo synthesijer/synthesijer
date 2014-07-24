@@ -22,6 +22,9 @@ public class HDLCombinationExpr implements HDLExpr{
 		this.uid = uid;
 		this.op = op;
 		this.args = args;
+		for(HDLExpr expr: args){
+			if(expr == null) throw new RuntimeException("An argument of HDLCombinationExpr is null.");
+		}
 		//System.out.println(this);
 		HDLType type = decideExprType(op, this.args);
 		result = m.newSignal(String.format("tmp_%04d", uid), type, HDLSignal.ResourceKind.WIRE);

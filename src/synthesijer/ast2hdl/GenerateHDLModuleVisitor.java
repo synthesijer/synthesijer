@@ -36,8 +36,10 @@ import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPortPairItem;
@@ -86,12 +88,21 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			HDLPort p = module.newPort(o.getName() + "_return", HDLPort.DIR.OUT, t);
 			methodReturnTable.put(o, p);
 		}
-		HDLPort req = module.newPort(o.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
-		HDLPort busy = module.newPort(o.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
 		HDLSignal req_local = module.newSignal(o.getName() + "_req_local", HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.REGISTER);
 		req_local.setDefaultValue(HDLPreDefinedConstant.LOW);
+		HDLExpr reqExpr;
+		HDLSignal busySig;
+		if(o.isPrivate() == false){
+			HDLPort req = module.newPort(o.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+			HDLPort busy = module.newPort(o.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+			reqExpr = module.newExpr(HDLOp.OR, req.getSignal(), req_local);
+			busySig = busy.getSignal();
+		}else{
+			reqExpr = module.newExpr(HDLOp.EQ, req_local, HDLPreDefinedConstant.HIGH);
+			busySig = module.newSignal(o.getName() + "_busy_sig", HDLPrimitiveType.genBitType());
+		}
 		genVariableTables(o);
-		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, req, req_local, busy));
+		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, reqExpr, busySig));
 		o.getBody().accept(this);
 		if(isThreadStart(o)){ genThreadStart(o); }
 		if(isThreadJoin(o)){ genThreadJoin(o); }
@@ -328,7 +339,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			}
 		}
 		
-		if(o.getScope() instanceof Module && var.getType() instanceof PrimitiveTypeKind){ // added an accessor for the member variable.
+		if(o.getScope() instanceof Module && var.getType() instanceof PrimitiveTypeKind && var.isPublic()){ // added an accessor for the member variable.
 			//System.out.print("global:" + o);
 			//System.out.println("  " + s.getType());
 			HDLPort port = module.newPort("field_" + o.getName() + "_output", DIR.OUT, s.getType());
