@@ -150,7 +150,10 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 
 		public String getCondExprAsVHDL(){
 			if(count < 0){
-				return String.format("%s = %s", s.getKey().getName(), s.getStateId().getValue());
+				String c = String.format("%s = %s", s.getKey().getName(), s.getStateId().getValue());
+				String ext = s.getExitConditionAsVHDL();
+				if(!ext.equals("")) c += " and " + ext;
+				return c;
 			}else{
 				return String.format("%s = %s and %s = %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
 			}
@@ -158,7 +161,10 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 
 		public String getCondExprAsVerilogHDL(){
 			if(count < 0){
-				return String.format("%s == %s", s.getKey().getName(), s.getStateId().getValue());
+				String c = String.format("%s == %s", s.getKey().getName(), s.getStateId().getValue());
+				String ext = s.getExitConditionAsVerilogHDL();
+				if(!ext.equals("")) c += " && " + ext;
+				return c;
 			}else{
 				return String.format("%s == %s && %s == %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
 			}

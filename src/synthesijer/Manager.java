@@ -150,7 +150,7 @@ public enum Manager {
 			HDLModule hm = moduleTable.get(m.getName()).hm;
 			if(format == OutputFormat.VHDL){
 				String destFileName = String.format("%s.vhd", hm.getName());
-				System.out.printf("Output VHDL: %s.vhd\n", destFileName);
+				System.out.printf("Output VHDL: %s\n", destFileName);
 				try(PrintWriter dest = new PrintWriter(new FileOutputStream(destFileName), true)){ 
 					hm.genVHDL(dest);
 				}catch(IOException e){
@@ -158,8 +158,8 @@ public enum Manager {
 				}
 			}else{
 				String destFileName = String.format("%s.v", hm.getName());
-				System.out.printf("Output Verilog HDL: %s.v\n", destFileName);
-				try(PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s.v", destFileName)), true)){ 
+				System.out.printf("Output Verilog HDL: %s\n", destFileName);
+				try(PrintWriter dest = new PrintWriter(new FileOutputStream(destFileName), true)){ 
 					hm.genVerilogHDL(dest);
 				}catch(IOException e){
 					e.printStackTrace();

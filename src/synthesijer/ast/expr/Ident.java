@@ -1,6 +1,7 @@
 package synthesijer.ast.expr;
 
 import synthesijer.ast.Expr;
+import synthesijer.ast.Method;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
@@ -41,7 +42,10 @@ public class Ident extends Expr{
 	
 	public Type getType(){
 		Variable v = getScope().search(symbol);
-		return v.getType();
+		if(v != null) return v.getType();
+		Method m = getScope().getModule().searchMethod(symbol);
+		if(m != null) return m.getType();
+		return null;
 	}
 
 }

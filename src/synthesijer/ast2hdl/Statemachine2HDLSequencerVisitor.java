@@ -3,7 +3,6 @@ package synthesijer.ast2hdl;
 import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLOp;
-import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
@@ -17,6 +16,7 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 	private final GenerateHDLModuleVisitor parent;
 	private final HDLExpr kickExpr;
 	private final HDLSignal busySig;
+	private HDLSequencer hs; 
 	
 	public Statemachine2HDLSequencerVisitor(GenerateHDLModuleVisitor parent, HDLExpr reqExpr, HDLSignal busySig) {
 		this.parent = parent;
@@ -52,7 +52,7 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 
 	@Override
 	public void visitStatemachine(Statemachine o) {
-		HDLSequencer hs = parent.module.newSequencer(o.getKey());
+		hs = parent.module.newSequencer(o.getKey());
 		for(State s: o.getStates()){
 			parent.stateTable.put(s, hs.addSequencerState(s.getId()));
 		}
@@ -73,6 +73,10 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 						parent.module.newExpr(HDLOp.EQ, hs.getStateKey(), hs.getIdleState().getStateId()),
 						HDLPreDefinedConstant.LOW,
 						HDLPreDefinedConstant.HIGH));
+	}
+	
+	public HDLSequencer getHDLSequencer(){
+		return hs;
 	}
 	
 	@Override

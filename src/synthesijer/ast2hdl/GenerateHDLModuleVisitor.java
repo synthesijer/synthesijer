@@ -57,7 +57,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	final HDLModule module;
 	final Hashtable<State, HDLSequencer.SequencerState> stateTable;
-	private final Hashtable<Method, HDLPort> methodReturnTable;
+	private final Hashtable<Method, HDLSignal> methodReturnTable;
 	private final Hashtable<Variable, HDLVariable> variableTable = new Hashtable<>();
 	private final Hashtable<Method, HDLValue> methodIdTable = new Hashtable<>();
 	
@@ -75,35 +75,58 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	public void visitMethod(Method o) {
 		if(o.isConstructor()) return; // skip 
 		if(o.isUnsynthesizable()) return; // skip
+		ArrayList<Pair<HDLPort, HDLSignal>> argPorts = new ArrayList<>();
 		for(VariableDecl v: o.getArgs()){
 			HDLType t = getHDLType(v.getType());
 			if(t != null){
-				//System.out.println(v);
-				HDLPort p = module.newPort(o.getName() + "_" + v.getName(), HDLPort.DIR.IN, t);
-				variableTable.put(v.getVariable(), p.getSignal());
+				HDLSignal s = module.newSignal(o.getName() + "_" + v.getName(), t);
+				if(o.isPrivate() == false){
+					HDLPort p = module.newPort(o.getName() + "_" + v.getName() + "_in", HDLPort.DIR.IN, t);
+					argPorts.add(new Pair<HDLPort, HDLSignal>(p, s));
+				}
+				variableTable.put(v.getVariable(), s);
 			}
 		}
 		HDLType t = getHDLType(o.getType());
 		if(t != null){
-			HDLPort p = module.newPort(o.getName() + "_return", HDLPort.DIR.OUT, t);
-			methodReturnTable.put(o, p);
+			if(o.isPrivate() == false){
+				HDLPort p = module.newPort(o.getName() + "_return", HDLPort.DIR.OUT, t);
+				methodReturnTable.put(o, p.getSignal());
+			}else{
+				HDLSignal s = module.newSignal(o.getName() + "_return_sig", t);
+				methodReturnTable.put(o, s);
+			}
 		}
 		HDLSignal req_local = module.newSignal(o.getName() + "_req_local", HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.REGISTER);
 		req_local.setDefaultValue(HDLPreDefinedConstant.LOW);
 		HDLExpr reqExpr;
 		HDLSignal busySig;
+		HDLPort req_global = null;
 		if(o.isPrivate() == false){
-			HDLPort req = module.newPort(o.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+			req_global = module.newPort(o.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 			HDLPort busy = module.newPort(o.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
-			reqExpr = module.newExpr(HDLOp.OR, req.getSignal(), req_local);
+			reqExpr = module.newExpr(HDLOp.OR, req_global.getSignal(), req_local);
 			busySig = busy.getSignal();
+						
 		}else{
 			reqExpr = module.newExpr(HDLOp.EQ, req_local, HDLPreDefinedConstant.HIGH);
 			busySig = module.newSignal(o.getName() + "_busy_sig", HDLPrimitiveType.genBitType());
 		}
 		genVariableTables(o);
-		o.getStateMachine().accept(new Statemachine2HDLSequencerVisitor(this, reqExpr, busySig));
+		Statemachine2HDLSequencerVisitor visitor = new Statemachine2HDLSequencerVisitor(this, reqExpr, busySig);
+		o.getStateMachine().accept(visitor);
 		o.getBody().accept(this);
+		
+		if(o.isPrivate() == false){
+			for(Pair<HDLPort,HDLSignal> a: argPorts){
+				a.w.setAssign(visitor.getHDLSequencer().getIdleState(),
+						module.newExpr(HDLOp.IF,
+								module.newExpr(HDLOp.EQ, req_global.getSignal(), HDLPreDefinedConstant.HIGH),
+								a.v.getSignal(),
+								a.w));
+			}
+		}
+
 		if(isThreadStart(o)){ genThreadStart(o); }
 		if(isThreadJoin(o)){ genThreadJoin(o); }
 		if(isThreadYield(o)){ genThreadYield(o); }
@@ -233,11 +256,11 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitReturnStatement(ReturnStatement o) {
 		if(o.getExpr() != null){
-			HDLPort p = methodReturnTable.get(o.getScope().getMethod());
+			HDLSignal s = methodReturnTable.get(o.getScope().getMethod());
 			HDLSequencer.SequencerState state = stateTable.get(o.getState());
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, state);
 			o.getExpr().accept(v);
-			p.getSignal().setAssign(state, v.getResult());
+			s.setAssign(state, v.getResult());
 		}
 	}
 
@@ -423,5 +446,14 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	private void genThreadYield(Method o){
 		
+	}
+	
+	class Pair<V, W>{
+		final V v;
+		final W w;
+		public Pair(V v, W w){
+			this.v = v;
+			this.w = w;
+		}
 	}
 }

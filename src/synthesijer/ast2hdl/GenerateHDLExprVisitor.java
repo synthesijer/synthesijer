@@ -263,10 +263,16 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		}else{
 			throw new RuntimeException("Unsupported method invocation: " + o.getMethod());
 		}
-		
+
 		for(int i = 0; i < o.getParameters().size(); i++){
-			String arg = o.getMethodName() + "_" + method.getArgs()[i].getVariable().getName();
-			HDLSignal s = inst.getSignalForPort(arg);
+			HDLSignal s;
+			if(localFlag){
+				String arg = o.getMethodName() + "_" + method.getArgs()[i].getVariable().getName();
+				s = parent.module.getSignal(arg);
+			}else{
+				String arg = o.getMethodName() + "_" + method.getArgs()[i].getVariable().getName() + "_in";
+				s = inst.getSignalForPort(arg);
+			}
 			s.setAssign(state, 0, stepIn(o.getParameters().get(i)));
 		}
 
@@ -301,7 +307,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			result = null;
 		}else{
 			if(localFlag){
-				result = parent.module.getPort(o.getMethodName() + "_return").getSignal();
+				result = parent.module.getSignal(o.getMethodName() + "_return_sig");
 			}else{
 				result = inst.getSignalForPort(o.getMethodName() + "_return");
 			}
