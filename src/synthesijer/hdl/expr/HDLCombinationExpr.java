@@ -205,6 +205,21 @@ public class HDLCombinationExpr implements HDLExpr{
 					return args[0].getResultExpr().getVHDL();
 				}
 			}
+			case LSHIFT:{
+				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
+				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				if(shift > 1){
+					return String.format("%s(%d downto %d) & (%d-1 downto %d => '0')",
+							args[0].getResultExpr().getVHDL(),
+							t0.getWidth()-shift-1,
+							0,
+							shift,
+							0
+							);
+				}else{
+					return args[0].getResultExpr().getVHDL();
+				}
+			}
 			case ID:
 				return args[0].getResultExpr().getVHDL();
 			default:
@@ -274,6 +289,20 @@ public class HDLCombinationExpr implements HDLExpr{
 							shift,
 							args[0].getResultExpr().getVerilogHDL(),
 							t0.getWidth()-1,
+							shift
+							);
+				}else{
+					return args[0].getResultExpr().getVerilogHDL();
+				}
+			}
+			case LSHIFT:{
+				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
+				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				if(shift > 1){
+					return String.format("{%s[%d:%d],%d'b0}",
+							args[0].getResultExpr().getVerilogHDL(),
+							t0.getWidth()-shift-1,
+							0,
 							shift
 							);
 				}else{

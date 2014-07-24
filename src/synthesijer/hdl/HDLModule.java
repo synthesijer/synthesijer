@@ -29,7 +29,7 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	private HDLPort sysReset; 
 	
 	public HDLModule(String name, String sysClkName, String sysResetName, boolean syncFlag){
-		this.name = name;
+		this.name = name.replace('.', '_');
 		this.sysClkName = sysClkName;
 		this.sysResetName = sysResetName;
 		if(syncFlag){

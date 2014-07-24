@@ -138,8 +138,8 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 				Manager.INSTANCE.genHDL(info);
 			}
 			HDLInstance inst = module.newModuleInstance(info.hm, v.getName());
-			inst.getSignalForPort("clk").setAssign(null, module.getSysClk().getSignal());
-			inst.getSignalForPort("reset").setAssign(null, module.getSysReset().getSignal());
+			inst.getSignalForPort(inst.getSubModule().getSysClkName()).setAssign(null, module.getSysClk().getSignal());
+			inst.getSignalForPort(inst.getSubModule().getSysResetName()).setAssign(null, module.getSysReset().getSignal());
 			return inst;
 		}else{
 			throw new RuntimeException("unsupported type: " + t);
