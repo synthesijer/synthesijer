@@ -1,5 +1,7 @@
 package synthesijer.ast.expr;
 
+import java.util.ArrayList;
+
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
@@ -59,4 +61,18 @@ public class FieldAccess extends Expr{
 		}
 	}
 
+	@Override
+	public Variable[] getSrcVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: selected.getSrcVariables()) list.add(var);
+		for(Variable var: ident.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
+	}
+
+	@Override
+	public Variable[] getDestVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: selected.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
+	}
 }

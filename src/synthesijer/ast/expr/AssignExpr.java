@@ -1,8 +1,11 @@
 package synthesijer.ast.expr;
 
+import java.util.ArrayList;
+
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 
 public class AssignExpr extends Expr{
 	
@@ -49,5 +52,19 @@ public class AssignExpr extends Expr{
 	
 	public String toString(){
 		return String.format("Assign::(assign %s %s)", lhs, rhs); 
+	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: rhs.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
+	}
+
+	@Override
+	public Variable[] getDestVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: lhs.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
 	}
 }

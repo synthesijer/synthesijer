@@ -11,6 +11,7 @@ import synthesijer.ast.Module;
 import synthesijer.ast2hdl.GenerateHDLModuleVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.BlockRAM;
+import synthesijer.model.StatemachineOptimizer;
 
 public enum Manager {
 	
@@ -98,9 +99,20 @@ public enum Manager {
 		}
 	}
 	
+	private void doStateCombine(){
+		for(Module m: entries.values()){
+			(new StatemachineOptimizer(m)).optimize();
+		}
+	}
+	
+	private void optimizations(){
+		doStateCombine();
+	}
+	
 	public void generate(){
 		makeStateMachine();
 		dumpStateMachine();
+		optimizations();
 		genHDLAll();
 		output(OutputFormat.VHDL);
 		output(OutputFormat.Verilog);

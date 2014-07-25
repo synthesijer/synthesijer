@@ -3,6 +3,7 @@ package synthesijer.ast.expr;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 
 public class ParenExpr extends Expr{
 	
@@ -43,4 +44,13 @@ public class ParenExpr extends Expr{
 		return "ParenExpr(" + expr + ")";
 	}
 	
+	@Override
+	public Variable[] getSrcVariables(){
+		return expr.getSrcVariables();
+	}
+	
+	@Override
+	public Variable[] getDestVariables(){
+		return expr.getDestVariables();
+	}
 }

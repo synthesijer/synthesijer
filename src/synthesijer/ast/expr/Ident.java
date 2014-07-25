@@ -47,5 +47,17 @@ public class Ident extends Expr{
 		if(m != null) return m.getType();
 		return null;
 	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		Variable var = getScope().search(symbol);
+		return new Variable[]{var};
+	}
+	
+	@Override
+	public Variable[] getDestVariables(){
+		Variable var = getScope().search(symbol);
+		return new Variable[]{var};
+	}
 
 }

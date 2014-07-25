@@ -3,6 +3,7 @@ package synthesijer.ast.expr;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 
 public class TypeCast extends Expr{
 	
@@ -47,5 +48,14 @@ public class TypeCast extends Expr{
 	public String toString(){
 		return String.format("(CAST %s::(%s)", targetType, expr);
 	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		return expr.getSrcVariables();
+	}
 
+	@Override
+	public Variable[] getDestVariables(){
+		return expr.getDestVariables();
+	}
 }

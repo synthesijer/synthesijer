@@ -1,8 +1,11 @@
 package synthesijer.ast.expr;
 
+import java.util.ArrayList;
+
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 
 public class ArrayAccess extends Expr{
 	
@@ -46,6 +49,20 @@ public class ArrayAccess extends Expr{
 	public Type getType(){
 		return indexed.getType();
 	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: index.getSrcVariables()) list.add(var);
+		for(Variable var: indexed.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
+	}
 
+	@Override
+	public Variable[] getDestVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: indexed.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
+	}
 }
 

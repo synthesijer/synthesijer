@@ -2,7 +2,6 @@ package synthesijer.ast.expr;
 
 import java.util.ArrayList;
 
-import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
@@ -57,6 +56,22 @@ public class NewArray extends Expr{
 	@Override
 	public Type getType() {
 		return PrimitiveTypeKind.ARRAY;
-	}	
+	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Expr expr: dimExpr){
+			for(Variable var: expr.getSrcVariables()) list.add(var);
+		}
+		for(Expr expr: elemExpr){
+			for(Variable var: expr.getSrcVariables()) list.add(var);
+		}
+		return list.toArray(new Variable[]{});
+	}
 
+	@Override
+	public Variable[] getDestVariables(){
+		return new Variable[]{};
+	}
 }

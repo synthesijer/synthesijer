@@ -27,6 +27,10 @@ public class State {
 		this.body = s;
 	}
 	
+	public ExprContainStatement getBody(){
+		return body;
+	}
+	
 	public void addTransition(State s){
 		//System.out.println("add:" + s);
 		transitions.add(new Transition(s, null, true));

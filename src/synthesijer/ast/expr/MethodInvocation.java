@@ -3,11 +3,11 @@ package synthesijer.ast.expr;
 import java.util.ArrayList;
 
 import synthesijer.Manager;
-import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 import synthesijer.ast.type.ComponentType;
 
 public class MethodInvocation extends Expr{
@@ -91,5 +91,21 @@ public class MethodInvocation extends Expr{
 			return m.getType();
 		}
 	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: method.getSrcVariables()) list.add(var);
+		for(Expr expr: params){
+			for(Variable var: expr.getSrcVariables()) list.add(var);
+		}
+		return list.toArray(new Variable[]{});
+	}
 
+	@Override
+	public Variable[] getDestVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Variable var: method.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
+	}
 }

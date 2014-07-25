@@ -1,9 +1,13 @@
 package synthesijer.ast.expr;
 
+import java.util.ArrayList;
+
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
+import synthesijer.hdl.HDLOp;
 
 public class BinaryExpr extends Expr{
 	
@@ -64,4 +68,22 @@ public class BinaryExpr extends Expr{
 		return r;
 	}
 
+	@Override
+	public Variable[] getSrcVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		if(op != Op.ASSIGN){
+			for(Variable var: lhs.getSrcVariables()) list.add(var);
+		}
+		for(Variable var: rhs.getSrcVariables()) list.add(var);
+		return list.toArray(new Variable[]{});
+	}
+	
+	@Override
+	public Variable[] getDestVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		if(op == Op.ASSIGN){
+			for(Variable var: lhs.getSrcVariables()) list.add(var);
+		}
+		return list.toArray(new Variable[]{});
+	}
 }

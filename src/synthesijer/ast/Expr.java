@@ -25,4 +25,8 @@ public abstract class Expr{
 	
 	abstract public Type getType();
 	
+	abstract public Variable[] getSrcVariables();
+	
+	abstract public Variable[] getDestVariables();
+	
 }

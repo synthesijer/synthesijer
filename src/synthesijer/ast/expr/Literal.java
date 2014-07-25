@@ -3,6 +3,7 @@ package synthesijer.ast.expr;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.ast.type.StringType;
 
@@ -156,4 +157,13 @@ public class Literal extends Expr{
 		return "Literal:" + getValueAsStr() + "@" + getType();
 	}
 	
+	@Override
+	public Variable[] getSrcVariables(){
+		return new Variable[]{};
+	}
+	
+	@Override
+	public Variable[] getDestVariables(){
+		return new Variable[]{};
+	}
 }

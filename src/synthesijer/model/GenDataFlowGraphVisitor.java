@@ -1,11 +1,13 @@
 package synthesijer.model;
 
+import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.SynthesijerMethodVisitor;
 import synthesijer.ast.SynthesijerModuleVisitor;
+import synthesijer.ast.Variable;
 
-public class SimpleASAPStateCombineVisitor implements SynthesijerModuleVisitor, SynthesijerMethodVisitor, StatemachineVisitor{
+public class GenDataFlowGraphVisitor implements SynthesijerModuleVisitor, SynthesijerMethodVisitor, StatemachineVisitor{
 
 	@Override
 	public void visitMethod(Method o) {
@@ -28,10 +30,19 @@ public class SimpleASAPStateCombineVisitor implements SynthesijerModuleVisitor, 
 
 	@Override
 	public void visitState(State o) {
-		for(Transition t: o.getTransitions()){
-			if(t.getDestination() != null){
-				System.out.println(t);
+		System.out.println(o);
+		if(o.getBody() != null){
+			Expr expr = o.getBody().getExpr();
+			System.out.println("::" + expr);
+			for(Variable v: expr.getSrcVariables()){
+				System.out.println("   <- " + v);
 			}
+			for(Variable v: expr.getDestVariables()){
+				System.out.println("   -> " + v);
+			}
+		}
+		for(Transition t: o.getTransitions()){
+			System.out.println("=>" + t);
 		}
 	}
 

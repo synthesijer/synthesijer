@@ -4,6 +4,7 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 
 public class UnaryExpr extends Expr{
 	
@@ -51,5 +52,18 @@ public class UnaryExpr extends Expr{
 	public String toString(){
 		return String.format("UnaryExpr::(%s %s)", op, arg); 
 	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		return arg.getSrcVariables();
+	}
 
+	@Override
+	public Variable[] getDestVariables(){
+		if(op == Op.INC || op == Op.DEC){
+			return arg.getDestVariables();
+		}else{
+			return new Variable[]{};
+		}
+	}
 }

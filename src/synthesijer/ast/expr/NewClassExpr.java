@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class NewClassExpr extends Expr{
@@ -50,5 +51,18 @@ public class NewClassExpr extends Expr{
 	public Type getType() {
 		return PrimitiveTypeKind.DECLARED;
 	}
+	
+	@Override
+	public Variable[] getSrcVariables(){
+		ArrayList<Variable> list = new ArrayList<>();
+		for(Expr expr: params){
+			for(Variable var: expr.getSrcVariables()) list.add(var);
+		}
+		return list.toArray(new Variable[]{});
+	}
 
+	@Override
+	public Variable[] getDestVariables(){
+		return new Variable[]{};
+	}
 }
