@@ -69,7 +69,6 @@ public class VariableDecl extends ExprContainStatement{
 		if(hasInitExpr() && init.isConstant()){
 			State s = m.newState("var_init");
 			s.setBody(this);
-			//System.out.println("VarDecl::genStateMachine:" + dest);
 			s.addTransition(dest);
 			state = s;
 		}else{
@@ -81,6 +80,10 @@ public class VariableDecl extends ExprContainStatement{
 		return state;
 	}
 	
+	public void setState(State s){
+		this.state = s;
+	}
+
 	public State getState(){
 		return state;
 	}
@@ -93,4 +96,13 @@ public class VariableDecl extends ExprContainStatement{
 		return "VariableDecl: " + var; 
 	}
 	
+	@Override
+	public Variable[] getSrcVariables(){
+		return getExpr().getSrcVariables();
+	}
+	
+	@Override
+	public Variable[] getDestVariables(){
+		return new Variable[]{var};
+	}
 }

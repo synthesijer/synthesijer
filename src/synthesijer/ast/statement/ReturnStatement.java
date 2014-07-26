@@ -3,6 +3,7 @@ package synthesijer.ast.statement;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
+import synthesijer.ast.Variable;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 
@@ -32,6 +33,10 @@ public class ReturnStatement extends ExprContainStatement{
 		return state;
 	}
 	
+	public void setState(State s){
+		this.state = s;
+	}
+	
 	public State getState(){
 		return state;
 	}
@@ -40,4 +45,13 @@ public class ReturnStatement extends ExprContainStatement{
 		v.visitReturnStatement(this);
 	}
 	
+	@Override
+	public Variable[] getSrcVariables(){
+		return getExpr().getSrcVariables();
+	}
+	
+	@Override
+	public Variable[] getDestVariables(){
+		return getExpr().getDestVariables();
+	}
 }

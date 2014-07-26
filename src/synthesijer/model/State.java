@@ -31,6 +31,10 @@ public class State {
 		return body;
 	}
 	
+	public void clearTransition(){
+		transitions.clear();
+	}
+	
 	public void addTransition(State s){
 		//System.out.println("add:" + s);
 		transitions.add(new Transition(s, null, true));

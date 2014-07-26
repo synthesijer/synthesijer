@@ -1,49 +1,48 @@
 package synthesijer.model;
 
-import synthesijer.ast.Expr;
-import synthesijer.ast.Method;
-import synthesijer.ast.Module;
-import synthesijer.ast.SynthesijerMethodVisitor;
-import synthesijer.ast.SynthesijerModuleVisitor;
-import synthesijer.ast.Variable;
 
-public class GenDataFlowGraphVisitor implements SynthesijerModuleVisitor, SynthesijerMethodVisitor, StatemachineVisitor{
+public class GenDataFlowGraphVisitor implements StatemachineVisitor{
 
-	@Override
-	public void visitMethod(Method o) {
-		o.getStateMachine().accept(this);
+	private DataFlowGraph dfg = new DataFlowGraph();
+	private final DataFlowGraph parent;
+	
+	public GenDataFlowGraphVisitor(DataFlowGraph parent){
+		this.parent = parent;
 	}
 
-	@Override
-	public void visitModule(Module o) {
-		for(Method m: o.getMethods()){
-			m.accept(this);
-		}
+	public GenDataFlowGraphVisitor(){
+		this(null);
+	}
+	
+	public DataFlowGraph getDataFlowGraph(){
+		return dfg;
 	}
 
 	@Override
 	public void visitStatemachine(Statemachine o) {
-		for(State s: o.getStates()){
-			s.accept(this);
-		}
+		State s = o.getEntryState();
+		s.accept(this);
+	}
+	
+	private DataFlowGraph stepIn(DataFlowGraph dfg, State s){
+		GenDataFlowGraphVisitor v = new GenDataFlowGraphVisitor(dfg);
+		s.accept(v);
+		return v.getDataFlowGraph();
 	}
 
 	@Override
 	public void visitState(State o) {
-		System.out.println(o);
-		if(o.getBody() != null){
-			Expr expr = o.getBody().getExpr();
-			System.out.println("::" + expr);
-			for(Variable v: expr.getSrcVariables()){
-				System.out.println("   <- " + v);
-			}
-			for(Variable v: expr.getDestVariables()){
-				System.out.println("   -> " + v);
-			}
-		}
+		DataFlowNode node = null;
+		if(parent != null) node = parent.contains(o); // get if added already
+		if(node == null) node = new DataFlowNode(o, o.getBody()); // unless added
 		for(Transition t: o.getTransitions()){
-			System.out.println("=>" + t);
+			if(t.getDestination() != null){
+				DataFlowGraph g = stepIn(dfg, t.getDestination());
+				if(node != null) g.apply(node);
+				dfg.addNodes(g);
+			}
 		}
+		dfg.addNode(node);
 	}
 
 }
