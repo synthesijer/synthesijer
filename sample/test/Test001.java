@@ -26,8 +26,8 @@ public class Test001{
 			return 3 + 4;
 		case 2:
 		{
-			int i = 100;
-			int j = 200;
+			int i = 300;
+			int j = 400;
 			return i + j;
 		}
 		case 3:

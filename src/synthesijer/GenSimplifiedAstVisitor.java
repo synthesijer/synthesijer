@@ -228,7 +228,7 @@ class GenSimplifiedAstBlockVisitor implements SynthesijerAstVisitor{
 	public void visitSwitchCaseElement(Elem o) {
 		GenSimplifiedAstBlockVisitor v = new GenSimplifiedAstBlockVisitor(scope, idGenerator);
 		for(Statement stmt: o.getStatements()){
-			System.out.println(" trace: " + stmt);
+//			System.out.println(" trace: " + stmt);
 			stmt.accept(v);
 			if(stmt instanceof BlockStatement){
 				v.newList.add(stmt);

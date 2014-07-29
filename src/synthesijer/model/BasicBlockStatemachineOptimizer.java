@@ -9,16 +9,28 @@ import synthesijer.ast.SynthesijerModuleVisitor;
 
 
 //// TODO めそっどれべるじゃなくてBasicBlock単位で処理できるようにする
-public class StatemachineOptimizer implements SynthesijerModuleVisitor, SynthesijerMethodVisitor{
+public class BasicBlockStatemachineOptimizer implements SynthesijerModuleVisitor, SynthesijerMethodVisitor{
 
 	private final Module module;
 	
-	public StatemachineOptimizer(Module m) {
+	private static final boolean DEBUG = true; 
+	
+	public BasicBlockStatemachineOptimizer(Module m) {
 		this.module  = m;
 	}
 	
 	@Override
 	public void visitMethod(Method o) {
+		GenBasicStatemachineBlockVisitor v = new GenBasicStatemachineBlockVisitor();
+		o.getStateMachine().accept(v);
+		if(DEBUG){
+			for(BasicBlock bb: v.getBasicBlockList()){
+				System.out.println("--------------");
+				bb.printAll();
+			}
+		}
+			
+		/*
 		System.out.println("== " + o.getName());
 		GenDataFlowGraphVisitor v = new GenDataFlowGraphVisitor();
 		o.getStateMachine().accept(v);
@@ -35,6 +47,7 @@ public class StatemachineOptimizer implements SynthesijerModuleVisitor, Synthesi
 			}
 			pred = state;
 		}
+		*/
 	}
 
 	@Override

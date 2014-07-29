@@ -14,7 +14,8 @@ public class State {
 	
 	private ExprContainStatement body;
 	
-	ArrayList<Transition> transitions = new ArrayList<>();
+	private ArrayList<Transition> transitions = new ArrayList<>();
+	private ArrayList<State> predecesors = new ArrayList<>();
 	
 	State(Statemachine m, int id, String desc, boolean terminate){
 		this.machine = m;
@@ -35,23 +36,33 @@ public class State {
 		transitions.clear();
 	}
 	
-	public void addTransition(State s){
-		//System.out.println("add:" + s);
-		transitions.add(new Transition(s, null, true));
+	private void addTransition(State s, Transition t){
+		transitions.add(t);
+		s.addPredecesors(this);
 	}
 	
+	public void addTransition(State s){
+		addTransition(s, new Transition(s, null, true));
+	}
+		
 	public void addTransition(State s, Expr cond, boolean flag){
-		//System.out.println("add:" + s);
-		transitions.add(new Transition(s, cond, flag));
+		addTransition(s, new Transition(s, cond, flag));
 	}
 
 	public void addTransition(State s, Expr cond, Expr pat){
-		//System.out.println("add:" + s);
-		transitions.add(new Transition(s, cond, pat));
+		addTransition(s, new Transition(s, cond, pat));
 	}
 	
+	public void addPredecesors(State s){
+		predecesors.add(s);
+	}
+
 	public Transition[] getTransitions(){
-		return transitions.toArray(new Transition[]{});
+		return transitions.toArray(new Transition[0]);
+	}
+	
+	public State[] getPredecesors(){
+		return predecesors.toArray(new State[0]);
 	}
 	
 	public String getId(){

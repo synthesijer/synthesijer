@@ -11,7 +11,7 @@ import synthesijer.ast.Module;
 import synthesijer.ast2hdl.GenerateHDLModuleVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.BlockRAM;
-import synthesijer.model.StatemachineOptimizer;
+import synthesijer.model.BasicBlockStatemachineOptimizer;
 
 public enum Manager {
 	
@@ -101,7 +101,7 @@ public enum Manager {
 	
 	private void doStateCombine(){
 		for(Module m: entries.values()){
-			(new StatemachineOptimizer(m)).optimize();
+			(new BasicBlockStatemachineOptimizer(m)).optimize();
 		}
 	}
 	
