@@ -13,7 +13,6 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 		this.list = list;
 		this.sentinel = sentinel;
 		this.bb = new BasicBlock();
-		list.add(bb);
 	}
 
 	public GenBasicStatemachineBlockVisitor() {
@@ -31,6 +30,7 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 	private BasicBlock stepIn(State s){
 		GenBasicStatemachineBlockVisitor v = new GenBasicStatemachineBlockVisitor(list, sentinel); 
 		s.accept(v);
+		if(v.bb.getSize() > 0) list.add(v.bb);
 		return v.getBasicBlock();
 	}
 	
@@ -61,6 +61,7 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 				b = bb;
 			}else{ // fork & join
 				b = newBB();
+				list.add(b); // should be a state, at least.
 			}
 			b.addState(o);
 			for(Transition t: o.getTransitions()){

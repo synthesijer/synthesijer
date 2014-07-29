@@ -27,8 +27,12 @@ public class BasicBlockStatemachineOptimizer implements SynthesijerModuleVisitor
 			for(BasicBlock bb: v.getBasicBlockList()){
 				System.out.println("--------------");
 				bb.printAll();
+				System.out.println(" entry=" + bb.getEntryState());
+				System.out.println(" exit=" + bb.getExitState());
 			}
 		}
+		
+		
 			
 		/*
 		System.out.println("== " + o.getName());

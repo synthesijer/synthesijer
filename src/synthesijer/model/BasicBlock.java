@@ -20,5 +20,17 @@ public class BasicBlock {
 			System.out.println(s + ":" + s.getBody());
 		}
 	}
+	
+	public int getSize(){
+		return states.size();
+	}
+	
+	public State getEntryState(){
+		return states.get(0);
+	}
+	
+	public State getExitState(){
+		return states.get(states.size()-1);
+	}
 
 }
