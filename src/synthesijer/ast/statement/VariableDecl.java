@@ -98,7 +98,11 @@ public class VariableDecl extends ExprContainStatement{
 	
 	@Override
 	public Variable[] getSrcVariables(){
-		return getExpr().getSrcVariables();
+		if(getExpr() != null){
+			return getExpr().getSrcVariables();
+		}else{
+			return new Variable[]{};
+		}
 	}
 	
 	@Override
