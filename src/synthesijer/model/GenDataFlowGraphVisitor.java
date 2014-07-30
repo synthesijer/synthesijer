@@ -34,7 +34,7 @@ public class GenDataFlowGraphVisitor implements StatemachineVisitor{
 	public void visitState(State o) {
 		DataFlowNode node = null;
 		if(parent != null) node = parent.contains(o); // get if added already
-		if(node == null) node = new DataFlowNode(o, o.getBody()); // unless added
+		if(node == null) node = new DataFlowNode(o, o.getBodies()); // unless added
 		for(Transition t: o.getTransitions()){
 			if(t.getDestination() != null){
 				DataFlowGraph g = stepIn(dfg, t.getDestination());

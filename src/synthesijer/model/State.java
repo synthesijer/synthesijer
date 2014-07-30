@@ -12,7 +12,7 @@ public class State {
 	private final Statemachine machine;
 	private final boolean terminate;
 	
-	private ExprContainStatement body;
+	private ArrayList<ExprContainStatement> body = new ArrayList<>();
 	
 	private ArrayList<Transition> transitions = new ArrayList<>();
 	private ArrayList<State> predecesors = new ArrayList<>();
@@ -24,12 +24,12 @@ public class State {
 		this.terminate = terminate;
 	}
 	
-	public void setBody(ExprContainStatement s){
-		this.body = s;
+	public void addBody(ExprContainStatement s){
+		body.add(s);
 	}
 	
-	public ExprContainStatement getBody(){
-		return body;
+	public ExprContainStatement[] getBodies(){
+		return body.toArray(new ExprContainStatement[0]);
 	}
 	
 	public void clearTransition(){

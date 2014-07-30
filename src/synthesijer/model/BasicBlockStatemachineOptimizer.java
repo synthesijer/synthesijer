@@ -11,7 +11,7 @@ public class BasicBlockStatemachineOptimizer implements SynthesijerModuleVisitor
 
 	private final Module module;
 	
-	private static final boolean BB_DEBUG = false; 
+	private static final boolean BB_DEBUG = true; 
 	
 	public BasicBlockStatemachineOptimizer(Module m) {
 		this.module  = m;
@@ -63,6 +63,11 @@ public class BasicBlockStatemachineOptimizer implements SynthesijerModuleVisitor
 		module.accept(this);
 	}
 	
+	private void update(DataFlowNode node, State s){
+		node.setScheduled();
+		if(node.stmt != null && node.stmt.length > 0) node.stmt[0].setState(s);
+	}
+	
 	public State schedule(DataFlowGraph dfg){
 		if(BB_DEBUG) System.out.println("-- schedule");
 		ArrayList<DataFlowNode> fire = new ArrayList<>();
@@ -79,23 +84,15 @@ public class BasicBlockStatemachineOptimizer implements SynthesijerModuleVisitor
 		State s = null;
 		for(DataFlowNode n: fire){
 			if(BB_DEBUG) System.out.println(n.state + ":" + n.stmt);
-			n.setScheduled();
-			if(s == null){
-				s = n.state;
-			}else{
-				if(n.stmt != null) n.stmt.setState(s);
-			}
+			if(s == null) s = n.state;
+			update(n, s);
 		}
 		if(fire.size() == 0 && rest.size() > 0){
 			if(BB_DEBUG) System.out.println("// last");
 			for(DataFlowNode n: rest){
 				if(BB_DEBUG) System.out.println(n.state + ":" + n.stmt);
-				n.setScheduled();
-				if(s == null){
-					s = n.state;
-				}else{
-					n.stmt.setState(s);
-				}
+				if(s == null) s = n.state;
+				update(n, s);
 			}
 		}
 		if(BB_DEBUG) System.out.println("--");
@@ -103,3 +100,4 @@ public class BasicBlockStatemachineOptimizer implements SynthesijerModuleVisitor
 	}
 
 }
+ 

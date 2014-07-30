@@ -3,6 +3,8 @@ package synthesijer.model;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import synthesijer.ast.statement.ExprContainStatement;
+
 public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 	
 	private final ArrayList<BasicBlock> list;
@@ -46,9 +48,17 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 		s.accept(this);
 	}
 	
+	private boolean hasMethodInvocation(State state){
+		if(state.getBodies() == null) return false;
+		for(ExprContainStatement s: state.getBodies()){
+			if(s.hasMethodInvocation()) return true;
+		}
+		return false;
+	}
+	
 	private boolean isSameBasicBlock(State s){
 //		return s.getTransitions().length == 1 && s.getPredecesors().length <= 1;
-		if(s.getBody() != null && s.getBody().hasMethodInvocation()) return false;
+		if(hasMethodInvocation(s)) return false;
 		if(s.getPredecesors().length > 1) return false;
 		if(s.getTransitions().length > 1) return false;
 		

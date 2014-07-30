@@ -8,7 +8,7 @@ import synthesijer.ast.statement.ExprContainStatement;
 public class DataFlowNode {
 	
 	public final State state;
-	public final ExprContainStatement stmt;
+	public final ExprContainStatement[] stmt;
 	
 	private boolean flagScheduled = false;
 	
@@ -17,19 +17,25 @@ public class DataFlowNode {
 	
 	private final static boolean DUMP = false;
 	
-	public DataFlowNode(State state, ExprContainStatement stmt){
+	public DataFlowNode(State state, ExprContainStatement[] stmt){
 		this.state = state;
 		this.stmt = stmt;
-		if(DUMP){
-			System.out.println("::" + stmt.getExpr() + "@" + stmt.getClass());
-			for(Variable v: stmt.getSrcVariables()){
+		if(DUMP) dump();
+	}
+	
+	private void dump(){
+		System.out.println(state);
+		for(ExprContainStatement s: stmt){
+			System.out.println("::" + s.getExpr() + "@" + s.getClass());
+			for(Variable v: s.getSrcVariables()){
 				System.out.println("   <- " + v);
 			}
-			for(Variable v: stmt.getDestVariables()){
+			for(Variable v: s.getDestVariables()){
 				System.out.println("   -> " + v);
 			}
 		}
 	}
+
 	
 	public void addPred(DataFlowNode n){
 		pred.add(n);

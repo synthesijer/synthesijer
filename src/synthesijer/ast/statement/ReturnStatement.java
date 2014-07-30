@@ -27,7 +27,7 @@ public class ReturnStatement extends ExprContainStatement{
 	
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		state = m.newState("return");
-		state.setBody(this);
+		state.addBody(this);
 		//System.out.println("Return::genStateMachine:" + dest);
 		state.addTransition(terminal);
 		return state;

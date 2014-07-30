@@ -3,6 +3,7 @@ package synthesijer.model;
 import java.util.ArrayList;
 
 import synthesijer.ast.Variable;
+import synthesijer.ast.statement.ExprContainStatement;
 
 public class DataFlowGraph {
 	
@@ -28,16 +29,24 @@ public class DataFlowGraph {
 		}
 		return null;
 	}
-
-	private void connectEdge(DataFlowNode pred, DataFlowNode succ){
-		if(succ.stmt == null || pred.stmt == null) return;
-		for(Variable v0: succ.stmt.getSrcVariables()){
-			for(Variable v1: pred.stmt.getDestVariables()){
+	
+	private void conectEdge(DataFlowNode pred, DataFlowNode succ, ExprContainStatement pred_expr, ExprContainStatement succ_expr){
+		for(Variable v0: succ_expr.getSrcVariables()){
+			for(Variable v1: pred_expr.getDestVariables()){
 				if(v0 == v1){
 					succ.addPred(pred);
 					pred.addSucc(succ);
 					if(DUMP) System.out.println("**con** " + pred.stmt + " => " + succ.stmt);
 				}
+			}
+		}
+	}
+
+	private void connectEdge(DataFlowNode pred, DataFlowNode succ){
+		if(succ.stmt == null || pred.stmt == null) return;
+		for(ExprContainStatement succ_expr: succ.stmt){
+			for(ExprContainStatement pred_expr: pred.stmt){
+				conectEdge(pred, succ, pred_expr, succ_expr);
 			}
 		}
 	}

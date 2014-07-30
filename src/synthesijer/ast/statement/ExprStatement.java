@@ -24,7 +24,7 @@ public class ExprStatement extends ExprContainStatement{
 	
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		State s = m.newState("expr");
-		s.setBody(this);
+		s.addBody(this);
 		//System.out.println("Expr::genStateMachine:" + dest);
 		s.addTransition(dest);
 		state = s;

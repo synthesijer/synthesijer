@@ -68,12 +68,12 @@ public class VariableDecl extends ExprContainStatement{
 	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
 		if(hasInitExpr() && init.isConstant()){
 			State s = m.newState("var_init");
-			s.setBody(this);
+			s.addBody(this);
 			s.addTransition(dest);
 			state = s;
 		}else{
 			State s = m.newState("var_decl");
-			s.setBody(this);
+			s.addBody(this);
 			s.addTransition(dest);
 			state = s;
 		}
