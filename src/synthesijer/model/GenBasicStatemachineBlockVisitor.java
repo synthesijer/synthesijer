@@ -74,6 +74,7 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 			}
 		}else{
 			BasicBlock b = null;
+			/*
 			if(o.getBody() != null && o.getBody().hasMethodInvocation()){ // special treating for method invocation
 				b = newBB();
 			}else if(o.getPredecesors().length <= 1){ // just fork
@@ -81,6 +82,8 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 			}else{ // fork & join
 				b = newBB();
 			}
+			*/
+			b = newBB(); // naive implementation
 			b.addState(o);
 			for(Transition t: o.getTransitions()){
 				State s = t.getDestination();
