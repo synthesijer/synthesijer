@@ -58,4 +58,9 @@ public class TypeCast extends Expr{
 	public Variable[] getDestVariables(){
 		return expr.getDestVariables();
 	}
+	
+	@Override
+	public boolean hasMethodInvocation() {
+		return expr.hasMethodInvocation();
+	}
 }

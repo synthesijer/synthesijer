@@ -42,10 +42,18 @@ public class DataFlowGraph {
 		}
 	}
 	
-	public void apply(DataFlowNode node){
+	// append as predecessors for all
+	public void toPredeccessor(DataFlowNode node){
 		for(DataFlowNode n: nodes){
 			connectEdge(node, n);
 		}
 	}
-	
+
+	// append as successors for all
+	public void toSuccessor(DataFlowNode node){
+		for(DataFlowNode n: nodes){
+			connectEdge(n, node);
+		}
+	}
+
 }

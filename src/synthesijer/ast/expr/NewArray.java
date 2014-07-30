@@ -74,4 +74,15 @@ public class NewArray extends Expr{
 	public Variable[] getDestVariables(){
 		return new Variable[]{};
 	}
+	
+	@Override
+	public boolean hasMethodInvocation() {
+		for(Expr expr: dimExpr){
+			if(expr.hasMethodInvocation()) return true;
+		}
+		for(Expr expr: elemExpr){
+			if(expr.hasMethodInvocation()) return true;
+		}
+		return false;
+	}
 }

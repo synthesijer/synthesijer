@@ -36,6 +36,12 @@ public class State {
 		transitions.clear();
 	}
 	
+	public void setTransition(Transition[] t){
+		for(Transition t0: t){
+			transitions.add(t0);
+		}
+	}
+	
 	private void addTransition(State s, Transition t){
 		transitions.add(t);
 		s.addPredecesors(this);

@@ -38,7 +38,7 @@ public class GenDataFlowGraphVisitor implements StatemachineVisitor{
 		for(Transition t: o.getTransitions()){
 			if(t.getDestination() != null){
 				DataFlowGraph g = stepIn(dfg, t.getDestination());
-				if(node != null) g.apply(node);
+				if(node != null) g.toPredeccessor(node);
 				dfg.addNodes(g);
 			}
 		}

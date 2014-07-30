@@ -109,10 +109,15 @@ public enum Manager {
 		doStateCombine();
 	}
 	
-	public void generate(){
+	public void generate(boolean optimizeFlag){
 		makeStateMachine();
-		dumpStateMachine();
-		optimizations();
+		dumpStateMachine("init");
+		if(optimizeFlag){
+			optimizations();
+		}else{
+			SynthesijerUtils.warn("skip optimization");
+		}
+		dumpStateMachine("opt");
 		genHDLAll();
 		output(OutputFormat.VHDL);
 		output(OutputFormat.Verilog);
@@ -131,9 +136,9 @@ public enum Manager {
 		}
 	}
 	
-	public void dumpStateMachine(){
+	public void dumpStateMachine(String s){
 		for(Module m: entries.values()){
-			try(PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s_statemachine.dot", m.getName())), true)){
+			try(PrintWriter dest = new PrintWriter(new FileOutputStream(String.format("%s_statemachine_%s.dot", m.getName(), s)), true)){
 				m.accept(new DumpStatemachineVisitor(dest));
 			}catch(IOException e){
 				e.printStackTrace();

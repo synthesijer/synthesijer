@@ -66,4 +66,9 @@ public class UnaryExpr extends Expr{
 			return new Variable[]{};
 		}
 	}
+	
+	@Override
+	public boolean hasMethodInvocation() {
+		return arg.hasMethodInvocation();
+	}
 }

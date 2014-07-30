@@ -166,4 +166,9 @@ public class Literal extends Expr{
 	public Variable[] getDestVariables(){
 		return new Variable[]{};
 	}
+	
+	@Override
+	public boolean hasMethodInvocation() {
+		return false;
+	}
 }

@@ -32,6 +32,10 @@ public class Transition {
 		return condition;
 	}
 	
+	public boolean hasCondition(){
+		return (condition != null && pattern != null); 
+	}
+	
 	public Expr getPattern(){
 		return pattern;
 	}

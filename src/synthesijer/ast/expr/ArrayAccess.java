@@ -64,5 +64,10 @@ public class ArrayAccess extends Expr{
 		for(Variable var: indexed.getSrcVariables()) list.add(var);
 		return list.toArray(new Variable[]{});
 	}
+
+	@Override
+	public boolean hasMethodInvocation() {
+		return index.hasMethodInvocation() || indexed.hasMethodInvocation();
+	}
 }
 

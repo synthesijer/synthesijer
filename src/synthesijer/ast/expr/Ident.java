@@ -60,4 +60,8 @@ public class Ident extends Expr{
 		return new Variable[]{var};
 	}
 
+	@Override
+	public boolean hasMethodInvocation() {
+		return false;
+	}
 }

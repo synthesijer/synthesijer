@@ -65,4 +65,12 @@ public class NewClassExpr extends Expr{
 	public Variable[] getDestVariables(){
 		return new Variable[]{};
 	}
+
+	@Override
+	public boolean hasMethodInvocation() {
+		for(Expr expr: params){
+			if(expr.hasMethodInvocation()) return true;
+		}
+		return false;
+	}
 }

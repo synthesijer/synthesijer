@@ -105,7 +105,12 @@ public class MethodInvocation extends Expr{
 	@Override
 	public Variable[] getDestVariables(){
 		ArrayList<Variable> list = new ArrayList<>();
-		for(Variable var: method.getSrcVariables()) list.add(var);
+		for(Variable var: method.getDestVariables()) list.add(var);
 		return list.toArray(new Variable[]{});
+	}
+
+	@Override
+	public boolean hasMethodInvocation() {
+		return true;
 	}
 }

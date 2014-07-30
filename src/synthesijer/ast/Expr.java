@@ -29,4 +29,5 @@ public abstract class Expr{
 	
 	abstract public Variable[] getDestVariables();
 	
+	abstract public boolean hasMethodInvocation();
 }

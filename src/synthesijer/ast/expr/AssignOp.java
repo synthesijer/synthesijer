@@ -74,4 +74,10 @@ public class AssignOp extends Expr{
 		for(Variable var: lhs.getSrcVariables()) list.add(var);
 		return list.toArray(new Variable[]{});
 	}
+	
+	@Override
+	public boolean hasMethodInvocation() {
+		return lhs.hasMethodInvocation() || rhs.hasMethodInvocation();
+	}
+
 }

@@ -7,7 +7,6 @@ import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
-import synthesijer.hdl.HDLOp;
 
 public class BinaryExpr extends Expr{
 	
@@ -86,4 +85,11 @@ public class BinaryExpr extends Expr{
 		}
 		return list.toArray(new Variable[]{});
 	}
+	
+	@Override
+	public boolean hasMethodInvocation() {
+		return lhs.hasMethodInvocation() || rhs.hasMethodInvocation();
+	}
+
 }
+

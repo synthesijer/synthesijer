@@ -19,4 +19,11 @@ public abstract class ExprContainStatement extends Statement{
 	abstract public Variable[] getSrcVariables();
 	
 	abstract public Variable[] getDestVariables();
+	
+	public boolean hasMethodInvocation(){
+		Expr expr = getExpr();
+		if(expr == null) return false;
+		return expr.hasMethodInvocation();
+	}
+	
 }

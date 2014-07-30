@@ -13,6 +13,7 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 		this.list = list;
 		this.sentinel = sentinel;
 		this.bb = new BasicBlock();
+		list.add(bb);
 	}
 
 	public GenBasicStatemachineBlockVisitor() {
@@ -30,7 +31,7 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 	private BasicBlock stepIn(State s){
 		GenBasicStatemachineBlockVisitor v = new GenBasicStatemachineBlockVisitor(list, sentinel); 
 		s.accept(v);
-		if(v.bb.getSize() > 0) list.add(v.bb);
+		//if(v.bb.getSize() > 0) list.add(v.bb);
 		return v.getBasicBlock();
 	}
 	
@@ -45,11 +46,27 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 		s.accept(this);
 	}
 	
+	private boolean isSameBasicBlock(State s){
+//		return s.getTransitions().length == 1 && s.getPredecesors().length <= 1;
+		if(s.getBody() != null && s.getBody().hasMethodInvocation()) return false;
+		if(s.getPredecesors().length > 1) return false;
+		if(s.getTransitions().length > 1) return false;
+		
+		if(s.getTransitions() != null){
+			for(Transition t: s.getTransitions()){
+				if(t.hasCondition()) return false;
+			}
+		}
+		if(s.getTransitions().length == 1) return true;
+		return false;
+	}
+
+	
 	@Override
 	public void visitState(State o) {
 		if(sentinel.containsKey(o)) return;
 		sentinel.put(o, true);
-		if(o.getTransitions().length == 1 && o.getPredecesors().length <= 1){
+		if(isSameBasicBlock(o)){ // o.getTransitions().length == 1 && o.getPredecesors().length <= 1){
 			bb.addState(o);
 			State s = o.getTransitions()[0].getDestination();
 			if(s != null){
@@ -57,11 +74,12 @@ public class GenBasicStatemachineBlockVisitor implements StatemachineVisitor{
 			}
 		}else{
 			BasicBlock b = null;
-			if(o.getPredecesors().length <= 1){ // just fork
+			if(o.getBody() != null && o.getBody().hasMethodInvocation()){ // special treating for method invocation
+				b = newBB();
+			}else if(o.getPredecesors().length <= 1){ // just fork
 				b = bb;
 			}else{ // fork & join
 				b = newBB();
-				list.add(b); // should be a state, at least.
 			}
 			b.addState(o);
 			for(Transition t: o.getTransitions()){

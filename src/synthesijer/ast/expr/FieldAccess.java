@@ -75,4 +75,10 @@ public class FieldAccess extends Expr{
 		for(Variable var: selected.getSrcVariables()) list.add(var);
 		return list.toArray(new Variable[]{});
 	}
+	
+	@Override
+	public boolean hasMethodInvocation() {
+		return selected.hasMethodInvocation();
+	}
+
 }
