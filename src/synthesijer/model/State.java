@@ -83,6 +83,10 @@ public class State {
 		return machine.getKey();
 	}
 	
+	public Statemachine getStateMachine(){
+		return machine;
+	}
+	
 	public boolean isTerminate(){
 		return terminate;
 	}

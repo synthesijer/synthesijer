@@ -26,6 +26,10 @@ public class Statemachine {
 		return s;
 	}
 	
+	public void rmState(State s){
+		states.remove(s);
+	}
+	
 	public State[] getStates(){
 		return states.toArray(new State[]{});
 	}
