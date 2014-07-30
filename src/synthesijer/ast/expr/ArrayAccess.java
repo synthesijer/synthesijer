@@ -67,7 +67,8 @@ public class ArrayAccess extends Expr{
 
 	@Override
 	public boolean hasMethodInvocation() {
-		return index.hasMethodInvocation() || indexed.hasMethodInvocation();
+		//return index.hasMethodInvocation() || indexed.hasMethodInvocation();
+		return true;
 	}
 }
 
