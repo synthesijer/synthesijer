@@ -78,7 +78,8 @@ public class FieldAccess extends Expr{
 	
 	@Override
 	public boolean hasMethodInvocation() {
-		return selected.hasMethodInvocation();
+		//return selected.hasMethodInvocation();
+		return true;
 	}
 
 }
