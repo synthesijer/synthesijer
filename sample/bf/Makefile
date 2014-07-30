@@ -1,14 +1,15 @@
+SYNTHESIJER ?= ../../bin
 SOURCES = BF.java HW.java IO.java ../serial_echo/RS232C_RX_Wrapper.java ../serial_echo/RS232C_TX_Wrapper.java rs232c.java 
 CLASSES = $(SOURCES:.java=.class)
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 
 all: $(SOURCES) microboard
-	java -cp ../../bin:../serial_echo:. synthesijer.Main $(SOURCES)
+	java -cp $(SYNTHESIJER):../serial_echo:. synthesijer.Main $(SOURCES)
 
 microboard: MicroboardTop.java
-	javac -cp ../../bin:. $<
-	java -cp ../../bin:. $(<:.java=)
+	javac -cp $(SYNTHESIJER):. $<
+	java -cp $(SYNTHESIJER):. $(<:.java=)
 
 clean:
 	-rm -f $(CLASSES)

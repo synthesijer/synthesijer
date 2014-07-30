@@ -1,3 +1,5 @@
+SYNTHESIJER ?= ../../bin
+
 SOURCES = EchoTest.java RS232C_RX_Wrapper.java RS232C_TX_Wrapper.java ToUpper.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
@@ -5,15 +7,15 @@ VERILOG_SOURCES = $(SOURCES:.java=.v)
 all: hdl exstick microboard
 
 hdl: $(SOURCES)
-	java -cp ../../bin:. synthesijer.Main $(SOURCES)
+	java -cp $(SYNTHESIJER):. synthesijer.Main $(SOURCES)
 
 exstick: EchoTestTop.java 
-	javac -cp ../../bin:. EchoTestTop.java
-	java -cp ../../bin:. EchoTestTop
+	javac -cp $(SYNTHESIJER):. EchoTestTop.java
+	java -cp $(SYNTHESIJER):. EchoTestTop
 
 microboard: MicroboardTop.java 
-	javac -cp ../../bin:. MicroboardTop.java
-	java -cp ../../bin:. MicroboardTop
+	javac -cp $(SYNTHESIJER):. MicroboardTop.java
+	java -cp $(SYNTHESIJER):. MicroboardTop
 
 clean:
 	-rm -f *.class

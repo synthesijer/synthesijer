@@ -1,3 +1,4 @@
+SYNTHESIJER ?= ../../bin
 SOURCES = Prime.java PrimeSim.java BubbleSort.java BubbleSortSim.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
@@ -6,7 +7,7 @@ all: build
 
 
 build: $(SOURCES)
-	java -cp ../../bin synthesijer.Main $(SOURCES)
+	java -cp $(SYNTHESIJER) synthesijer.Main $(SOURCES)
 
 ghdl64: build primesim_top.vhd bubblesortsim_top.vhd
 	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) primesim_top.vhd bubblesortsim_top.vhd ../../lib/vhdl/simple_dualportram.vhd
