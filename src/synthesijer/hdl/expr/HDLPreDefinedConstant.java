@@ -48,6 +48,9 @@ public enum HDLPreDefinedConstant implements HDLLiteral{
 		case HIGH:
 		case LOW:
 			return HDLPrimitiveType.genBitType();
+		case INTEGER_ZERO:
+		case INTEGER_ONE:
+			return HDLPrimitiveType.genSignedType(-1);
 		case VECTOR_ZERO:
 			return HDLPrimitiveType.genVectorType(-1);
 		default: return HDLPrimitiveType.genUnknowType();
