@@ -17,7 +17,9 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 	HDLUserDefinedType(String base, String[] items, int defaultIndex) {
 		this.base = "Type_" + base;
 		if(items != null){
-			for(String s: items){ this.items.add(new HDLValue(s, HDLPrimitiveType.genStringType())); }
+			for(String s: items){
+				this.items.add(new HDLValue(s, HDLPrimitiveType.genStringType()));
+			}
 		}
 		this.defaultIndex = defaultIndex;
 		this.kind = KIND.USERDEF;

@@ -201,7 +201,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		HDLUserDefinedType type = module.newUserDefinedType("methodId", new String[]{"IDLE"}, 0);		
 		for(Method m: o.getMethods()){
 			if(m.isConstructor()) continue;
-			HDLValue v = type.addItem(m.getUniqueName());
+			HDLValue v = type.addItem("method_" + m.getUniqueName()); // to avoid that method name equals with any keywords of Verilog or Vhdl.
 			methodIdTable.put(m, v);
 		}
 		module.newSignal("methodId", type);

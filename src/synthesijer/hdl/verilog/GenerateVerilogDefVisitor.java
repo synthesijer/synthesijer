@@ -89,7 +89,8 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLUserDefinedType(HDLUserDefinedType o) {
 		for(int i = 0; i < o.getItems().length; i++){
-			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getItems()[i].getVerilogHDL(), i));
+//			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getItems()[i].getVerilogHDL(), i));
+			HDLUtils.println(dest, offset, String.format("localparam %s = 32'd%d;", o.getItems()[i].getVerilogHDL(), i));
 		}
 	}
 

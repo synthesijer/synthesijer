@@ -43,7 +43,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 				HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.param.getName(), pair.getValue()));
 			}else{
 				HDLUtils.print(dest, 0, sep);
-				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.param.getValue()));
+				HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.param.getName(), pair.param.getValue()));
 			}
 			sep = ",\n";
 		}
