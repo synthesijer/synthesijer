@@ -69,34 +69,17 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	public HDLVariable getHDLVariable(Variable v){
 		return variableTable.get(v);
-	}	
+	}
 	
-	@Override
-	public void visitMethod(Method o) {
-		if(o.isConstructor()) return; // skip 
-		if(o.isUnsynthesizable()) return; // skip
-		ArrayList<Pair<HDLPort, HDLSignal>> argPorts = new ArrayList<>();
-		for(VariableDecl v: o.getArgs()){
-			HDLType t = getHDLType(v.getType());
-			if(t != null){
-				HDLSignal s = module.newSignal(o.getName() + "_" + v.getName(), t);
-				if(o.isPrivate() == false){
-					HDLPort p = module.newPort(o.getName() + "_" + v.getName() + "_in", HDLPort.DIR.IN, t);
-					argPorts.add(new Pair<HDLPort, HDLSignal>(p, s));
-				}
-				variableTable.put(v.getVariable(), s);
-			}
-		}
-		HDLType t = getHDLType(o.getType());
-		if(t != null){
-			if(o.isPrivate() == false){
-				HDLPort p = module.newPort(o.getName() + "_return", HDLPort.DIR.OUT, t);
-				methodReturnTable.put(o, p.getSignal());
-			}else{
-				HDLSignal s = module.newSignal(o.getName() + "_return_sig", t);
-				methodReturnTable.put(o, s);
-			}
-		}
+	private void genAutoMethod(Method o){
+		genVariableTables(o);
+		Statemachine2HDLSequencerVisitor visitor = new Statemachine2HDLSequencerVisitor(this);
+		o.getStateMachine().accept(visitor);
+		o.getBody().accept(this);
+	}
+	
+	private void genMethod(Method o, ArrayList<Pair<HDLPort, HDLSignal>> argPorts){
+
 		HDLSignal req_local = module.newSignal(o.getName() + "_req_local", HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.REGISTER);
 		req_local.setDefaultValue(HDLPreDefinedConstant.LOW);
 		HDLExpr reqExpr;
@@ -130,6 +113,39 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		if(isThreadStart(o)){ genThreadStart(o); }
 		if(isThreadJoin(o)){ genThreadJoin(o); }
 		if(isThreadYield(o)){ genThreadYield(o); }
+	}
+
+	@Override
+	public void visitMethod(Method o) {
+		if(o.isConstructor()) return; // skip 
+		if(o.isUnsynthesizable()) return; // skip
+		ArrayList<Pair<HDLPort, HDLSignal>> argPorts = new ArrayList<>();
+		for(VariableDecl v: o.getArgs()){
+			HDLType t = getHDLType(v.getType());
+			if(t != null){
+				HDLSignal s = module.newSignal(o.getName() + "_" + v.getName(), t);
+				if(o.isPrivate() == false){
+					HDLPort p = module.newPort(o.getName() + "_" + v.getName() + "_in", HDLPort.DIR.IN, t);
+					argPorts.add(new Pair<HDLPort, HDLSignal>(p, s));
+				}
+				variableTable.put(v.getVariable(), s);
+			}
+		}
+		HDLType t = getHDLType(o.getType());
+		if(t != null){
+			if(o.isPrivate() == false){
+				HDLPort p = module.newPort(o.getName() + "_return", HDLPort.DIR.OUT, t);
+				methodReturnTable.put(o, p.getSignal());
+			}else{
+				HDLSignal s = module.newSignal(o.getName() + "_return_sig", t);
+				methodReturnTable.put(o, s);
+			}
+		}
+		if(o.isAuto()){
+			genAutoMethod(o);
+		}else{
+			genMethod(o, argPorts);
+		}
 	}
 	
 	private HDLVariable genHDLVariable(Variable v, ArrayType t){

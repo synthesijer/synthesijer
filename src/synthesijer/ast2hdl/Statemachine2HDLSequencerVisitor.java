@@ -23,7 +23,11 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 		this.kickExpr = reqExpr;
 		this.busySig = busySig;
 	}
-	
+
+	public Statemachine2HDLSequencerVisitor(GenerateHDLModuleVisitor parent){
+		this(parent, null, null);
+	}
+
 	private void addStateTransition(HDLSequencer.SequencerState ss, Transition t){
 		if(t.getCondition() == null){
 			if(t.getDestination() != null){
@@ -49,6 +53,10 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 			ss.addStateTransit(expr, parent.stateTable.get(t.getDestination()));
 		}
 	}
+	
+	private boolean isAuto(){
+		return (kickExpr == null && busySig == null);
+	}
 
 	@Override
 	public void visitStatemachine(Statemachine o) {
@@ -66,13 +74,17 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 				ss.addStateTransit(hs.getIdleState());
 			}
 		}
-		HDLSequencer.SequencerState entryState = parent.stateTable.get(o.getEntryState()); 
-		hs.getIdleState().addStateTransit(kickExpr, entryState);
-		busySig.setAssign(null,
-				parent.module.newExpr(HDLOp.IF,
-						parent.module.newExpr(HDLOp.EQ, hs.getStateKey(), hs.getIdleState().getStateId()),
-						HDLPreDefinedConstant.LOW,
-						HDLPreDefinedConstant.HIGH));
+		HDLSequencer.SequencerState entryState = parent.stateTable.get(o.getEntryState());
+		if(isAuto() == false){
+			hs.getIdleState().addStateTransit(kickExpr, entryState);
+			busySig.setAssign(null,
+					parent.module.newExpr(HDLOp.IF,
+							parent.module.newExpr(HDLOp.EQ, hs.getStateKey(), hs.getIdleState().getStateId()),
+							HDLPreDefinedConstant.LOW,
+							HDLPreDefinedConstant.HIGH));
+		}else{
+			hs.getIdleState().addStateTransit(entryState);
+		}
 	}
 	
 	public HDLSequencer getHDLSequencer(){
