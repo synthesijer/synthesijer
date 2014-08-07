@@ -14,6 +14,7 @@ entity simple_dualportram is
     clk      : in  std_logic;
     reset    : in  std_logic;
     we       : in  std_logic;
+    oe       : in  std_logic;
     length   : out signed(31 downto 0);
     raddress : in  signed(31 downto 0);
     dout     : out signed(WIDTH-1 downto 0);

@@ -17,6 +17,7 @@ public class BlockRAM extends HDLModule{
 		newPort("din",      DIR.IN,  HDLPrimitiveType.genSignedType(width));
 		newPort("dout",     DIR.OUT, HDLPrimitiveType.genSignedType(width));
 		newPort("we",       DIR.IN,  HDLPrimitiveType.genBitType());
+		newPort("oe",       DIR.IN,  HDLPrimitiveType.genBitType());
 	}
 
 }

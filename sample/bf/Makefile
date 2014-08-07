@@ -4,12 +4,8 @@ CLASSES = $(SOURCES:.java=.class)
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 
-all: $(SOURCES) microboard
+all: $(SOURCES)
 	java -cp $(SYNTHESIJER):../serial_echo:. synthesijer.Main $(SOURCES)
-
-microboard: MicroboardTop.java
-	javac -cp $(SYNTHESIJER):. $<
-	java -cp $(SYNTHESIJER):. $(<:.java=)
 
 clean:
 	-rm -f $(CLASSES)
@@ -22,6 +18,4 @@ clean:
 	-rm -f *.vcd
 	-rm -f work-obj93.cf
 	-rm -f *.svg
-	-rm -f microboard_top.vhd
-	-rm -f microboard_top.v
 

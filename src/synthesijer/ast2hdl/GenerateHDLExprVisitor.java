@@ -58,7 +58,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitArrayAccess(ArrayAccess o) {
-		HDLSignal addr = null, we = null;
+		HDLSignal addr = null, we = null, oe = null;
 		if(o.getIndexed() instanceof Ident){
 			Ident id = (Ident)o.getIndexed();
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
@@ -66,6 +66,8 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			
 			addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
 			we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
+			oe = inst.getSignalForPort("oe"); // see synthsijer.lib.BlockRAM
+			//System.out.println("mem:"+inst.getSignalForPort("oe"));
 			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
 		}else if(o.getIndexed() instanceof FieldAccess){
 			FieldAccess fa = (FieldAccess)o.getIndexed();
@@ -75,6 +77,8 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			HDLInstance inst = (HDLInstance)var;
 			addr = inst.getSignalForPort(sym.getSymbol() + "_raddress");
 			we = inst.getSignalForPort(sym.getSymbol() + "_we");
+			//System.out.println("field.mem:"+sym.getSymbol() + "_oe");
+			oe = inst.getSignalForPort(sym.getSymbol() + "_oe");
 			result = inst.getSignalForPort(sym.getSymbol() + "_dout");
 			//System.out.println(addr);
 			//System.out.println(we);
@@ -85,6 +89,10 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		}
 		addr.setAssign(state, 0, stepIn(o.getIndex()));
 		we.setAssign(state, HDLPreDefinedConstant.LOW);
+		if(oe != null){
+			oe.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
+			oe.setDefaultValue(HDLPreDefinedConstant.LOW);
+		}
 		if(state != null){
 			state.setMaxConstantDelay(2);
 		}else{

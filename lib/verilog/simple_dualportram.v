@@ -8,7 +8,8 @@ module simple_dualportram #( parameter WIDTH = 32, DEPTH = 10, WORDS =1024 )
 	input  wire [31:0] waddress,
 	input  wire [WIDTH-1:0] din,
 	output wire [WIDTH-1:0] dout,
-	input  wire we
+	input  wire we,
+	input  wire oe
 );
 
 	reg [WIDTH-1:0] mem [WORDS-1:0];
