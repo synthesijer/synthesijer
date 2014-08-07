@@ -75,6 +75,8 @@ public enum Manager {
 	private void loadUserHDLModules(){
 		for(String s: userHDLModules){
 			try {
+				System.out.println(s);
+				System.out.println(ClassLoader.getSystemClassLoader().getResource(s));
 				Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
 				
 				Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
