@@ -28,20 +28,20 @@ import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPrimitiveType;
-import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
+import synthesijer.hdl.sequencer.SequencerState;
 
 public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		
 	private final GenerateHDLModuleVisitor parent;
-	private final HDLSequencer.SequencerState state;
+	private final SequencerState state;
 	
 	private HDLExpr result;
 	
-	public GenerateHDLExprVisitor(GenerateHDLModuleVisitor parent, HDLSequencer.SequencerState state){
+	public GenerateHDLExprVisitor(GenerateHDLModuleVisitor parent, SequencerState state){
 		this.parent = parent;
 		this.state = state;
 	}

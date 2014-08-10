@@ -6,6 +6,7 @@ import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
+import synthesijer.hdl.sequencer.SequencerState;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 import synthesijer.model.StatemachineVisitor;
@@ -28,7 +29,7 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 		this(parent, null, null);
 	}
 
-	private void addStateTransition(HDLSequencer.SequencerState ss, Transition t){
+	private void addStateTransition(SequencerState ss, Transition t){
 		if(t.getCondition() == null){
 			if(t.getDestination() != null){
 				ss.addStateTransit(parent.stateTable.get(t.getDestination()));
@@ -65,7 +66,7 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 			parent.stateTable.put(s, hs.addSequencerState(s.getId()));
 		}
 		for(State s: o.getStates()){
-			HDLSequencer.SequencerState ss = parent.stateTable.get(s);
+			SequencerState ss = parent.stateTable.get(s);
 			for(Transition t: s.getTransitions()){
 				//System.out.println("state=" + s + " => " + t);
 				addStateTransition(ss, t);
@@ -74,7 +75,7 @@ class Statemachine2HDLSequencerVisitor implements StatemachineVisitor {
 				ss.addStateTransit(hs.getIdleState());
 			}
 		}
-		HDLSequencer.SequencerState entryState = parent.stateTable.get(o.getEntryState());
+		SequencerState entryState = parent.stateTable.get(o.getEntryState());
 		if(isAuto() == false){
 			hs.getIdleState().addStateTransit(kickExpr, entryState);
 			busySig.setAssign(null,

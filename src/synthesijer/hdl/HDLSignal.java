@@ -2,6 +2,8 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
+import synthesijer.hdl.sequencer.SequencerState;
+
 public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem{
 	
 	private final HDLModule module;
@@ -84,7 +86,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	}
 
 	@Override
-	public void setAssign(HDLSequencer.SequencerState s, HDLExpr expr){
+	public void setAssign(SequencerState s, HDLExpr expr){
 		if(s != null){
 			AssignmentCondition c = new AssignmentCondition(s, expr);
 			conditions.add(c);
@@ -96,7 +98,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	}
 
 	@Override
-	public void setAssign(HDLSequencer.SequencerState s, int counter, HDLExpr expr){
+	public void setAssign(SequencerState s, int counter, HDLExpr expr){
 		if(s != null){
 			AssignmentCondition c = new AssignmentCondition(s, counter, expr);
 			conditions.add(c);
@@ -134,15 +136,15 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	}
 	
 	public class AssignmentCondition{
-		private final HDLSequencer.SequencerState s;
+		private final SequencerState s;
 		private final HDLExpr value;
 		private final int count;
 		
-		public AssignmentCondition(HDLSequencer.SequencerState s, HDLExpr value) {
+		public AssignmentCondition(SequencerState s, HDLExpr value) {
 			this(s, -1, value);
 		}
 
-		public AssignmentCondition(HDLSequencer.SequencerState s, int count, HDLExpr value) {
+		public AssignmentCondition(SequencerState s, int count, HDLExpr value) {
 			this.s = s;
 			this.value = value;
 			this.count = count;

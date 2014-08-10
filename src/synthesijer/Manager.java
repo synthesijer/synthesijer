@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import synthesijer.ast.Module;
@@ -56,6 +57,13 @@ public enum Manager {
 		HDLModuleInfo info = moduleTable.get(name);
 		return info;
 	}
+	
+	public void HDLModuleInfoList(){
+		Enumeration<String> keys = moduleTable.keys();
+		while(keys.hasMoreElements()){
+			System.out.println(keys.nextElement());
+		}
+	}
 
 	public boolean isGeneratedHDLModule(String name){
 		HDLModuleInfo info = moduleTable.get(name);
@@ -75,8 +83,6 @@ public enum Manager {
 	private void loadUserHDLModules(){
 		for(String s: userHDLModules){
 			try {
-				System.out.println(s);
-				System.out.println(ClassLoader.getSystemClassLoader().getResource(s));
 				Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
 				
 				Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});

@@ -9,6 +9,7 @@ import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
+import synthesijer.hdl.sequencer.SequencerState;
 
 public class ClkDiv extends HDLModule{
 	
@@ -20,7 +21,7 @@ public class ClkDiv extends HDLModule{
 		HDLSignal c = newSignal("counter", HDLPrimitiveType.genVectorType(16));
 		
 		HDLSequencer seq = newSequencer("main");
-		HDLSequencer.SequencerState s0 = seq.addSequencerState("S0");
+		SequencerState s0 = seq.addSequencerState("S0");
 		seq.getIdleState().addStateTransit(s0);
 		c.setAssign(seq.getIdleState(), HDLPreDefinedConstant.VECTOR_ZERO);
 		

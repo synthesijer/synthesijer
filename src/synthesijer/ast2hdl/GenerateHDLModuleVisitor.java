@@ -51,12 +51,13 @@ import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
+import synthesijer.hdl.sequencer.SequencerState;
 import synthesijer.model.State;
 
 public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	
 	final HDLModule module;
-	final Hashtable<State, HDLSequencer.SequencerState> stateTable;
+	final Hashtable<State, SequencerState> stateTable;
 	private final Hashtable<Method, HDLSignal> methodReturnTable;
 	private final Hashtable<Variable, HDLVariable> variableTable = new Hashtable<>();
 	private final Hashtable<Method, HDLValue> methodIdTable = new Hashtable<>();
@@ -182,6 +183,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			Manager.HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(c.getName());
 			if(info == null){
 				SynthesijerUtils.error(c.getName() + " is not found.");
+				Manager.INSTANCE.HDLModuleInfoList();
 				System.exit(0);
 			}
 			if(info.getCompileState().isBefore(CompileState.GENERATE_HDL)){
@@ -273,7 +275,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	public void visitReturnStatement(ReturnStatement o) {
 		if(o.getExpr() != null){
 			HDLSignal s = methodReturnTable.get(o.getScope().getMethod());
-			HDLSequencer.SequencerState state = stateTable.get(o.getState());
+			SequencerState state = stateTable.get(o.getState());
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, state);
 			o.getExpr().accept(v);
 			s.setAssign(state, v.getResult());

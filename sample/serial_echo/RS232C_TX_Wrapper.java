@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPort;
-import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;

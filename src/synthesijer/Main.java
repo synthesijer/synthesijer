@@ -12,6 +12,8 @@ public class Main {
 		GetOpt opt = new GetOpt("", "no-optimize", args);
 
 		openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
+		
+		System.out.println("classpath : " + System.getProperty("java.class.path"));
 
 		for(String arg: args){
 			System.out.println(arg);
@@ -20,7 +22,7 @@ public class Main {
 //		int err = openjdk.com.sun.tools.javac.Main.compile(args);
 		//int err = compiler.compile(opt.getArgs());
 		
-		boolean optimizeFlag = !opt.flag("no-optimize"); 
+		boolean optimizeFlag = !opt.flag("no-optimize");
 		
 		if(err == 0){
 			dump("dump000.xml");

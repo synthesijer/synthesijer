@@ -6,6 +6,8 @@ import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLInstance.ParamPair;
+import synthesijer.hdl.sequencer.SequencerState;
+import synthesijer.hdl.sequencer.StateTransitCondition;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLParameter;
@@ -156,7 +158,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	private void genSyncSequencerSwitch(HDLSequencer o, int offset){
 		if(o.getStates().size() > 0){
 			HDLUtils.println(dest, offset, String.format("case (%s)", o.getStateKey().getName()));
-			for(HDLSequencer.SequencerState s: o.getStates()){
+			for(SequencerState s: o.getStates()){
 				HDLUtils.println(dest, offset+2, String.format("%s : begin", s.getStateId().getVerilogHDL()));
 				
 				if(s.hasExitCondition()){
@@ -192,7 +194,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	
 	private void genAsyncSequencerBody(HDLSequencer o, int offset){
 		if(o.getStates().size() > 0){
-			for(HDLSequencer.SequencerState s: o.getStates()){
+			for(SequencerState s: o.getStates()){
 				HDLUtils.println(dest, offset, String.format("// state %s = %s", o.getStateKey().getName(), s.getStateId().getVerilogHDL()));
 				if(o.getTransitionTime() > 0) HDLUtils.println(dest, offset, String.format("#%d", o.getTransitionTime()));
 				genStateTransition(dest, offset, s);
@@ -218,11 +220,11 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.nl(dest);
 	}
 	
-	public void genStateTransition(PrintWriter dest, int offset, HDLSequencer.SequencerState s){
+	public void genStateTransition(PrintWriter dest, int offset, SequencerState s){
 		if(s.getTransitions().size() > 0){
 			String sep = "";
 			int cnt = 0;
-			for(HDLSequencer.StateTransitCondition c: s.getTransitions()){
+			for(StateTransitCondition c: s.getTransitions()){
 				String str = String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId().getVerilogHDL());
 				if(c.hasCondition()){
 					HDLUtils.println(dest, offset, String.format("%sif (%s) begin", sep, c.getCondExprAsVerilogHDL()));

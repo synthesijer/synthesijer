@@ -9,6 +9,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLUtils;
+import synthesijer.hdl.sequencer.SequencerState;
 
 public class LED extends HDLModule{
 	
@@ -23,7 +24,7 @@ public class LED extends HDLModule{
 		
 		// at main state, counter <= counter + 1
 		HDLSequencer seq = newSequencer("main");
-		HDLSequencer.SequencerState ss = seq.getIdleState();
+		SequencerState ss = seq.getIdleState();
 		counter.setAssign(ss, newExpr(HDLOp.ADD, counter, 1));
 		
 	}

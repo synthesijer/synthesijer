@@ -8,6 +8,7 @@ import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
+import synthesijer.hdl.sequencer.SequencerState;
 
 public class StateBranch extends HDLModule{
 	
@@ -16,11 +17,11 @@ public class StateBranch extends HDLModule{
 		HDLPort sel = newPort("sel", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort q = newPort("q", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
 		HDLSequencer s = newSequencer("main");
-		HDLSequencer.SequencerState idle = s.getIdleState();
-		HDLSequencer.SequencerState s0 = s.addSequencerState("s0");
+		SequencerState idle = s.getIdleState();
+		SequencerState s0 = s.addSequencerState("s0");
 		idle.addStateTransit(s0);
-		HDLSequencer.SequencerState s1 = s.addSequencerState("s1");
-		HDLSequencer.SequencerState s2 = s.addSequencerState("s2");
+		SequencerState s1 = s.addSequencerState("s1");
+		SequencerState s2 = s.addSequencerState("s2");
 		s0.addStateTransit(newExpr(HDLOp.EQ, sel.getSignal(), HDLPreDefinedConstant.HIGH), s1);
 		s0.addStateTransit(newExpr(HDLOp.EQ, sel.getSignal(), HDLPreDefinedConstant.LOW), s2);
 		q.getSignal().setAssign(idle, HDLPreDefinedConstant.LOW);

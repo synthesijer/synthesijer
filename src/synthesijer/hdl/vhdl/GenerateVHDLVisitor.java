@@ -18,6 +18,8 @@ import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
+import synthesijer.hdl.sequencer.SequencerState;
+import synthesijer.hdl.sequencer.StateTransitCondition;
 
 public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	
@@ -134,7 +136,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	private void genSyncSequencerSwitch(HDLSequencer o, int offset){
 		if(o.getStates().size() > 0){
 			HDLUtils.println(dest, offset, String.format("case (%s) is", o.getStateKey().getName()));
-			for(HDLSequencer.SequencerState s: o.getStates()){
+			for(SequencerState s: o.getStates()){
 				HDLUtils.println(dest, offset+2, String.format("when %s => ", s.getStateId().getVHDL()));
 				if(s.hasExitCondition()){
 					HDLUtils.println(dest, offset+4, String.format("if %s then", s.getExitConditionAsVHDL()));
@@ -171,7 +173,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	
 	private void genAsyncSequencerBody(HDLSequencer o, int offset){
 		if(o.getStates().size() > 0){
-			for(HDLSequencer.SequencerState s: o.getStates()){
+			for(SequencerState s: o.getStates()){
 				HDLUtils.println(dest, offset, String.format("-- state %s = %s", o.getStateKey().getName(), s.getStateId().getVHDL()));
 				genStateTransition(dest, offset, s);
 				if(o.hasTransitionTime()) HDLUtils.println(dest, offset, String.format("wait for %d ns;", o.getTransitionTime()));
@@ -198,11 +200,11 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.nl(dest);
 	}
 	
-	public void genStateTransition(PrintWriter dest, int offset, HDLSequencer.SequencerState s){
+	public void genStateTransition(PrintWriter dest, int offset, SequencerState s){
 		if(s.getTransitions().size() > 0){
 			String sep = "if";
 			int cnt = 0;
-			for(HDLSequencer.StateTransitCondition c: s.getTransitions()){
+			for(StateTransitCondition c: s.getTransitions()){
 				String str = String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId().getVHDL());
 				if(c.hasCondition()){
 					HDLUtils.println(dest, offset, String.format("%s %s then", sep, c.getCondExprAsVHDL()));

@@ -11,12 +11,13 @@ import synthesijer.hdl.HDLSimModule;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
+import synthesijer.hdl.sequencer.SequencerState;
 
 public class BasicSim extends HDLSimModule{
 	
 	protected HDLInstance inst;
 	protected HDLSignal counter;
-	protected HDLSequencer.SequencerState ss;
+	protected SequencerState ss;
 	
 	public BasicSim(HDLModule target, String name) {
 		super(name);
@@ -29,7 +30,7 @@ public class BasicSim extends HDLSimModule{
 		seq.setTransitionTime(10);
 		
 		ss = seq.getIdleState();
-		HDLSequencer.SequencerState s0 = seq.addSequencerState("S0");
+		SequencerState s0 = seq.addSequencerState("S0");
 		ss.addStateTransit(s0);
 		s0.addStateTransit(ss);
 		
@@ -59,7 +60,7 @@ public class BasicSim extends HDLSimModule{
 		return newExpr(HDLOp.AND, newExpr(HDLOp.GEQ, counter, value0), newExpr(HDLOp.LEQ, counter, value1)); 
 	}
 
-	protected HDLExpr delayPulse(HDLSequencer.SequencerState s, String name, HDLSignal flag, int value){
+	protected HDLExpr delayPulse(SequencerState s, String name, HDLSignal flag, int value){
 		HDLSignal sig = newSignal(name, HDLPrimitiveType.genSignedType(32));
 		sig.setAssign(s, newExpr(HDLOp.IF, newExpr(HDLOp.AND, flag, newExpr(HDLOp.EQ, sig, 0)),
 				new HDLValue(String.valueOf(value), HDLPrimitiveType.genSignedType(32)),
