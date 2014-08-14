@@ -12,12 +12,7 @@ public class Main {
 		GetOpt opt = new GetOpt("", "no-optimize", args);
 
 		openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
-		
-		System.out.println("classpath : " + System.getProperty("java.class.path"));
 
-		for(String arg: args){
-			System.out.println(arg);
-		}
 		int err = compiler.compile(args);
 //		int err = openjdk.com.sun.tools.javac.Main.compile(args);
 		//int err = compiler.compile(opt.getArgs());

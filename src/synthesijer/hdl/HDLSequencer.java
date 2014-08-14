@@ -2,7 +2,6 @@ package synthesijer.hdl;
 
 import java.util.ArrayList;
 
-import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.sequencer.SequencerState;
