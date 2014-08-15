@@ -96,6 +96,12 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		return null;
 	}
 
+	public HDLSignal newSignal(String name, HDLType type, HDLSignal.ResourceKind kind, HDLExpr equivExpr, boolean equivFlag){
+		HDLSignal sig = new HDLSignal(this, name, type, kind, equivExpr, equivFlag);
+		signals.add(sig);
+		return sig;
+	}
+
 	public HDLSignal newSignal(String name, HDLType type, HDLSignal.ResourceKind kind){
 		HDLSignal sig = new HDLSignal(this, name, type, kind);
 		signals.add(sig);

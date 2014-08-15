@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.hdl.tools.HDLSequencerToDot;
+import synthesijer.hdl.tools.ResourceUsageTable;
 
 public class HDLUtils {
 	
@@ -44,6 +46,24 @@ public class HDLUtils {
 			}else{
 				m.genVerilogHDL(dest);
 			}
+		}catch(IOException e){
+			SynthesijerUtils.error(e.toString());
+		}
+	}
+
+	public static void genHDLSequencerDump(HDLModule m){
+		try(PrintWriter dest = new PrintWriter(new FileOutputStream(new File(m.getName() + "_statemachine_hdl.dot")), true)){
+			HDLSequencerToDot obj = new HDLSequencerToDot(m);
+			obj.generate(dest);
+		}catch(IOException e){
+			SynthesijerUtils.error(e.toString());
+		}
+	}
+
+	public static void genResourceUsageTable(HDLModule m){
+		try(PrintWriter dest = new PrintWriter(new FileOutputStream(new File(m.getName() + "_resourcetable.html")), true)){
+			ResourceUsageTable obj = new ResourceUsageTable(m);
+			obj.generate(dest);
 		}catch(IOException e){
 			SynthesijerUtils.error(e.toString());
 		}

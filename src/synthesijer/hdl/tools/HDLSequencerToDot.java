@@ -37,13 +37,21 @@ public class HDLSequencerToDot {
 		return s.getStateId().getValue();
 	}
 	
+	private String getCondNode(StateTransitCondition t){
+		return "\"" + t.toLabel() + "\"";
+	}
+
 	private void generate_node(PrintWriter dest, SequencerState s){
-		dest.println(getLabel(s) + ";");
+//		dest.println(getLabel(s) + ";");
 	}
 	
 	private void generate_edge(PrintWriter dest, SequencerState s){
 		for(StateTransitCondition t: s.getTransitions()){
-			dest.printf("%s -> %s;\n", getLabel(s), getLabel(t.getDestState()));
+			if(t.hasCondition() == false){
+				dest.printf("%s -> %s;\n", getLabel(s), getLabel(t.getDestState()));
+			}else{
+				dest.printf("%s -> %s [label = %s];\n", getLabel(s), getLabel(t.getDestState()), getCondNode(t));
+			}
 		}
 	}
 

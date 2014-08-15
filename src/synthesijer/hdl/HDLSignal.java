@@ -19,6 +19,9 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	private boolean assignAlwaysFlag;
 	private HDLExpr assignAlwaysExpr;
 	
+	private final HDLExpr equivExpr;
+	private final boolean equivFlag;
+	
 	public enum ResourceKind{
 		REGISTER("reg"), WIRE("wire");
 		String sym;
@@ -27,12 +30,18 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	}
 	
 	HDLSignal(HDLModule module, String name, HDLType type, ResourceKind kind){
+		this(module, name, type, kind, null, false);
+	}
+	
+	HDLSignal(HDLModule module, String name, HDLType type, ResourceKind kind, HDLExpr equivExpr, boolean equivFlag){
 		this.module = module;
 		this.name = name;
 		this.type = type;
 		this.kind = kind;
 		defaultValue = null;
 		assignAlwaysFlag = false;
+		this.equivExpr = equivExpr;
+		this.equivFlag = equivFlag;
 	}
 	
 	public String getName(){
@@ -121,17 +130,35 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 		return conditions.toArray(new AssignmentCondition[]{});
 	}
 	
+	private void getSrcSignals(HDLExpr expr, ArrayList<HDLSignal> list){
+		if(expr != null){
+			HDLSignal[] src = expr.getSrcSignals();
+			if(src != null){
+				for(HDLSignal s: src){ list.add(s); }
+			}
+		}
+	}
+	
 	@Override
 	public HDLSignal[] getSrcSignals(){
 		ArrayList<HDLSignal> list = new ArrayList<>();
+		System.out.println("getSrcSignal:" + getName());
+		/*
 		for(AssignmentCondition c: conditions){
 			if(!list.contains(c.getStateKey())){
 				list.add(c.getStateKey());
 			}
-			if(c.getValue().getSrcSignals() != null){
-				for(HDLSignal s: c.getValue().getSrcSignals()){ list.add(s); }
+			HDLSignal[] src = c.getValue().getSrcSignals();
+			if(src != null){
+				for(HDLSignal s: src){ list.add(s); }
 			}
 		}
+		*/
+		getSrcSignals(assignAlwaysExpr, list);
+		getSrcSignals(resetValue, list);
+		getSrcSignals(defaultValue, list);
+		getSrcSignals(equivExpr, list);
+
 		return list.toArray(new HDLSignal[]{});
 	}
 	
@@ -180,6 +207,9 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 			return s.getKey();
 		}
 		
+		public SequencerState getSequencerState(){
+			return s;
+		}
 		
 	}
 

@@ -98,8 +98,10 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.nl(dest);
 		for(HDLPort p: o.getPorts()){ p.accept(new GenerateVHDLVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
+		HDLUtils.println(dest, offset+2, "-- expressions");
 		for(HDLExpr expr : o.getExprs()){ expr.accept(new GenerateVHDLVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
+		HDLUtils.println(dest, offset+2, "-- sequencers");
 		for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVHDLVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
 		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLVisitor(dest, offset+2)); }

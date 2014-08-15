@@ -21,6 +21,14 @@ public class StateTransitCondition{
 		return destState;
 	}
 	
+	public String toLabel(){
+		String s = "";
+		if(cond != null){
+			s = String.format("%s = '1'", cond.getResultExpr().getVHDL());
+		}
+		return s;
+	}
+	
 	public String getCondExprAsVHDL(){
 		String s = "";
 		if(cond != null){

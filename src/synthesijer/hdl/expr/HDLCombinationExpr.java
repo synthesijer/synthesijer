@@ -27,7 +27,7 @@ public class HDLCombinationExpr implements HDLExpr{
 		}
 		//System.out.println(this);
 		HDLType type = decideExprType(op, this.args);
-		result = m.newSignal(String.format("tmp_%04d", uid), type, HDLSignal.ResourceKind.WIRE);
+		result = m.newSignal(String.format("tmp_%04d", uid), type, HDLSignal.ResourceKind.WIRE, this, true);
 		//System.out.println(result);
 	}
 	
