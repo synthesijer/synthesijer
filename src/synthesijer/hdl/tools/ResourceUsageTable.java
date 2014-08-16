@@ -117,7 +117,7 @@ public class ResourceUsageTable {
 		boolean[] writeVec, readVec;
 		writeVec = getBitVector(writeTable.get(s));
 		readVec = getBitVector(readTable.get(s));
-		System.out.println(s.getStateId().getValue());
+		//System.out.println(s.getStateId().getValue());
 		dest.printf("<td>%s</td>", s.getStateId().getValue());
 		for(int i = 0; i < signals.size(); i++){
 			String label = "";
