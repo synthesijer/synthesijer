@@ -10,12 +10,14 @@ build: $(SOURCES)
 	java -cp $(SYNTHESIJER) synthesijer.Main $(SOURCES)
 
 ghdl64: build primesim_top.vhd bubblesortsim_top.vhd
-	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) primesim_top.vhd bubblesortsim_top.vhd ../../lib/vhdl/simple_dualportram.vhd
+	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) primesim_top.vhd bubblesortsim_top.vhd ../../lib/vhdl/dualportram.vhd
 	ghdl -e -Wa,--32 -Wl,-m32 primesim_top
 	ghdl -e -Wa,--32 -Wl,-m32 bubblesortsim_top
 
 ghdl32: build
-	ghdl -a --std=93c --workdir=. $(VHDL_SOURCES) bubblesortsim_top.vhd primesim_top.vhd ../../lib/vhdl/simple_dualportram.vhd
+	ghdl -a --std=93c --workdir=. $(VHDL_SOURCES) bubblesortsim_top.vhd primesim_top.vhd ../../lib/vhdl/dualportram.vhd
+	ghdl -e primesim_top
+	ghdl -e bubblesortsim_top
 
 clean:
 	-rm -f *.class

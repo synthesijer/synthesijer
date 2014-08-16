@@ -64,25 +64,20 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			HDLInstance inst = (HDLInstance)var;
 			
-			addr = inst.getSignalForPort("raddress"); // see synthsijer.lib.BlockRAM
-			we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
-			oe = inst.getSignalForPort("oe"); // see synthsijer.lib.BlockRAM
-			//System.out.println("mem:"+inst.getSignalForPort("oe"));
-			result = inst.getSignalForPort("dout"); // see synthsijer.lib.BlockRAM
+			addr = inst.getSignalForPort("address_b"); // see synthsijer.lib.BlockRAM
+			we = inst.getSignalForPort("we_b"); // see synthsijer.lib.BlockRAM
+			oe = inst.getSignalForPort("oe_b"); // see synthsijer.lib.BlockRAM
+			result = inst.getSignalForPort("dout_b"); // see synthsijer.lib.BlockRAM
 		}else if(o.getIndexed() instanceof FieldAccess){
 			FieldAccess fa = (FieldAccess)o.getIndexed();
 			Ident id = (Ident)(fa.getSelected());
 			Ident sym = fa.getIdent();
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			HDLInstance inst = (HDLInstance)var;
-			addr = inst.getSignalForPort(sym.getSymbol() + "_raddress");
+			addr = inst.getSignalForPort(sym.getSymbol() + "_address");
 			we = inst.getSignalForPort(sym.getSymbol() + "_we");
-			//System.out.println("field.mem:"+sym.getSymbol() + "_oe");
 			oe = inst.getSignalForPort(sym.getSymbol() + "_oe");
 			result = inst.getSignalForPort(sym.getSymbol() + "_dout");
-			//System.out.println(addr);
-			//System.out.println(we);
-			//System.out.println(result);
 		}else{
 			SynthesijerUtils.error(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 			System.exit(0);
@@ -142,16 +137,16 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 				Ident id = (Ident)aa.getIndexed();
 				HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 				HDLInstance inst = (HDLInstance)var;
-				addr = inst.getSignalForPort("waddress"); // see synthsijer.lib.BlockRAM
-				we = inst.getSignalForPort("we"); // see synthsijer.lib.BlockRAM
-				din = inst.getSignalForPort("din"); // see synthsijer.lib.BlockRAM
+				addr = inst.getSignalForPort("address_b"); // see synthsijer.lib.BlockRAM
+				we = inst.getSignalForPort("we_b"); // see synthsijer.lib.BlockRAM
+				din = inst.getSignalForPort("din_b"); // see synthsijer.lib.BlockRAM
 			}else if(aa.getIndexed() instanceof FieldAccess){
 				FieldAccess fa = (FieldAccess)aa.getIndexed();
 				Ident id = (Ident)(fa.getSelected());
 				Ident sym = fa.getIdent();
 				HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 				HDLInstance inst = (HDLInstance)var;
-				addr = inst.getSignalForPort(sym.getSymbol() + "_waddress");
+				addr = inst.getSignalForPort(sym.getSymbol() + "_address");
 				we = inst.getSignalForPort(sym.getSymbol() + "_we");
 				din = inst.getSignalForPort(sym.getSymbol() + "_din");
 			}else{

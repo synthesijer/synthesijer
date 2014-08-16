@@ -19,7 +19,7 @@ entity sc1602_wrapper is
     req           : in  std_logic;
     busy          : out std_logic;
     data_din      : in std_logic_vector(7 downto 0);
-    data_waddress : in std_logic_vector(31 downto 0);
+    data_address : in std_logic_vector(31 downto 0);
     data_we       : in std_logic
   );
 end sc1602_wrapper;
@@ -66,7 +66,7 @@ begin
       pReq     => req,
       pBusy    => busy,
       pWrData  => data_din,
-      pWrAddr  => data_waddress(6 downto 0),
+      pWrAddr  => data_address(6 downto 0),
       pWrWe(0) => data_we,
       pReset   => reset
       );

@@ -45,7 +45,9 @@ begin
   USB_RS232_TXD_sig <= U_tx_dout;
 
 
+  -- expressions
 
+  -- sequencers
 
   U_clk <= CLOCK_Y3_sig;
 
