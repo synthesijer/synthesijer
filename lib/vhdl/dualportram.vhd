@@ -14,13 +14,13 @@ entity dualportram is
     
     we      : in  std_logic;
     oe      : in  std_logic;
-    address : in  signed(DEPTH-1 downto 0);
+    address : in  signed(31 downto 0);
     din     : in  signed(WIDTH-1 downto 0);
     dout    : out signed(WIDTH-1 downto 0);
 
     we_b      : in  std_logic;
     oe_b      : in  std_logic;
-    address_b : in  signed(DEPTH-1 downto 0);
+    address_b : in  signed(31 downto 0);
     din_b     : in  signed(WIDTH-1 downto 0);
     dout_b    : out signed(WIDTH-1 downto 0);
 
@@ -30,7 +30,7 @@ end dualportram;
  
 architecture RTL of dualportram is
   -- Shared memory
-  type MEM_TYPE is array ( 2**DEPTH-1 downto 0 ) of std_logic_vector(WIDTH-1 downto 0);
+  type MEM_TYPE is array ( WORDS-1 downto 0 ) of std_logic_vector(WIDTH-1 downto 0);
   shared variable mem : MEM_TYPE;
 
   signal q, q_b : std_logic_vector(WIDTH-1 downto 0);
