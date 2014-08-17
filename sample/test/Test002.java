@@ -3,7 +3,8 @@ public class Test002 {
 	
 	public static final int DEFAULT_VALUE = 0x20;
 
-	int[] a = new int[1024];
+	public int[] a = new int[1024];
+	public int x, y;
 	
 	public void init(){
 		for(int i = 0; i < a.length; i++){
@@ -26,5 +27,12 @@ public class Test002 {
 		case 2: return a[2];
 		default: return a[3];
 		}
+	}
+	
+	public int sum_x_y(){
+		int v = x + y;
+		x = 0;
+		y = 0;
+		return v;
 	}
 }

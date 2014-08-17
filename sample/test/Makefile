@@ -8,8 +8,12 @@ all: $(SOURCES)
 	java -cp $(SYNTHESIJER) synthesijer.Main $(SOURCES)
 
 ghdl64: $(VHDL_SOURCES)
-	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/simple_dualportram.vhd
+	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd
 	ghdl -e -Wa,--32 -Wl,-m32 sim
+
+ghdl32: $(VHDL_SOURCES)
+	ghdl -a $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd
+	ghdl -e sim
 
 clean:
 	-rm -f *.class

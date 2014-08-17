@@ -22,6 +22,8 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	private final HDLExpr equivExpr;
 	private final boolean equivFlag;
 	
+	private boolean ignoreFlag = false; 
+	
 	public enum ResourceKind{
 		REGISTER("reg"), WIRE("wire");
 		String sym;
@@ -92,6 +94,14 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	
 	public String toString(){
 		return String.format("HDLSignal:: name=%s, type=%s, kind=%s", name, type, kind);
+	}
+	
+	public void setIgnore(boolean flag){
+		ignoreFlag = flag;
+	}
+	
+	public boolean isIgnore(){
+		return ignoreFlag;
 	}
 
 	@Override

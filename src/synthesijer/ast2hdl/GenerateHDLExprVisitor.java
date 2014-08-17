@@ -36,22 +36,30 @@ import synthesijer.hdl.sequencer.SequencerState;
 
 public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		
+	enum AccessMode {READ, WRITE};
+
 	private final GenerateHDLModuleVisitor parent;
 	private final SequencerState state;
+	private final AccessMode mode;
 	
 	private HDLExpr result;
 	
 	public GenerateHDLExprVisitor(GenerateHDLModuleVisitor parent, SequencerState state){
+		this(parent, state, AccessMode.READ);
+	}
+	
+	public GenerateHDLExprVisitor(GenerateHDLModuleVisitor parent, SequencerState state, AccessMode mode){
 		this.parent = parent;
 		this.state = state;
+		this.mode = mode;
 	}
 	
 	public HDLExpr getResult(){
 		return result;
 	}
 	
-	private HDLExpr stepIn(Expr expr){
-		GenerateHDLExprVisitor visitor = new GenerateHDLExprVisitor(parent, state);
+	private HDLExpr stepIn(Expr expr, AccessMode mode){
+		GenerateHDLExprVisitor visitor = new GenerateHDLExprVisitor(parent, state, mode);
 		expr.accept(visitor);
 		return visitor.getResult();
 	}
@@ -82,7 +90,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			SynthesijerUtils.error(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 			System.exit(0);
 		}
-		addr.setAssign(state, 0, stepIn(o.getIndex()));
+		addr.setAssign(state, 0, stepIn(o.getIndex(), AccessMode.READ));
 		we.setAssign(state, HDLPreDefinedConstant.LOW);
 		if(oe != null){
 			oe.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
@@ -97,7 +105,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
-		HDLExpr expr = stepIn(o.getRhs());
+		HDLExpr expr = stepIn(o.getRhs(), AccessMode.READ);
 		Expr lhs = o.getLhs();
 		if(lhs instanceof Ident){
 			Ident id = (Ident)lhs;
@@ -126,14 +134,13 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 				SynthesijerUtils.warn("Unsupported array access for non-Ident/FieldAccess: " + aa.getIndexed());
 				System.exit(0);
 			}
-			addr.setAssign(state, stepIn(aa.getIndex()));
+			addr.setAssign(state, stepIn(aa.getIndex(), AccessMode.READ));
 			we.setAssign(state, HDLPreDefinedConstant.HIGH);
 			we.setDefaultValue(HDLPreDefinedConstant.LOW);
 			din.setAssign(state, expr);
-			
-			
 		}else if(lhs instanceof FieldAccess){
-			HDLExpr l = stepIn(lhs);
+			HDLExpr l = stepIn(lhs, AccessMode.WRITE);
+//			HDLExpr l = stepIn(lhs, AccessMode.READ);
 			if(l instanceof HDLSignal){
 				((HDLSignal)l).setAssign(state, expr);
 			}else{
@@ -147,7 +154,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitAssignOp(AssignOp o) {
-		HDLExpr expr = parent.module.newExpr(o.getOp().getHDLOp(), stepIn(o.getLhs()), stepIn(o.getRhs()));
+		HDLExpr expr = parent.module.newExpr(o.getOp().getHDLOp(), stepIn(o.getLhs(), AccessMode.READ), stepIn(o.getRhs(), AccessMode.READ));
 		Ident id = (Ident)o.getLhs();
 		HDLVariable sig = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 		sig.setAssign(state, expr);
@@ -156,31 +163,34 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		
 	@Override
 	public void visitBinaryExpr(BinaryExpr o) {
-		HDLExpr lhs = stepIn(o.getLhs());
-		HDLExpr rhs = stepIn(o.getRhs());
+		HDLExpr lhs = stepIn(o.getLhs(), AccessMode.READ);
+		HDLExpr rhs = stepIn(o.getRhs(), AccessMode.READ);
 		result = parent.module.newExpr(o.getOp().getHDLOp(), lhs, rhs);
-		//HDLSignal sig = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
-		//sig.setAssign(null, parent.module.newExpr(convOp(o.getOp()), lhs, rhs));
-		//result = sig;
 	}
 	
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
-		//System.out.println(o);
 		Ident id = (Ident)o.getSelected();
 		if(o.getScope().search(id.getSymbol()) != null){
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			HDLInstance inst = (HDLInstance)var;
 			HDLSignal sig = inst.getSignalForPort(o.getIdent().getSymbol());
 			if(sig == null){
-				sig = inst.getSignalForPort("field_" + o.getIdent().getSymbol() + "_output");
+				if(mode == AccessMode.WRITE){
+					sig = inst.getSignalForPort("field_" + o.getIdent().getSymbol() + "_input");
+					HDLSignal we = inst.getSignalForPort("field_" + o.getIdent().getSymbol() + "_input_we");
+					we.setDefaultValue(HDLPreDefinedConstant.LOW);
+					we.setAssign(state, HDLPreDefinedConstant.HIGH);
+				}else{
+					sig = inst.getSignalForPort("field_" + o.getIdent().getSymbol() + "_output");
+				}
 			}
 			result = sig.getResultExpr();
 		}else{ // search global static field
 			Module m = Manager.INSTANCE.searchModule(id.getSymbol());
 			Variable v = m.search(o.getIdent().getSymbol());
 			if(v.isGlobalConstant()){
-				result = stepIn(v.getInitExpr());
+				result = stepIn(v.getInitExpr(), AccessMode.READ);
 			}
 		}
 	}
@@ -249,7 +259,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 				String arg = o.getMethodName() + "_" + method.getArgs()[i].getVariable().getName() + "_in";
 				s = inst.getSignalForPort(arg);
 			}
-			s.setAssign(state, 0, stepIn(o.getParameters().get(i)));
+			s.setAssign(state, 0, stepIn(o.getParameters().get(i), AccessMode.READ));
 		}
 
 		// method request
@@ -308,12 +318,12 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitParenExpr(ParenExpr o) {
-		result = stepIn(o.getExpr());
+		result = stepIn(o.getExpr(), AccessMode.READ);
 	}
 	
 	@Override
 	public void visitTypeCast(TypeCast o) {
-		HDLExpr expr = stepIn(o.getExpr());
+		HDLExpr expr = stepIn(o.getExpr(), AccessMode.READ);
 		
 		HDLPrimitiveType target = convToHDLType(o.getType());
 		HDLPrimitiveType given = (HDLPrimitiveType)(expr.getType());
@@ -337,7 +347,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
-		HDLExpr arg = stepIn(o.getArg());
+		HDLExpr arg = stepIn(o.getArg(), AccessMode.READ);
 		HDLVariable sig = (HDLVariable)arg;
 		HDLExpr expr;
 		if(o.getOp() == Op.INC || o.getOp() == Op.DEC){

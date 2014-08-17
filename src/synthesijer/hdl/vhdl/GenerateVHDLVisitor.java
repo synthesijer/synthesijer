@@ -254,7 +254,11 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			}
 			HDLUtils.println(dest, offset+4, String.format("end if;"));
 		}else{
-			HDLUtils.println(dest, offset+4, String.format("null;"));
+			if(o.hasDefaultValue()){
+				HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o,  o.getDefaultValue())));
+			}else{
+				HDLUtils.println(dest, offset+4, String.format("null;"));
+			}
 		}
 		HDLUtils.println(dest, offset+2, String.format("end if;"));
 		HDLUtils.println(dest, offset, String.format("end if;"));
@@ -328,7 +332,9 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLSignal(HDLSignal o) {
 		if(o.isRegister() && !o.isAssignAlways()){
-			if(o.getConditions().length == 0) return;
+			if(o.isIgnore()) return;
+			if(o.getConditions().length == 0 && o.hasDefaultValue() == false) return;
+//			if(o.getConditions().length == 0) return;
 			genSignalRegisterProcess(o);
 		}else if(o.isAssignAlways()){
 			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignAlwaysExpr().getResultExpr())));

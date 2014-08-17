@@ -381,10 +381,14 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		}
 		
 		if(o.getScope() instanceof Module && var.getType() instanceof PrimitiveTypeKind && var.isPublic()){ // added an accessor for the member variable.
-			//System.out.print("global:" + o);
-			//System.out.println("  " + s.getType());
-			HDLPort port = module.newPort("field_" + o.getName() + "_output", DIR.OUT, s.getType());
-			port.getSignal().setAssign(null, s);
+
+			HDLPort oport = module.newPort("field_" + o.getName() + "_output", DIR.OUT, s.getType());
+			oport.getSignal().setAssign(null, s);
+			
+			HDLPort iport = module.newPort("field_" + o.getName() + "_input", DIR.IN, s.getType());
+			HDLPort iport_we = module.newPort("field_" + o.getName() + "_input_we", DIR.IN, HDLPrimitiveType.genBitType());
+			s.setDefaultValue(module.newExpr(HDLOp.IF, iport_we.getSignal(), iport.getSignal(), s).getResultExpr());
+
 		}
 	}
 

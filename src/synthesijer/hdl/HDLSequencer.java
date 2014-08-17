@@ -28,6 +28,7 @@ public class HDLSequencer implements HDLTree{
 		states.add(idle);
 		delayCounter = module.newSignal(key + "_delay", HDLPrimitiveType.genSignedType(32), HDLSignal.ResourceKind.REGISTER);
 		delayCounter.setDefaultValue(HDLPreDefinedConstant.VECTOR_ZERO);
+		delayCounter.setIgnore(true);
 	}
 	
 	public void setTransitionTime(int step){

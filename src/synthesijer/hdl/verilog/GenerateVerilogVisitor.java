@@ -269,6 +269,10 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 				HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), o.getDefaultValue().getVerilogHDL()));
 			}
 			HDLUtils.println(dest, offset+2, String.format("end"));
+		}else{
+			if(o.hasDefaultValue()){
+				HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getName(), o.getDefaultValue().getVerilogHDL()));
+			}
 		}
 		HDLUtils.println(dest, offset, String.format("end"));
 	}
@@ -322,7 +326,8 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLSignal(HDLSignal o) {
 		if(o.isRegister()){
-			if(o.getConditions().length == 0) return;
+			if(o.isIgnore()) return;
+			if(o.getConditions().length == 0 && o.hasDefaultValue() == false) return;
 			genSignalRegisterProcess(o);
 		}else if(o.isAssignAlways()){
 			HDLUtils.println(dest, offset, String.format("assign %s = %s;", o.getName(), o.getAssignAlwaysExpr().getResultExpr().getVerilogHDL()));

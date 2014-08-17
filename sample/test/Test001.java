@@ -1,6 +1,6 @@
 public class Test001{
 	
-	int x = 0;
+	private int x = 0;
 	public int acc(int y){
 		x += y; 
 		return x;
