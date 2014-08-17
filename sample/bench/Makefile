@@ -30,6 +30,8 @@ clean:
 	-rm -f *.o
 	-rm -f *.s
 	-rm -f *.vcd
+	-rm -f *~
 	-rm -f work-obj93.cf
 	-rm -f primesim_top 
 	-rm -f bubblesortsim_top
+	-rm -f mergesortsim_top
