@@ -94,34 +94,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			SynthesijerUtils.warn("Array acceess in non-state region is not supported yet: " + o.getIndexed() + "[" + o.getIndex() + "]");
 		}
 	}
-		
-	private HDLOp convOp(Op op){
-		switch(op){
-		case PLUS : return HDLOp.ADD;
-		case MINUS : return HDLOp.SUB;
-		case AND : return HDLOp.AND;
-		case LAND : return HDLOp.AND;		
-		case LOR : return HDLOp.OR;
-		case OR : return HDLOp.OR;
-		case XOR : return HDLOp.XOR;
-		case COMPEQ : return HDLOp.EQ;
-		case NEQ : return HDLOp.NEQ;
-		case GT : return HDLOp.GT;
-		case GEQ : return HDLOp.GEQ;
-		case LT : return HDLOp.LT;
-		case LEQ : return HDLOp.LEQ;
-		case INC : return HDLOp.ADD;
-		case DEC : return HDLOp.SUB;
-		case LNOT : return HDLOp.NOT;
-		case ARITH_RSHIFT : return HDLOp.ARITH_RSHIFT;
-		case LOGIC_RSHIFT : return HDLOp.LOGIC_RSHIFT;
-		case LSHIFT : return HDLOp.LSHIFT;
-		default:
-			SynthesijerUtils.warn("undefined op:" + op);
-			return HDLOp.UNDEFINED;
-		}
-	}
-	
+			
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
 		HDLExpr expr = stepIn(o.getRhs());
@@ -174,7 +147,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitAssignOp(AssignOp o) {
-		HDLExpr expr = parent.module.newExpr(convOp(o.getOp()), stepIn(o.getLhs()), stepIn(o.getRhs()));
+		HDLExpr expr = parent.module.newExpr(o.getOp().getHDLOp(), stepIn(o.getLhs()), stepIn(o.getRhs()));
 		Ident id = (Ident)o.getLhs();
 		HDLVariable sig = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 		sig.setAssign(state, expr);
@@ -185,7 +158,7 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 	public void visitBinaryExpr(BinaryExpr o) {
 		HDLExpr lhs = stepIn(o.getLhs());
 		HDLExpr rhs = stepIn(o.getRhs());
-		result = parent.module.newExpr(convOp(o.getOp()), lhs, rhs);
+		result = parent.module.newExpr(o.getOp().getHDLOp(), lhs, rhs);
 		//HDLSignal sig = parent.module.newSignal("binaryexpr_result_" + this.hashCode(), HDLPrimitiveType.genVectorType(32));
 		//sig.setAssign(null, parent.module.newExpr(convOp(o.getOp()), lhs, rhs));
 		//result = sig;
@@ -293,6 +266,9 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		HDLSignal busy;
 		if(localFlag){
 			busy = parent.module.getSignal(o.getMethodName() + "_busy_sig");
+			if(busy == null){ // for public method
+				busy = parent.module.getPort(o.getMethodName() + "_busy").getSignal();
+			}
 		}else{
 			busy = inst.getSignalForPort(o.getMethodName() + "_busy");
 		}
@@ -305,12 +281,14 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 								HDLPreDefinedConstant.HIGH));
 		state.setMaxConstantDelay(1);
 		state.setStateExitFlag(flag);
-		
 		if(method.getType() == PrimitiveTypeKind.VOID){
 			result = null;
 		}else{
 			if(localFlag){
 				result = parent.module.getSignal(o.getMethodName() + "_return_sig");
+				if(result == null){
+					result = parent.module.getPort(o.getMethodName() + "_return").getSignal();
+				}
 			}else{
 				result = inst.getSignalForPort(o.getMethodName() + "_return");
 			}
@@ -363,10 +341,10 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 		HDLVariable sig = (HDLVariable)arg;
 		HDLExpr expr;
 		if(o.getOp() == Op.INC || o.getOp() == Op.DEC){
-			expr = parent.module.newExpr(convOp(o.getOp()), arg, HDLPreDefinedConstant.INTEGER_ONE);
+			expr = parent.module.newExpr(o.getOp().getHDLOp(), arg, HDLPreDefinedConstant.INTEGER_ONE);
 			sig.setAssign(state, expr);
 		}else{
-			expr = parent.module.newExpr(convOp(o.getOp()), arg);
+			expr = parent.module.newExpr(o.getOp().getHDLOp(), arg);
 		}
 		result = expr;
 	}

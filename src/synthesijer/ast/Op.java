@@ -1,37 +1,45 @@
 package synthesijer.ast;
 
+import synthesijer.hdl.HDLOp;
+
 public enum Op{
 	
-	ASSIGN("="),
-	PLUS("+"),
-	MINUS("-"),
-	MUL("*"),
-	DIV("/"),
-	MOD("%"),
-	COMPEQ("=="),
-	NEQ("!="),
-	GT(">"),
-	GEQ(">="),
-	LT("<"),
-	LEQ("<="),
-	LSHIFT("<<"),
-	LOGIC_RSHIFT(">>>"),
-	ARITH_RSHIFT(">>"),
-	AND("&"),
-	NOT("~"),
-	LAND("&&"),
-	LOR("||"),
-	OR("|"),
-	XOR("^"),
-	LNOT("!"),
-	INC("++"),
-	DEC("--"),
-	UNDEFINED("UNDEFINED");
+	ASSIGN("=", HDLOp.UNDEFINED),
+	PLUS("+", HDLOp.ADD),
+	MINUS("-", HDLOp.SUB),
+	MUL("*", HDLOp.MUL),
+	DIV("/", HDLOp.UNDEFINED),
+	MOD("%", HDLOp.UNDEFINED),
+	COMPEQ("==", HDLOp.EQ),
+	NEQ("!=", HDLOp.NEQ),
+	GT(">", HDLOp.GT),
+	GEQ(">=", HDLOp.GEQ),
+	LT("<", HDLOp.LT),
+	LEQ("<=", HDLOp.LEQ),
+	LSHIFT("<<", HDLOp.LSHIFT),
+	LOGIC_RSHIFT(">>>", HDLOp.LOGIC_RSHIFT),
+	ARITH_RSHIFT(">>", HDLOp.ARITH_RSHIFT),
+	AND("&", HDLOp.AND),
+	NOT("~", HDLOp.NOT),
+	LAND("&&", HDLOp.AND),
+	LOR("||", HDLOp.OR),
+	OR("|", HDLOp.OR),
+	XOR("^", HDLOp.XOR),
+	LNOT("!", HDLOp.NOT),
+	INC("++", HDLOp.ADD),
+	DEC("--", HDLOp.SUB),
+	UNDEFINED("UNDEFINED", HDLOp.UNDEFINED);
 	
 	private final String name;
+	private final HDLOp hdlOp;
 	
-	Op(String name){
+	Op(String name, HDLOp hdlOp){
 		this.name = name;
+		this.hdlOp = hdlOp;
+	}
+	
+	public HDLOp getHDLOp(){
+		return hdlOp;
 	}
 	
 	public static Op getOp(String opName){
@@ -61,5 +69,5 @@ public enum Op{
 		else if(DEC.name.equals(opName))    return Op.DEC;
 		else return Op.UNDEFINED;
 	}
-	
+		
 }

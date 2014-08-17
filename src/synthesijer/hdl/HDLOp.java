@@ -4,6 +4,7 @@ public enum HDLOp {
 		
 	ADD(KIND.INFIX, "+"),
 	SUB(KIND.INFIX, "-"),
+	MUL(KIND.INFIX, "*"),
 	AND(KIND.INFIX, "and", "&&"),
 	OR(KIND.INFIX, "or", "||"),
 	XOR(KIND.INFIX, "xor", "^"),
