@@ -29,7 +29,7 @@ module dualportram #(
    assign length = WORDS;
 
    always @(posedge clk) begin
-      q <= mem[a_addr];
+      q <= mem[address];
       if(we) begin
          mem[address] <= din;
       end

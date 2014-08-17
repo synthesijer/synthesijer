@@ -83,9 +83,13 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 			HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 			HDLInstance inst = (HDLInstance)var;
 			addr = inst.getSignalForPort(sym.getSymbol() + "_address");
+			if(addr == null) addr = inst.getSignalForPort("field_" + sym.getSymbol() + "_address"); // ad-hoc, to access generated field array
 			we = inst.getSignalForPort(sym.getSymbol() + "_we");
+			if(we == null) we = inst.getSignalForPort("field_" + sym.getSymbol() + "_we"); // ad-hoc, to access generated field array
 			oe = inst.getSignalForPort(sym.getSymbol() + "_oe");
+			if(oe == null) oe = inst.getSignalForPort("field_" + sym.getSymbol() + "_oe"); // ad-hoc, to access generated field array
 			result = inst.getSignalForPort(sym.getSymbol() + "_dout");
+			if(result == null) result = inst.getSignalForPort("field_" + sym.getSymbol() + "_dout"); // ad-hoc, to access generated field array
 		}else{
 			SynthesijerUtils.error(String.format("%s(%s) cannot convert to HDL.", o.getIndexed(), o.getIndexed().getClass()));
 			System.exit(0);
@@ -128,8 +132,11 @@ public class GenerateHDLExprVisitor implements SynthesijerExprVisitor{
 				HDLVariable var = parent.getHDLVariable(o.getScope().search(id.getSymbol()));
 				HDLInstance inst = (HDLInstance)var;
 				addr = inst.getSignalForPort(sym.getSymbol() + "_address");
+				if(addr == null) addr = inst.getSignalForPort("field_" + sym.getSymbol() + "_address"); // ad-hoc, to access generated field array
 				we = inst.getSignalForPort(sym.getSymbol() + "_we");
+				if(we == null) we = inst.getSignalForPort("field_" + sym.getSymbol() + "_we"); // ad-hoc, to access generated field array
 				din = inst.getSignalForPort(sym.getSymbol() + "_din");
+				if(din == null) din = inst.getSignalForPort("field_" + sym.getSymbol() + "_din"); // ad-hoc, to access generated field array
 			}else{
 				SynthesijerUtils.warn("Unsupported array access for non-Ident/FieldAccess: " + aa.getIndexed());
 				System.exit(0);

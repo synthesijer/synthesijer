@@ -380,15 +380,34 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 			}
 		}
 		
-		if(o.getScope() instanceof Module && var.getType() instanceof PrimitiveTypeKind && var.isPublic()){ // added an accessor for the member variable.
+		if(o.getScope() instanceof Module && var.isPublic()){
+			if(var.getType() instanceof PrimitiveTypeKind){ // added an accessor for the member variable.
+				HDLPort oport = module.newPort("field_" + o.getName() + "_output", DIR.OUT, s.getType());
+				oport.getSignal().setAssign(null, s);
+				
+				HDLPort iport = module.newPort("field_" + o.getName() + "_input", DIR.IN, s.getType());
+				HDLPort iport_we = module.newPort("field_" + o.getName() + "_input_we", DIR.IN, HDLPrimitiveType.genBitType());
+				s.setDefaultValue(module.newExpr(HDLOp.IF, iport_we.getSignal(), iport.getSignal(), s).getResultExpr());
+			}else if(var.getType() instanceof ArrayType){ // added access signals for the member array
+				HDLInstance inst = (HDLInstance)s;
+				HDLSignal addr_sig = inst.getSignalForPort("address");
+				HDLSignal we_sig = inst.getSignalForPort("we");
+				HDLSignal din_sig = inst.getSignalForPort("din");
+				HDLSignal dout_sig = inst.getSignalForPort("dout");
+				HDLSignal oe_sig = inst.getSignalForPort("oe");
 
-			HDLPort oport = module.newPort("field_" + o.getName() + "_output", DIR.OUT, s.getType());
-			oport.getSignal().setAssign(null, s);
-			
-			HDLPort iport = module.newPort("field_" + o.getName() + "_input", DIR.IN, s.getType());
-			HDLPort iport_we = module.newPort("field_" + o.getName() + "_input_we", DIR.IN, HDLPrimitiveType.genBitType());
-			s.setDefaultValue(module.newExpr(HDLOp.IF, iport_we.getSignal(), iport.getSignal(), s).getResultExpr());
-
+				HDLPort addr_port = module.newPort("field_" + o.getName() + "_address", DIR.IN, addr_sig.getType());
+				HDLPort we_port = module.newPort("field_" + o.getName() + "_we", DIR.IN, we_sig.getType());
+				HDLPort din_port = module.newPort("field_" + o.getName() + "_din", DIR.IN, din_sig.getType()); 
+				HDLPort dout_port = module.newPort("field_" + o.getName() + "_dout", DIR.OUT, dout_sig.getType());
+				HDLPort oe_port = module.newPort("field_" + o.getName() + "_oe", DIR.IN, oe_sig.getType());
+				
+				dout_port.getSignal().setAssign(null, dout_sig);
+				addr_sig.setAssign(null, addr_port.getSignal());
+				we_sig.setAssign(null, we_port.getSignal());
+				din_sig.setAssign(null, din_port.getSignal());
+				oe_sig.setAssign(null, oe_port.getSignal());
+			}
 		}
 	}
 
