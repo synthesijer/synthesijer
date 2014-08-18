@@ -61,6 +61,8 @@ module primesim_top
     .clk(clk),
     .reset(reset),
     .field_finish_flag_output(finish_flag),
+    .field_finish_flag_input(0),
+    .field_finish_flag_input_we(0),
     .run_req(1),
     .run_busy(),
     .start_req(0),

@@ -23,13 +23,15 @@ public class led_top{
 		HDLPort run_req = led.newPort("run_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort run_busy = led.newPort("run_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
 		HDLPort out = led.newPort("field_flag_output", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+		HDLPort in = led.newPort("field_flag_input", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		HDLPort in_we = led.newPort("field_flag_input_we", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		addThreadPort(led);
-       HDLInstance inst = led_top.newModuleInstance(led, "U");
+		HDLInstance inst = led_top.newModuleInstance(led, "U");
 
-       inst.getSignalForPort("clk").setAssign(null, led_top.getSysClk().getSignal());
-       inst.getSignalForPort("reset").setAssign(null, led_top.newExpr(HDLOp.NOT, led_top.getSysReset().getSignal()));
-       inst.getSignalForPort(run_req.getName()).setAssign(null, HDLPreDefinedConstant.HIGH); // always high to start immediately
-       q.getSignal().setAssign(null, inst.getSignalForPort(out.getName()));
+		inst.getSignalForPort("clk").setAssign(null, led_top.getSysClk().getSignal());
+		inst.getSignalForPort("reset").setAssign(null, led_top.newExpr(HDLOp.NOT, led_top.getSysReset().getSignal()));
+		inst.getSignalForPort(run_req.getName()).setAssign(null, HDLPreDefinedConstant.HIGH); // always high to start immediately
+		q.getSignal().setAssign(null, inst.getSignalForPort(out.getName()));
 		
 		HDLUtils.generate(led_top, HDLUtils.VHDL);
 		HDLUtils.generate(led_top, HDLUtils.Verilog);
