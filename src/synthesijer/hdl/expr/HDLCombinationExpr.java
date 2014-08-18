@@ -141,6 +141,16 @@ public class HDLCombinationExpr implements HDLExpr{
 			return expr.getVHDL();
 		}
 	}
+	
+	private int toImmValue(HDLExpr expr){
+		int value = 0;
+		if(expr instanceof HDLValue){
+			value = Integer.parseInt(((HDLValue)expr).getValue());
+		}else{
+			value = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+		}
+		return value;
+	}
 
 	@Override
 	public String getVHDL() {
@@ -178,7 +188,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case ARITH_RSHIFT:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				int shift = toImmValue(args[1]);
 				if(shift >= 1){
 					return String.format("(%d-1 downto %d => %s(%d)) & %s(%d downto %d)",
 							shift,
@@ -195,7 +206,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case LOGIC_RSHIFT:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				int shift = toImmValue(args[1]);
 				if(shift >= 1){
 					return String.format("(%d-1 downto %d => '0') & %s(%d downto %d)",
 							shift,
@@ -210,7 +222,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case LSHIFT:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				int shift = toImmValue(args[1]);
 				if(shift >= 1){
 					return String.format("%s(%d downto %d) & (%d-1 downto %d => '0')",
 							args[0].getResultExpr().getVHDL(),
@@ -271,7 +284,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case ARITH_RSHIFT:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				int shift = toImmValue(args[1]);
 				if(shift >= 1){
 					String pad = getPaddingBitInVerilog(args[0].getResultExpr().getVerilogHDL(), t0.getWidth(), shift);
 					return String.format("{%s%s[%d:%d]}",
@@ -286,7 +300,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case LOGIC_RSHIFT:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				int shift = toImmValue(args[1]);
 				if(shift >= 1){
 					return String.format("{%d'b0,%s[%d:%d]}",
 							shift,
@@ -300,7 +315,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case LSHIFT:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
+				int shift = toImmValue(args[1]);
 				if(shift >= 1){
 					String s = String.format("{%s[%d:%d],%d'b0}",
 							args[0].getResultExpr().getVerilogHDL(),
