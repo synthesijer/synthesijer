@@ -265,9 +265,12 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	}
 
 	private void genAsyncProcess(HDLSignal o, int offset){
+		/*
 		if(o.getConditions().length == 1){
 			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getConditions()[0].getValue())));
 		}else if(o.getConditions().length > 1){
+		*/
+		if(o.getConditions().length > 0){
 			String sep = "if";
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset, String.format("%s %s then", sep, c.getCondExprAsVHDL()));
