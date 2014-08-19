@@ -132,7 +132,7 @@ public class HDLCombinationExpr implements HDLExpr{
 	}
 	
 	// TODO experimental code
-	private String convType(HDLExpr expr){
+	private String toSigned(HDLExpr expr){
 		if(expr instanceof HDLPreDefinedConstant) return expr.getVHDL();
 		if(expr instanceof HDLValue) return expr.getVHDL();
 		if(expr.getType().isVector()){
@@ -140,6 +140,15 @@ public class HDLCombinationExpr implements HDLExpr{
 		}else{
 			return expr.getVHDL();
 		}
+	}
+	
+	// TODO experimental code
+	private String toStdLogicVector(HDLExpr e){
+		String s = e.getResultExpr().getVHDL();
+		if(e.getType().isSigned()){
+			return "std_logic_vector(" + s + ")";
+		}
+		return s;
 	}
 	
 	private int toImmValue(HDLExpr expr){
@@ -152,23 +161,17 @@ public class HDLCombinationExpr implements HDLExpr{
 		return value;
 	}
 	
-	private String toStdLogicVector(HDLExpr e){
-		String s = e.getResultExpr().getVHDL();
-		if(e.getType().isSigned()){
-			return "std_logic_vector(" + s + ")";
-		}
-		return s;
-	}
-
 	@Override
 	public String getVHDL() {
 		if(op.isInfix()){
-			return String.format("%s %s %s", convType(args[0].getResultExpr()), op.getVHDL(), convType(args[1].getResultExpr()));
+			String s = String.format("%s %s %s", toSigned(args[0].getResultExpr()), op.getVHDL(), toSigned(args[1].getResultExpr()));
+			if(getResultExpr().getType().isVector()) s = "std_logic_vector(" + s + ")";
+			return s; 
 		}else if(op.isCompare()){
 			if(args[0] instanceof HDLValue && args[0].getType().isBit()){
 				return String.format("%s and %s", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			}else{
-				return String.format("'1' when %s %s %s else '0'", convType(args[0].getResultExpr()), op.getVHDL(), convType(args[1].getResultExpr()));
+				return String.format("'1' when %s %s %s else '0'", toSigned(args[0].getResultExpr()), op.getVHDL(), toSigned(args[1].getResultExpr()));
 			}
 		}else{
 			switch(op){

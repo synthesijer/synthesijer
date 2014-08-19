@@ -300,7 +300,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	private void genAsyncProcessHeader(HDLSignal o){
 		String s = "";
 		String sep = "";
-		for(HDLSignal src: o.getSrcSignals()){
+		for(HDLSignal src: o.getDriveSignals()){
 			s += sep + src.getName();
 			sep = " or ";
 		}
