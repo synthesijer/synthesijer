@@ -29,6 +29,8 @@ architecture RTL of bubblesortsim_top is
       clk : in std_logic;
       reset : in std_logic;
       field_finish_flag_output : out std_logic;
+      field_finish_flag_input : in std_logic;
+      field_finish_flag_input_we : in std_logic;
       run_req : in std_logic;
       run_busy : out std_logic;
       start_req : in std_logic;
@@ -48,6 +50,8 @@ begin
     clk => clk,
     reset => reset,
     field_finish_flag_output => finish_flag,
+    field_finish_flag_input => '0',
+    field_finish_flag_input_we => '0',
     run_req => '1',
     run_busy => open,
     start_req => '0',

@@ -2,30 +2,30 @@ package synthesijer.hdl;
 
 public enum HDLOp {
 		
-	ADD(KIND.INFIX, "+"),
-	SUB(KIND.INFIX, "-"),
-	MUL(KIND.INFIX, "*"),
-	AND(KIND.INFIX, "and", "&&"),
-	OR(KIND.INFIX, "or", "||"),
-	XOR(KIND.INFIX, "xor", "^"),
-	NOT(KIND.OTHER, "not", "~"),
-	EQ(KIND.COMP, "=", "=="),
-	LT(KIND.COMP, "<", "<"),
-	GT(KIND.COMP, ">", ">"),
-	LEQ(KIND.COMP, "<=", "<="),
-	GEQ(KIND.COMP, ">=", ">="),
-	NEQ(KIND.COMP, "/=", "!="),
-	REF(KIND.OTHER),
-	IF(KIND.OTHER),
-	CONCAT(KIND.OTHER),
-	DROPHEAD(KIND.OTHER),
-	PADDINGHEAD(KIND.OTHER),
-	PADDINGHEAD_ZERO(KIND.OTHER),
-	ID(KIND.OTHER),
-	ARITH_RSHIFT(KIND.OTHER),
-	LOGIC_RSHIFT(KIND.OTHER),
-	LSHIFT(KIND.OTHER),
-	UNDEFINED(KIND.OTHER);
+	ADD(KIND.INFIX, 2, "+"),
+	SUB(KIND.INFIX, 2, "-"),
+	MUL(KIND.INFIX, 2, "*"),
+	AND(KIND.INFIX, 2, "and", "&&"),
+	OR(KIND.INFIX, 2, "or", "||"),
+	XOR(KIND.INFIX, 2, "xor", "^"),
+	NOT(KIND.OTHER, 1, "not", "~"),
+	EQ(KIND.COMP, 2, "=", "=="),
+	LT(KIND.COMP, 2, "<", "<"),
+	GT(KIND.COMP, 2, ">", ">"),
+	LEQ(KIND.COMP, 2, "<=", "<="),
+	GEQ(KIND.COMP, 2, ">=", ">="),
+	NEQ(KIND.COMP, 2, "/=", "!="),
+	REF(KIND.OTHER, 2),
+	IF(KIND.OTHER, 3),
+	CONCAT(KIND.OTHER, 2),
+	DROPHEAD(KIND.OTHER, 2),
+	PADDINGHEAD(KIND.OTHER, 2),
+	PADDINGHEAD_ZERO(KIND.OTHER, 2),
+	ID(KIND.OTHER, 1),
+	ARITH_RSHIFT(KIND.OTHER, 2),
+	LOGIC_RSHIFT(KIND.OTHER, 2),
+	LSHIFT(KIND.OTHER, 2),
+	UNDEFINED(KIND.OTHER, 0);
 
 	enum KIND{
 		INFIX, COMP, OTHER
@@ -33,11 +33,21 @@ public enum HDLOp {
 
 	private final String vhdlSym, verilogSym;
 	private final KIND kind;
+	private final int argc;
 	
-	private HDLOp(KIND kind, String vhdlSym, String verilogSym){
+	private HDLOp(KIND kind, int argc, String vhdlSym, String verilogSym){
 		this.kind = kind;
+		this.argc = argc;
 		this.vhdlSym = vhdlSym;
 		this.verilogSym = verilogSym;
+	}
+	
+	private HDLOp(KIND kind, int argc, String sym){
+		this(kind, argc, sym, sym);
+	}
+
+	private HDLOp(KIND kind, int argc){
+		this(kind, argc, "", "");
 	}
 	
 	public boolean isInfix(){
@@ -47,15 +57,11 @@ public enum HDLOp {
 	public boolean isCompare(){
 		return kind == KIND.COMP;
 	}
-
-	private HDLOp(KIND kind, String sym){
-		this(kind, sym, sym);
-	}
-
-	private HDLOp(KIND kind){
-		this(kind, "", "");
-	}
 	
+	public int getArgNums(){
+		return argc;
+	}
+
 	public String getVHDL(){
 		return vhdlSym;
 	}
