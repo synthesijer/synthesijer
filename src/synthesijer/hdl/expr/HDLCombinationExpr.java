@@ -151,6 +151,14 @@ public class HDLCombinationExpr implements HDLExpr{
 		}
 		return value;
 	}
+	
+	private String toStdLogicVector(HDLExpr e){
+		String s = e.getResultExpr().getVHDL();
+		if(e.getType().isSigned()){
+			return "std_logic_vector(" + s + ")";
+		}
+		return s;
+	}
 
 	@Override
 	public String getVHDL() {
@@ -170,8 +178,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				return String.format("%s(%s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			case IF:
 				return String.format("%s when %s = '1' else %s", args[1].getResultExpr().getVHDL(), args[0].getResultExpr().getVHDL(), args[2].getResultExpr().getVHDL());
-			case CONCAT:
-				return String.format("%s & %s", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
+			case CONCAT:{
+				String arg0 = toStdLogicVector(args[0].getResultExpr());
+				String arg1 = toStdLogicVector(args[1].getResultExpr());
+				return String.format("%s & %s", arg0, arg1);
+			}
 			case DROPHEAD: {
 				HDLPrimitiveType t = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				return String.format("%s(%d - %s - 1 downto 0)", args[0].getResultExpr().getVHDL(), t.getWidth(), args[1].getResultExpr().getVHDL());
