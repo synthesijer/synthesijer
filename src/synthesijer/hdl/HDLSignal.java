@@ -155,6 +155,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 			if(!list.contains(c.getStateKey())){
 				list.add(c.getStateKey());
 			}
+			/*
 			if(c.getValue() instanceof HDLSignal){
 				list.add((HDLSignal)c.getValue());
 			}else{
@@ -163,10 +164,11 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 					for(HDLSignal s: src){ list.add(s); }
 				}
 			}
+			*/
 		}
 		return list.toArray(new HDLSignal[]{});
 	}
-	
+
 	@Override
 	public HDLSignal[] getSrcSignals(){
 		ArrayList<HDLSignal> list = new ArrayList<>();
