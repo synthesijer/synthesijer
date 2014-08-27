@@ -31,9 +31,9 @@ end dualportram;
 architecture RTL of dualportram is
   -- Shared memory
   type MEM_TYPE is array ( WORDS-1 downto 0 ) of std_logic_vector(WIDTH-1 downto 0);
-  shared variable mem : MEM_TYPE;
+  shared variable mem : MEM_TYPE := (others => (others => '0'));
 
-  signal q, q_b : std_logic_vector(WIDTH-1 downto 0);
+  signal q, q_b : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
   
 begin
 
@@ -46,9 +46,9 @@ begin
   begin
     if clk'event and clk = '1' then
       if we = '1' then
-        mem(to_integer(unsigned(address))) := std_logic_vector(din);
+        mem(to_integer(unsigned(address(DEPTH-1 downto 0)))) := std_logic_vector(din);
       end if;
-      q <= mem(to_integer(unsigned(address)));
+      q <= mem(to_integer(unsigned(address(DEPTH-1 downto 0))));
     end if;
   end process;
   
@@ -56,9 +56,9 @@ begin
   begin
     if clk'event and clk = '1' then
       if we_b = '1' then
-        mem(to_integer(unsigned(address_b))) := std_logic_vector(din_b);
+        mem(to_integer(unsigned(address_b(DEPTH-1 downto 0)))) := std_logic_vector(din_b);
       end if;
-      q_b <= mem(to_integer(unsigned(address_b)));
+      q_b <= mem(to_integer(unsigned(address_b(DEPTH-1 downto 0))));
     end if;
   end process;
   

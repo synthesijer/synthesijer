@@ -11,15 +11,14 @@ entity simple_dualportram is
   );
 
   port (
-    clk      : in  std_logic;
-    reset    : in  std_logic;
-    we       : in  std_logic;
-    oe       : in  std_logic;
-    length   : out signed(31 downto 0);
-    raddress : in  signed(31 downto 0);
-    dout     : out signed(WIDTH-1 downto 0);
-    waddress : in  signed(31 downto 0);
-    din      : in  signed(WIDTH-1 downto 0)
+    clk       : in  std_logic;
+    reset     : in  std_logic;
+    we_b      : in  std_logic;
+    oe_b      : in  std_logic;
+    length    : out signed(31 downto 0);
+    address_b : in  signed(31 downto 0);
+    dout_b    : out signed(WIDTH-1 downto 0);
+    din_b     : in  signed(WIDTH-1 downto 0)
     );
 
 end simple_dualportram;
@@ -27,20 +26,20 @@ end simple_dualportram;
 architecture RTL of simple_dualportram is
 
   type ram_type is array (WORDS-1 downto 0) of std_logic_vector (WIDTH-1 downto 0);
-  signal RAM: ram_type;
+  signal RAM: ram_type := (others => (others => '0'));
 
-  signal q : std_logic_vector(WIDTH-1 downto 0);
+  signal q : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
 
 begin  -- RTL
 
   length <= to_signed(WORDS, length'length);
-  dout <= signed(q);
+  dout_b <= signed(q);
 
   process (clk)
   begin  -- process
     if clk'event and clk = '1' then  -- rising clock edge
-      if we = '1' then
-        RAM(to_integer(waddress)) <= std_logic_vector(din);
+      if we_b = '1' then
+        RAM(to_integer(unsigned(address_b(DEPTH-1 downto 0)))) <= std_logic_vector(din_b);
       end if;
     end if;
   end process;
@@ -48,7 +47,7 @@ begin  -- RTL
   process (clk)
   begin  -- process
     if clk'event and clk = '1' then  -- rising clock edge
-      q <= RAM(to_integer(raddress));
+      q <= RAM(to_integer(unsigned(address_b(DEPTH-1 downto 0))));
     end if;
   end process;
 
