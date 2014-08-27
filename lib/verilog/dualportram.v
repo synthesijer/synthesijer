@@ -29,16 +29,16 @@ module dualportram #(
    assign length = WORDS;
 
    always @(posedge clk) begin
-      q <= mem[address];
+      q <= mem[address[DEPTH-1:0]];
       if(we) begin
-         mem[address] <= din;
+         mem[address[DEPTH-1:0]] <= din;
       end
    end
  
    always @(posedge clk) begin
-      q_b <= mem[address_b];
+      q_b <= mem[address_b[DEPTH-1:0]];
       if(we) begin
-         mem[address_b] <= din_b;
+         mem[address_b[DEPTH-1:0]] <= din_b;
       end
    end
  
