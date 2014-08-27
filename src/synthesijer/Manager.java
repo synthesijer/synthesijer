@@ -12,6 +12,12 @@ import synthesijer.ast.Module;
 import synthesijer.ast2hdl.GenerateHDLModuleVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.BlockRAM;
+import synthesijer.lib.INPUT1;
+import synthesijer.lib.INPUT16;
+import synthesijer.lib.INPUT32;
+import synthesijer.lib.OUTPUT1;
+import synthesijer.lib.OUTPUT16;
+import synthesijer.lib.OUTPUT32;
 import synthesijer.model.BasicBlockStatemachineOptimizer;
 
 public enum Manager {
@@ -29,6 +35,18 @@ public enum Manager {
 		addHDLModule("BlockRAM16", null, new BlockRAM(16, 10, 1024), false);
 		addHDLModule("BlockRAM32", null, new BlockRAM(32, 10, 1024), false);
 		addHDLModule("BlockRAM64", null, new BlockRAM(64, 10, 1024), false);
+		addHDLModule("synthesijer.lib.INPUT1", null, new INPUT1(), false);
+		addHDLModule("synthesijer.lib.INPUT16", null, new INPUT16(), false);
+		addHDLModule("synthesijer.lib.INPUT32", null, new INPUT32(), false);
+		addHDLModule("synthesijer.lib.OUTPUT1", null, new OUTPUT1(), false);
+		addHDLModule("synthesijer.lib.OUTPUT16", null, new OUTPUT16(), false);
+		addHDLModule("synthesijer.lib.OUTPUT32", null, new OUTPUT32(), false);
+		addHDLModule("INPUT1", null, new INPUT1(), false);
+		addHDLModule("INPUT16", null, new INPUT16(), false);
+		addHDLModule("INPUT32", null, new INPUT32(), false);
+		addHDLModule("OUTPUT1", null, new OUTPUT1(), false);
+		addHDLModule("OUTPUT16", null, new OUTPUT16(), false);
+		addHDLModule("OUTPUT32", null, new OUTPUT32(), false);
 	}
 	
 	public void registUserHDLModule(String name){
@@ -213,7 +231,11 @@ public enum Manager {
 			this.m = m;
 			this.hm = hm;
 			this.sysnthesisFlag = synthesisFlag;
-			this.state = CompileState.INITIALIZE;
+			if(synthesisFlag == false){
+				this.state = CompileState.GENERATE_HDL;
+			}else{
+				this.state = CompileState.INITIALIZE;
+			}
 		}
 		
 		public HDLModuleInfo(Module m, HDLModule hm){

@@ -9,7 +9,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 
 public class INPUT32 extends HDLModule{
 	
-	int value;
+	public int value;
 	
 	public INPUT32(){
 		super("inputport", "clk", "reset");

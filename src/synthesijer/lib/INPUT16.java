@@ -9,7 +9,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 
 public class INPUT16 extends HDLModule{
 	
-	short value;
+	public short value;
 	
 	public INPUT16(){
 		super("inputport", "clk", "reset");
