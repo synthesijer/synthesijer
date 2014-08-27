@@ -88,7 +88,15 @@ public class HDLCombinationExpr implements HDLExpr{
 			return HDLPrimitiveType.genVectorType(t.getWidth()+Integer.parseInt(v.getValue()));
 		}
 	}
-	
+
+	private HDLType getTakeType(HDLPrimitiveType t, HDLValue v){
+		if(t.isSigned()){
+			return HDLPrimitiveType.genSignedType(Integer.parseInt(v.getValue()));
+		}else{
+			return HDLPrimitiveType.genVectorType(Integer.parseInt(v.getValue()));
+		}
+	}
+
 	private HDLType decideExprType(HDLOp op, HDLExpr[] args){
 		if(op.isInfix()){
 			return getPriorType(args[0].getType(), args[1].getType());
@@ -106,6 +114,8 @@ public class HDLCombinationExpr implements HDLExpr{
 				return getConcatType((HDLPrimitiveType)args[0].getType(), (HDLPrimitiveType)args[1].getType());
 			case DROPHEAD:
 				return getDropHeadType((HDLPrimitiveType)args[0].getType(), (HDLValue)args[1]);
+			case TAKE:
+				return getTakeType((HDLPrimitiveType)args[0].getType(), (HDLValue)args[1]);
 			case PADDINGHEAD:
 			case PADDINGHEAD_ZERO:
 				return getPaddingHeadType((HDLPrimitiveType)args[0].getType(), (HDLValue)args[1]);
@@ -189,6 +199,10 @@ public class HDLCombinationExpr implements HDLExpr{
 			case DROPHEAD: {
 				HDLPrimitiveType t = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				return String.format("%s(%d - %s - 1 downto 0)", args[0].getResultExpr().getVHDL(), t.getWidth(), args[1].getResultExpr().getVHDL());
+			}
+			case TAKE: {
+				HDLPrimitiveType t = (HDLPrimitiveType)getResultExpr().getType();
+				return String.format("%s(%d - 1 downto 0)", args[0].getResultExpr().getVHDL(), t.getWidth());
 			}
 			case PADDINGHEAD:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
