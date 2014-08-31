@@ -189,8 +189,18 @@ public class HDLCombinationExpr implements HDLExpr{
 				return String.format("%s %s", op.getVHDL(), args[0].getResultExpr().getVHDL());
 			case REF:
 				return String.format("%s(%s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
-			case IF:
-				return String.format("%s when %s = '1' else %s", args[1].getResultExpr().getVHDL(), args[0].getResultExpr().getVHDL(), args[2].getResultExpr().getVHDL());
+			case IF:{
+				HDLType t = getResultExpr().getType();
+				String arg1, arg2;
+//				System.out.println("result:" + t + " ? " + t.isSigned());
+//				System.out.println("arg1:" + args[1].getResultExpr().getType() + " ? " + args[1].getResultExpr().getType().isVector() + " -- " + args[1]);
+//				System.out.println("arg2:" + args[2].getResultExpr().getType() + " ? " + args[2].getResultExpr().getType().isVector() + " -- " + args[2]);
+				arg1 = (t.isSigned() && args[1].getResultExpr().getType().isVector()) ? toSigned(args[1].getResultExpr()) : args[1].getResultExpr().getVHDL(); 
+				arg2 = (t.isSigned() && args[2].getResultExpr().getType().isVector()) ? toSigned(args[2].getResultExpr()) : args[2].getResultExpr().getVHDL();
+				String r = String.format("%s when %s = '1' else %s", arg1, args[0].getResultExpr().getVHDL(), arg2);
+//				System.out.println(r);
+				return r;
+			}
 			case CONCAT:{
 				String arg0 = toStdLogicVector(args[0].getResultExpr());
 				String arg1 = toStdLogicVector(args[1].getResultExpr());
