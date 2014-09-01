@@ -25,7 +25,9 @@ public class State {
 	}
 	
 	public void addBody(ExprContainStatement s){
-		body.add(s);
+		if(body.contains(s) == false){
+			body.add(s);
+		}
 	}
 	
 	public ExprContainStatement[] getBodies(){

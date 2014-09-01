@@ -1,7 +1,9 @@
 package synthesijer;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import synthesijer.lib.OUTPUT1;
 import synthesijer.lib.OUTPUT16;
 import synthesijer.lib.OUTPUT32;
 import synthesijer.model.BasicBlockStatemachineOptimizer;
+import synthesijer.model.GenerateSynthesisTableVisitor;
+import synthesijer.model.SynthesisTable;
 
 public enum Manager {
 	
@@ -93,8 +97,8 @@ public enum Manager {
 	}
 	
 	public void preprocess(){
-		doGenSimplifiedAst(new IdentifierGenerator());
 		loadUserHDLModules();
+		doGenSimplifiedAst(new IdentifierGenerator());
 		//makeCallGraph();
 	}
 	
@@ -135,15 +139,30 @@ public enum Manager {
 		doStateCombine();
 	}
 	
+	private void doGenSynthesisTable(){
+		for(Module m: entries.values()){
+			try(FileOutputStream fo = new FileOutputStream(new File(m.getName() + "_synthesis_table.txt"))){
+				PrintStream out = new PrintStream(fo);
+				ArrayList<SynthesisTable> tables = new ArrayList<>();
+				GenerateSynthesisTableVisitor v = new GenerateSynthesisTableVisitor(out, tables);
+				m.accept(v);
+				v.dump(out);
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void generate(boolean optimizeFlag){
 		makeStateMachine();
 		dumpStateMachine("init");
 		if(optimizeFlag){
 			optimizations();
+			dumpStateMachine("opt");
 		}else{
 			SynthesijerUtils.warn("skip optimization");
 		}
-		dumpStateMachine("opt");
+		doGenSynthesisTable();
 		genHDLAll();
 		output(OutputFormat.VHDL);
 		output(OutputFormat.Verilog);

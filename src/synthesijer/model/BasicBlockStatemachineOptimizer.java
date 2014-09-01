@@ -64,7 +64,10 @@ public class BasicBlockStatemachineOptimizer implements SynthesijerModuleVisitor
 	
 	private void update(DataFlowNode node, State s){
 		node.setScheduled();
-		if(node.stmt != null && node.stmt.length > 0) node.stmt[0].setState(s);
+		if(node.stmt != null && node.stmt.length > 0){
+			node.stmt[0].setState(s);
+			s.addBody(node.stmt[0]);
+		}
 	}
 	
 	public State schedule(DataFlowGraph dfg){

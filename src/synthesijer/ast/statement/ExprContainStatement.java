@@ -14,6 +14,8 @@ public abstract class ExprContainStatement extends Statement{
 	
 	abstract public Expr getExpr();
 	
+	abstract public State getState();
+	
 	abstract public void setState(State s);
 
 	abstract public Variable[] getSrcVariables();

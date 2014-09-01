@@ -28,6 +28,11 @@ public enum Op{
 	LNOT("!", HDLOp.NOT),
 	INC("++", HDLOp.ADD),
 	DEC("--", HDLOp.SUB),
+	RETURN("return", HDLOp.UNDEFINED),
+	CALL("call", HDLOp.UNDEFINED),
+	JC("jc", HDLOp.UNDEFINED),
+	JEQ("jeq", HDLOp.UNDEFINED),
+	J("j", HDLOp.UNDEFINED),
 	UNDEFINED("UNDEFINED", HDLOp.UNDEFINED);
 	
 	private final String name;

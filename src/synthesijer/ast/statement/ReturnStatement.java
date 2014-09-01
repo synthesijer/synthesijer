@@ -35,6 +35,7 @@ public class ReturnStatement extends ExprContainStatement{
 	
 	public void setState(State s){
 		this.state = s;
+		s.addBody(this);
 	}
 	
 	public State getState(){
