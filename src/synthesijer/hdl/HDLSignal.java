@@ -53,7 +53,15 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	public HDLType getType(){
 		return type;
 	}
-	
+
+	public int getWidth(){
+		if(type instanceof HDLPrimitiveType){
+			return ((HDLPrimitiveType)type).getWidth();
+		}else{
+			return -1;
+		}
+	}
+
 	public ResourceKind getKind(){
 		return kind;
 	}
