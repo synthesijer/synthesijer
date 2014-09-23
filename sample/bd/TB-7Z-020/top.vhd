@@ -1,12 +1,3 @@
---Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
-----------------------------------------------------------------------------------
---Tool Version: Vivado v.2014.2 (lin64) Build 932637 Wed Jun 11 13:08:52 MDT 2014
---Date        : Sat Sep 13 17:08:57 2014
---Host        : devmac running 64-bit Ubuntu 14.04.1 LTS
---Command     : generate_target design_1_wrapper.bd
---Design      : design_1_wrapper
---Purpose     : IP block netlist
-----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
@@ -179,20 +170,21 @@ architecture STRUCTURE of top is
 
   signal FCLK_CLK0 : std_logic;
   signal FCLK_RESET0_N : std_logic;
-  signal counter : unsigned(63 downto 0) := (others => '0');
+  signal counter : unsigned(31 downto 0) := (others => '0');
 
-  component fifo2dvi
+  component sync_generator
     port (
-      CLK       : in  std_logic;
-      RESET     : in  std_logic;
-      VSYNC     : out std_logic;
-      HSYNC     : out std_logic;
-      DE        : out std_logic;
-      DATA      : out STD_LOGIC_VECTOR(23 downto 0);
-      fifo_rd   : out std_logic;
-      fifo_dout : in  std_logic_vector(23 downto 0)
+      clk : in std_logic;
+      reset : in std_logic;
+      VSYNC : out std_logic;
+      HSYNC : out std_logic;
+      DE : out std_logic;
+      DATA : out std_logic_vector(24-1 downto 0);
+      fifo_rd : out std_logic;
+      fifo_din : in std_logic_vector(24-1 downto 0);
+      wakeup : in std_logic
       );
-  end component fifo2dvi;
+  end component sync_generator;
 
   signal fifo2dvi_reset : std_logic := '1';
 
@@ -318,7 +310,7 @@ architecture STRUCTURE of top is
   signal fifo_full      : std_logic;
   signal fifo_empty     : std_logic;
   signal fifo_prog_full : std_logic;
-  signal fifo_data_count : std_logic_vector(13 downto 0);
+  signal fifo_data_count : std_logic_vector(12 downto 0);
 
   signal gpio_tri_o : std_logic_vector(31 downto 0);
   signal color : std_logic_vector(23 downto 0);
@@ -342,8 +334,8 @@ architecture STRUCTURE of top is
       dout          : out std_logic_vector(23 downto 0);
       rd_en         : in  std_logic;
       prog_full     : out std_logic;
-      rd_data_count : out std_logic_vector(13 downto 0);
-      wr_data_count : out std_logic_vector(13 downto 0)
+      rd_data_count : out std_logic_vector(12 downto 0);
+      wr_data_count : out std_logic_vector(12 downto 0)
       );
   end component fifo_generator_0;
 
@@ -359,8 +351,8 @@ architecture STRUCTURE of top is
       dout          : out std_logic_vector(63 downto 0);
       rd_en         : in  std_logic;
       prog_full     : out std_logic;
-      rd_data_count : out std_logic_vector(13 downto 0);
-      wr_data_count : out std_logic_vector(13 downto 0)
+      rd_data_count : out std_logic_vector(11 downto 0);
+      wr_data_count : out std_logic_vector(11 downto 0)
       );
   end component fifo_generator_1;
 
@@ -371,8 +363,8 @@ architecture STRUCTURE of top is
   signal fifo64_dout      : std_logic_vector(63 downto 0);
   signal fifo64_rd_en     : std_logic;
   signal fifo64_prog_full : std_logic;
-  signal fifo64_rd_count  : std_logic_vector(13 downto 0);
-  signal fifo64_wr_count  : std_logic_vector(13 downto 0);
+  signal fifo64_rd_count  : std_logic_vector(11 downto 0);
+  signal fifo64_wr_count  : std_logic_vector(11 downto 0);
 
   component axi_reader
     port (
@@ -425,13 +417,14 @@ architecture STRUCTURE of top is
   signal test_counter : unsigned(31 downto 0) := (others => '0');
   signal fifo_empty_reg : std_logic := '0';
   signal fifo_prog_full_counter : unsigned(31 downto 0) := (others => '0');
-  signal fifo2dvi_wakup_0 : std_logic := '0';
-  signal fifo2dvi_wakup_1 : std_logic := '0';
-  signal fifo2dvi_wakup : std_logic := '0';
+  signal fifo2dvi_wakeup : std_logic := '0';
+
+  signal gpio_tri_o_clk_ibufg_0 : std_logic_vector(31 downto 0);
+  signal gpio_tri_o_clk_ibufg_1 : std_logic_vector(31 downto 0);
 
 begin
   
-design_1_i : component design_1
+  design_1_i : component design_1
     port map (
       DDR_addr(14 downto 0)                   => DDR_addr(14 downto 0),
       DDR_ba(2 downto 0)                      => DDR_ba(2 downto 0),
@@ -548,93 +541,81 @@ design_1_i : component design_1
       S_AXI_HP2_wvalid                        => S_AXI_HP2_wvalid,
       ext_reset_in => '1',
       gpio_tri_o => gpio_tri_o
-    );
+      );
 
-LED(7) <= '0' when counter(25) = '1' else '1';
---LED(6) <= '0' when counter(27 downto 25) = "001" else '1';
---LED(5) <= '0' when counter(27 downto 25) = "010" else '1';
---LED(4) <= '0' when counter(27 downto 25) = "011" else '1';
---LED(3) <= '0' when counter(27 downto 25) = "100" else '1';
---LED(2) <= '0' when counter(27 downto 25) = "101" else '1';
---LED(1) <= '0' when counter(27 downto 25) = "110" else '1';
---LED(0) <= '0' when counter(27 downto 25) = "111" else '1';
---LED(6) <= not fifo64_rd_en;
---LED(5) <= not fifo64_wr_en;
-LED(6) <= not axi_reader_request;
-LED(5) <= not axi_reader_busy;
-LED(4) <= not fifo64_empty;
-LED(3) <= not fifo_wr_en;
-LED(2) <= not fifo_rd_en;
+  LED(7) <= '0' when counter(25) = '1' else '1';
+  LED(6) <= not axi_reader_request;
+  LED(5) <= not axi_reader_busy;
+  LED(4) <= not fifo64_empty;
+  LED(3) <= not fifo_wr_en;
+  LED(2) <= not fifo_rd_en;
 --LED(1) <= not fifo_empty;
-LED(1) <= not fifo_empty_reg;
-LED(0) <= not fifo_prog_full;
+  LED(1) <= not fifo_empty_reg;
+  LED(0) <= not fifo_prog_full;
 
 --LED <= gpio_tri_o(7 downto 0);
 
---process(clk_ibufg)
---begin
---  if clk_ibufg'event and clk_ibufg = '1' then
-process(FCLK_CLK1)
-begin
-  if FCLK_CLK1'event and FCLK_CLK1 = '1' then
-    if FCLK_RESET1_N = '0' then
-      counter <= (others => '0');
-    else
-      counter <= counter + 1;
-    end if;
-  end if;
-end process;
-
-U : fifo2dvi port map(
-  CLK       => clk_ibufg,
-  RESET     => fifo2dvi_reset,
-  VSYNC     => s_syncgen_vs,
-  HSYNC     => s_syncgen_hs,
-  DE        => s_syncgen_de,
-  DATA      => s_syncgen_da,
-  fifo_rd   => fifo_rd_en,
-  fifo_dout => fifo_dout
-  );
-
-process(clk_ibufg)
-begin
-  if clk_ibufg'event and clk_ibufg = '1' then
-    fifo2dvi_wakup_0 <= gpio_tri_o(0);
-    fifo2dvi_wakup_1 <= fifo2dvi_wakup_0;
-    fifo2dvi_wakup <= fifo2dvi_wakup_1;
-  end if;
-end process;
-
-process(clk_ibufg)
-begin
-  if clk_ibufg'event and clk_ibufg = '1' then
-    if FCLK_RESET0_N = '0' then
-      fifo2dvi_reset <= '1';
-      fifo_empty_reg <= '0';
-      fifo_prog_full_counter <= (others => '0');
-    else
-      if fifo2dvi_reset = '1' then
-        if fifo_prog_full = '1' and fifo2dvi_wakup = '1' then
-          fifo_prog_full_counter <= fifo_prog_full_counter + 1;
-        else
-          fifo_prog_full_counter <= (others => '0');
-        end if;
-      end if;
-
-      if fifo2dvi_reset = '1' and fifo_prog_full_counter > 200 then
-        fifo2dvi_reset <= '0'; -- after first fifo_prog_full is asserted.
-      end if;
-      
-      if fifo2dvi_reset = '1' then
-        fifo_empty_reg <= '0';
+  process(FCLK_CLK1)
+  begin
+    if FCLK_CLK1'event and FCLK_CLK1 = '1' then
+      if FCLK_RESET1_N = '0' then
+        counter <= (others => '0');
       else
-        if fifo_empty = '1' then
-          fifo_empty_reg <= '1';
+        counter <= counter + 1;
+      end if;
+    end if;
+  end process;
+
+  U : sync_generator port map(
+    clk      => clk_ibufg,
+    reset    => not FCLK_RESET0_N,
+    VSYNC    => s_syncgen_vs,
+    HSYNC    => s_syncgen_hs,
+    DE       => s_syncgen_de,
+    DATA     => s_syncgen_da,
+    fifo_rd  => fifo_rd_en,
+    fifo_din => fifo_dout,
+    wakeup   => fifo2dvi_wakeup
+    );
+
+  process(clk_ibufg)
+  begin
+    if clk_ibufg'event and clk_ibufg = '1' then
+      gpio_tri_o_clk_ibufg_0 <= gpio_tri_o;
+      gpio_tri_o_clk_ibufg_1 <= gpio_tri_o_clk_ibufg_0;
+    end if;
+  end process;
+
+  process(clk_ibufg)
+  begin
+    if clk_ibufg'event and clk_ibufg = '1' then
+      if FCLK_RESET0_N = '0' then
+        fifo2dvi_wakeup <= '0';
+        fifo_empty_reg <= '0';
+        fifo_prog_full_counter <= (others => '0');
+      else
+        if fifo2dvi_wakeup = '0' then
+          if fifo_prog_full = '1' and gpio_tri_o_clk_ibufg_1(0) = '1' then
+            fifo_prog_full_counter <= fifo_prog_full_counter + 1;
+          else
+            fifo_prog_full_counter <= (others => '0');
+          end if;
+        end if;
+
+        if fifo2dvi_wakeup = '0' and fifo_prog_full_counter > 200 then
+          fifo2dvi_wakeup <= '1'; -- after first fifo_prog_full is asserted.
+        end if;
+        
+        if fifo2dvi_wakeup = '0' then
+          fifo_empty_reg <= '0';
+        else
+          if fifo_empty = '1' then
+            fifo_empty_reg <= '1'; -- at least, fifo starves in a time.
+          end if;
         end if;
       end if;
     end if;
-  end if;
-end process;
+  end process;
 
   DVI_R  <= r_dvit_da_3t(23 downto 16);
   DVI_G  <= r_dvit_da_3t(15 downto 8);
@@ -649,62 +630,62 @@ end process;
   DVI_ISEL  <= '0';
   DVI_MSEN  <= '0';
 
-process(clk_ibufg)
-begin
-  if clk_ibufg'event and clk_ibufg = '1' then
-    if FCLK_RESET0_N = '0' then
-      r_dvit_vs_1t <= '0';
-      r_dvit_hs_1t <= '0';
-      r_dvit_de_1t <= '0';
-      r_dvit_da_1t <= X"000000";
-      r_dvit_vs_2t <= '0';
-      r_dvit_hs_2t <= '0';
-      r_dvit_de_2t <= '0';
-      r_dvit_da_2t <= X"000000";
-      r_dvit_vs_3t <= '0';
-      r_dvit_hs_3t <= '0';
-      r_dvit_de_3t <= '0';
-      r_dvit_da_3t <= X"000000";
-    else
-      r_dvit_vs_1t <= s_syncgen_vs;
-      r_dvit_hs_1t <= s_syncgen_hs;
-      r_dvit_de_1t <= s_syncgen_de;
-      r_dvit_da_1t <= s_syncgen_da;
-      r_dvit_vs_2t <= r_dvit_vs_1t;
-      r_dvit_hs_2t <= r_dvit_hs_1t;
-      r_dvit_de_2t <= r_dvit_de_1t;
-      r_dvit_da_2t <= r_dvit_da_1t;
-      r_dvit_vs_3t <= r_dvit_vs_2t;
-      r_dvit_hs_3t <= r_dvit_hs_2t;
-      r_dvit_de_3t <= r_dvit_de_2t;
-      r_dvit_da_3t <= r_dvit_da_2t;
+  process(clk_ibufg)
+  begin
+    if clk_ibufg'event and clk_ibufg = '1' then
+      if FCLK_RESET0_N = '0' then
+        r_dvit_vs_1t <= '0';
+        r_dvit_hs_1t <= '0';
+        r_dvit_de_1t <= '0';
+        r_dvit_da_1t <= X"000000";
+        r_dvit_vs_2t <= '0';
+        r_dvit_hs_2t <= '0';
+        r_dvit_de_2t <= '0';
+        r_dvit_da_2t <= X"000000";
+        r_dvit_vs_3t <= '0';
+        r_dvit_hs_3t <= '0';
+        r_dvit_de_3t <= '0';
+        r_dvit_da_3t <= X"000000";
+      else
+        r_dvit_vs_1t <= s_syncgen_vs;
+        r_dvit_hs_1t <= s_syncgen_hs;
+        r_dvit_de_1t <= s_syncgen_de;
+        r_dvit_da_1t <= s_syncgen_da;
+        r_dvit_vs_2t <= r_dvit_vs_1t;
+        r_dvit_hs_2t <= r_dvit_hs_1t;
+        r_dvit_de_2t <= r_dvit_de_1t;
+        r_dvit_da_2t <= r_dvit_da_1t;
+        r_dvit_vs_3t <= r_dvit_vs_2t;
+        r_dvit_hs_3t <= r_dvit_hs_2t;
+        r_dvit_de_3t <= r_dvit_de_2t;
+        r_dvit_da_3t <= r_dvit_da_2t;
+      end if;
     end if;
-  end if;
-end process;
+  end process;
 
--- DVI clock
-U_DVITCLK_ODDR : ODDR
-  generic map(
-    DDR_CLK_EDGE => "SAME_EDGE",
-    INIT         => '0',
-    SRTYPE       => "SYNC"
-    )
-  port map(
-    Q  => DVI_CLK,
-    C  => clk_ibufg,
-    CE => '1',
-    D1 => '0',
-    D2 => '1',
-    R  => '0',
-    S  => '0');
+  -- DVI clock
+  U_DVITCLK_ODDR : ODDR
+    generic map(
+      DDR_CLK_EDGE => "SAME_EDGE",
+      INIT         => '0',
+      SRTYPE       => "SYNC"
+      )
+    port map(
+      Q  => DVI_CLK,
+      C  => clk_ibufg,
+      CE => '1',
+      D1 => '0',
+      D2 => '1',
+      R  => '0',
+      S  => '0');
 
-U_BUFG_DVI_CLKIN : BUFG
-  port map(
-    I => SYS_CLK3,
-    O => clk_ibufg
-    );
+  U_BUFG_DVI_CLKIN : BUFG
+    port map(
+      I => SYS_CLK3,
+      O => clk_ibufg
+      );
 
-U_FIFO : fifo_generator_0
+  U_FIFO : fifo_generator_0
     port map(
       rd_clk        => clk_ibufg,
       wr_clk        => clk_ibufg,
@@ -720,120 +701,94 @@ U_FIFO : fifo_generator_0
       wr_data_count => fifo_data_count
       );
 
-U_CONV64to24 : conv64to24 port map(
-  clk                           => clk_ibufg,
-  reset                         => not FCLK_RESET0_N,
-  fifo64_re                     => fifo64_rd_en,
-  fifo64_din                    => fifo64_dout,
-  fifo64_empty                  => fifo64_empty,
-  fifo64_rd_count(13 downto 0)  => fifo64_rd_count,
-  fifo64_rd_count(31 downto 14) => (others => '0'),
-  fifo24_we                     => fifo_wr_en,
-  fifo24_dout                   => fifo_din,
-  fifo24_full                   => fifo_prog_full,
-  fifo24_wr_count(13 downto 0)  => fifo_data_count,
-  fifo24_wr_count(31 downto 14) => (others => '0')
-  );
-
-U_FIFO64 : fifo_generator_1
-  port map(
-    wr_clk        => FCLK_CLK1,
-    rd_clk        => clk_ibufg,
-    rst           => not FCLK_RESET1_N,
-    full          => fifo64_full,
-    din           => fifo64_din,
-    wr_en         => fifo64_wr_en,
-    empty         => fifo64_empty,
-    dout          => fifo64_dout,
-    rd_en         => fifo64_rd_en,
-    prog_full     => fifo64_prog_full,
-    rd_data_count => fifo64_rd_count,
-    wr_data_count => fifo64_wr_count
+  U_CONV64to24 : conv64to24 port map(
+    clk                           => clk_ibufg,
+    reset                         => not FCLK_RESET0_N,
+    fifo64_re                     => fifo64_rd_en,
+    fifo64_din                    => fifo64_dout,
+    fifo64_empty                  => fifo64_empty,
+    fifo64_rd_count(11 downto 0)  => fifo64_rd_count,
+    fifo64_rd_count(31 downto 12) => (others => '0'),
+    fifo24_we                     => fifo_wr_en,
+    fifo24_dout                   => fifo_din,
+    fifo24_full                   => fifo_prog_full,
+    fifo24_wr_count(12 downto 0)  => fifo_data_count,
+    fifo24_wr_count(31 downto 13) => (others => '0')
     );
 
---process (FCLK_CLK1)
---begin
---  if FCLK_CLK1'event and FCLK_CLK1 = '1' then
---    if FCLK_RESET1_N = '0' then
---      fifo64_wr_en <= '0';
---      test_counter <= (others => '0');
---    else
---      if fifo64_prog_full = '0' then
---        fifo64_wr_en <= '1';
---        if test_counter = 0 then
---          fifo64_din  <= X"00000000000000FF";
---        else
---          fifo64_din  <= X"0000000000000000";
---        end if;
---        if test_counter = 2 then
---          test_counter <= (others => '0');
---        else
---          test_counter <= test_counter + 1;
---        end if;
---      else
---        fifo64_wr_en <= '0';
---      end if;
---    end if;
---  end if;
---end process;
+  U_FIFO64 : fifo_generator_1
+    port map(
+      wr_clk        => FCLK_CLK1,
+      rd_clk        => clk_ibufg,
+      rst           => not FCLK_RESET1_N,
+      full          => fifo64_full,
+      din           => fifo64_din,
+      wr_en         => fifo64_wr_en,
+      empty         => fifo64_empty,
+      dout          => fifo64_dout,
+      rd_en         => fifo64_rd_en,
+      prog_full     => fifo64_prog_full,
+      rd_data_count => fifo64_rd_count,
+      wr_data_count => fifo64_wr_count
+      );
 
-fifo64_wr_en <= axi_reader_fifo_we;
-fifo64_din <= axi_reader_fifo_dout;
+  fifo64_wr_en <= axi_reader_fifo_we;
+  fifo64_din <= axi_reader_fifo_dout;
 
-U_AXI_READER : axi_reader port map(
-  clk                       => FCLK_CLK1,
-  reset                     => not FCLK_RESET1_N,
-  fifo_din                  => (others => '0'),
-  fifo_re                   => open,
-  fifo_rclk                 => open,
-  fifo_empty                => '0',
-  fifo_length(13 downto 0)  => fifo64_wr_count,
-  fifo_length(31 downto 14) => (others => '0'),
-  fifo_dout                 => axi_reader_fifo_dout,
-  fifo_we                   => axi_reader_fifo_we,
-  fifo_wclk                 => open,
-  fifo_full                 => fifo64_prog_full,
-  S_AXI_ARADDR              => S_AXI_HP0_araddr,
-  S_AXI_ARLEN(3 downto 0)   => S_AXI_HP0_arlen,
-  S_AXI_ARLEN(7 downto 4)   => open,
-  S_AXI_ARSIZE              => S_AXI_HP0_arsize,
-  S_AXI_ARBURST             => S_AXI_HP0_arburst,
-  S_AXI_ARCACHE             => S_AXI_HP0_arcache,
-  S_AXI_ARPROT              => S_AXI_HP0_arprot,
-  S_AXI_ARVALID             => S_AXI_HP0_arvalid,
-  S_AXI_ARREADY             => S_AXI_HP0_arready,
-  S_AXI_RDATA               => S_AXI_HP0_rdata,
-  S_AXI_RRESP               => S_AXI_HP0_rresp,
-  S_AXI_RLAST               => S_AXI_HP0_rlast,
-  S_AXI_RVALID              => S_AXI_HP0_rvalid,
-  S_AXI_RREADY              => S_AXI_HP0_rready,
-  request                   => axi_reader_request,
-  busy                      => axi_reader_busy,
-  addr                      => std_logic_vector(axi_reader_addr),
-  len                       => X"0C"
-  );
+  U_AXI_READER : axi_reader port map(
+    clk                       => FCLK_CLK1,
+    reset                     => not FCLK_RESET1_N,
+    fifo_din                  => (others => '0'),
+    fifo_re                   => open,
+    fifo_rclk                 => open,
+    fifo_empty                => '0',
+    fifo_length(11 downto 0)  => fifo64_wr_count,
+    fifo_length(31 downto 12) => (others => '0'),
+    fifo_dout                 => axi_reader_fifo_dout,
+    fifo_we                   => axi_reader_fifo_we,
+    fifo_wclk                 => open,
+    fifo_full                 => fifo64_prog_full,
+    S_AXI_ARADDR              => S_AXI_HP0_araddr,
+    S_AXI_ARLEN(3 downto 0)   => S_AXI_HP0_arlen,
+    S_AXI_ARLEN(7 downto 4)   => open,
+    S_AXI_ARSIZE              => S_AXI_HP0_arsize,
+    S_AXI_ARBURST             => S_AXI_HP0_arburst,
+    S_AXI_ARCACHE             => S_AXI_HP0_arcache,
+    S_AXI_ARPROT              => S_AXI_HP0_arprot,
+    S_AXI_ARVALID             => S_AXI_HP0_arvalid,
+    S_AXI_ARREADY             => S_AXI_HP0_arready,
+    S_AXI_RDATA               => S_AXI_HP0_rdata,
+    S_AXI_RRESP               => S_AXI_HP0_rresp,
+    S_AXI_RLAST               => S_AXI_HP0_rlast,
+    S_AXI_RVALID              => S_AXI_HP0_rvalid,
+    S_AXI_RREADY              => S_AXI_HP0_rready,
+    request                   => axi_reader_request,
+    busy                      => axi_reader_busy,
+    addr                      => std_logic_vector(axi_reader_addr),
+    len                       => X"0C"
+    );
 
-process(FCLK_CLK1)
-begin
-  if (FCLK_CLK1'event and FCLK_CLK1 = '1') then
-    if FCLK_RESET1_N = '0' then
-      axi_reader_addr <= X"3F000000";
-      axi_reader_addr_next <= X"3F000000";
-    else
-      if axi_reader_busy = '0' and axi_reader_request = '0' and fifo64_prog_full = '0' and unsigned(fifo64_wr_count) < 2160 then
-        axi_reader_request <= '1';
-        axi_reader_addr <= axi_reader_addr_next;
-        if axi_reader_addr_next < X"3F000000" + (1920 * 1080 * 3) - 96 then
-          axi_reader_addr_next <= axi_reader_addr_next + 96; -- for next
-        else
-          axi_reader_addr_next <= X"3F000000";
-        end if;
+  process(FCLK_CLK1)
+  begin
+    if (FCLK_CLK1'event and FCLK_CLK1 = '1') then
+      if FCLK_RESET1_N = '0' then
+        axi_reader_addr <= X"3F000000";
+        axi_reader_addr_next <= X"3F000000";
       else
-        axi_reader_request <= '0';
+        if axi_reader_busy = '0' and axi_reader_request = '0' and fifo64_prog_full = '0' and unsigned(fifo64_wr_count) < 3240 then
+          axi_reader_request <= '1';
+          axi_reader_addr <= axi_reader_addr_next;
+          if axi_reader_addr_next < X"3F000000" + (1920 * 1080 * 3) - 96 then
+            axi_reader_addr_next <= axi_reader_addr_next + 96; -- for next
+          else
+            axi_reader_addr_next <= X"3F000000";
+          end if;
+        else
+          axi_reader_request <= '0';
+        end if;
       end if;
     end if;
-  end if;
-end process;
+  end process;
 
 
 end STRUCTURE;
