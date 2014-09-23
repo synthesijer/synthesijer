@@ -21,7 +21,7 @@ public class MergeSort {
 	public void check() {
 		for (int i = 0; i < ar.length; i++) {
 			int v0 = ar[i];
-			int v1 = tmp[i];
+//			int v1 = tmp[i];
 		}
 	}
 

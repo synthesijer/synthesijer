@@ -85,7 +85,8 @@ public class JCStmtVisitor extends Visitor{
 	public void visitForLoop(JCForLoop that){
 		ForStatement tmp = new ForStatement(scope);
 		for(JCStatement s: that.init){
-			tmp.addInitialize(stepIn(s, scope));
+			//tmp.addInitialize(stepIn(s, scope));
+			tmp.addInitialize(stepIn(s, tmp));
 		}
 		tmp.setCondition(stepIn(that.cond, tmp));
 		for(JCStatement s: that.step){

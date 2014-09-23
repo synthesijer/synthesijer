@@ -28,7 +28,9 @@ public class Method implements Scope, SynthesijerAstTree{
 	private VariableDecl[] args;
 	private final BlockStatement body;
 	
-	private Hashtable<String, Variable> varTable = new Hashtable<>();	
+	private Hashtable<String, Variable> varTable = new Hashtable<>();
+	
+	private int uniq_id;
 	
 	public Method(Scope parent, String name, Type type){
 		this.parent = parent;
@@ -37,6 +39,7 @@ public class Method implements Scope, SynthesijerAstTree{
 		this.body = new BlockStatement(this);
 		parent.addScope(this);
 		args = new VariableDecl[]{}; // dummy
+		uniq_id = 0;
 	}
 	
 	public void addScope(Scope s){
@@ -54,7 +57,7 @@ public class Method implements Scope, SynthesijerAstTree{
 	public Method getMethod(){
 		return this;
 	}
-
+	
 	public void setArgs(VariableDecl[] args){
 		this.args = args;
 	}
@@ -184,6 +187,12 @@ public class Method implements Scope, SynthesijerAstTree{
 
 	public void accept(SynthesijerMethodVisitor v){
 		v.visitMethod(this);
+	}
+	
+	public int getUniqId(){
+		int v = uniq_id;
+		uniq_id++;
+		return v;
 	}
 
 }

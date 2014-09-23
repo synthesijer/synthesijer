@@ -8,12 +8,14 @@ public class Variable{
 	private final Expr init;
 	private boolean flagGlobalConstant;
 	private boolean flagPublic;
+	private String uniqName = null;
 	
 	public Variable(String n, Type t, Method method, Expr init){
 		this.name = n;
 		this.type = t;
 		this.method = method;
 		this.init = init;
+//		System.out.println("new Variable:" + n);
 	}
 	
 	public String getName(){
@@ -45,11 +47,13 @@ public class Variable{
 	}
 	
 	public String getUniqueName(){
+		if(uniqName != null) return uniqName;
 		if(method != null){
-			return method.getName() + "_" + name;
+			uniqName = method.getName() + "_" + name + "_" + method.getUniqId();
 		}else{
-			return name;
+			uniqName = name;
 		}
+		return uniqName;
 	}
 	
 	public String toString(){

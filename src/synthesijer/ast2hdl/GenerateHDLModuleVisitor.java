@@ -199,8 +199,11 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	}
 	
 	private void genVariableTables(Scope s){
+//		System.out.println(s.getClass().getName());
+
 		for(Variable v: s.getVariables()){
-			//System.out.println("genVariableTable: " + v);
+//			System.out.println(" " + v.getName());
+//			System.out.println(" " + v.getUniqueName());
 			if(variableTable.containsKey(v)) continue; // skip
 			HDLVariable var = genHDLVariable(v);
 			variableTable.put(v, var);
@@ -210,7 +213,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitModule(Module o) {
 		for(Scope s: o.getScope()){
-			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port. 
+			if(s instanceof Method) continue; // variables declared in method scope should be instantiated as port.
 			genVariableTables(s);
 		}
 		for(VariableDecl v: o.getVariableDecls()){
