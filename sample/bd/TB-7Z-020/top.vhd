@@ -81,11 +81,11 @@ architecture STRUCTURE of top is
     S_AXI_HP0_FIFO_CTRL_wacount : out STD_LOGIC_VECTOR ( 5 downto 0 );
     S_AXI_HP0_FIFO_CTRL_rdissuecapen : in STD_LOGIC;
     S_AXI_HP0_FIFO_CTRL_wrissuecapen : in STD_LOGIC;
-    S_AXI_HP2_FIFO_CTRL_rcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
-    S_AXI_HP2_FIFO_CTRL_wcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
     S_AXI_HP2_FIFO_CTRL_racount : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    S_AXI_HP2_FIFO_CTRL_wacount : out STD_LOGIC_VECTOR ( 5 downto 0 );
+    S_AXI_HP2_FIFO_CTRL_rcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
     S_AXI_HP2_FIFO_CTRL_rdissuecapen : in STD_LOGIC;
+    S_AXI_HP2_FIFO_CTRL_wacount : out STD_LOGIC_VECTOR ( 5 downto 0 );
+    S_AXI_HP2_FIFO_CTRL_wcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
     S_AXI_HP2_FIFO_CTRL_wrissuecapen : in STD_LOGIC;
     S_AXI_HP0_arready : out STD_LOGIC;
     S_AXI_HP0_awready : out STD_LOGIC;
@@ -135,7 +135,7 @@ architecture STRUCTURE of top is
     S_AXI_HP2_rresp : out STD_LOGIC_VECTOR ( 1 downto 0 );
     S_AXI_HP2_bid : out STD_LOGIC_VECTOR ( 5 downto 0 );
     S_AXI_HP2_rid : out STD_LOGIC_VECTOR ( 5 downto 0 );
-    S_AXI_HP2_rdata : out STD_LOGIC_VECTOR ( 63 downto 0 );
+    S_AXI_HP2_rdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
     S_AXI_HP2_arvalid : in STD_LOGIC;
     S_AXI_HP2_awvalid : in STD_LOGIC;
     S_AXI_HP2_bready : in STD_LOGIC;
@@ -161,8 +161,8 @@ architecture STRUCTURE of top is
     S_AXI_HP2_arid : in STD_LOGIC_VECTOR ( 5 downto 0 );
     S_AXI_HP2_awid : in STD_LOGIC_VECTOR ( 5 downto 0 );
     S_AXI_HP2_wid : in STD_LOGIC_VECTOR ( 5 downto 0 );
-    S_AXI_HP2_wdata : in STD_LOGIC_VECTOR ( 63 downto 0 );
-    S_AXI_HP2_wstrb : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    S_AXI_HP2_wdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    S_AXI_HP2_wstrb : in STD_LOGIC_VECTOR ( 3 downto 0 );
     ext_reset_in : in STD_LOGIC;
     gpio_tri_o : out STD_LOGIC_VECTOR ( 31 downto 0 )
   );
@@ -296,11 +296,11 @@ architecture STRUCTURE of top is
   signal S_AXI_HP2_rready                 : STD_LOGIC := '0';
   signal S_AXI_HP2_rresp                  : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
   signal S_AXI_HP2_rvalid                 : STD_LOGIC := '0';
-  signal S_AXI_HP2_wdata                  : STD_LOGIC_VECTOR (63 downto 0) := (others => '0');
+  signal S_AXI_HP2_wdata                  : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
   signal S_AXI_HP2_wid                    : STD_LOGIC_VECTOR (5 downto 0)  := (others => '0');
   signal S_AXI_HP2_wlast                  : STD_LOGIC := '0';
   signal S_AXI_HP2_wready                 : STD_LOGIC := '0';
-  signal S_AXI_HP2_wstrb                  : STD_LOGIC_VECTOR (7 downto 0)  := (others => '0');
+  signal S_AXI_HP2_wstrb                  : STD_LOGIC_VECTOR (3 downto 0)  := (others => '0');
   signal S_AXI_HP2_wvalid                 : STD_LOGIC := '0';
 
   signal fifo_dout      : std_logic_vector(23 downto 0);
@@ -366,18 +366,14 @@ architecture STRUCTURE of top is
   signal fifo64_rd_count  : std_logic_vector(11 downto 0);
   signal fifo64_wr_count  : std_logic_vector(11 downto 0);
 
-  component axi_reader
+  component axi_reader_64
     port (
       clk : in std_logic;
       reset : in std_logic;
-      fifo_din : in std_logic_vector(64-1 downto 0);
-      fifo_re : out std_logic;
-      fifo_rclk : out std_logic;
-      fifo_empty : in std_logic;
-      fifo_length : in std_logic_vector(32-1 downto 0);
       fifo_dout : out std_logic_vector(64-1 downto 0);
       fifo_we : out std_logic;
       fifo_wclk : out std_logic;
+      fifo_length : in std_logic_vector(32-1 downto 0);
       fifo_full : in std_logic;
       S_AXI_ARADDR : out std_logic_vector(32-1 downto 0);
       S_AXI_ARLEN : out std_logic_vector(8-1 downto 0);
@@ -397,7 +393,7 @@ architecture STRUCTURE of top is
       addr : in std_logic_vector(32-1 downto 0);
       len : in std_logic_vector(8-1 downto 0)
       );
-  end component axi_reader;
+  end component axi_reader_64;
 
   component conv64to24
     port (
@@ -422,6 +418,46 @@ architecture STRUCTURE of top is
   signal gpio_tri_o_clk_ibufg_0 : std_logic_vector(31 downto 0);
   signal gpio_tri_o_clk_ibufg_1 : std_logic_vector(31 downto 0);
 
+  component synthesijer_lib_axi_SimpleAXIMemIface32RTLTest
+    port (
+      clk : in std_logic;
+      reset : in std_logic;
+      obj_axi_writer_dout : out std_logic_vector(32-1 downto 0);
+      obj_axi_writer_we : out std_logic;
+      obj_axi_writer_wclk : out std_logic;
+      obj_axi_writer_length : in std_logic_vector(32-1 downto 0);
+      obj_axi_writer_full : in std_logic;
+      obj_axi_reader_din : in std_logic_vector(32-1 downto 0);
+      obj_axi_reader_re : out std_logic;
+      obj_axi_reader_rclk : out std_logic;
+      obj_axi_reader_empty : in std_logic;
+      obj_axi_reader_length : in std_logic_vector(32-1 downto 0);
+      obj_axi_reader_full : in std_logic;
+      write_data_addr_in : in signed(32-1 downto 0);
+      write_data_data_in : in signed(32-1 downto 0);
+      write_data_req : in std_logic;
+      write_data_busy : out std_logic;
+      read_data_addr_in : in signed(32-1 downto 0);
+      read_data_return : out signed(32-1 downto 0);
+      read_data_req : in std_logic;
+      read_data_busy : out std_logic;
+      test_req : in std_logic;
+      test_busy : out std_logic
+      );
+  end component synthesijer_lib_axi_SimpleAXIMemIface32RTLTest;
+
+  signal obj_axi_writer_dout   : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_writer_we     : std_logic := '0';
+  signal obj_axi_writer_wclk   : std_logic := '0';
+  signal obj_axi_writer_length : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_writer_full   : std_logic := '0';
+  signal obj_axi_reader_din    : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_reader_re     : std_logic := '0';
+  signal obj_axi_reader_rclk   : std_logic := '0';
+  signal obj_axi_reader_empty  : std_logic := '0';
+  signal obj_axi_reader_length : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_reader_full   : std_logic := '0';
+  
 begin
   
   design_1_i : component design_1
@@ -527,17 +563,17 @@ begin
       S_AXI_HP2_bready                        => S_AXI_HP2_bready,
       S_AXI_HP2_bresp(1 downto 0)             => S_AXI_HP2_bresp(1 downto 0),
       S_AXI_HP2_bvalid                        => S_AXI_HP2_bvalid,
-      S_AXI_HP2_rdata(63 downto 0)            => S_AXI_HP2_rdata(63 downto 0),
+      S_AXI_HP2_rdata(31 downto 0)            => S_AXI_HP2_rdata(31 downto 0),
       S_AXI_HP2_rid(5 downto 0)               => S_AXI_HP2_rid(5 downto 0),
       S_AXI_HP2_rlast                         => S_AXI_HP2_rlast,
       S_AXI_HP2_rready                        => S_AXI_HP2_rready,
       S_AXI_HP2_rresp(1 downto 0)             => S_AXI_HP2_rresp(1 downto 0),
       S_AXI_HP2_rvalid                        => S_AXI_HP2_rvalid,
-      S_AXI_HP2_wdata(63 downto 0)            => S_AXI_HP2_wdata(63 downto 0),
+      S_AXI_HP2_wdata(31 downto 0)            => S_AXI_HP2_wdata(31 downto 0),
       S_AXI_HP2_wid(5 downto 0)               => S_AXI_HP2_wid(5 downto 0),
       S_AXI_HP2_wlast                         => S_AXI_HP2_wlast,
       S_AXI_HP2_wready                        => S_AXI_HP2_wready,
-      S_AXI_HP2_wstrb(7 downto 0)             => S_AXI_HP2_wstrb(7 downto 0),
+      S_AXI_HP2_wstrb(3 downto 0)             => S_AXI_HP2_wstrb(3 downto 0),
       S_AXI_HP2_wvalid                        => S_AXI_HP2_wvalid,
       ext_reset_in => '1',
       gpio_tri_o => gpio_tri_o
@@ -735,18 +771,14 @@ begin
   fifo64_wr_en <= axi_reader_fifo_we;
   fifo64_din <= axi_reader_fifo_dout;
 
-  U_AXI_READER : axi_reader port map(
+  U_AXI_READER : axi_reader_64 port map(
     clk                       => FCLK_CLK1,
     reset                     => not FCLK_RESET1_N,
-    fifo_din                  => (others => '0'),
-    fifo_re                   => open,
-    fifo_rclk                 => open,
-    fifo_empty                => '0',
-    fifo_length(11 downto 0)  => fifo64_wr_count,
-    fifo_length(31 downto 12) => (others => '0'),
     fifo_dout                 => axi_reader_fifo_dout,
     fifo_we                   => axi_reader_fifo_we,
     fifo_wclk                 => open,
+    fifo_length(11 downto 0)  => fifo64_wr_count,
+    fifo_length(31 downto 12) => (others => '0'),
     fifo_full                 => fifo64_prog_full,
     S_AXI_ARADDR              => S_AXI_HP0_araddr,
     S_AXI_ARLEN(3 downto 0)   => S_AXI_HP0_arlen,
@@ -790,6 +822,31 @@ begin
     end if;
   end process;
 
+  U_TEST : synthesijer_lib_axi_SimpleAXIMemIface32RTLTest port map(
+      clk                   => FCLK_CLK1,
+      reset                 => not FCLK_RESET1_N,
+      obj_axi_writer_dout   => obj_axi_writer_dout,
+      obj_axi_writer_we     => obj_axi_writer_we,
+      obj_axi_writer_wclk   => obj_axi_writer_wclk,
+      obj_axi_writer_length => obj_axi_writer_length,
+      obj_axi_writer_full   => obj_axi_writer_full,
+      obj_axi_reader_din    => obj_axi_reader_din,
+      obj_axi_reader_re     => obj_axi_reader_re,
+      obj_axi_reader_rclk   => obj_axi_reader_rclk,
+      obj_axi_reader_empty  => obj_axi_reader_empty,
+      obj_axi_reader_length => obj_axi_reader_length,
+      obj_axi_reader_full   => obj_axi_reader_full,
+      write_data_addr_in    => (others => '0'),
+      write_data_data_in    => (others => '0'),
+      write_data_req        => '0',
+      write_data_busy       => open,
+      read_data_addr_in     => read_data_addr_in,
+      read_data_return      => open,
+      read_data_req         => '0',
+      read_data_busy        => open,
+      test_req              => '1',
+      test_busy             => open
+      );
 
 end STRUCTURE;
 
