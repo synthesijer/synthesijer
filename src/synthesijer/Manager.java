@@ -164,8 +164,6 @@ public enum Manager {
 		}
 		doGenSynthesisTable();
 		genHDLAll();
-		output(OutputFormat.VHDL);
-		output(OutputFormat.Verilog);
 	}
 	
 	public void makeCallGraph(){

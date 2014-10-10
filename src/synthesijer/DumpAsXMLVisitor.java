@@ -40,6 +40,12 @@ import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
+/**
+ * A visitor class to dump module hierarchy of AST as XML.
+ * 
+ * @author miyo
+ *
+ */
 public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprVisitor, SynthesijerAstTypeVisitor{
 	
 	private final PrintWriter dest;

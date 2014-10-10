@@ -15,8 +15,23 @@ import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
+
+/**
+ * 
+ * The programmatic interface for the Java Programming Language,
+ * which generates ASTs for synthesijer compilation.
+ * 
+ * @author miyo
+ *
+ */
 public class Main {
 	
+	/**
+	 * 
+	 * @param importTable the table of importing classes. 
+	 * @param name target class name.
+	 * @return the absolute extending class name.  
+	 */
 	private static String getExtendingClassName(Hashtable<String, String> importTable, JCTree name){
 		if(name == null) return null;
 		if(importTable.containsKey(name.toString())){
@@ -26,6 +41,12 @@ public class Main {
 		}
 	}
 
+	/**
+	 * 
+	 * @param importTable the table of importing classes. 
+	 * @param name target interface name.
+	 * @return the absolute extending interface name.  
+	 */
 	private static String getImplementingIntarfaceName(Hashtable<String, String> importTable, String name){
 		if(name == null) return null;
 		if(importTable.containsKey(name)){
@@ -35,6 +56,11 @@ public class Main {
 		}
 	}
 
+	/**
+	 * starts to parse a new class in order to generate a instance of Module from a given instance of JCClassDecl.
+	 * @param env
+	 * @param decl
+	 */
 	public static void newModule(Env<AttrContext> env, JCClassDecl decl){
 		if(JCFrontendUtils.isAnnotationDecl(decl.mods)){
 			SynthesijerUtils.warn(decl.sym.toString() + " is skipped.");

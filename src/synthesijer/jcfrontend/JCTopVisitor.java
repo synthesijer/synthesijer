@@ -16,6 +16,12 @@ import synthesijer.ast.Type;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.type.MySelfType;
 
+/**
+ * A visitor to generate an instance of Module from a given instance of JCClassDecl.
+ * 
+ * @author miyo
+ *
+ */
 public class JCTopVisitor extends Visitor{
 	
 	private final Module module;
@@ -73,6 +79,12 @@ public class JCTopVisitor extends Visitor{
 		module.addMethod(m);
 	}
 	
+	/**
+	 * parse arguments of method declaration.
+	 * @param args
+	 * @param scope
+	 * @return
+	 */
 	private VariableDecl[] parseArgs(List<JCVariableDecl> args, Scope scope){
 		if(args == null || args.size() == 0) return new VariableDecl[0];
 		VariableDecl[] v = new VariableDecl[args.size()];
