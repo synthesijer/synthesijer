@@ -104,6 +104,7 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		if(o.isPrivate() == false){
 			for(Pair<HDLPort,HDLSignal> a: argPorts){
 				a.w.setAssign(visitor.getHDLSequencer().getIdleState(),
+						module.newExpr(HDLOp.EQ, req_global.getSignal(), HDLPreDefinedConstant.HIGH),
 						module.newExpr(HDLOp.IF,
 								module.newExpr(HDLOp.EQ, req_global.getSignal(), HDLPreDefinedConstant.HIGH),
 								a.v.getSignal(),

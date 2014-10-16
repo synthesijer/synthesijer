@@ -136,6 +136,18 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 		}
 	}
 
+	@Override
+	public void setAssign(SequencerState s, HDLExpr cond, HDLExpr expr){
+		if(s != null){
+			AssignmentCondition c = new AssignmentCondition(s, cond, expr);
+			conditions.add(c);
+		}else{
+			kind = ResourceKind.WIRE; // change resource kind to allow using "assign" statement
+			assignAlwaysFlag = true;
+			assignAlwaysExpr = expr;
+		}
+	}
+
 	public boolean isAssignAlways(){
 		return assignAlwaysFlag;
 	}
@@ -204,37 +216,53 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 		private final SequencerState s;
 		private final HDLExpr value;
 		private final int count;
+		private final HDLExpr cond;
 		
-		public AssignmentCondition(SequencerState s, HDLExpr value) {
-			this(s, -1, value);
-		}
-
-		public AssignmentCondition(SequencerState s, int count, HDLExpr value) {
+		private AssignmentCondition(SequencerState s, HDLExpr cond, int count, HDLExpr value) {
 			this.s = s;
 			this.value = value;
 			this.count = count;
+			this.cond = cond;
+		}
+
+		public AssignmentCondition(SequencerState s, HDLExpr value) {
+			this(s, null, -1, value);
+		}
+
+		public AssignmentCondition(SequencerState s, int count, HDLExpr value) {
+			this(s, null, count, value);
+		}
+
+		public AssignmentCondition(SequencerState s, HDLExpr cond, HDLExpr value) {
+			this(s, cond, -1, value);
 		}
 
 		public String getCondExprAsVHDL(){
+			String str = "";
 			if(count < 0){
 				String c = String.format("%s = %s", s.getKey().getName(), s.getStateId().getValue());
 				String ext = s.getExitConditionAsVHDL();
 				if(!ext.equals("")) c += " and " + ext;
-				return c;
+				str = c;
 			}else{
-				return String.format("%s = %s and %s = %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
+				str = String.format("%s = %s and %s = %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
 			}
+			if(cond != null) str += " and " + cond.getResultExpr().getVHDL() + " = '1'";
+			return str;
 		}
 
 		public String getCondExprAsVerilogHDL(){
+			String str;
 			if(count < 0){
 				String c = String.format("%s == %s", s.getKey().getName(), s.getStateId().getValue());
 				String ext = s.getExitConditionAsVerilogHDL();
 				if(!ext.equals("")) c += " && " + ext;
-				return c;
+				str = c;
 			}else{
-				return String.format("%s == %s && %s == %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
+				str = String.format("%s == %s && %s == %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
 			}
+			if(cond != null) str += " && " + cond.getResultExpr().getVerilogHDL() + " == 1'b1";
+			return str;
 		}
 		
 		public HDLExpr getValue(){
