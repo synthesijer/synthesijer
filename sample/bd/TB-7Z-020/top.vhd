@@ -48,6 +48,10 @@ entity top is
 end top;
 
 architecture STRUCTURE of top is
+
+  attribute MARK_DEBUG : string;
+  attribute KEEP : string;
+  
   component design_1 is
   port (
     DDR_cas_n : inout STD_LOGIC;
@@ -290,7 +294,7 @@ architecture STRUCTURE of top is
   signal S_AXI_HP2_bready                 : STD_LOGIC := '0';
   signal S_AXI_HP2_bresp                  : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
   signal S_AXI_HP2_bvalid                 : STD_LOGIC := '0';
-  signal S_AXI_HP2_rdata                  : STD_LOGIC_VECTOR (63 downto 0) := (others => '0');
+  signal S_AXI_HP2_rdata                  : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
   signal S_AXI_HP2_rid                    : STD_LOGIC_VECTOR (5 downto 0)  := (others => '0');
   signal S_AXI_HP2_rlast                  : STD_LOGIC := '0';
   signal S_AXI_HP2_rready                 : STD_LOGIC := '0';
@@ -420,44 +424,217 @@ architecture STRUCTURE of top is
 
   component synthesijer_lib_axi_SimpleAXIMemIface32RTLTest
     port (
-      clk : in std_logic;
-      reset : in std_logic;
-      obj_axi_writer_dout : out std_logic_vector(32-1 downto 0);
-      obj_axi_writer_we : out std_logic;
-      obj_axi_writer_wclk : out std_logic;
-      obj_axi_writer_length : in std_logic_vector(32-1 downto 0);
-      obj_axi_writer_full : in std_logic;
-      obj_axi_reader_din : in std_logic_vector(32-1 downto 0);
-      obj_axi_reader_re : out std_logic;
-      obj_axi_reader_rclk : out std_logic;
-      obj_axi_reader_empty : in std_logic;
-      obj_axi_reader_length : in std_logic_vector(32-1 downto 0);
-      obj_axi_reader_full : in std_logic;
-      write_data_addr_in : in signed(32-1 downto 0);
-      write_data_data_in : in signed(32-1 downto 0);
-      write_data_req : in std_logic;
-      write_data_busy : out std_logic;
-      read_data_addr_in : in signed(32-1 downto 0);
-      read_data_return : out signed(32-1 downto 0);
-      read_data_req : in std_logic;
-      read_data_busy : out std_logic;
-      test_req : in std_logic;
-      test_busy : out std_logic
+      clk                    : in  std_logic;
+      reset                  : in  std_logic;
+      obj_forbid : in std_logic;
+      obj_axi_reader_ARADDR  : out std_logic_vector(32-1 downto 0);
+      obj_axi_reader_ARLEN   : out std_logic_vector(8-1 downto 0);
+      obj_axi_reader_ARVALID : out std_logic;
+      obj_axi_reader_ARREADY : in  std_logic;
+      obj_axi_reader_ARSIZE  : out std_logic_vector(3-1 downto 0);
+      obj_axi_reader_ARBURST : out std_logic_vector(2-1 downto 0);
+      obj_axi_reader_ARCACHE : out std_logic_vector(4-1 downto 0);
+      obj_axi_reader_ARPROT  : out std_logic_vector(3-1 downto 0);
+      obj_axi_reader_RDATA   : in  std_logic_vector(32-1 downto 0);
+      obj_axi_reader_RRESP   : in  std_logic_vector(2-1 downto 0);
+      obj_axi_reader_RLAST   : in  std_logic;
+      obj_axi_reader_RVALID  : in  std_logic;
+      obj_axi_reader_RREADY  : out std_logic;
+      obj_axi_writer_AWADDR  : out std_logic_vector(32-1 downto 0);
+      obj_axi_writer_AWLEN   : out std_logic_vector(8-1 downto 0);
+      obj_axi_writer_AWVALID : out std_logic;
+      obj_axi_writer_AWSIZE  : out std_logic_vector(3-1 downto 0);
+      obj_axi_writer_AWBURST : out std_logic_vector(2-1 downto 0);
+      obj_axi_writer_AWCACHE : out std_logic_vector(4-1 downto 0);
+      obj_axi_writer_AWPROT  : out std_logic_vector(3-1 downto 0);
+      obj_axi_writer_AWREADY : in  std_logic;
+      obj_axi_writer_WDATA   : out std_logic_vector(32-1 downto 0);
+      obj_axi_writer_WLAST   : out std_logic;
+      obj_axi_writer_WVALID  : out std_logic;
+      obj_axi_writer_WREADY  : in  std_logic;
+      obj_axi_writer_WSTRB   : out std_logic_vector(4-1 downto 0);
+      obj_axi_writer_BRESP   : in  std_logic_vector(2-1 downto 0);
+      obj_axi_writer_BVALID  : in  std_logic;
+      obj_axi_writer_BREADY  : out std_logic;
+      write_data_addr_in     : in  signed(32-1 downto 0);
+      write_data_data_in     : in  signed(32-1 downto 0);
+      write_data_req         : in  std_logic;
+      write_data_busy        : out std_logic;
+      read_data_addr_in      : in  signed(32-1 downto 0);
+      read_data_return       : out signed(32-1 downto 0);
+      read_data_req          : in  std_logic;
+      read_data_busy         : out std_logic;
+      test_req               : in  std_logic;
+      test_busy              : out std_logic
       );
   end component synthesijer_lib_axi_SimpleAXIMemIface32RTLTest;
 
-  signal obj_axi_writer_dout   : std_logic_vector(32-1 downto 0) := (others => '0');
-  signal obj_axi_writer_we     : std_logic := '0';
-  signal obj_axi_writer_wclk   : std_logic := '0';
-  signal obj_axi_writer_length : std_logic_vector(32-1 downto 0) := (others => '0');
-  signal obj_axi_writer_full   : std_logic := '0';
-  signal obj_axi_reader_din    : std_logic_vector(32-1 downto 0) := (others => '0');
-  signal obj_axi_reader_re     : std_logic := '0';
-  signal obj_axi_reader_rclk   : std_logic := '0';
-  signal obj_axi_reader_empty  : std_logic := '0';
-  signal obj_axi_reader_length : std_logic_vector(32-1 downto 0) := (others => '0');
-  signal obj_axi_reader_full   : std_logic := '0';
+  signal obj_axi_reader_ARADDR  : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_reader_ARLEN   : std_logic_vector(8-1 downto 0) := (others => '0');
+  signal obj_axi_reader_ARVALID : std_logic := '0';
+  signal obj_axi_reader_ARREADY : std_logic := '0';
+  signal obj_axi_reader_ARSIZE  : std_logic_vector(3-1 downto 0) := (others => '0');
+  signal obj_axi_reader_ARBURST : std_logic_vector(2-1 downto 0) := (others => '0');
+  signal obj_axi_reader_ARCACHE : std_logic_vector(4-1 downto 0) := (others => '0');
+  signal obj_axi_reader_ARPROT  : std_logic_vector(3-1 downto 0) := (others => '0');
+  signal obj_axi_reader_RDATA   : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_reader_RRESP   : std_logic_vector(2-1 downto 0) := (others => '0');
+  signal obj_axi_reader_RLAST   : std_logic := '0';
+  signal obj_axi_reader_RVALID  : std_logic := '0';
+  signal obj_axi_reader_RREADY  : std_logic := '0';
+  signal obj_axi_writer_AWADDR  : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_writer_AWLEN   : std_logic_vector(8-1 downto 0) := (others => '0');
+  signal obj_axi_writer_AWVALID : std_logic := '0';
+  signal obj_axi_writer_AWSIZE  : std_logic_vector(3-1 downto 0) := (others => '0');
+  signal obj_axi_writer_AWBURST : std_logic_vector(2-1 downto 0) := (others => '0');
+  signal obj_axi_writer_AWCACHE : std_logic_vector(4-1 downto 0) := (others => '0');
+  signal obj_axi_writer_AWPROT  : std_logic_vector(3-1 downto 0) := (others => '0');
+  signal obj_axi_writer_AWREADY : std_logic := '0';
+  signal obj_axi_writer_WDATA   : std_logic_vector(32-1 downto 0) := (others => '0');
+  signal obj_axi_writer_WLAST   : std_logic := '0';
+  signal obj_axi_writer_WVALID  : std_logic := '0';
+  signal obj_axi_writer_WREADY  : std_logic := '0';
+  signal obj_axi_writer_WSTRB   : std_logic_vector(4-1 downto 0) := (others => '0');
+  signal obj_axi_writer_BRESP   : std_logic_vector(2-1 downto 0) := (others => '0');
+  signal obj_axi_writer_BVALID  : std_logic := '0';
+  signal obj_axi_writer_BREADY  : std_logic := '0';
+  signal write_data_addr_in     : signed(32-1 downto 0) := (others => '0');
+  signal write_data_data_in     : signed(32-1 downto 0) := (others => '0');
+  signal write_data_req         : std_logic := '0';
+  signal write_data_busy        : std_logic := '0';
+  signal read_data_addr_in      : signed(32-1 downto 0) := (others => '0');
+  signal read_data_return       : signed(32-1 downto 0) := (others => '0');
+  signal read_data_req          : std_logic := '0';
+  signal read_data_busy         : std_logic := '0';
+  signal test_req               : std_logic := '0';
+  signal test_busy              : std_logic := '0';
   
+  attribute MARK_DEBUG of obj_axi_reader_ARADDR  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_ARLEN   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_ARVALID : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_ARREADY : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_ARSIZE  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_ARBURST : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_ARCACHE : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_ARPROT  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_RDATA   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_RRESP   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_RLAST   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_RVALID  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_reader_RREADY  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWADDR  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWLEN   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWVALID : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWSIZE  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWBURST : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWCACHE : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWPROT  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_AWREADY : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_WDATA   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_WLAST   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_WVALID  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_WREADY  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_WSTRB   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_BRESP   : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_BVALID  : signal is "TRUE";
+  attribute MARK_DEBUG of obj_axi_writer_BREADY  : signal is "TRUE";
+  attribute MARK_DEBUG of write_data_addr_in     : signal is "TRUE";
+  attribute MARK_DEBUG of write_data_data_in     : signal is "TRUE";
+  attribute MARK_DEBUG of write_data_req         : signal is "TRUE";
+  attribute MARK_DEBUG of write_data_busy        : signal is "TRUE";
+  attribute MARK_DEBUG of read_data_addr_in      : signal is "TRUE";
+  attribute MARK_DEBUG of read_data_return       : signal is "TRUE";
+  attribute MARK_DEBUG of read_data_req          : signal is "TRUE";
+  attribute MARK_DEBUG of read_data_busy         : signal is "TRUE";
+  attribute MARK_DEBUG of test_req               : signal is "TRUE";
+  attribute MARK_DEBUG of test_busy              : signal is "TRUE";
+
+  attribute KEEP of obj_axi_reader_ARADDR  : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_ARLEN   : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_ARVALID : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_ARREADY : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_ARSIZE  : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_ARBURST : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_ARCACHE : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_ARPROT  : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_RDATA   : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_RRESP   : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_RLAST   : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_RVALID  : signal is "TRUE";
+  attribute KEEP of obj_axi_reader_RREADY  : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWADDR  : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWLEN   : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWVALID : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWSIZE  : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWBURST : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWCACHE : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWPROT  : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_AWREADY : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_WDATA   : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_WLAST   : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_WVALID  : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_WREADY  : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_WSTRB   : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_BRESP   : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_BVALID  : signal is "TRUE";
+  attribute KEEP of obj_axi_writer_BREADY  : signal is "TRUE";
+  attribute KEEP of write_data_addr_in     : signal is "TRUE";
+  attribute KEEP of write_data_data_in     : signal is "TRUE";
+  attribute KEEP of write_data_req         : signal is "TRUE";
+  attribute KEEP of write_data_busy        : signal is "TRUE";
+  attribute KEEP of read_data_addr_in      : signal is "TRUE";
+  attribute KEEP of read_data_return       : signal is "TRUE";
+  attribute KEEP of read_data_req          : signal is "TRUE";
+  attribute KEEP of read_data_busy         : signal is "TRUE";
+  attribute KEEP of test_req               : signal is "TRUE";
+  attribute KEEP of test_busy              : signal is "TRUE";
+
+  signal obj_forbid : std_logic := '1';
+
+  component TestCanvas
+  port (
+    clk : in std_logic;
+    reset : in std_logic;
+    obj_obj_forbid : in std_logic;
+    obj_obj_axi_reader_ARADDR : out std_logic_vector(32-1 downto 0);
+    obj_obj_axi_reader_ARLEN : out std_logic_vector(8-1 downto 0);
+    obj_obj_axi_reader_ARVALID : out std_logic;
+    obj_obj_axi_reader_ARREADY : in std_logic;
+    obj_obj_axi_reader_ARSIZE : out std_logic_vector(3-1 downto 0);
+    obj_obj_axi_reader_ARBURST : out std_logic_vector(2-1 downto 0);
+    obj_obj_axi_reader_ARCACHE : out std_logic_vector(4-1 downto 0);
+    obj_obj_axi_reader_ARPROT : out std_logic_vector(3-1 downto 0);
+    obj_obj_axi_reader_RDATA : in std_logic_vector(32-1 downto 0);
+    obj_obj_axi_reader_RRESP : in std_logic_vector(2-1 downto 0);
+    obj_obj_axi_reader_RLAST : in std_logic;
+    obj_obj_axi_reader_RVALID : in std_logic;
+    obj_obj_axi_reader_RREADY : out std_logic;
+    obj_obj_axi_writer_AWADDR : out std_logic_vector(32-1 downto 0);
+    obj_obj_axi_writer_AWLEN : out std_logic_vector(8-1 downto 0);
+    obj_obj_axi_writer_AWVALID : out std_logic;
+    obj_obj_axi_writer_AWSIZE : out std_logic_vector(3-1 downto 0);
+    obj_obj_axi_writer_AWBURST : out std_logic_vector(2-1 downto 0);
+    obj_obj_axi_writer_AWCACHE : out std_logic_vector(4-1 downto 0);
+    obj_obj_axi_writer_AWPROT : out std_logic_vector(3-1 downto 0);
+    obj_obj_axi_writer_AWREADY : in std_logic;
+    obj_obj_axi_writer_WDATA : out std_logic_vector(32-1 downto 0);
+    obj_obj_axi_writer_WLAST : out std_logic;
+    obj_obj_axi_writer_WVALID : out std_logic;
+    obj_obj_axi_writer_WREADY : in std_logic;
+    obj_obj_axi_writer_WSTRB : out std_logic_vector(4-1 downto 0);
+    obj_obj_axi_writer_BRESP : in std_logic_vector(2-1 downto 0);
+    obj_obj_axi_writer_BVALID : in std_logic;
+    obj_obj_axi_writer_BREADY : out std_logic;
+    pset_x_in : in signed(32-1 downto 0);
+    pset_y_in : in signed(32-1 downto 0);
+    pset_color_in : in signed(32-1 downto 0);
+    pset_req : in std_logic;
+    pset_busy : out std_logic;
+    test_req : in std_logic;
+    test_busy : out std_logic
+  );
+  end component TestCanvas;
+
 begin
   
   design_1_i : component design_1
@@ -822,31 +999,142 @@ begin
     end if;
   end process;
 
-  U_TEST : synthesijer_lib_axi_SimpleAXIMemIface32RTLTest port map(
-      clk                   => FCLK_CLK1,
-      reset                 => not FCLK_RESET1_N,
-      obj_axi_writer_dout   => obj_axi_writer_dout,
-      obj_axi_writer_we     => obj_axi_writer_we,
-      obj_axi_writer_wclk   => obj_axi_writer_wclk,
-      obj_axi_writer_length => obj_axi_writer_length,
-      obj_axi_writer_full   => obj_axi_writer_full,
-      obj_axi_reader_din    => obj_axi_reader_din,
-      obj_axi_reader_re     => obj_axi_reader_re,
-      obj_axi_reader_rclk   => obj_axi_reader_rclk,
-      obj_axi_reader_empty  => obj_axi_reader_empty,
-      obj_axi_reader_length => obj_axi_reader_length,
-      obj_axi_reader_full   => obj_axi_reader_full,
-      write_data_addr_in    => (others => '0'),
-      write_data_data_in    => (others => '0'),
-      write_data_req        => '0',
-      write_data_busy       => open,
-      read_data_addr_in     => read_data_addr_in,
-      read_data_return      => open,
-      read_data_req         => '0',
-      read_data_busy        => open,
-      test_req              => '1',
-      test_busy             => open
-      );
+  U_CANVAS: TestCanvas
+  port map(
+    clk                        => FCLK_CLK1,
+    reset                      => not FCLK_RESET1_N,
+    obj_obj_forbid             => obj_forbid,
+    obj_obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
+    obj_obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
+    obj_obj_axi_reader_ARVALID => obj_axi_reader_ARVALID,
+    obj_obj_axi_reader_ARREADY => obj_axi_reader_ARREADY,
+    obj_obj_axi_reader_ARSIZE  => obj_axi_reader_ARSIZE,
+    obj_obj_axi_reader_ARBURST => obj_axi_reader_ARBURST,
+    obj_obj_axi_reader_ARCACHE => obj_axi_reader_ARCACHE,
+    obj_obj_axi_reader_ARPROT  => obj_axi_reader_ARPROT,
+    obj_obj_axi_reader_RDATA   => obj_axi_reader_RDATA,
+    obj_obj_axi_reader_RRESP   => obj_axi_reader_RRESP,
+    obj_obj_axi_reader_RLAST   => obj_axi_reader_RLAST,
+    obj_obj_axi_reader_RVALID  => obj_axi_reader_RVALID,
+    obj_obj_axi_reader_RREADY  => obj_axi_reader_RREADY,
+    obj_obj_axi_writer_AWADDR  => obj_axi_writer_AWADDR,
+    obj_obj_axi_writer_AWLEN   => obj_axi_writer_AWLEN,
+    obj_obj_axi_writer_AWVALID => obj_axi_writer_AWVALID,
+    obj_obj_axi_writer_AWSIZE  => obj_axi_writer_AWSIZE,
+    obj_obj_axi_writer_AWBURST => obj_axi_writer_AWBURST,
+    obj_obj_axi_writer_AWCACHE => obj_axi_writer_AWCACHE,
+    obj_obj_axi_writer_AWPROT  => obj_axi_writer_AWPROT,
+    obj_obj_axi_writer_AWREADY => obj_axi_writer_AWREADY,
+    obj_obj_axi_writer_WDATA   => obj_axi_writer_WDATA,
+    obj_obj_axi_writer_WLAST   => obj_axi_writer_WLAST,
+    obj_obj_axi_writer_WVALID  => obj_axi_writer_WVALID,
+    obj_obj_axi_writer_WREADY  => obj_axi_writer_WREADY,
+    obj_obj_axi_writer_WSTRB   => obj_axi_writer_WSTRB,
+    obj_obj_axi_writer_BRESP   => obj_axi_writer_BRESP,
+    obj_obj_axi_writer_BVALID  => obj_axi_writer_BVALID,
+    obj_obj_axi_writer_BREADY  => obj_axi_writer_BREADY,
+    pset_x_in                  => (others => '0'),
+    pset_y_in                  => (others => '0'),
+    pset_color_in              => (others => '0'),
+    pset_req                   => '0',
+    pset_busy                  => open,
+    test_req                   => test_req,
+    test_busy                  => open
+  );
+
+  --U_TEST: synthesijer_lib_axi_SimpleAXIMemIface32RTLTest port map(
+  --  clk                    => FCLK_CLK1,
+  --  reset                  => not FCLK_RESET1_N,
+  --  obj_forbid => obj_forbid,
+  --  obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
+  --  obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
+  --  obj_axi_reader_ARVALID => obj_axi_reader_ARVALID,
+  --  obj_axi_reader_ARREADY => obj_axi_reader_ARREADY,
+  --  obj_axi_reader_ARSIZE  => obj_axi_reader_ARSIZE,
+  --  obj_axi_reader_ARBURST => obj_axi_reader_ARBURST,
+  --  obj_axi_reader_ARCACHE => obj_axi_reader_ARCACHE,
+  --  obj_axi_reader_ARPROT  => obj_axi_reader_ARPROT,
+  --  obj_axi_reader_RDATA   => obj_axi_reader_RDATA,
+  --  obj_axi_reader_RRESP   => obj_axi_reader_RRESP,
+  --  obj_axi_reader_RLAST   => obj_axi_reader_RLAST,
+  --  obj_axi_reader_RVALID  => obj_axi_reader_RVALID,
+  --  obj_axi_reader_RREADY  => obj_axi_reader_RREADY,
+  --  obj_axi_writer_AWADDR  => obj_axi_writer_AWADDR,
+  --  obj_axi_writer_AWLEN   => obj_axi_writer_AWLEN,
+  --  obj_axi_writer_AWVALID => obj_axi_writer_AWVALID,
+  --  obj_axi_writer_AWSIZE  => obj_axi_writer_AWSIZE,
+  --  obj_axi_writer_AWBURST => obj_axi_writer_AWBURST,
+  --  obj_axi_writer_AWCACHE => obj_axi_writer_AWCACHE,
+  --  obj_axi_writer_AWPROT  => obj_axi_writer_AWPROT,
+  --  obj_axi_writer_AWREADY => obj_axi_writer_AWREADY,
+  --  obj_axi_writer_WDATA   => obj_axi_writer_WDATA,
+  --  obj_axi_writer_WLAST   => obj_axi_writer_WLAST,
+  --  obj_axi_writer_WVALID  => obj_axi_writer_WVALID,
+  --  obj_axi_writer_WREADY  => obj_axi_writer_WREADY,
+  --  obj_axi_writer_WSTRB   => obj_axi_writer_WSTRB,
+  --  obj_axi_writer_BRESP   => obj_axi_writer_BRESP,
+  --  obj_axi_writer_BVALID  => obj_axi_writer_BVALID,
+  --  obj_axi_writer_BREADY  => obj_axi_writer_BREADY,
+  --  write_data_addr_in     => write_data_addr_in,
+  --  write_data_data_in     => write_data_data_in,
+  --  write_data_req         => write_data_req,
+  --  write_data_busy        => write_data_busy,
+  --  read_data_addr_in      => read_data_addr_in,
+  --  read_data_return       => read_data_return,
+  --  read_data_req          => read_data_req,
+  --  read_data_busy         => read_data_busy,
+  --  test_req               => test_req,
+  --  test_busy              => test_busy
+  --  );
+
+  S_AXI_HP2_araddr  <= obj_axi_reader_ARADDR;
+  S_AXI_HP2_arlen   <= obj_axi_reader_ARLEN(3 downto 0);
+  S_AXI_HP2_arvalid <= obj_axi_reader_ARVALID;
+  S_AXI_HP2_arsize  <= obj_axi_reader_ARSIZE;
+  S_AXI_HP2_arburst <= obj_axi_reader_ARBURST;
+  S_AXI_HP2_arcache <= obj_axi_reader_ARCACHE;
+  S_AXI_HP2_arprot  <= obj_axi_reader_ARPROT;
+  S_AXI_HP2_rready  <= obj_axi_reader_RREADY;
+  S_AXI_HP2_awaddr  <= obj_axi_writer_AWADDR;
+  S_AXI_HP2_awlen   <= obj_axi_writer_AWLEN(3 downto 0);
+  S_AXI_HP2_awvalid <= obj_axi_writer_AWVALID;
+  S_AXI_HP2_awsize  <= obj_axi_writer_AWSIZE;
+  S_AXI_HP2_awburst <= obj_axi_writer_AWBURST;
+  S_AXI_HP2_awcache <= obj_axi_writer_AWCACHE;
+  S_AXI_HP2_awprot  <= obj_axi_writer_AWPROT;
+  S_AXI_HP2_wdata   <= obj_axi_writer_WDATA;
+  S_AXI_HP2_wlast   <= obj_axi_writer_WLAST;
+  S_AXI_HP2_wvalid  <= obj_axi_writer_WVALID;
+  S_AXI_HP2_wstrb   <= obj_axi_writer_WSTRB;
+  S_AXI_HP2_bready  <= obj_axi_writer_BREADY;
+  
+  obj_axi_reader_ARREADY <= S_AXI_HP2_arready;
+  obj_axi_reader_RDATA   <= S_AXI_HP2_rdata;
+  obj_axi_reader_RRESP   <= S_AXI_HP2_rresp;
+  obj_axi_reader_RLAST   <= S_AXI_HP2_rlast;
+  obj_axi_reader_RVALID  <= S_AXI_HP2_rvalid;
+  obj_axi_writer_AWREADY <= S_AXI_HP2_awready;
+  obj_axi_writer_WREADY  <= S_AXI_HP2_wready;
+  obj_axi_writer_BRESP   <= S_AXI_HP2_bresp;
+  obj_axi_writer_BVALID  <= S_AXI_HP2_bvalid;
+
+--  test_req <= FCLK_RESET1_N;
+--  test_req <= '1';
+  test_req <= fifo2dvi_wakeup;
+  
+  process(FCLK_CLK1)
+  begin
+    if (FCLK_CLK1'event and FCLK_CLK1 = '1') then
+      if FCLK_RESET1_N = '0' then
+        obj_forbid <= '1';
+      else
+        if fifo2dvi_wakeup = '1' and fifo_prog_full = '1' then
+          obj_forbid <= '0';
+        else
+          obj_forbid <= '1';
+        end if;
+      end if;
+    end if;
+  end process;
 
 end STRUCTURE;
-
