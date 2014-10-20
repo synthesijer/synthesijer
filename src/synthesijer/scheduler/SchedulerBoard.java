@@ -29,5 +29,11 @@ public class SchedulerBoard {
 		item.setStepId(items.size()-1);
 	}
 	
+	public void dump(){
+		for(SchedulerItem item: items){
+			System.out.println(item.info());
+		}
+	}
+
 	
 }

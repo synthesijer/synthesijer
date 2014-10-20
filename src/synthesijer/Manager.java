@@ -23,6 +23,8 @@ import synthesijer.lib.OUTPUT32;
 import synthesijer.model.BasicBlockStatemachineOptimizer;
 import synthesijer.model.GenerateSynthesisTableVisitor;
 import synthesijer.model.SynthesisTable;
+import synthesijer.scheduler.GenSchedulerBoardVisitor;
+import synthesijer.scheduler.SchedulerBoard;
 
 public enum Manager {
 	
@@ -96,9 +98,20 @@ public enum Manager {
 		return entries.contains(key);
 	}
 	
+	private void doGenSchedulerBoard(){
+		for(Module m: entries.values()){
+			SchedulerBoard b = new SchedulerBoard();
+			IdentifierGenerator i = new IdentifierGenerator();
+			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(b, i);
+			m.accept(v);
+			b.dump();
+		}
+	}
+	
 	public void preprocess(){
 		loadUserHDLModules();
 		doGenSimplifiedAst(new IdentifierGenerator());
+		doGenSchedulerBoard();
 		//makeCallGraph();
 	}
 	

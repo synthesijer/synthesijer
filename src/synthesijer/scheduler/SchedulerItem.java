@@ -21,7 +21,7 @@ public class SchedulerItem {
 	/**
 	 * source variables
 	 */
-	private Variable[] src;
+	private Operand[] src;
 	
 	/**
 	 * a destination variable
@@ -39,7 +39,7 @@ public class SchedulerItem {
 	 * @param src source variables
 	 * @param dest destination variables
 	 */
-	public SchedulerItem(Op op, Variable[] src, Variable dest){
+	public SchedulerItem(Op op, Operand[] src, Variable dest){
 		this.op = op;
 		this.src = src;
 		this.dest = dest;
@@ -47,6 +47,9 @@ public class SchedulerItem {
 	
 	public void setStepId(int id){
 		this.stepId = id;
+		if(op.isBranch == false){
+			this.branchId = id + 1; 
+		}
 	}
 
 	public int getStepId(){
@@ -60,6 +63,27 @@ public class SchedulerItem {
 	public int getBranchId(){
 		return this.branchId;
 	}
+	
+	private String srcInfo(){
+		if(src == null) return "";
+		String s = "";
+		String sep = "";
+		for(Operand o: src){
+			s += sep + o.info();
+			sep = ", ";
+		}
+		return s;
+	}
+
+	private String destInfo(){
+		if(dest == null) return "";
+		return dest.info();
+	}
+
+	public String info(){
+		String s = String.format("%04d: op=%s src=%s, dest=%s [%d]", stepId, op, srcInfo(), destInfo(), branchId);
+		return s;
+	}
 
 }
 
@@ -70,6 +94,12 @@ class MethodEntryItem extends SchedulerItem{
 	public MethodEntryItem(String name){
 		super(Op.METHOD_ENTRY, null, null);
 		this.name = name;
+	}
+	
+	public String info(){
+		String s = super.info();
+		s += " (name=" + name + ")";
+		return s;
 	}
 	
 }
