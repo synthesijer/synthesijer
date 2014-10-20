@@ -4,7 +4,10 @@ public enum Op {
 	
 	METHOD_ENTRY(true),
 	METHOD_EXIT,
-	NULL;
+	ASSIGN,
+	NOP,
+	ADD,
+	UNDEFINED;
 	
 	public final boolean isBranch; 
 	public final int latency;
@@ -24,6 +27,15 @@ public enum Op {
 
 	private Op(){
 		this(false, 0);
+	}
+	
+	public static Op get(synthesijer.ast.Op o){
+		switch(o){
+		case PLUS: return ADD;
+		default:
+			System.out.println("undefiend:" + o);
+			return UNDEFINED;
+		}
 	}
 
 }

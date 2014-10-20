@@ -1,11 +1,15 @@
 package synthesijer.scheduler;
 
+import java.util.Hashtable;
+
+import synthesijer.IdentifierGenerator;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstTypeVisitor;
 import synthesijer.ast.SynthesijerAstVisitor;
+import synthesijer.ast.Type;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
@@ -44,26 +48,58 @@ import synthesijer.ast.type.PrimitiveTypeKind;
  * @author miyo
  *
  */
-public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor, SynthesijerAstTypeVisitor {
+public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	
 	private final SchedulerBoard board;
+	private final IdentifierGenerator idGen;
 	private final GenSchedulerBoardVisitor parent;
 	
-	public GenSchedulerBoardVisitor(SchedulerBoard board) {
+	private final Hashtable<String, Variable> varTable = new Hashtable<>();
+	
+	public GenSchedulerBoardVisitor(SchedulerBoard board, IdentifierGenerator idGen) {
 		this.parent = null;
 		this.board = board;
+		this.idGen = idGen;
 	}
 
-	public GenSchedulerBoardVisitor(GenSchedulerBoardVisitor parent) {
+	private GenSchedulerBoardVisitor(GenSchedulerBoardVisitor parent) {
 		this.parent = parent;
 		this.board = parent.board;
+		this.idGen = parent.idGen;
 	}
 	
-	private Variable stepIn(Expr expr){
+	public SchedulerBoard getBoard(){
+		return board;
+	}
+	
+	public IdentifierGenerator getIdGen(){
+		return idGen;
+	}
+	
+	public Variable search(String key){
+		if(varTable.containsKey(key)){
+			return varTable.get(key);
+		}else if(parent != null){
+			return parent.search(key);
+		}else{
+			return null;
+		}
+		
+	}
+	
+	private Operand stepIn(Expr expr){
 		GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this);
 		expr.accept(v);
-		return v.getVariable();
+		return v.getOperand();
 	}
+
+	private Type stepIn(Type type){
+		GenSchedulerBoardTypeVisitor v = new GenSchedulerBoardTypeVisitor(this);
+		type.accept(v);
+		return v.getType();
+	}
+
+	private SchedulerItem entry, exit;
 
 	@Override
 	public void visitModule(Module o) {
@@ -71,25 +107,27 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor, Synthesi
 			v.accept(this);
 		}
 		for (Method m : o.getMethods()) {
-			m.accept(this);
+			GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this);
+			m.accept(child);
 		}
 	}
 
 	@Override
 	public void visitMethod(Method o) {
-		
-		SchedulerItem exit = new SchedulerItem(Op.METHOD_EXIT, null, null);
-		board.addItem(exit);
-		MethodEntryItem entry = new MethodEntryItem(o.getName());
-		board.addItem(entry);
-		
-		GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this);
-		o.getBody().accept(child);
+		if(o.isConstructor()) return; // skip 
+		if(o.isUnsynthesizable()) return; // skip
+		this.exit = new SchedulerItem(Op.METHOD_EXIT, null, null);
+		board.addItem(this.exit);
+		this.entry = new MethodEntryItem(o.getName());
+		board.addItem(this.entry);
+		this.entry.setBranchId(this.exit.getStepId()); // jump to exit temporally.
+		o.getBody().accept(this);
 	}
 
 	@Override
 	public void visitBlockStatement(BlockStatement o) {
 		for (Statement s : o.getStatements()) {
+			System.out.println(s);
 			s.accept(this);
 		}
 	}
@@ -163,9 +201,13 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor, Synthesi
 
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
-		o.getVariable().getType().accept(this);
-		if (o.getInitExpr() != null)
-			stepIn(o.getInitExpr());
+		Type t = stepIn(o.getVariable().getType());
+		Variable v = new Variable(o.getName(), t);
+		varTable.put(o.getName(), v);
+		if (o.getInitExpr() != null){
+			Operand src = stepIn(o.getInitExpr());
+			board.addItem(new SchedulerItem(Op.ASSIGN, new Operand[]{src}, v));
+		}
 	}
 
 	@Override
@@ -174,38 +216,30 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor, Synthesi
 		o.getBody().accept(this);
 	}
 
-	@Override
-	public void visitArrayType(ArrayType o) {
-		o.getElemType().accept(this);
-	}
-
-	@Override
-	public void visitComponentType(ComponentType o) {
-	}
-
-	@Override
-	public void visitMySelfType(MySelfType o) {
-	}
-
-	@Override
-	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
-	}
-
 }
 
 class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	
+	private Operand result;
+	
+	private final GenSchedulerBoardVisitor parent;
+	
 	public GenSchedulerBoardExprVisitor(GenSchedulerBoardVisitor parent) {
-		// TODO Auto-generated constructor stub
+		this.parent = parent;
 	}
 	
 	/**
 	 * returns the last result of expression chain.
 	 * @return
 	 */
-	public Variable getVariable(){
-		// TODO
-		return null;
+	public Operand getOperand(){
+		return result;
+	}
+	
+	private Operand stepIn(Expr expr){
+		GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this.parent);
+		expr.accept(v);
+		return v.getOperand();
 	}
 
 	@Override
@@ -216,8 +250,9 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
-		o.getLhs().accept(this);
-		o.getRhs().accept(this);
+		Operand lhs = stepIn(o.getLhs());
+		Operand rhs = stepIn(o.getRhs());
+		parent.getBoard().addItem(new SchedulerItem(Op.ASSIGN, new Operand[]{rhs}, (Variable)lhs));
 	}
 
 	@Override
@@ -226,10 +261,16 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		o.getRhs().accept(this);
 	}
 
+	private Variable newVariable(String key, Type t){
+		return new Variable(String.format("%s_%05d", key, parent.getIdGen().id()), t);
+	}
+	
 	@Override
 	public void visitBinaryExpr(BinaryExpr o) {
-		o.getLhs().accept(this);
-		o.getRhs().accept(this);
+		Operand lhs = stepIn(o.getLhs());
+		Operand rhs = stepIn(o.getRhs());
+		result = newVariable("binary_expr", lhs.getType());
+		parent.getBoard().addItem(new SchedulerItem(Op.get(o.getOp()), new Operand[]{lhs,rhs}, (Variable)result));
 	}
 
 	@Override
@@ -239,10 +280,12 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitIdent(Ident o) {
+		result = parent.search(o.getSymbol());
 	}
 
 	@Override
 	public void visitLitral(Literal o) {
+		result = new Constant(o.getValueAsStr(), o.getType());
 	}
 
 	@Override
@@ -285,4 +328,38 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		o.getArg().accept(this);
 	}
 	
+}
+
+class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {
+	
+	private Type type;
+
+	public GenSchedulerBoardTypeVisitor(GenSchedulerBoardVisitor parent) {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Type getType(){
+		return type;
+	}
+
+	@Override
+	public void visitArrayType(ArrayType o) {
+		o.getElemType().accept(this);
+	}
+
+	@Override
+	public void visitComponentType(ComponentType o) {
+		this.type = o;
+	}
+
+	@Override
+	public void visitMySelfType(MySelfType o) {
+		this.type = o;
+	}
+
+	@Override
+	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
+		this.type = o;
+	}
+
 }

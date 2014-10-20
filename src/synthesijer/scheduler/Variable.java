@@ -1,9 +1,26 @@
 package synthesijer.scheduler;
 
-public class Variable {
+import synthesijer.ast.Type;
+
+public class Variable implements Operand{
 	
-	String name;
+	private final String name;
 	
-	Type type;
+	private final Type type;
+	
+	public Variable(String name, Type type){
+		this.name = name;
+		this.type = type;
+	}
+	
+	@Override
+	public Type getType(){
+		return type;
+	}
+
+	@Override
+	public String info(){
+		return name + ":" + type;
+	}
 
 }
