@@ -14,19 +14,19 @@ public class TestCanvas {
 	
 	private void set_color_1(int base, int color){
 		int v = 0; 
-		v = obj.read_data(base + 8);
+		v = obj.read_data(base);
 		v = (v & 0x000000FF) | ((color & 0x00FFFFFF) << 8);
-		obj.write_data(base + 8, v);
+		obj.write_data(base, v);
 	}
 	
 	private void set_color_2(int base, int color){
 		int v = 0;
-		v = obj.read_data(base + 4);
+		v = obj.read_data(base);
 		v = (v & 0x0000FFFF) | ((color & 0x0000FFFF) << 16);
-		obj.write_data(base + 4, v);
-		v = obj.read_data(base + 8);
+		obj.write_data(base, v);
+		v = obj.read_data(base + 4);
 		v = (v & 0xFFFFFF00) | ((color & 0x00FF0000) >> 16);
-		obj.write_data(base + 8, v);
+		obj.write_data(base + 4, v);
 	}
 
 	private void set_color_3(int base, int color){
@@ -70,6 +70,12 @@ public class TestCanvas {
 	}
 	
 	public void test(){
+		
+		for(int i = 0; i < 1920; i++){
+			for(int j = 0; j < 1920; j++){
+				pset(i, j, 0x00000000);
+			}
+		}
 		
 		for(int i = 30; i < 120; i++){
 			for(int j = 30; j < 120; j++){

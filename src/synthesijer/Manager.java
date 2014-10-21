@@ -111,7 +111,7 @@ public enum Manager {
 	public void preprocess(){
 		loadUserHDLModules();
 		doGenSimplifiedAst(new IdentifierGenerator());
-		doGenSchedulerBoard();
+		//doGenSchedulerBoard();
 		//makeCallGraph();
 	}
 	
