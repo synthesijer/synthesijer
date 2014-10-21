@@ -78,13 +78,13 @@ public class TestCanvas {
 	}
 	
 	public void test(){
-		clear();
 		
 		for(int i = 30; i < 120; i++){
 			for(int j = 30; j < 120; j++){
 				pset(i, j, 0x00FF0000);
 			}
 		}
+		
 	}
 
 }
