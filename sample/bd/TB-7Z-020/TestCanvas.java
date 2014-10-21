@@ -70,7 +70,7 @@ public class TestCanvas {
 	}
 	
 	public void clear(){
-		for(int i = 0; i < 1920; i++){
+		for(int i = 0; i < 1080; i++){
 			for(int j = 0; j < 1920; j++){
 				pset(i, j, 0x00000000);
 			}
