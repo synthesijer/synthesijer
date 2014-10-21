@@ -69,20 +69,22 @@ public class TestCanvas {
 		return;
 	}
 	
-	public void test(){
-		
+	public void clear(){
 		for(int i = 0; i < 1920; i++){
 			for(int j = 0; j < 1920; j++){
 				pset(i, j, 0x00000000);
 			}
 		}
+	}
+	
+	public void test(){
+		clear();
 		
 		for(int i = 30; i < 120; i++){
 			for(int j = 30; j < 120; j++){
 				pset(i, j, 0x00FF0000);
 			}
 		}
-		
 	}
 
 }
