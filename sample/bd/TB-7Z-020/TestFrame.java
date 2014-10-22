@@ -1,7 +1,7 @@
 
 import synthesijer.lib.axi.SimpleAXIMemIface32RTLTest;
 
-public class TestCanvas {
+public class TestFrame {
 	
 	SimpleAXIMemIface32RTLTest obj = new SimpleAXIMemIface32RTLTest();
 	
@@ -77,14 +77,24 @@ public class TestCanvas {
 		}
 	}
 	
+	public void fill_rect(int x, int y, int w, int h, int c){
+		for(int i = 0; i < w; i++){
+			for(int j = 0; j < h; j++){
+				pset(x+i, y+j, c);
+			}
+		}
+	}
+	
 	public void test(){
-		
 		for(int i = 30; i < 120; i++){
 			for(int j = 30; j < 120; j++){
 				pset(i, j, 0x00FF0000);
 			}
 		}
-		
+	}
+	
+	public void flush(){
+	
 	}
 
 }
