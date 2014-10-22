@@ -308,7 +308,7 @@ public class HDLCombinationExpr implements HDLExpr{
 				return String.format("{%s, %s}", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			case DROPHEAD:{
 				HDLPrimitiveType t = (HDLPrimitiveType)args[0].getResultExpr().getType();
-				return String.format("%s(%d - %s - 1 downto 0)", args[0].getResultExpr().getVerilogHDL(), t.getWidth(), args[1].getResultExpr().getVerilogHDL());
+				return String.format("%s[%d - %s - 1 : 0]", args[0].getResultExpr().getVerilogHDL(), t.getWidth(), args[1].getResultExpr().getVerilogHDL());
 			}
 			case PADDINGHEAD:{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
