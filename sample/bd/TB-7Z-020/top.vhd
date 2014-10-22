@@ -469,6 +469,45 @@ architecture STRUCTURE of top is
       );
   end component synthesijer_lib_axi_SimpleAXIMemIface32RTLTest;
 
+  component RGBTest
+    port (
+      clk : in std_logic;
+      reset : in std_logic;
+      obj_obj_obj_forbid : in std_logic;
+      obj_obj_obj_axi_reader_ARADDR : out std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_reader_ARLEN : out std_logic_vector(8-1 downto 0);
+      obj_obj_obj_axi_reader_ARVALID : out std_logic;
+      obj_obj_obj_axi_reader_ARREADY : in std_logic;
+      obj_obj_obj_axi_reader_ARSIZE : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_reader_ARBURST : out std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_reader_ARCACHE : out std_logic_vector(4-1 downto 0);
+      obj_obj_obj_axi_reader_ARPROT : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_reader_RDATA : in std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_reader_RRESP : in std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_reader_RLAST : in std_logic;
+      obj_obj_obj_axi_reader_RVALID : in std_logic;
+      obj_obj_obj_axi_reader_RREADY : out std_logic;
+      obj_obj_obj_axi_writer_AWADDR : out std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_writer_AWLEN : out std_logic_vector(8-1 downto 0);
+      obj_obj_obj_axi_writer_AWVALID : out std_logic;
+      obj_obj_obj_axi_writer_AWSIZE : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_writer_AWBURST : out std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_writer_AWCACHE : out std_logic_vector(4-1 downto 0);
+      obj_obj_obj_axi_writer_AWPROT : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_writer_AWREADY : in std_logic;
+      obj_obj_obj_axi_writer_WDATA : out std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_writer_WLAST : out std_logic;
+      obj_obj_obj_axi_writer_WVALID : out std_logic;
+      obj_obj_obj_axi_writer_WREADY : in std_logic;
+      obj_obj_obj_axi_writer_WSTRB : out std_logic_vector(4-1 downto 0);
+      obj_obj_obj_axi_writer_BRESP : in std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_writer_BVALID : in std_logic;
+      obj_obj_obj_axi_writer_BREADY : out std_logic;
+      run_req : in std_logic;
+      run_busy : out std_logic
+      );
+  end component RGBTest;
+
   signal obj_axi_reader_ARADDR  : std_logic_vector(32-1 downto 0) := (others => '0');
   signal obj_axi_reader_ARLEN   : std_logic_vector(8-1 downto 0) := (others => '0');
   signal obj_axi_reader_ARVALID : std_logic := '0';
@@ -999,48 +1038,86 @@ begin
     end if;
   end process;
 
-  U_CANVAS: TestCanvas
-  port map(
-    clk                        => FCLK_CLK1,
-    reset                      => not FCLK_RESET1_N,
-    obj_obj_forbid             => obj_forbid,
-    obj_obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
-    obj_obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
-    obj_obj_axi_reader_ARVALID => obj_axi_reader_ARVALID,
-    obj_obj_axi_reader_ARREADY => obj_axi_reader_ARREADY,
-    obj_obj_axi_reader_ARSIZE  => obj_axi_reader_ARSIZE,
-    obj_obj_axi_reader_ARBURST => obj_axi_reader_ARBURST,
-    obj_obj_axi_reader_ARCACHE => obj_axi_reader_ARCACHE,
-    obj_obj_axi_reader_ARPROT  => obj_axi_reader_ARPROT,
-    obj_obj_axi_reader_RDATA   => obj_axi_reader_RDATA,
-    obj_obj_axi_reader_RRESP   => obj_axi_reader_RRESP,
-    obj_obj_axi_reader_RLAST   => obj_axi_reader_RLAST,
-    obj_obj_axi_reader_RVALID  => obj_axi_reader_RVALID,
-    obj_obj_axi_reader_RREADY  => obj_axi_reader_RREADY,
-    obj_obj_axi_writer_AWADDR  => obj_axi_writer_AWADDR,
-    obj_obj_axi_writer_AWLEN   => obj_axi_writer_AWLEN,
-    obj_obj_axi_writer_AWVALID => obj_axi_writer_AWVALID,
-    obj_obj_axi_writer_AWSIZE  => obj_axi_writer_AWSIZE,
-    obj_obj_axi_writer_AWBURST => obj_axi_writer_AWBURST,
-    obj_obj_axi_writer_AWCACHE => obj_axi_writer_AWCACHE,
-    obj_obj_axi_writer_AWPROT  => obj_axi_writer_AWPROT,
-    obj_obj_axi_writer_AWREADY => obj_axi_writer_AWREADY,
-    obj_obj_axi_writer_WDATA   => obj_axi_writer_WDATA,
-    obj_obj_axi_writer_WLAST   => obj_axi_writer_WLAST,
-    obj_obj_axi_writer_WVALID  => obj_axi_writer_WVALID,
-    obj_obj_axi_writer_WREADY  => obj_axi_writer_WREADY,
-    obj_obj_axi_writer_WSTRB   => obj_axi_writer_WSTRB,
-    obj_obj_axi_writer_BRESP   => obj_axi_writer_BRESP,
-    obj_obj_axi_writer_BVALID  => obj_axi_writer_BVALID,
-    obj_obj_axi_writer_BREADY  => obj_axi_writer_BREADY,
-    pset_x_in                  => (others => '0'),
-    pset_y_in                  => (others => '0'),
-    pset_color_in              => (others => '0'),
-    pset_req                   => '0',
-    pset_busy                  => open,
-    test_req                   => test_req,
-    test_busy                  => open
-  );
+  --U_CANVAS: TestCanvas
+  --port map(
+  --  clk                        => FCLK_CLK1,
+  --  reset                      => not FCLK_RESET1_N,
+  --  obj_obj_forbid             => obj_forbid,
+  --  obj_obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
+  --  obj_obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
+  --  obj_obj_axi_reader_ARVALID => obj_axi_reader_ARVALID,
+  --  obj_obj_axi_reader_ARREADY => obj_axi_reader_ARREADY,
+  --  obj_obj_axi_reader_ARSIZE  => obj_axi_reader_ARSIZE,
+  --  obj_obj_axi_reader_ARBURST => obj_axi_reader_ARBURST,
+  --  obj_obj_axi_reader_ARCACHE => obj_axi_reader_ARCACHE,
+  --  obj_obj_axi_reader_ARPROT  => obj_axi_reader_ARPROT,
+  --  obj_obj_axi_reader_RDATA   => obj_axi_reader_RDATA,
+  --  obj_obj_axi_reader_RRESP   => obj_axi_reader_RRESP,
+  --  obj_obj_axi_reader_RLAST   => obj_axi_reader_RLAST,
+  --  obj_obj_axi_reader_RVALID  => obj_axi_reader_RVALID,
+  --  obj_obj_axi_reader_RREADY  => obj_axi_reader_RREADY,
+  --  obj_obj_axi_writer_AWADDR  => obj_axi_writer_AWADDR,
+  --  obj_obj_axi_writer_AWLEN   => obj_axi_writer_AWLEN,
+  --  obj_obj_axi_writer_AWVALID => obj_axi_writer_AWVALID,
+  --  obj_obj_axi_writer_AWSIZE  => obj_axi_writer_AWSIZE,
+  --  obj_obj_axi_writer_AWBURST => obj_axi_writer_AWBURST,
+  --  obj_obj_axi_writer_AWCACHE => obj_axi_writer_AWCACHE,
+  --  obj_obj_axi_writer_AWPROT  => obj_axi_writer_AWPROT,
+  --  obj_obj_axi_writer_AWREADY => obj_axi_writer_AWREADY,
+  --  obj_obj_axi_writer_WDATA   => obj_axi_writer_WDATA,
+  --  obj_obj_axi_writer_WLAST   => obj_axi_writer_WLAST,
+  --  obj_obj_axi_writer_WVALID  => obj_axi_writer_WVALID,
+  --  obj_obj_axi_writer_WREADY  => obj_axi_writer_WREADY,
+  --  obj_obj_axi_writer_WSTRB   => obj_axi_writer_WSTRB,
+  --  obj_obj_axi_writer_BRESP   => obj_axi_writer_BRESP,
+  --  obj_obj_axi_writer_BVALID  => obj_axi_writer_BVALID,
+  --  obj_obj_axi_writer_BREADY  => obj_axi_writer_BREADY,
+  --  pset_x_in                  => (others => '0'),
+  --  pset_y_in                  => (others => '0'),
+  --  pset_color_in              => (others => '0'),
+  --  pset_req                   => '0',
+  --  pset_busy                  => open,
+  --  test_req                   => test_req,
+  --  test_busy                  => open
+  --);
+
+  U_TEST : RGBTest
+    port map(
+      clk                        => FCLK_CLK1,
+      reset                      => not FCLK_RESET1_N,
+      obj_obj_obj_forbid             => obj_forbid,
+      obj_obj_obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
+      obj_obj_obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
+      obj_obj_obj_axi_reader_ARVALID => obj_axi_reader_ARVALID,
+      obj_obj_obj_axi_reader_ARREADY => obj_axi_reader_ARREADY,
+      obj_obj_obj_axi_reader_ARSIZE  => obj_axi_reader_ARSIZE,
+      obj_obj_obj_axi_reader_ARBURST => obj_axi_reader_ARBURST,
+      obj_obj_obj_axi_reader_ARCACHE => obj_axi_reader_ARCACHE,
+      obj_obj_obj_axi_reader_ARPROT  => obj_axi_reader_ARPROT,
+      obj_obj_obj_axi_reader_RDATA   => obj_axi_reader_RDATA,
+      obj_obj_obj_axi_reader_RRESP   => obj_axi_reader_RRESP,
+      obj_obj_obj_axi_reader_RLAST   => obj_axi_reader_RLAST,
+      obj_obj_obj_axi_reader_RVALID  => obj_axi_reader_RVALID,
+      obj_obj_obj_axi_reader_RREADY  => obj_axi_reader_RREADY,
+      obj_obj_obj_axi_writer_AWADDR  => obj_axi_writer_AWADDR,
+      obj_obj_obj_axi_writer_AWLEN   => obj_axi_writer_AWLEN,
+      obj_obj_obj_axi_writer_AWVALID => obj_axi_writer_AWVALID,
+      obj_obj_obj_axi_writer_AWSIZE  => obj_axi_writer_AWSIZE,
+      obj_obj_obj_axi_writer_AWBURST => obj_axi_writer_AWBURST,
+      obj_obj_obj_axi_writer_AWCACHE => obj_axi_writer_AWCACHE,
+      obj_obj_obj_axi_writer_AWPROT  => obj_axi_writer_AWPROT,
+      obj_obj_obj_axi_writer_AWREADY => obj_axi_writer_AWREADY,
+      obj_obj_obj_axi_writer_WDATA   => obj_axi_writer_WDATA,
+      obj_obj_obj_axi_writer_WLAST   => obj_axi_writer_WLAST,
+      obj_obj_obj_axi_writer_WVALID  => obj_axi_writer_WVALID,
+      obj_obj_obj_axi_writer_WREADY  => obj_axi_writer_WREADY,
+      obj_obj_obj_axi_writer_WSTRB   => obj_axi_writer_WSTRB,
+      obj_obj_obj_axi_writer_BRESP   => obj_axi_writer_BRESP,
+      obj_obj_obj_axi_writer_BVALID  => obj_axi_writer_BVALID,
+      obj_obj_obj_axi_writer_BREADY  => obj_axi_writer_BREADY,
+      run_req                        => test_req,
+      run_busy                       => open
+      );
 
   --U_TEST: synthesijer_lib_axi_SimpleAXIMemIface32RTLTest port map(
   --  clk                    => FCLK_CLK1,

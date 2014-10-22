@@ -1,0 +1,1 @@
+java -cp ../../../../synthesijer-applications/bin:../../../bin:. synthesijer.Main ../../../../synthesijer-applications/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java ../../../../synthesijer-applications/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java TestFrame.java RGBTest.java SinTableRom.java
