@@ -79,6 +79,8 @@ architecture STRUCTURE of top is
     FCLK_RESET0_N : out STD_LOGIC;
     FCLK_CLK1 : out STD_LOGIC;
     FCLK_RESET1_N : out STD_LOGIC;
+    FCLK_CLK2 : out STD_LOGIC;
+    FCLK_RESET2_N : out STD_LOGIC;
     S_AXI_HP0_FIFO_CTRL_rcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
     S_AXI_HP0_FIFO_CTRL_wcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
     S_AXI_HP0_FIFO_CTRL_racount : out STD_LOGIC_VECTOR ( 2 downto 0 );
@@ -217,6 +219,9 @@ architecture STRUCTURE of top is
 
   signal FCLK_CLK1 : std_logic;
   signal FCLK_RESET1_N : std_logic;
+
+  signal FCLK_CLK2 : std_logic;
+  signal FCLK_RESET2_N : std_logic;
   
   signal S_AXI_HP0_FIFO_CTRL_racount      : STD_LOGIC_VECTOR (2 downto 0)  := (others => '0');
   signal S_AXI_HP0_FIFO_CTRL_rcount       : STD_LOGIC_VECTOR (7 downto 0)  := (others => '0');
@@ -703,6 +708,8 @@ begin
       FIXED_IO_ps_srstb                       => FIXED_IO_ps_srstb,
       FCLK_CLK1                               => FCLK_CLK1,
       FCLK_RESET1_N                           => FCLK_RESET1_N,
+      FCLK_CLK2                               => FCLK_CLK2,
+      FCLK_RESET2_N                           => FCLK_RESET2_N,
       S_AXI_HP0_FIFO_CTRL_racount(2 downto 0) => S_AXI_HP0_FIFO_CTRL_racount(2 downto 0),
       S_AXI_HP0_FIFO_CTRL_rcount(7 downto 0)  => S_AXI_HP0_FIFO_CTRL_rcount(7 downto 0),
       S_AXI_HP0_FIFO_CTRL_rdissuecapen        => S_AXI_HP0_FIFO_CTRL_rdissuecapen,
@@ -1083,8 +1090,8 @@ begin
 
   U_TEST : RGBTest
     port map(
-      clk                        => FCLK_CLK1,
-      reset                      => not FCLK_RESET1_N,
+      clk                        => FCLK_CLK2,
+      reset                      => not FCLK_RESET2_N,
       obj_obj_obj_forbid             => obj_forbid,
       obj_obj_obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
       obj_obj_obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
@@ -1199,10 +1206,10 @@ begin
 --  test_req <= '1';
   test_req <= fifo2dvi_wakeup;
   
-  process(FCLK_CLK1)
+  process(FCLK_CLK2)
   begin
-    if (FCLK_CLK1'event and FCLK_CLK1 = '1') then
-      if FCLK_RESET1_N = '0' then
+    if (FCLK_CLK2'event and FCLK_CLK2 = '1') then
+      if FCLK_RESET2_N = '0' then
         obj_forbid <= '1';
       else
         if fifo2dvi_wakeup = '1' and fifo_prog_full = '1' then

@@ -40,7 +40,13 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		for(HDLPort p: target.getPorts()){
 			if(p.isSet(HDLPort.OPTION.NO_SIG)) continue;
 			HDLSignal.ResourceKind k = p.isOutput() ? HDLSignal.ResourceKind.WIRE : HDLSignal.ResourceKind.REGISTER;
-			HDLSignal s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
+			HDLSignal s;
+			if(p.hasWireName()){
+				s = module.getSignal(p.getWireName());
+				if(s == null) s = module.newSignal(p.getWireName(), p.getType(), k);
+			}else{
+				s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
+			}
 			pairs.add(new PortPair(s, p));
 		}
 	}

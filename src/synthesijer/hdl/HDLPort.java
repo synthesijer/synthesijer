@@ -6,6 +6,8 @@ import java.util.EnumSet;
 public class HDLPort implements HDLTree, HDLPortPairItem{
 	
 	private final String name;
+	
+	private final String wire;
 		
 	private final DIR dir;
 	
@@ -16,7 +18,16 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 	private final EnumSet<OPTION> options;
 	
 	HDLPort(HDLModule m, String name, DIR dir, HDLType type, EnumSet<OPTION> opt){
+		this(m, name, "", dir, type, opt);
+	}
+	
+	HDLPort(HDLModule m, String name, String wire, DIR dir, HDLType type, EnumSet<OPTION> opt){
 		this.name = name;
+		if(wire.equals("") == false){
+			this.wire = "user_wire_" + wire;
+		}else{
+			this.wire = "";
+		}
 		this.dir = dir;
 		this.type = type;
 		options = opt;
@@ -34,6 +45,14 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 	
 	public boolean isSet(OPTION opt){
 		return options.contains(opt);
+	}
+	
+	public boolean hasWireName(){
+		return !wire.equals("");
+	}
+
+	public String getWireName(){
+		return wire;
 	}
 
 	public String getName(){

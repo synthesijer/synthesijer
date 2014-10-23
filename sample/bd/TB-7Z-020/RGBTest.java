@@ -3,8 +3,8 @@ import synthesijer.rt.unsynthesizable;
 
 public class RGBTest {
 	
-	private final TestFrame obj = new TestFrame();
 	private final SinTableRom sin = new SinTableRom();
+	private final TestFrame obj = new TestFrame();
 	
 	private int colortbl[] = new int[6];
 
@@ -18,8 +18,8 @@ public class RGBTest {
 	}
 	
 
-	private void paint_sincurve(int offset){
-		int c_id = 0;
+	private void paint_sincurve(int offset, int color_offset){
+		int c_id = color_offset;
 	    for(int i = 0; i < (1920 >> 2); i++){ // 1920 / 4
 	    	int x = i << 2; // i * 4
 	    	int y = sin.sintable[(i+offset)&0x0000007F]; // %128
@@ -30,16 +30,25 @@ public class RGBTest {
 	    }
 	}
 	
+	private void sleep(int n){
+		for(int i = 0; i < n; i++){ ; }
+	}
+	
 	public void run(){
 		
 		init_colortbl();
 		
+		int c_id = 0;
+		
 		while(true){
-			paint_sincurve(0);
-			paint_sincurve(32);
-			paint_sincurve(64);
-			paint_sincurve(96);
+			paint_sincurve(0, c_id);
+			paint_sincurve(32, c_id);
+			paint_sincurve(64, c_id);
+			paint_sincurve(96, c_id);
+			sleep(100);
 			obj.flush();
+	    	c_id = c_id + 1;
+	    	if(c_id == 6) c_id = 0;
 		}
 	}
 	

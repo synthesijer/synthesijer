@@ -18,6 +18,6 @@ end outputflag;
 architecture RTL of outputflag is
 begin
 
-  flag <= din;
+  dout <= flag;
   
 end RTL;

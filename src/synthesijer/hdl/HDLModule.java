@@ -75,6 +75,18 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		return parameters.toArray(new HDLParameter[]{});
 	}
 
+	public HDLPort newPort(String name, String wire, HDLPort.DIR dir, HDLType type, EnumSet<HDLPort.OPTION> opt){
+		HDLPort port = new HDLPort(this, name, wire, dir, type, opt);
+		ports.add(port);
+		return port;
+	}
+
+	public HDLPort newPort(String name, String wire, HDLPort.DIR dir, HDLType type){
+		HDLPort port = new HDLPort(this, name, wire, dir, type, EnumSet.noneOf(HDLPort.OPTION.class));
+		ports.add(port);
+		return port;
+	}
+
 	public HDLPort newPort(String name, HDLPort.DIR dir, HDLType type, EnumSet<HDLPort.OPTION> opt){
 		HDLPort port = new HDLPort(this, name, dir, type, opt);
 		ports.add(port);
