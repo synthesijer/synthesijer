@@ -5,7 +5,7 @@ VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 
 all:
-	java -cp $(SYNTHESIJER):. synthesijer.Main $(SOURCES)
+	java -cp $(SYNTHESIJER):. synthesijer.Main --vhld --verilog $(SOURCES)
 	javac -cp $(SYNTHESIJER):. SC1602TestKC705.java
 	java -cp $(SYNTHESIJER):. SC1602TestKC705
 

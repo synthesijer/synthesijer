@@ -24,7 +24,7 @@ public class SC1602Wrapper extends HDLModule {
 		newPort("req", DIR.IN, HDLPrimitiveType.genBitType());
 		newPort("busy", DIR.OUT, HDLPrimitiveType.genBitType());
 
-		newPort("data_we", "data_we_hoge", DIR.IN, HDLPrimitiveType.genBitType());
+		newPort("data_we", DIR.IN, HDLPrimitiveType.genBitType());
 		newPort("data_address", DIR.IN, HDLPrimitiveType.genVectorType(32));
 		newPort("data_din", DIR.IN, HDLPrimitiveType.genVectorType(8));
 
