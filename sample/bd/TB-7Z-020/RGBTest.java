@@ -41,10 +41,10 @@ public class RGBTest {
 		int c_id = 0;
 		
 		while(true){
-			paint_sincurve(0, c_id);
-			paint_sincurve(32, c_id);
-			paint_sincurve(64, c_id);
-			paint_sincurve(96, c_id);
+			paint_sincurve(0, 0);
+			paint_sincurve(32, 0);
+			paint_sincurve(64, 0);
+			paint_sincurve(96, 0);
 			sleep(100);
 			obj.flush();
 	    	c_id = c_id + 1;
