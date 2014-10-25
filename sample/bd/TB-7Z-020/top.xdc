@@ -101,3 +101,5 @@ set_property DRIVE 8 [get_ports DVI_MSEN]
 set_false_path -from [get_clocks clk_fpga_0] -to [get_clocks SYS_CLK3]
 
 
+
+set_false_path -from [get_clocks SYS_CLK3] -to [get_clocks clk_fpga_0]
