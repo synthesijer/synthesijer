@@ -79,8 +79,6 @@ architecture STRUCTURE of top is
     FCLK_RESET0_N : out STD_LOGIC;
     FCLK_CLK1 : out STD_LOGIC;
     FCLK_RESET1_N : out STD_LOGIC;
-    FCLK_CLK2 : out STD_LOGIC;
-    FCLK_RESET2_N : out STD_LOGIC;
     S_AXI_HP0_FIFO_CTRL_rcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
     S_AXI_HP0_FIFO_CTRL_wcount : out STD_LOGIC_VECTOR ( 7 downto 0 );
     S_AXI_HP0_FIFO_CTRL_racount : out STD_LOGIC_VECTOR ( 2 downto 0 );
@@ -220,9 +218,6 @@ architecture STRUCTURE of top is
   signal FCLK_CLK1 : std_logic;
   signal FCLK_RESET1_N : std_logic;
 
-  signal FCLK_CLK2 : std_logic;
-  signal FCLK_RESET2_N : std_logic;
-  
   signal S_AXI_HP0_FIFO_CTRL_racount      : STD_LOGIC_VECTOR (2 downto 0)  := (others => '0');
   signal S_AXI_HP0_FIFO_CTRL_rcount       : STD_LOGIC_VECTOR (7 downto 0)  := (others => '0');
   signal S_AXI_HP0_FIFO_CTRL_rdissuecapen : STD_LOGIC := '0';
@@ -635,6 +630,8 @@ architecture STRUCTURE of top is
 
   signal obj_forbid : std_logic := '1';
 
+  signal fifo2dvi_wakeup_clk0_0, fifo2dvi_wakeup_clk0_1 : std_logic := '0';
+
   component TestCanvas
   port (
     clk : in std_logic;
@@ -708,8 +705,6 @@ begin
       FIXED_IO_ps_srstb                       => FIXED_IO_ps_srstb,
       FCLK_CLK1                               => FCLK_CLK1,
       FCLK_RESET1_N                           => FCLK_RESET1_N,
-      FCLK_CLK2                               => FCLK_CLK2,
-      FCLK_RESET2_N                           => FCLK_RESET2_N,
       S_AXI_HP0_FIFO_CTRL_racount(2 downto 0) => S_AXI_HP0_FIFO_CTRL_racount(2 downto 0),
       S_AXI_HP0_FIFO_CTRL_rcount(7 downto 0)  => S_AXI_HP0_FIFO_CTRL_rcount(7 downto 0),
       S_AXI_HP0_FIFO_CTRL_rdissuecapen        => S_AXI_HP0_FIFO_CTRL_rdissuecapen,
@@ -1090,8 +1085,8 @@ begin
 
   U_TEST : RGBTest
     port map(
-      clk                        => FCLK_CLK2,
-      reset                      => not FCLK_RESET2_N,
+      clk                            => FCLK_CLK0,
+      reset                          => not FCLK_RESET0_N,
       obj_obj_obj_forbid             => obj_forbid,
       obj_obj_obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
       obj_obj_obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
@@ -1202,17 +1197,28 @@ begin
   obj_axi_writer_BRESP   <= S_AXI_HP2_bresp;
   obj_axi_writer_BVALID  <= S_AXI_HP2_bvalid;
 
---  test_req <= FCLK_RESET1_N;
---  test_req <= '1';
-  test_req <= fifo2dvi_wakeup;
+  test_req <= fifo2dvi_wakeup_clk0_1;
   
-  process(FCLK_CLK2)
+  process(FCLK_CLK0)
   begin
-    if (FCLK_CLK2'event and FCLK_CLK2 = '1') then
-      if FCLK_RESET2_N = '0' then
+    if (FCLK_CLK0'event and FCLK_CLK0 = '1') then
+      if FCLK_RESET0_N = '0' then
+        fifo2dvi_wakeup_clk0_0 <= '0';
+        fifo2dvi_wakeup_clk0_1 <= '0';
+      else
+        fifo2dvi_wakeup_clk0_0 <= fifo2dvi_wakeup;
+        fifo2dvi_wakeup_clk0_1 <= fifo2dvi_wakeup_clk0_0;
+      end if;
+    end if;
+  end process;
+    
+  process(FCLK_CLK0)
+  begin
+    if (FCLK_CLK0'event and FCLK_CLK0 = '1') then
+      if FCLK_RESET0_N = '0' then
         obj_forbid <= '1';
       else
-        if fifo2dvi_wakeup = '1' and fifo_prog_full = '1' then
+        if fifo2dvi_wakeup_clk0_1 = '1' and fifo_prog_full = '1' then
           obj_forbid <= '0';
         else
           obj_forbid <= '1';

@@ -1,0 +1,6 @@
+the_ROM_image:
+{
+	[bootloader]/home/miyo/Vivado/zynq_test/zynq_test.sdk/fsbl/Debug/fsbl.elf
+	/home/miyo/Vivado/zynq_test/zynq_test.runs/impl_1/top.bit
+	/home/miyo/Vivado/zynq_test/zynq_test.sdk/hello_world/Debug/hello_world.elf
+}
