@@ -25,6 +25,13 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 		this.kind = KIND.USERDEF;
 	}
 	
+	@Override
+	public boolean isEqual(HDLType t) {
+		if(!(t instanceof HDLUserDefinedType)) return false;
+		HDLUserDefinedType t0 = (HDLUserDefinedType)t;
+		return base.equals(t0.base);
+	};
+	
 	public String getName(){
 		return base;
 	}

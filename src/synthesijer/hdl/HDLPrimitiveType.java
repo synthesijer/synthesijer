@@ -17,6 +17,15 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		this.width = width;
 	}
 	
+	@Override
+	public boolean isEqual(HDLType t) {
+		if(!(t instanceof HDLPrimitiveType)) return false;
+		HDLPrimitiveType t0 = (HDLPrimitiveType)t;
+		if(kind != t0.kind) return false;
+		if(width != t0.width) return false;
+		return true;
+	};
+	
 	public KIND getKind(){
 		return kind;
 	}

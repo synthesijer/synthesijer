@@ -46,7 +46,8 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 				if(s == null){
 					s = module.newSignal(p.getWireName(), p.getType(), HDLSignal.ResourceKind.WIRE);
 				}else{
-					if(p.getType() != s.getType()) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
+					//if(p.getType() != s.getType()) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
+					if(!p.getType().isEqual(s.getType())) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
 				}
 			}else{
 				s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);

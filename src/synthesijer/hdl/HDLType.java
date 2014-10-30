@@ -7,6 +7,8 @@ public interface HDLType {
 	public String getVHDL();
 	public String getVerilogHDL();
 	
+	public boolean isEqual(HDLType t);
+	
 	public enum KIND {
 		VECTOR, BIT, SIGNED, USERDEF, INTEGER, STRING, UNKNOWN;
 		

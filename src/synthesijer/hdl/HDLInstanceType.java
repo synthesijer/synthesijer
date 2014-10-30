@@ -7,6 +7,13 @@ public class HDLInstanceType implements HDLType{
 	HDLInstanceType(HDLModule target){
 		this.target = target;
 	}
+	
+	@Override
+	public boolean isEqual(HDLType t) {
+		if(!(t instanceof HDLInstanceType)) return false;
+		HDLInstanceType t0 = (HDLInstanceType)t;
+		return target.getName().equals(t0.target.getName());
+	};
 
 	@Override
 	public HDLExpr getDefaultValue() {
