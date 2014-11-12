@@ -33,6 +33,15 @@ public class Test001{
 		case 3:
 			value = 100;
 			break;
+		case 4:
+		{
+			value = 50;
+			value = 70;
+		}
+		case 5:
+			value = 10;
+		case 6:
+			value = 10;
 		default:
 			value = 200;
 		}

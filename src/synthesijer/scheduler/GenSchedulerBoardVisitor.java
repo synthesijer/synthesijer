@@ -1,5 +1,6 @@
 package synthesijer.scheduler;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import synthesijer.IdentifierGenerator;
@@ -54,26 +55,65 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	private final IdentifierGenerator idGen;
 	private final GenSchedulerBoardVisitor parent;
 	
+	/**
+	 * the stepId where the step pointer visits as normal flow
+	 */
+	private final int exitId;
+	
+	/**
+	 * the stepId where the step pointer visits by "break" jump
+	 */
+	private final int breakId;
+
+	/**
+	 * the stepId where the step pointer visits by "continue" jump
+	 */
+	private final int continueId;
+	
+	/**
+	 * 1st stepId of this visitor
+	 */
+	private int entryId = -1;
+	
+	/**
+	 * last added Item
+	 */
+	private SchedulerItem lastItem;
+	
 	private final Hashtable<String, Variable> varTable = new Hashtable<>();
+	
+	private SchedulerItem methodExit;
 	
 	public GenSchedulerBoardVisitor(SchedulerBoard board, IdentifierGenerator idGen) {
 		this.parent = null;
 		this.board = board;
 		this.idGen = idGen;
+		this.exitId = -1;
+		this.continueId = -1;		
+		this.breakId = -1;		
 	}
 
-	private GenSchedulerBoardVisitor(GenSchedulerBoardVisitor parent) {
+	private GenSchedulerBoardVisitor(GenSchedulerBoardVisitor parent, int exitId, int breakId, int continueId) {
 		this.parent = parent;
 		this.board = parent.board;
 		this.idGen = parent.idGen;
+		this.exitId = exitId;
+		this.methodExit = parent.methodExit;
+		this.lastItem = parent.lastItem;
+		this.breakId = breakId;		
+		this.continueId = continueId;		
 	}
-	
-	public SchedulerBoard getBoard(){
-		return board;
-	}
-	
+
 	public IdentifierGenerator getIdGen(){
 		return idGen;
+	}
+	
+	public int getEntryId(){
+		return entryId;
+	}
+	
+	public void setEntryId(int id){
+		entryId = id;
 	}
 	
 	public Variable search(String key){
@@ -85,6 +125,15 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 			return null;
 		}
 		
+	}
+	
+	private GenSchedulerBoardVisitor stepIn(Statement stmt, int exitId, int breakId, int continueId){
+		GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, exitId, breakId, continueId);
+		stmt.accept(v);
+		SchedulerItem ret = v.addMethodItem(new SchedulerItem(Op.JP, null, null)); // exit from this block
+		ret.setBranchId(exitId);
+		lastItem = v.lastItem; // update last item
+		return v;
 	}
 	
 	private Operand stepIn(Expr expr){
@@ -99,45 +148,55 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		return v.getType();
 	}
 
-	private SchedulerItem entry, exit;
+//	private SchedulerItem entry, exit;
 
 	@Override
 	public void visitModule(Module o) {
-		for (VariableDecl v : o.getVariableDecls()) {
+		for(VariableDecl v : o.getVariableDecls()) {
 			v.accept(this);
 		}
 		for (Method m : o.getMethods()) {
-			GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this);
+			if(m.isConstructor()) continue; // skip 
+			if(m.isUnsynthesizable()) continue; // skip
+			this.methodExit = board.addItemInNewSlot(new SchedulerItem(Op.METHOD_EXIT, null, null));
+			// breakId and continueId will not be defined for method
+			GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this, methodExit.getStepId(), -1, -1);
 			m.accept(child);
 		}
 	}
 
 	@Override
 	public void visitMethod(Method o) {
-		if(o.isConstructor()) return; // skip 
-		if(o.isUnsynthesizable()) return; // skip
-		this.exit = new SchedulerItem(Op.METHOD_EXIT, null, null);
-		board.addItem(this.exit);
-		this.entry = new MethodEntryItem(o.getName());
-		board.addItem(this.entry);
-		this.entry.setBranchId(this.exit.getStepId()); // jump to exit temporally.
-		o.getBody().accept(this);
+		
+		SchedulerItem entry = board.addItemInNewSlot(new MethodEntryItem(o.getName()));
+		lastItem = entry;
+
+		for(VariableDecl v: o.getArgs()){
+			v.accept(this);
+		}
+
+		// breakId and continueId will not be defined for method
+		GenSchedulerBoardVisitor v = stepIn(o.getBody(), exitId, -1, -1);
+		entry.setBranchId(v.entryId);
 	}
 
 	@Override
 	public void visitBlockStatement(BlockStatement o) {
 		for (Statement s : o.getStatements()) {
-			System.out.println(s);
 			s.accept(this);
 		}
 	}
 
 	@Override
 	public void visitBreakStatement(BreakStatement o) {
+		SchedulerItem br = addMethodItem(new SchedulerItem(Op.BREAK, null, null));
+		br.setBranchId(breakId);
 	}
 
 	@Override
 	public void visitContinueStatement(ContinueStatement o) {
+		SchedulerItem br = addMethodItem(new SchedulerItem(Op.CONTINUE, null, null));
+		br.setBranchId(continueId);
 	}
 
 	@Override
@@ -150,25 +209,52 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		for (Statement s : o.getInitializations()) {
 			s.accept(this);
 		}
-		stepIn(o.getCondition());
-		for (Statement s : o.getUpdates())
+		int afterInitId = lastItem.getStepId(); // return point for "for loop"
+		
+		Operand flag = stepIn(o.getCondition());
+		SchedulerItem fork = addMethodItem(new SchedulerItem(Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = addMethodItem(new SchedulerItem(Op.JP, null, null)); // join point to go to branch following
+		
+		int beforeUpdateId = lastItem.getStepId(); // entry point for updte statements
+		for (Statement s : o.getUpdates()){
 			s.accept(this);
-		o.getBody().accept(this);
+		}
+		SchedulerItem loop_back = addMethodItem(new SchedulerItem(Op.JP, null, null)); // join point to go to branch following
+		loop_back.setBranchId(afterInitId+1); // after loop body and update, back to condition checking
+		
+		GenSchedulerBoardVisitor v = stepIn(o.getBody(), beforeUpdateId+1, join.getStepId(), beforeUpdateId);
+		fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
+		join.setBranchId(lastItem.getStepId()+1); // next
 	}
 
 	@Override
 	public void visitIfStatement(IfStatement o) {
-		stepIn(o.getCondition());
-		o.getThenPart().accept(this);
-		if (o.getElsePart() != null) {
-			o.getElsePart().accept(this);
+		Operand flag = stepIn(o.getCondition());
+		SchedulerItem fork = addMethodItem(new SchedulerItem(Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = addMethodItem(new SchedulerItem(Op.JP, null, null)); // join point to go to branch following
+		
+		GenSchedulerBoardVisitor v0, v1;
+		v0 = stepIn(o.getThenPart(), join.getStepId(), breakId, continueId);
+		if (o.getElsePart() == null) {
+			fork.setBranchIds(new int[]{v0.getEntryId(), join.getStepId()});
+			join.setBranchId(v0.lastItem.getStepId() + 1);
+		}else{
+			v1 = stepIn(o.getElsePart(), join.getStepId(), breakId, continueId);
+			fork.setBranchIds(new int[]{v0.getEntryId(), v1.getEntryId()});
+			join.setBranchId(v1.lastItem.getStepId() + 1);
 		}
 	}
 
 	@Override
 	public void visitReturnStatement(ReturnStatement o) {
-		if (o.getExpr() != null)
-			stepIn(o.getExpr());
+		SchedulerItem ret;
+		if (o.getExpr() != null){
+			Operand v = stepIn(o.getExpr());
+			ret = addMethodItem(new SchedulerItem(Op.RETURN, new Operand[]{v}, null));
+		}else{
+			ret = addMethodItem(new SchedulerItem(Op.RETURN, null, null));
+		}
+		ret.setBranchId(methodExit.getStepId());
 	}
 
 	@Override
@@ -177,16 +263,54 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitSwitchStatement(SwitchStatement o) {
-		stepIn(o.getSelector());
-		for (SwitchStatement.Elem elem : o.getElements()) {
-			elem.accept(this);
+		ArrayList<SwitchStatement.Elem> elements = o.getElements();
+		Operand[] selector_list = new Operand[elements.size() + 1];
+		int[] branchIDs = new int[elements.size() + 1]; // #. patterns and default
+		selector_list[0] = stepIn(o.getSelector()); // target operand
+				
+		// gather selector operand
+		for(int i = 0; i < elements.size(); i++){
+			SwitchStatement.Elem elem = elements.get(i);
+			selector_list[i+1] = stepIn(elem.getPattern());
 		}
+
+		SchedulerItem fork = addMethodItem(new SchedulerItem(Op.SELECT, selector_list, null));
+		SchedulerItem join = addMethodItem(new SchedulerItem(Op.JP, null, null)); // join point to go to branch following
+		
+		int nextCaseId;
+		{ // for default
+			int idx = elements.size();
+			branchIDs[idx] = lastItem.getStepId() + 1; // currentID + 1
+			SwitchStatement.Elem elem = o.getDefaultElement();
+			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, join.getStepId(), join.getStepId(), continueId);
+			elem.accept(v);
+			lastItem = v.lastItem;
+			SchedulerItem ret = addMethodItem(new SchedulerItem(Op.JP, null, null)); // exit from this block
+			ret.setBranchId(join.getStepId());
+			nextCaseId = branchIDs[idx];
+		}
+		
+        // switch body (access in manner of reverse order)
+		for(int i = 0; i < elements.size(); i++){
+			int idx = elements.size() - i - 1;
+			branchIDs[idx] = lastItem.getStepId() + 1; // currentID
+			SwitchStatement.Elem elem = elements.get(idx);
+			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, nextCaseId, join.getStepId(), continueId);
+			elem.accept(v);
+			lastItem = v.lastItem;
+			SchedulerItem ret = addMethodItem(new SchedulerItem(Op.JP, null, null)); // exit from this block
+			ret.setBranchId(nextCaseId);
+			nextCaseId = branchIDs[idx];
+		}
+
+		fork.setBranchIds(branchIDs);
+		join.setBranchId(lastItem.getStepId() + 1);
 	}
 
 	public void visitSwitchCaseElement(SwitchStatement.Elem o) {
-		stepIn(o.getPattern());
-		for (Statement s : o.getStatements())
+		for (Statement s : o.getStatements()){
 			s.accept(this);
+		}
 	}
 
 	@Override
@@ -206,14 +330,29 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		varTable.put(o.getName(), v);
 		if (o.getInitExpr() != null){
 			Operand src = stepIn(o.getInitExpr());
-			board.addItem(new SchedulerItem(Op.ASSIGN, new Operand[]{src}, v));
+			addMethodItem(new SchedulerItem(Op.ASSIGN, new Operand[]{src}, v));
 		}
 	}
 
 	@Override
 	public void visitWhileStatement(WhileStatement o) {
-		stepIn(o.getCondition());
-		o.getBody().accept(this);
+		int loopEntryId = lastItem.getStepId(); // return point for "for loop"
+
+		Operand flag = stepIn(o.getCondition());
+		SchedulerItem fork = addMethodItem(new SchedulerItem(Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = addMethodItem(new SchedulerItem(Op.JP, null, null)); // join point to go to branch following
+		
+		GenSchedulerBoardVisitor v = stepIn(o.getBody(), loopEntryId+1, join.getStepId(), loopEntryId+1);
+
+		fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
+		join.setBranchId(lastItem.getStepId()+1); // next
+	}
+	
+	public SchedulerItem addMethodItem(SchedulerItem item){
+		board.addItemInNewSlot(item);
+		if(entryId == -1) entryId = item.getStepId();
+		lastItem = item;
+		return item;
 	}
 
 }
@@ -244,21 +383,34 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitArrayAccess(ArrayAccess o) {
-		o.getIndexed().accept(this);
-		o.getIndex().accept(this);
+		Operand indexed = stepIn(o.getIndexed());
+		Operand index = stepIn(o.getIndex());
+		Type type;
+		if(indexed.getType() instanceof ArrayType){
+			type = ((ArrayType)o.getIndexed().getType()).getElemType();
+		}else{
+			type = PrimitiveTypeKind.VOID;
+		}
+		Variable tmp = newVariable("array_access", type);
+		parent.addMethodItem(new SchedulerItem(Op.ARRAY_ACCESS, new Operand[]{indexed, index}, tmp));
+		result = tmp;
 	}
 
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
-		parent.getBoard().addItem(new SchedulerItem(Op.ASSIGN, new Operand[]{rhs}, (Variable)lhs));
+		parent.addMethodItem(new SchedulerItem(Op.ASSIGN, new Operand[]{rhs}, (Variable)lhs));
 	}
 
 	@Override
 	public void visitAssignOp(AssignOp o) {
-		o.getLhs().accept(this);
-		o.getRhs().accept(this);
+		Operand lhs = stepIn(o.getLhs());
+		Operand rhs = stepIn(o.getRhs());
+		Variable tmp = newVariable("binary_expr", lhs.getType());
+		parent.addMethodItem(new SchedulerItem(Op.get(o.getOp()), new Operand[]{lhs,rhs}, tmp));
+		parent.addMethodItem(new SchedulerItem(Op.ASSIGN, new Operand[]{tmp}, (Variable)lhs));
+		result = lhs;
 	}
 
 	private Variable newVariable(String key, Type t){
@@ -270,12 +422,15 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
 		result = newVariable("binary_expr", lhs.getType());
-		parent.getBoard().addItem(new SchedulerItem(Op.get(o.getOp()), new Operand[]{lhs,rhs}, (Variable)result));
+		parent.addMethodItem(new SchedulerItem(Op.get(o.getOp()), new Operand[]{lhs,rhs}, (Variable)result));
 	}
 
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
-		o.getSelected().accept(this);
+		Variable tmp = newVariable("field_access", PrimitiveTypeKind.UNDEFIEND);
+		Operand v = stepIn(o.getSelected());
+		parent.addMethodItem(new FieldAccessItem((Variable)v, o.getIdent().getSymbol(), null, tmp));
+		result = tmp;
 	}
 
 	@Override
@@ -291,12 +446,19 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitMethodInvocation(MethodInvocation o) {
 		Expr method = o.getMethod();
-		if (method instanceof FieldAccess) {
-			method.accept(this);
+		Variable tmp = newVariable("method_result", o.getType());
+		ArrayList<Expr> params = o.getParameters();
+		Operand[] list = new Operand[params.size()];
+		for(int i = 0; i < params.size(); i++){
+			list[i] = stepIn(params.get(i));
 		}
-		for (Expr expr : o.getParameters()) {
-			expr.accept(this);
+		if (method instanceof FieldAccess) { // calling other instance method
+			FieldAccess fa = (FieldAccess)method;
+			parent.addMethodItem(new MethodInvokeItem((Variable)stepIn(fa.getSelected()), o.getMethodName(), list, tmp));
+		}else{ // calling this instance method
+			parent.addMethodItem(new MethodInvokeItem(o.getMethodName(), list, tmp));
 		}
+		result = tmp;
 	}
 
 	@Override
@@ -311,6 +473,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		for (Expr expr : o.getParameters()) {
 			expr.accept(this);
 		}
+		result = newVariable("new_class", o.getType());
 	}
 
 	@Override
@@ -325,7 +488,25 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
-		o.getArg().accept(this);
+		Operand v = stepIn(o.getArg());
+		Constant c1 = new Constant("1", v.getType());
+		switch(o.getOp()){
+		case INC:{
+			Variable tmp = newVariable("binary_expr", v.getType());
+			parent.addMethodItem(new SchedulerItem(Op.ADD, new Operand[]{v, c1}, tmp));
+			parent.addMethodItem(new SchedulerItem(Op.ASSIGN, new Operand[]{tmp}, (Variable)v));
+			break;
+		}
+		case DEC:{
+			Variable tmp = newVariable("binary_expr", v.getType());
+			parent.addMethodItem(new SchedulerItem(Op.SUB, new Operand[]{v, c1}, tmp));
+			parent.addMethodItem(new SchedulerItem(Op.ASSIGN, new Operand[]{tmp}, (Variable)v));
+			break;
+		}
+		default:
+			System.out.println("unknown unary expr:" + o.getOp());
+		}
+		result = v;
 	}
 	
 }

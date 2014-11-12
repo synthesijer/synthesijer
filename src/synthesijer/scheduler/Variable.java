@@ -13,6 +13,10 @@ public class Variable implements Operand{
 		this.type = type;
 	}
 	
+	public String getName(){
+		return name;
+	}
+
 	@Override
 	public Type getType(){
 		return type;

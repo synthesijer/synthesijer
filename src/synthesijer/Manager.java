@@ -104,14 +104,27 @@ public enum Manager {
 			IdentifierGenerator i = new IdentifierGenerator();
 			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(b, i);
 			m.accept(v);
-			b.dump();
+			try(FileOutputStream fo = new FileOutputStream(new File(m.getName() + "_scheduler_board.txt"))){
+				PrintStream out = new PrintStream(fo);
+				b.dump(out);
+				out.close();
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+			try(FileOutputStream fo = new FileOutputStream(new File(m.getName() + "_scheduler_board.dot"))){
+				PrintStream out = new PrintStream(fo);
+				b.dumpDot(out);
+				out.close();
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 		}
 	}
 	
 	public void preprocess(){
 		loadUserHDLModules();
+		doGenSchedulerBoard();
 		doGenSimplifiedAst(new IdentifierGenerator());
-		//doGenSchedulerBoard();
 		//makeCallGraph();
 	}
 	
@@ -160,6 +173,7 @@ public enum Manager {
 				GenerateSynthesisTableVisitor v = new GenerateSynthesisTableVisitor(out, tables);
 				m.accept(v);
 				v.dump(out);
+				out.close();
 			}catch(IOException e){
 				e.printStackTrace();
 			}

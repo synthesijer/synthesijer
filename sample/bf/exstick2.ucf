@@ -1,0 +1,14 @@
+NET reset      LOC = A12  | IOSTANDARD = LVCMOS33;    # "USER_RESET"
+NET reset      TIG;
+
+NET clk        LOC = N7 | IOSTANDARD = LVCMOS33;               # "USER_CLOCK"
+
+NET clk TNM_NET = clk;
+TIMESPEC ts_clk = PERIOD clk 25000 kHz;
+
+#NET rx_din  LOC = D1  | IOSTANDARD = LVCMOS33;               # "FPGA_EX_IO(22)"
+#NET tx_dout LOC = E2  | IOSTANDARD = LVCMOS33;               # "FPGA_EX_IO(24)"
+#NET rx_din  LOC = C10 | IOSTANDARD = LVCMOS33 | PULLDOWN;               # "PMOD_P1"
+#NET tx_dout LOC = B11 | IOSTANDARD = LVCMOS33 | PULLDOWN;               # "PMOD_P2"
+NET rx_din  LOC = C1 | IOSTANDARD = LVCMOS33 | PULLDOWN;               # "PMOD_P1"
+NET tx_dout LOC = C2 | IOSTANDARD = LVCMOS33 | PULLDOWN;               # "PMOD_P2"
