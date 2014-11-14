@@ -3,6 +3,8 @@ package synthesijer.scheduler;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import synthesijer.ast.Method;
+
 /**
  * SchdulerBoard manages scheduling table of instances of SchdulerItem. 
  * 
@@ -11,14 +13,32 @@ import java.util.ArrayList;
  */
 public class SchedulerBoard {
 
+	private final String name;
+	
+	private final Method method;
+	
 	/**
 	 * container of slots.
 	 * the index in this array corresponds to computation step. 
 	 */
 	private ArrayList<SchedulerSlot> slots;
 	
-	public SchedulerBoard(){
+	public SchedulerBoard(String name, Method m){
+		this.name = name;
+		this.method = m;
 		this.slots = new ArrayList<SchedulerSlot>();
+	}
+	
+	public String getName(){
+		return name;
+	}
+
+	public Method getMethod(){
+		return method;
+	}
+
+	public SchedulerSlot[] getSlots(){
+		return slots.toArray(new SchedulerSlot[]{});
 	}
 	
 	/**
@@ -41,11 +61,9 @@ public class SchedulerBoard {
 	}
 
 	public void dumpDot(PrintStream out){
-		out.println("digraph{");
 		for(SchedulerSlot slot: slots){
 			slot.dumpDot(out);
 		}
-		out.println("}");
 	}
 
 	
@@ -59,6 +77,10 @@ class SchedulerSlot {
 	 * the index in this array corresponds to computation step. 
 	 */
 	private ArrayList<SchedulerItem> items = new ArrayList<>();
+	
+	public SchedulerItem[] getItems(){
+		return items.toArray(new SchedulerItem[]{});
+	}
 
 	
 	/**
@@ -81,9 +103,9 @@ class SchedulerSlot {
 	public void dumpDot(PrintStream out){
 		for(SchedulerItem item: items){
 			for(int n: item.getBranchId()){
-				out.printf("%d [shape = box, label = \"%s\"];", item.getStepId(), item.info());
+				out.printf("%s_%d [shape = box, label = \"%s\"];", item.getBoardName(), item.getStepId(), item.info());
 				out.println();
-				out.printf("%d -> %d;", item.getStepId(), n);
+				out.printf("%s_%d -> %s_%d;", item.getBoardName(), item.getStepId(), item.getBoardName(), n);
 				out.println();
 			}
 		}

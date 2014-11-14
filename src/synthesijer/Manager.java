@@ -24,7 +24,10 @@ import synthesijer.model.BasicBlockStatemachineOptimizer;
 import synthesijer.model.GenerateSynthesisTableVisitor;
 import synthesijer.model.SynthesisTable;
 import synthesijer.scheduler.GenSchedulerBoardVisitor;
+import synthesijer.scheduler.GlobalSymbolTable;
 import synthesijer.scheduler.SchedulerBoard;
+import synthesijer.scheduler.SchedulerInfo;
+import synthesijer.scheduler.SchedulerInfoCompiler;
 
 public enum Manager {
 	
@@ -32,6 +35,7 @@ public enum Manager {
 	
 	private Hashtable<String, Module> entries = new Hashtable<>();
 	private Hashtable<String, HDLModuleInfo> moduleTable = new Hashtable<>();
+	private Hashtable<String, SchedulerInfo> schedulerInfoTable = new Hashtable<>();
 	private ArrayList<String> userHDLModules = new ArrayList<>();
 		
 	private Manager(){
@@ -98,23 +102,29 @@ public enum Manager {
 		return entries.contains(key);
 	}
 	
+	private void genGlobalSymbolTable(){
+		for(Module m: entries.values()){
+			GlobalSymbolTable.INSTANCE.add(m);
+		}
+	}
+	
 	private void doGenSchedulerBoard(){
 		for(Module m: entries.values()){
-			SchedulerBoard b = new SchedulerBoard();
 			IdentifierGenerator i = new IdentifierGenerator();
-			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(b, i);
+			SchedulerInfo info = new SchedulerInfo(m.getName());
+			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(info, i);
 			m.accept(v);
-			try(FileOutputStream fo = new FileOutputStream(new File(m.getName() + "_scheduler_board.txt"))){
-				PrintStream out = new PrintStream(fo);
-				b.dump(out);
-				out.close();
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-			try(FileOutputStream fo = new FileOutputStream(new File(m.getName() + "_scheduler_board.dot"))){
-				PrintStream out = new PrintStream(fo);
-				b.dumpDot(out);
-				out.close();
+			schedulerInfoTable.put(m.getName(), info);
+			try(PrintStream txt = new PrintStream(new FileOutputStream(new File(m.getName() + "_scheduler_board.txt")));
+				PrintStream dot = new PrintStream(new FileOutputStream(new File(m.getName() + "_scheduler_board.dot")))){
+				dot.println("digraph {");
+				for(SchedulerBoard b: info.getBoardsList()){
+					b.dump(txt);
+					b.dumpDot(dot);
+				}
+				dot.println("}");
+				txt.close();
+				dot.close();
 			}catch(IOException e){
 				e.printStackTrace();
 			}
@@ -123,6 +133,7 @@ public enum Manager {
 	
 	public void preprocess(){
 		loadUserHDLModules();
+		genGlobalSymbolTable();
 		doGenSchedulerBoard();
 		doGenSimplifiedAst(new IdentifierGenerator());
 		//makeCallGraph();
@@ -180,17 +191,38 @@ public enum Manager {
 		}
 	}
 	
-	public void generate(boolean optimizeFlag){
-		makeStateMachine();
-		dumpStateMachine("init");
-		if(optimizeFlag){
-			optimizations();
-			dumpStateMachine("opt");
-		}else{
-			SynthesijerUtils.warn("skip optimization");
+	private boolean SCHEDULER_BOARD_MODE = true;
+	
+	private void compileSchedulerInfoAll(){
+		for(Module m: entries.values()){
+			compileSchedulerInfo(m.getName(), searchHDLModuleInfo(m.getName()));
 		}
-		doGenSynthesisTable();
-		genHDLAll();
+	}
+	
+	public void compileSchedulerInfo(String name, HDLModuleInfo hmi){
+		if(hmi.state.isBefore(CompileState.GENERATE_HDL)){
+			hmi.state = CompileState.GENERATE_HDL;
+			SchedulerInfo info = schedulerInfoTable.get(name);
+			SchedulerInfoCompiler compiler = new SchedulerInfoCompiler(info, hmi.hm);			
+			compiler.compile();
+		}
+	}
+	
+	public void generate(boolean optimizeFlag){
+		if(SCHEDULER_BOARD_MODE == false){
+			makeStateMachine();
+			dumpStateMachine("init");
+			if(optimizeFlag){
+				optimizations();
+				dumpStateMachine("opt");
+			}else{
+				SynthesijerUtils.warn("skip optimization");
+			}
+			doGenSynthesisTable();
+			genHDLAll();
+		}else{
+			compileSchedulerInfoAll();
+		}
 	}
 	
 	public void makeCallGraph(){

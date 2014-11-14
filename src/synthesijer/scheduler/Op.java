@@ -40,6 +40,7 @@ public enum Op {
 	FIELD_ACCESS,
 	BREAK,
 	CONTINUE,
+	CAST,
 	UNDEFINED;
 	
 	public final boolean isBranch; 
@@ -63,7 +64,7 @@ public enum Op {
 	 * @param latency fixed clock latency  
 	 */
 	private Op(int latency){
-		this(false, latency, PrimitiveTypeKind.VOID);
+		this(false, latency, PrimitiveTypeKind.UNDEFIEND);
 	}
 
 	/**
@@ -71,7 +72,7 @@ public enum Op {
 	 * @param flag branch instruction or not  
 	 */
 	private Op(boolean flag){
-		this(flag, 0, PrimitiveTypeKind.VOID);
+		this(flag, 0, PrimitiveTypeKind.UNDEFIEND);
 	}
 
 	/**
@@ -82,8 +83,11 @@ public enum Op {
 		this(false, 0, type);
 	}
 	
+	/**
+	 * Default constructor: not branch, latency=0, type=UNDEFINED
+	 */
 	private Op(){
-		this(false, 0, null);
+		this(false, 0, PrimitiveTypeKind.UNDEFIEND);
 	}
 	
 	public static Op get(synthesijer.ast.Op o){
@@ -114,6 +118,14 @@ public enum Op {
 			System.out.println("undefiend:" + o);
 			return UNDEFINED;
 		}
+	}
+	
+	public boolean isForcedType(){
+		return (type != PrimitiveTypeKind.UNDEFIEND);
+	}
+
+	public Type getType(){
+		return type;
 	}
 
 }

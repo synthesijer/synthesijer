@@ -369,6 +369,9 @@ public class GenerateHDLModuleVisitor implements SynthesijerAstVisitor{
 		Variable var = o.getVariable();
 		HDLVariable s = variableTable.get(var);
 		if(o.hasInitExpr()){
+			if(o.getState() == null || stateTable.containsKey(o.getState()) == false){
+				SynthesijerUtils.error("could not found: " + o + "@" + o.getState());
+			}
 			GenerateHDLExprVisitor v = new GenerateHDLExprVisitor(this, stateTable.get(o.getState()));
 			o.getInitExpr().accept(v);
 			if(v.getResult() != null && stateTable.get(o.getState()) != null){

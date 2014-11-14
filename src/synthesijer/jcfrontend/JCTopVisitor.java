@@ -93,6 +93,7 @@ public class JCTopVisitor extends Visitor{
 			args.get(i).accept(visitor); // Since args.get(i) is an instance of JCVariableDecl,
 			                             // this visitor should visit visitVarDef
 			v[i] = (VariableDecl)(visitor.getStatement()); // this type cast should occur no errors.
+			v[i].setMethodParam(true);
 		}
 		return v;
 	}

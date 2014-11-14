@@ -2,13 +2,13 @@ package synthesijer.scheduler;
 
 import synthesijer.ast.Type;
 
-public class Constant implements Operand{
+public class ConstantOperand implements Operand{
 	
 	private final String value;
 	
 	private final Type type;
 	
-	public Constant(String value, Type type){
+	public ConstantOperand(String value, Type type){
 		this.value = value;
 		this.type = type;
 	}
@@ -16,6 +16,10 @@ public class Constant implements Operand{
 	@Override
 	public Type getType(){
 		return type;
+	}
+	
+	public String getValue(){
+		return value;
 	}
 	
 	@Override

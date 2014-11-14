@@ -6,6 +6,7 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
+import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class FieldAccess extends Expr{
 	
@@ -55,7 +56,11 @@ public class FieldAccess extends Expr{
 	public Type getType(){
 		if(selected instanceof Ident){
 			Variable v = getScope().search(((Ident)selected).getSymbol());
-			return v.getType();
+			if(v != null){
+				return v.getType();
+			}else{
+				return PrimitiveTypeKind.UNDEFIEND;
+			}
 		}else{
 			throw new RuntimeException("Unsupported multi- field access");
 		}

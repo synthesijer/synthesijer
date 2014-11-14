@@ -8,6 +8,7 @@ public class Variable{
 	private final Expr init;
 	private boolean flagGlobalConstant;
 	private boolean flagPublic;
+	private boolean flagMethodParam = false;
 	private String uniqName = null;
 	
 	public Variable(String n, Type t, Method method, Expr init){
@@ -26,6 +27,10 @@ public class Variable{
 		return type;
 	}
 	
+	public Method getMethod(){
+		return method;
+	}
+	
 	public void setGlobalConstant(boolean f){
 		flagGlobalConstant = f;
 	}
@@ -40,6 +45,14 @@ public class Variable{
 
 	public boolean isPublic(){
 		return flagPublic;
+	}
+	
+	public void setMethodParam(boolean f){
+		flagMethodParam = f;
+	}
+	
+	public boolean isMethodParam(){
+		return flagMethodParam;
 	}
 	
 	public Expr getInitExpr(){

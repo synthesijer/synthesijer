@@ -10,6 +10,10 @@ public class SynthesijerUtils {
 		System.err.println("Warning: " + s);
 	}
 
+	public static void info(String s){
+		System.err.println("Info: " + s);
+	}
+
 	public static String escapeXML(String s){
 		s = s.replaceAll("<", "&lt;");
 		s = s.replaceAll(">", "&gt;");

@@ -1,5 +1,7 @@
 package synthesijer.scheduler;
 
+import synthesijer.ast.Type;
+
 
 /**
  * SchdulerItem is a unit of computation to be scheduled.
@@ -8,6 +10,11 @@ package synthesijer.scheduler;
  *
  */
 public class SchedulerItem {
+	
+	/**
+	 * the board where this item belongs. 
+	 */
+	private final SchedulerBoard board;
 	
 	/**
 	 * the index value in schedulerBoard. 
@@ -27,7 +34,7 @@ public class SchedulerItem {
 	/**
 	 * a destination variable
 	 */
-	private Variable dest;
+	private VariableOperand dest;
 	
 	/**
 	 * the index values to jump, which available when this is a kind of jump operations. 
@@ -40,10 +47,19 @@ public class SchedulerItem {
 	 * @param src source variables
 	 * @param dest destination variables
 	 */
-	public SchedulerItem(Op op, Operand[] src, Variable dest){
+	public SchedulerItem(SchedulerBoard board, Op op, Operand[] src, VariableOperand dest){
+		this.board = board;
 		this.op = op;
 		this.src = src;
 		this.dest = dest;
+	}
+	
+	public Op getOp(){
+		return op;
+	}
+	
+	public String getBoardName(){
+		return board.getName();
 	}
 	
 	public void setStepId(int id){
@@ -73,6 +89,14 @@ public class SchedulerItem {
 		return op.isBranch;
 	}
 	
+	public Operand[] getSrcOperand(){
+		return src;
+	}
+
+	public VariableOperand getDestOperand(){
+		return dest;
+	}
+
 	private String srcInfo(){
 		if(src == null) return "";
 		String s = "";
@@ -93,14 +117,15 @@ public class SchedulerItem {
 		String s = "";
 		String sep = "";
 		for(int id: branchIDs){
-			s += sep + id;
+			//s += String.format("%s%s_%04d", sep, getBoardName(), id);
+			s += String.format("%s%04d", sep, id);
 			sep = ", ";
 		}
 		return s;
 	}
 
 	public String info(){
-		String s = String.format("%04d: op=%s src=%s, dest=%s [%s]", stepID, op, srcInfo(), destInfo(), branchList());
+		String s = String.format("%s_%04d: op=%s, src=%s, dest=%s, next=%s", getBoardName(), stepID, op, srcInfo(), destInfo(), branchList());
 		return s;
 	}
 
@@ -110,8 +135,8 @@ class MethodEntryItem extends SchedulerItem{
 	
 	public final String name;
 	
-	public MethodEntryItem(String name){
-		super(Op.METHOD_ENTRY, null, null);
+	public MethodEntryItem(SchedulerBoard board, String name){
+		super(board, Op.METHOD_ENTRY, null, null);
 		this.name = name;
 	}
 	
@@ -125,19 +150,22 @@ class MethodEntryItem extends SchedulerItem{
 
 class MethodInvokeItem extends SchedulerItem{
 	
-	public final Variable obj;
+	public final VariableOperand obj;
 	public final String name;
+	public final String[] args;
 	
-	public MethodInvokeItem(String name, Operand[] src, Variable dest){
-		super(Op.CALL, src, dest);
+	public MethodInvokeItem(SchedulerBoard board, String name, Operand[] src, VariableOperand dest, String[] args){
+		super(board, Op.CALL, src, dest);
 		this.name = name;
 		this.obj = null;
+		this.args = args;
 	}
 
-	public MethodInvokeItem(Variable obj, String name, Operand[] src, Variable dest){
-		super(Op.EXT_CALL, src, dest);
+	public MethodInvokeItem(SchedulerBoard board, VariableOperand obj, String name, Operand[] src, VariableOperand dest, String[] args){
+		super(board, Op.EXT_CALL, src, dest);
 		this.name = name;
 		this.obj = obj;
+		this.args = args;
 	}
 
 	public String info(){
@@ -154,11 +182,11 @@ class MethodInvokeItem extends SchedulerItem{
 
 class FieldAccessItem extends SchedulerItem{
 	
-	public final Variable obj;
+	public final VariableOperand obj;
 	public final String name;
 	
-	public FieldAccessItem(Variable obj, String name, Operand[] src, Variable dest){
-		super(Op.FIELD_ACCESS, src, dest);
+	public FieldAccessItem(SchedulerBoard board, VariableOperand obj, String name, Operand[] src, VariableOperand dest){
+		super(board, Op.FIELD_ACCESS, src, dest);
 		this.name = name;
 		this.obj = obj;
 	}
@@ -168,8 +196,46 @@ class FieldAccessItem extends SchedulerItem{
 		if(obj == null){
 			s += " (name=" + name + ")";
 		}else{
-			s += " (obj = " + obj.getName() + ", name=" + name + ")";
+			s += " (obj=" + obj.getName() + ", name=" + name + ")";
 		}
+		return s;
+	}
+	
+}
+
+class TypeCastItem extends SchedulerItem{
+	
+	public final Type orig;
+	public final Type target;
+	
+	public TypeCastItem(SchedulerBoard board, Operand src, VariableOperand dest, Type orig, Type target){
+		super(board, Op.CAST, new Operand[]{src}, dest);
+		this.orig = orig;
+		this.target = target;
+	}
+
+	public String info(){
+		String s = super.info();
+		s += " (" + orig + "->" + target + ")";
+		return s;
+	}
+	
+}
+
+class SelectItem extends SchedulerItem{
+	
+	public final Operand target;
+	public final Operand[] pat;
+	
+	public SelectItem(SchedulerBoard board, Operand target, Operand[] pat){
+		super(board, Op.SELECT, new Operand[]{target}, null);
+		this.target = target;
+		this.pat = pat;
+	}
+
+	public String info(){
+		String s = super.info();
+		s += " (" + target + "->" + target + ")";
 		return s;
 	}
 	

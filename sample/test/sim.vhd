@@ -22,14 +22,14 @@ architecture RTL of sim is
   signal tmp_0004 : std_logic;
   signal tmp_0005 : std_logic;
 
- component Test005
-  port (
-    clk : in std_logic;
-    reset : in std_logic;
-    run_req : in std_logic;
-    run_busy : out std_logic
-  );
- end component Test005;
+-- component Test005
+--  port (
+--    clk : in std_logic;
+--    reset : in std_logic;
+--    run_req : in std_logic;
+--    run_busy : out std_logic
+--  );
+-- end component Test005;
 
  component Test001Sim
   port (
@@ -40,23 +40,23 @@ architecture RTL of sim is
   );
  end component Test001Sim;
 
- component Test003
-  port (
-    clk : in std_logic;
-    reset : in std_logic;
-    test_req : in std_logic;
-    test_busy : out std_logic
-  );
- end component Test003;
+-- component Test003
+--  port (
+--    clk : in std_logic;
+--    reset : in std_logic;
+--    test_req : in std_logic;
+--    test_busy : out std_logic
+--  );
+-- end component Test003;
 
- component Test006
-  port (
-    clk : in std_logic;
-    reset : in std_logic;
-    test_req : in std_logic;
-    test_busy : out std_logic
-  );
- end component Test006;
+-- component Test006
+--  port (
+--    clk : in std_logic;
+--    reset : in std_logic;
+--    test_req : in std_logic;
+--    test_busy : out std_logic
+--  );
+-- end component Test006;
 
  signal run_req, run_busy: std_logic;
 begin
@@ -103,13 +103,13 @@ begin
   end process;
 
  run_req <= '1' when counter = 10 else '0';
- U: Test005
-  port map(
-    clk => clk,
-    reset => reset,
-    run_req => run_req,
-    run_busy => run_busy
-  );
+-- U: Test005
+--  port map(
+--    clk => clk,
+--    reset => reset,
+--    run_req => run_req,
+--    run_busy => run_busy
+--  );
 
  U001: Test001Sim
   port map(
@@ -119,20 +119,20 @@ begin
     main_busy => open
   );
 
- U003: Test003
-  port map(
-    clk => clk,
-    reset => reset,
-    test_req => '1',
-    test_busy => open
-  );
+-- U003: Test003
+--  port map(
+--    clk => clk,
+--    reset => reset,
+--    test_req => '1',
+--    test_busy => open
+--  );
 
- U004: Test006
-  port map(
-    clk => clk,
-    reset => reset,
-    test_req => '1',
-    test_busy => open
-  );
+-- U004: Test006
+--  port map(
+--    clk => clk,
+--    reset => reset,
+--    test_req => '1',
+--    test_busy => open
+--  );
 
 end RTL;
