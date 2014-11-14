@@ -59,6 +59,9 @@ architecture RTL of sim is
 -- end component Test006;
 
  signal run_req, run_busy: std_logic;
+
+ signal req_001 : std_logic := '0';
+
 begin
 
 
@@ -111,11 +114,12 @@ begin
 --    run_busy => run_busy
 --  );
 
+ req_001 <= '1' when counter > 50 else '0';
  U001: Test001Sim
   port map(
     clk => clk,
     reset => reset,
-    main_req => '1',
+    main_req => req_001,
     main_busy => open
   );
 

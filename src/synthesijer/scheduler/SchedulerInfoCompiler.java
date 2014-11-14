@@ -3,7 +3,6 @@ package synthesijer.scheduler;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import scala.reflect.internal.Types.ArgsTypeRef;
 import synthesijer.CompileState;
 import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
@@ -441,7 +440,11 @@ public class SchedulerInfoCompiler {
 					break;
 				}
 				default:
-					s.addStateTransit(states[item.getStepId()+1]);
+					if(item.isBranchOp()){
+						s.addStateTransit(states[item.getBranchId()[0]]);
+					}else{
+						s.addStateTransit(states[item.getStepId()+1]);
+					}
 				}
 			}
 		}
