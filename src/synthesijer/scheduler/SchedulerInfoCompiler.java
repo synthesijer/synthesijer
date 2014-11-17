@@ -281,8 +281,29 @@ public class SchedulerInfoCompiler {
 		}
 		case ASSIGN : {
 			Operand[] src = item.getSrcOperand();
-			HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item.getDestOperand()));
-			dest.setAssign(state, convOperandToHDLExpr(src[0]));
+			VariableOperand dest = item.getDestOperand();
+			if(dest.getType() instanceof PrimitiveTypeKind){
+				HDLVariable d = (HDLVariable)(convOperandToHDLExpr(dest));
+				d.setAssign(state, convOperandToHDLExpr(src[0]));
+			}else if(dest.getType() instanceof ArrayRef){
+				VariableRefOperand d = (VariableRefOperand)dest;
+				VariableOperand ref = d.getRef();
+				
+				HDLInstance array = (HDLInstance)(varTable.get(ref.getName()));
+				// The address to access should be settled by ARRAY_ACCESS
+				//HDLExpr index = ... 
+				//HDLSignal addr = array.getSignalForPort("address_b");
+				//addr.setAssign(state, index);
+				
+				HDLSignal we = array.getSignalForPort("we_b");
+				HDLSignal din = array.getSignalForPort("din_b");
+				we.setAssign(state, HDLPreDefinedConstant.HIGH);
+				we.setDefaultValue(HDLPreDefinedConstant.LOW);
+				din.setAssign(state, convOperandToHDLExpr(src[0]));
+				
+			}else{
+				SynthesijerUtils.warn("Unsupported ASSIGN: " + item.info());
+			}
 		}
 		case NOP :{
 			break;
@@ -310,7 +331,21 @@ public class SchedulerInfoCompiler {
 			break;
 		}
 		case ARRAY_ACCESS :{
-			System.out.println("ARRAY_ACCESS is not implemented yet.");
+			state.setMaxConstantDelay(2);
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			Operand src[] = item.getSrcOperand();
+			HDLInstance array = (HDLInstance)(varTable.get(((VariableOperand)src[0]).getName()));
+			HDLExpr index = convOperandToHDLExpr(src[1]);
+			HDLSignal addr = array.getSignalForPort("address_b");
+			HDLSignal oe = array.getSignalForPort("oe_b");
+			HDLSignal dout = array.getSignalForPort("dout_b");
+			
+			addr.setAssign(state, 0, index);
+			oe.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
+			oe.setDefaultValue(HDLPreDefinedConstant.LOW);
+			
+			dest.setAssign(state, 2, dout);
+			
 			break;
 		}
 		case CALL :{

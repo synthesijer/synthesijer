@@ -417,9 +417,9 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitArrayAccess(ArrayAccess o) {
-		Operand indexed = stepIn(o.getIndexed());
+		VariableOperand indexed = (VariableOperand)(stepIn(o.getIndexed()));
 		Operand index = stepIn(o.getIndex());
-		VariableOperand tmp = newVariable("array_access", new ArrayRef((ArrayType)indexed.getType()));
+		VariableOperand tmp = newVariableRef("array_access", new ArrayRef((ArrayType)indexed.getType()), indexed);
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ARRAY_ACCESS, new Operand[]{indexed, index}, tmp));
 		result = tmp;
 	}
@@ -471,7 +471,13 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		parent.addVariable(v.getName(), v);
 		return v; 
 	}
-	
+
+	private VariableRefOperand newVariableRef(String key, Type t, VariableOperand ref){
+		VariableRefOperand v = new VariableRefOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, ref);
+		parent.addVariable(v.getName(), v);
+		return v; 
+	}
+
 	private Type getPreferableType(Type t0, Type t1){
 		if(((t0 instanceof PrimitiveTypeKind) && (t1 instanceof PrimitiveTypeKind)) == false){
 			SynthesijerUtils.warn("cannot convert:" + t0 + " <-> " + t1 + ", then use " + t0);
