@@ -8,6 +8,7 @@ import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Method;
 import synthesijer.ast.Type;
+import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
@@ -97,7 +98,6 @@ public class SchedulerInfoCompiler {
 		return list;
 	}
 	
-
 	private HDLVariable genHDLVariable(VariableOperand v){
 		String name = v.getName();
 		Type type = v.getType();
@@ -133,6 +133,10 @@ public class SchedulerInfoCompiler {
 			inst.getSignalForPort(inst.getSubModule().getSysClkName()).setAssign(null, hm.getSysClk().getSignal());
 			inst.getSignalForPort(inst.getSubModule().getSysResetName()).setAssign(null, hm.getSysReset().getSignal());
 			return inst;
+		}else if(type instanceof ArrayRef){
+			Type t = ((ArrayRef) type).getRefType().getElemType();
+			HDLSignal sig = hm.newSignal(name, getHDLType(t));
+			return sig;
 		}else{
 			throw new RuntimeException("unsupported type: " + type + " of " + name);
 		}
@@ -330,7 +334,11 @@ public class SchedulerInfoCompiler {
 			break;
 		}
 		case FIELD_ACCESS :{
-			System.out.println("FIELD_ACCESS is not implemented yet.");
+			FieldAccessItem item0 = (FieldAccessItem)item;
+			HDLInstance obj = (HDLInstance)(varTable.get(item0.obj.getName()));
+			HDLSignal src = obj.getSignalForPort(item0.name);
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item0.getDestOperand());
+			dest.setAssign(state, src);
 			break;
 		}
 		case BREAK :{

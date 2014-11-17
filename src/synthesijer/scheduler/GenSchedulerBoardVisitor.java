@@ -39,6 +39,7 @@ import synthesijer.ast.statement.SynchronizedBlock;
 import synthesijer.ast.statement.TryStatement;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
+import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
@@ -159,12 +160,6 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this);
 		expr.accept(v);
 		return v.getOperand();
-	}
-
-	private Type stepIn(Type type){
-		GenSchedulerBoardTypeVisitor v = new GenSchedulerBoardTypeVisitor(this);
-		type.accept(v);
-		return v.getType();
 	}
 
 //	private SchedulerItem entry, exit;
@@ -348,7 +343,8 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
-		Type t = stepIn(o.getVariable().getType());
+		//Type t = stepIn(o.getVariable().getType());
+		Type t = o.getVariable().getType();
 		String prefix = o.getScope().getMethod() == null ? "class" : o.getScope().getMethod().getName();
 		String vName;
 		vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
@@ -411,17 +407,34 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		return v.getOperand();
 	}
 
+	/*
+	private Type stepIn(Type type){
+		GenSchedulerBoardTypeVisitor v = new GenSchedulerBoardTypeVisitor(this.parent);
+		type.accept(v);
+		return v.getType();
+	}
+	*/
+	
 	@Override
 	public void visitArrayAccess(ArrayAccess o) {
 		Operand indexed = stepIn(o.getIndexed());
 		Operand index = stepIn(o.getIndex());
-		VariableOperand tmp = newVariable("array_access", indexed.getType());
+		VariableOperand tmp = newVariable("array_access", new ArrayRef((ArrayType)indexed.getType()));
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ARRAY_ACCESS, new Operand[]{indexed, index}, tmp));
 		result = tmp;
 	}
 	
-	private boolean isSameType(Type t0, Type t1){
-		return t0 == t1;
+	private boolean isCastRequired(Type t0, Type t1){
+		if(t0 == t1) return false;
+		Type pt0 = t0, pt1 = t1;
+		if(pt0 instanceof ArrayRef){
+			pt0 = ((ArrayRef) pt0).getRefType().getElemType(); 
+		}
+		if(pt1 instanceof ArrayRef){
+			pt1 = ((ArrayRef) pt1).getRefType().getElemType(); 
+		}
+		if(pt0 == pt1) return false;
+		return true;
 	}
 	
 	private VariableOperand addCast(Operand v, Type target){
@@ -435,7 +448,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	public void visitAssignExpr(AssignExpr o) {
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
-		if(isSameType(lhs.getType(), rhs.getType()) == false){
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true){
 			VariableOperand tmp = addCast(rhs, lhs.getType()); // RHS is casted into corresponding to LHS
 			if(tmp != null) rhs = tmp;
 		}
@@ -446,6 +459,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	public void visitAssignOp(AssignOp o) {
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
+		//VariableOperand tmp = newVariable("binary_expr", stepIn(lhs.getType()));
 		VariableOperand tmp = newVariable("binary_expr", lhs.getType());
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.get(o.getOp()), new Operand[]{lhs,rhs}, tmp));
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)lhs));
@@ -458,21 +472,20 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		return v; 
 	}
 	
-	private Type getPreferableType(Operand lhs, Operand rhs){
-		//SynthesijerUtils.warn("implicit type cast for lhs: " + lhs.getType() + " <- " + rhs.getType());
-		if(((lhs.getType() instanceof PrimitiveTypeKind) && (rhs.getType() instanceof PrimitiveTypeKind)) == false){
-			SynthesijerUtils.warn("cannot convert:" + lhs.getType() + " <-> " + rhs.getType() + ", use " + lhs.getType());
-			return lhs.getType(); // skip
+	private Type getPreferableType(Type t0, Type t1){
+		if(((t0 instanceof PrimitiveTypeKind) && (t1 instanceof PrimitiveTypeKind)) == false){
+			SynthesijerUtils.warn("cannot convert:" + t0 + " <-> " + t1 + ", then use " + t0);
+			return t0; // skip
 		}
-		PrimitiveTypeKind t0 = (PrimitiveTypeKind)(lhs.getType());
-		PrimitiveTypeKind t1 = (PrimitiveTypeKind)(rhs.getType());
-		if(t0.isInteger() && t1.isInteger()){ // both integer, select bigger one			
-			return (t0.getWidth() > t1.getWidth()) ? t0 : t1;
+		PrimitiveTypeKind pt0 = (PrimitiveTypeKind)t0;
+		PrimitiveTypeKind pt1 = (PrimitiveTypeKind)t1;
+		if(pt0.isInteger() && pt1.isInteger()){ // both integer, select bigger one			
+			return (pt0.getWidth() > pt1.getWidth()) ? t0 : t1;
 		}
-		if(t0.isFloating() && t1.isFloating()){ // both floating point, select bigger one			
-			return (t0.getWidth() > t1.getWidth()) ? t0 : t1;
+		if(pt0.isFloating() && pt1.isFloating()){ // both floating point, select bigger one			
+			return (pt0.getWidth() > pt1.getWidth()) ? t0 : t1;
 		}
-		return t0.isFloating() ? t0 : t1;
+		return pt0.isFloating() ? t0 : t1;
 	}
 	
 	@Override
@@ -483,8 +496,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Op op = Op.get(o.getOp());
 		if(op.isForcedType()){
 			type = op.getType();
-		}else if(isSameType(lhs.getType(), rhs.getType()) == false){
-			type = getPreferableType(lhs, rhs); // select type
+		}else if(isCastRequired(lhs.getType(), rhs.getType()) == true){
+			type = getPreferableType(lhs.getType(), rhs.getType()); // select type
 			if(lhs.getType() != type){
 				VariableOperand tmp = addCast(lhs, type);
 				if(tmp != null) lhs = tmp;
@@ -592,13 +605,13 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		ConstantOperand c1 = new ConstantOperand("1", v.getType());
 		switch(o.getOp()){
 		case INC:{
-			VariableOperand tmp = newVariable("binary_expr", v.getType());
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ADD, new Operand[]{v, c1}, tmp));
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
 			break;
 		}
 		case DEC:{
-			VariableOperand tmp = newVariable("binary_expr", v.getType());
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{v, c1}, tmp));
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
 			break;
@@ -626,6 +639,12 @@ class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {
 	@Override
 	public void visitArrayType(ArrayType o) {
 		o.getElemType().accept(this);
+	}
+	
+	@Override
+	public void visitArrayRef(ArrayRef o){
+		//o.getElemType().accept(this);
+		this.type = o;
 	}
 
 	@Override
