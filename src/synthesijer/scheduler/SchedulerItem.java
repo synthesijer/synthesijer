@@ -154,6 +154,8 @@ class MethodInvokeItem extends SchedulerItem{
 	public final String name;
 	public final String[] args;
 	
+	private boolean noWaitFlag = false;
+	
 	public MethodInvokeItem(SchedulerBoard board, String name, Operand[] src, VariableOperand dest, String[] args){
 		super(board, Op.CALL, src, dest);
 		this.name = name;
@@ -176,6 +178,14 @@ class MethodInvokeItem extends SchedulerItem{
 			s += " (obj = " + obj.getName() + ", name=" + name + ")";
 		}
 		return s;
+	}
+	
+	public void setNoWait(boolean flag){
+		noWaitFlag = flag;
+	}
+	
+	public boolean isNoWait(){
+		return noWaitFlag;
 	}
 	
 }

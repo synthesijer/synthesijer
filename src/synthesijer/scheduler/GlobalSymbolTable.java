@@ -6,6 +6,8 @@ import java.util.Hashtable;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Variable;
+import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.HDLPort;
 
 public enum GlobalSymbolTable {
 	
@@ -14,6 +16,7 @@ public enum GlobalSymbolTable {
 	Hashtable<String, ClassInfo> map = new Hashtable<>();
 	
 	public void add(Module m){
+//		SynthesijerUtils.info("set: " + m.getName());
 		ClassInfo i = new ClassInfo();
 		map.put(m.getName(), i);
 		
@@ -22,6 +25,15 @@ public enum GlobalSymbolTable {
 		}
 		for(Variable v: m.getVariables()){
 			i.variables.put(v.getName(), new VariableInfo(v));
+		}
+	}
+	
+	public void add(String name, HDLModule m){
+//		SynthesijerUtils.info("set(as RAW Module): " + name);
+		ClassInfo i = new ClassInfo();
+		map.put(name, i);
+		for(HDLPort p: m.getPorts()){
+			i.variables.put(p.getName(), new VariableInfo(p));
 		}
 	}
 	
@@ -56,9 +68,14 @@ class MethodInfo{
 class VariableInfo{
 	
 	VariableOperand var;
+	HDLPort port;
 	
 	public VariableInfo(Variable v){
 		var = new VariableOperand(v.getName(), v.getType(), v);
 	}
-	
+
+	public VariableInfo(HDLPort p){
+		port = p;
+	}
+
 }

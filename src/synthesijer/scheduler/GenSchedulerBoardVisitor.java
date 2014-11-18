@@ -41,9 +41,13 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
+import synthesijer.ast.type.BitVector;
+import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.hdl.HDLPrimitiveType;
+import synthesijer.hdl.HDLType;
 
 /**
  * A visitor class to dump module hierarchy of AST as XML.
@@ -419,7 +423,21 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	public void visitArrayAccess(ArrayAccess o) {
 		VariableOperand indexed = (VariableOperand)(stepIn(o.getIndexed()));
 		Operand index = stepIn(o.getIndex());
-		VariableOperand tmp = newVariableRef("array_access", new ArrayRef((ArrayType)indexed.getType()), indexed);
+//		System.out.println("visitArrayAccess:index: " + indexed.getName());
+//		System.out.println("visitArrayAccess:indexType: " + indexed.getType());
+		
+		ArrayRef type;
+		if(indexed.getType() instanceof ArrayRef){
+			type = (ArrayRef)indexed.getType();
+		}else if(indexed.getType() instanceof ComponentRef){
+			ComponentRef ref = (ComponentRef)indexed.getType();
+			type = new ArrayRef((ArrayType)ref.getRefType());
+		}else{
+			type = new ArrayRef((ArrayType)indexed.getType());
+		}
+		
+		//ArrayRef type = new ArrayRef((ArrayType)indexed.getType());
+		VariableOperand tmp = newVariableRef("array_access", type, indexed);
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ARRAY_ACCESS, new Operand[]{indexed, index}, tmp));
 		result = tmp;
 	}
@@ -518,22 +536,79 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		result = newVariable("binary_expr", type);
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.get(o.getOp()), new Operand[]{lhs,rhs}, (VariableOperand)result));
 	}
+	
+	
+	private Type convType(HDLType type){
+		if(type instanceof HDLPrimitiveType == false){
+			SynthesijerUtils.error("unsupported non-HDLPrimitiveType in user written HDLModule");
+			throw new RuntimeException("unsupported non-HDLPrimitiveType in user written HDLModule");
+		}
+		HDLPrimitiveType t0 = (HDLPrimitiveType)type;
+		
+		switch(t0.getKind()){
+		case BIT:
+			return PrimitiveTypeKind.BOOLEAN;
+		case VECTOR:
+			return new BitVector(t0.getWidth());
+		case SIGNED:
+			switch(t0.getWidth()){
+			case  8: return PrimitiveTypeKind.BYTE;
+			case 16: return PrimitiveTypeKind.SHORT;
+			case 32: return PrimitiveTypeKind.INT;
+			case 64: return PrimitiveTypeKind.LONG;
+			default:
+				SynthesijerUtils.error("supported only 8-, 16-, 32-, and 64- signed type in user written HDLModule");
+				throw new RuntimeException("supported only 8-, 16-, 32-, and 64- signed type in user written HDLModule");
+			}
+		default:
+			SynthesijerUtils.error("unsupported non-HDLPrimitiveType in user written HDLModule");
+			throw new RuntimeException("unsupported non-HDLPrimitiveType in user written HDLModule");
+		}
+	}
+	
 
 	@Override
 	public void visitFieldAccess(FieldAccess o) {
+		VariableOperand tmp;
 		Type type = PrimitiveTypeKind.UNDEFIEND;
+//		System.out.println("visitFieldAccess:Type: " + o.getType());
 		if(o.getType() instanceof ArrayType && o.getIdent().getSymbol().equals("length")){
 			type = PrimitiveTypeKind.INT;
+			tmp = newVariable("field_access", type);
+			Operand v = stepIn(o.getSelected());
+			parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
 		}else if(o.getType() instanceof ComponentType){
-			type = o.getIdent().getType();
+			ComponentType ct = (ComponentType)o.getType();
+//			System.out.println(" component:" + ct.getName());
+//			System.out.println(" field:" + o.getIdent());
+			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(ct.getName(), o.getIdent().getSymbol());
+//			System.out.println(var);
+			if(var.var == null && var.port != null){
+				type = convType(var.port.getType());
+			}else{
+				type = var.var.getType();
+			}
+
+			if(type instanceof ArrayType){
+				tmp = newVariable("field_access", new ArrayRef((ArrayType)type));
+			}else{
+				tmp = newVariable("field_access", type);
+			}
+
+			//tmp = newVariable("field_access", new ComponentRef(ct, type));
+			Operand v = stepIn(o.getSelected());
+			parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
+			//System.out.println("visitFiledAccess: " + tmp.getName() + "::" + tmp.getType());
 		}else{
+			// "public static final" is only allowed. 
 			String klass = ((Ident)o.getSelected()).getSymbol();
 			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(klass, o.getIdent().getSymbol());
 			type = var.var.getType();
+			tmp = newVariable("field_access", type);
+			Operand v = stepIn(var.var.getVariable().getInitExpr());
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, tmp));
 		}
-		VariableOperand tmp = newVariable("field_access", type);
-		Operand v = stepIn(o.getSelected());
-		parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
+		
 		result = tmp;
 	}
 
@@ -556,7 +631,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		for(int i = 0; i < params.size(); i++){
 			list[i] = stepIn(params.get(i));
 		}
-		SchedulerItem item;
+		MethodInvokeItem item;
 		VariableDecl[] vars = o.getTargetMethod().getArgs();
 		String[] callee_args = new String[o.getTargetMethod().getArgs().length];
 		for(int i = 0; i < callee_args.length; i++){
@@ -569,11 +644,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			item = new MethodInvokeItem(parent.getBoard(), o.getMethodName(), list, tmp, callee_args);
 		}
 		parent.addSchedulerItem(item);
-		/*
-		System.out.println(o.getTargetMethod());
-		System.out.println(" " + o.getTargetMethod().getName());
-		System.out.println(" " + o.getTargetMethod().getArgs());
-		*/
+		item.setNoWait(o.getTargetMethod().isNoWait());
 		result = tmp;
 	}
 
@@ -655,6 +726,12 @@ class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {
 
 	@Override
 	public void visitComponentType(ComponentType o) {
+		this.type = o;
+	}
+
+	@Override
+	public void visitComponentRef(ComponentRef o){
+		//o.getElemType().accept(this);
 		this.type = o;
 	}
 

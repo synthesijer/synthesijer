@@ -70,7 +70,7 @@ public enum Manager {
 	}
 	
 	private void addHDLModule(String name, Module m, HDLModule hm){
-		moduleTable.put(name, new HDLModuleInfo(m, hm));
+		addHDLModule(name, m, hm, true);
 	}
 
 	private void addHDLModule(String name, Module m, HDLModule hm, boolean synthesisFlag){
@@ -103,8 +103,15 @@ public enum Manager {
 	}
 	
 	private void genGlobalSymbolTable(){
-		for(Module m: entries.values()){
-			GlobalSymbolTable.INSTANCE.add(m);
+		Enumeration<String> keys = moduleTable.keys();
+		while(keys.hasMoreElements()){
+			String k = keys.nextElement();
+			HDLModuleInfo info = moduleTable.get(k);
+			if(info.m != null){
+				GlobalSymbolTable.INSTANCE.add(info.m);
+			}else{
+				GlobalSymbolTable.INSTANCE.add(k, info.hm);
+			}
 		}
 	}
 	

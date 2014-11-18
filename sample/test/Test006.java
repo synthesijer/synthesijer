@@ -1,5 +1,13 @@
 public class Test006{
 	
+	private boolean check(int c){
+		if(c == 10+20+40+50+70+80+100+110){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	public void test(){
 		boolean success = false;
 		int a = 10;
@@ -22,8 +30,6 @@ public class Test006{
 		l = l + i;
 		c = c + l;
 		if(c == 10+20+40+50+70+80+100+110) success = true;
+		boolean success2 = check(c);
 	}
-	
-	
-	
 }

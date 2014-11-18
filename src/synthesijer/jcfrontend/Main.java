@@ -13,6 +13,9 @@ import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
+import synthesijer.ast.expr.Ident;
+import synthesijer.ast.expr.MethodInvocation;
+import synthesijer.ast.statement.ExprStatement;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 
@@ -103,10 +106,21 @@ public class Main {
 
 	// TODO experimental
 	private static void addThread(Module m){
+		// start
 		Method start = new Method(m, "start", PrimitiveTypeKind.VOID);
 		m.addMethod(start);
+		MethodInvocation tmp = new MethodInvocation(start);
+		Ident run = new Ident(start);
+		run.setIdent("run");
+		tmp.setMethod(run);
+		start.getBody().addStatement(new ExprStatement(start, tmp));
+		start.setNoWaitFlag(true);
+
+		// join
 		Method join = new Method(m, "join", PrimitiveTypeKind.VOID);
 		m.addMethod(join);
+		join.setWaitWithMethod(start); // "join" must wait for "start".
+		
 		Method yield = new Method(m, "yield", PrimitiveTypeKind.VOID);
 		m.addMethod(yield);
 	}

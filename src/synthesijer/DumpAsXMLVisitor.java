@@ -37,6 +37,7 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
+import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
@@ -372,6 +373,13 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 	@Override
 	public void visitArrayRef(ArrayRef o){
 		dest.printf("<type kind=\"array_ref\">\n");
+		o.getRefType().accept(this);
+		dest.printf("</type>\n");
+	}
+	
+	@Override
+	public void visitComponentRef(ComponentRef o){
+		dest.printf("<type kind=\"component_ref\">\n");
 		o.getRefType().accept(this);
 		dest.printf("</type>\n");
 	}

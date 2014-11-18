@@ -32,6 +32,9 @@ public class Method implements Scope, SynthesijerAstTree{
 	
 	private int uniq_id;
 	
+	// A method, for which this method must wait. 
+	private Method waitWith;
+	
 	public Method(Scope parent, String name, Type type){
 		this.parent = parent;
 		this.name = name;
@@ -136,6 +139,14 @@ public class Method implements Scope, SynthesijerAstTree{
 	
 	public boolean isConstructor(){
 		return constructorFlag;
+	}
+	
+	public void setWaitWithMethod(Method method){
+		this.waitWith = method;
+	}
+		
+	public Method getWaitWithMethod(){
+		return waitWith;
 	}
 		
 	public String getName(){

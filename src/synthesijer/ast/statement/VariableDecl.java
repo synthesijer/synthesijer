@@ -12,8 +12,8 @@ public class VariableDecl extends ExprContainStatement{
 	
 	private Variable var;
 	private final Expr init;
-	private boolean flagGlobalConstant;
-	private boolean flagPublic;
+	private boolean flagGlobalConstant = false;
+	private boolean flagPublic = false;
 	private boolean flagMethodParam = false;
 	
 	public VariableDecl(Scope scope, String name, Type type, Expr init){

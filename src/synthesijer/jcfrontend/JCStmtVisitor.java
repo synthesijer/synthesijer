@@ -20,6 +20,7 @@ import openjdk.com.sun.tools.javac.tree.JCTree.JCWhileLoop;
 import openjdk.com.sun.tools.javac.tree.JCTree.Visitor;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
+import synthesijer.ast.Module;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.Type;
@@ -185,7 +186,7 @@ public class JCStmtVisitor extends Visitor{
 		if(JCFrontendUtils.isGlobalConstant(that.mods)){
 			tmp.setGlobalConstant(true);
 		}
-		if(JCFrontendUtils.isPrivate(that.mods) == false){
+		if(JCFrontendUtils.isPrivate(that.mods) == false && scope instanceof Module){
 			tmp.setPublic(true);
 		}
 		scope.addVariableDecl(tmp);

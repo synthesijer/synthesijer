@@ -3,7 +3,7 @@ public class Test002 {
 	
 	public static final int DEFAULT_VALUE = 0x20;
 
-	public int[] a = new int[1024];
+	public int[] a = new int[128];
 	public int x, y;
 	
 	public void init(){
