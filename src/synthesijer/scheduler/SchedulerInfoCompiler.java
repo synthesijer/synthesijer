@@ -492,7 +492,8 @@ public class SchedulerInfoCompiler {
 			if(item0.getDestOperand().getType() != PrimitiveTypeKind.VOID){
 				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item0.getDestOperand());
 				HDLSignal ret = hm.getSignal(item0.name + "_return");
-				dest.setAssign(state, ret);
+				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should be read in ***_body
+				//dest.setAssign(state, ret);
 			}
 			break;
 		}
@@ -507,7 +508,8 @@ public class SchedulerInfoCompiler {
 			if(item0.getDestOperand().getType() != PrimitiveTypeKind.VOID){ // non-void function
 				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item0.getDestOperand());
 				HDLSignal ret = obj.getSignalForPort(item0.name + "_return");
-				dest.setAssign(state, ret);
+				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should be read in ***_body
+				//dest.setAssign(state, ret);
 			}
 			break;
 		}

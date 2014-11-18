@@ -38,7 +38,7 @@ public enum Op {
 	CALL,
 	EXT_CALL,
 	FIELD_ACCESS,
-	BREAK,
+	BREAK(true),
 	CONTINUE,
 	CAST,
 	UNDEFINED;
