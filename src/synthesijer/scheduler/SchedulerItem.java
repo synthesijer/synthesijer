@@ -232,6 +232,25 @@ class TypeCastItem extends SchedulerItem{
 	
 }
 
+class ConvFlotingToIntegerItem extends SchedulerItem{
+	
+	public final Type orig;
+	public final Type target;
+	
+	public ConvFlotingToIntegerItem(SchedulerBoard board, Operand src, VariableOperand dest, Type orig, Type target){
+		super(board, Op.CONV_F2I, new Operand[]{src}, dest);
+		this.orig = orig;
+		this.target = target;
+	}
+
+	public String info(){
+		String s = super.info();
+		s += " (" + orig + "->" + target + ")";
+		return s;
+	}
+	
+}
+
 class SelectItem extends SchedulerItem{
 	
 	public final Operand target;

@@ -521,7 +521,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
 		Type type;
-		Op op = Op.get(o.getOp());
+		Op op = Op.get(o.getOp(), lhs, rhs);
 		if(op.isForcedType()){
 			type = op.getType();
 		}else if(isCastRequired(lhs.getType(), rhs.getType()) == true){
@@ -546,7 +546,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			type = lhs.getType();
 		}
 		result = newVariable("binary_expr", type);
-		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.get(o.getOp()), new Operand[]{lhs,rhs}, (VariableOperand)result));
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, (VariableOperand)result));
 	}
 	
 	
@@ -680,12 +680,21 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		o.getExpr().accept(this);
 	}
 
+	private boolean isFloating(Type t){
+		if(t instanceof PrimitiveTypeKind == false) return false;
+		return ((PrimitiveTypeKind)t).isFloating();
+	}
+	
 	@Override
 	public void visitTypeCast(TypeCast o) {
 		Operand v = stepIn(o.getExpr());
 		if(v instanceof VariableOperand){
 			VariableOperand tmp = newVariable("cast_expr", o.getType());
-			parent.addSchedulerItem(new TypeCastItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
+			if(isFloating(v.getType()) && isFloating(o.getType()) == false){
+				parent.addSchedulerItem(new ConvFlotingToIntegerItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
+			}else{
+				parent.addSchedulerItem(new TypeCastItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
+			}
 			result = tmp;
 		}else if(v instanceof ConstantOperand){
 			((ConstantOperand) v).setType(o.getType());

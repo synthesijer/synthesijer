@@ -41,6 +41,20 @@ public enum Op {
 	BREAK(true),
 	CONTINUE,
 	CAST,
+	FADD32(11),
+	FSUB32(11),
+	FMUL32(11),
+	FDIV32(11),
+	FADD64(11),
+	FSUB64(11),
+	FMUL64(11),
+	FDIV64(11),
+	CONV_F2I(6),
+	CONV_I2F(6),
+	CONV_D2L(6),
+	CONV_L2D(6),
+	CONV_F2D(6),
+	CONV_D2F(6),
 	UNDEFINED;
 	
 	public final boolean isBranch; 
@@ -88,6 +102,45 @@ public enum Op {
 	 */
 	private Op(){
 		this(false, 0, PrimitiveTypeKind.UNDEFIEND);
+	}
+	
+	private static boolean isFloat(Operand operand){
+		Type t = operand.getType();
+		if(t instanceof PrimitiveTypeKind == false) return false;
+		return t == PrimitiveTypeKind.FLOAT;
+	}
+	
+	private static boolean isDouble(Operand operand){
+		Type t = operand.getType();
+		if(t instanceof PrimitiveTypeKind == false) return false;
+		return t == PrimitiveTypeKind.DOUBLE;
+	}
+	
+	public static Op get(synthesijer.ast.Op o, Operand lhs, Operand rhs){
+		switch(o){
+		case PLUS: {
+			if(isDouble(lhs) || isDouble(rhs)) return FADD64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FADD32;
+			else return ADD;
+		}
+		case MINUS: {
+			if(isDouble(lhs) || isDouble(rhs)) return FSUB64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FSUB32;
+			else return ADD;
+		}
+		case MUL: {
+			if(isDouble(lhs) || isDouble(rhs)) return FMUL64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FMUL32;
+			else return ADD;
+		}
+		case DIV: {
+			if(isDouble(lhs) || isDouble(rhs)) return FDIV64;
+			if(isFloat(lhs) || isFloat(rhs)) return FDIV32;
+			else return ADD;
+		}
+		default:
+			return get(o);
+		}
 	}
 	
 	public static Op get(synthesijer.ast.Op o){

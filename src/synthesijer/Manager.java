@@ -14,6 +14,20 @@ import synthesijer.ast.Module;
 import synthesijer.ast2hdl.GenerateHDLModuleVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.BlockRAM;
+import synthesijer.lib.FADD32;
+import synthesijer.lib.FADD64;
+import synthesijer.lib.FCONV_D2F;
+import synthesijer.lib.FCONV_D2L;
+import synthesijer.lib.FCONV_F2D;
+import synthesijer.lib.FCONV_F2I;
+import synthesijer.lib.FCONV_I2F;
+import synthesijer.lib.FCONV_L2D;
+import synthesijer.lib.FDIV32;
+import synthesijer.lib.FDIV64;
+import synthesijer.lib.FMUL32;
+import synthesijer.lib.FMUL64;
+import synthesijer.lib.FSUB32;
+import synthesijer.lib.FSUB64;
 import synthesijer.lib.INPUT1;
 import synthesijer.lib.INPUT16;
 import synthesijer.lib.INPUT32;
@@ -57,6 +71,23 @@ public enum Manager {
 		addHDLModule("OUTPUT1", null, new OUTPUT1(), false);
 		addHDLModule("OUTPUT16", null, new OUTPUT16(), false);
 		addHDLModule("OUTPUT32", null, new OUTPUT32(), false);
+		// floating 32-bit
+		addHDLModule("FADD32", null, new FADD32(), false);
+		addHDLModule("FSUB32", null, new FSUB32(), false);
+		addHDLModule("FMUL32", null, new FMUL32(), false);
+		addHDLModule("FDIV32", null, new FDIV32(), false);
+		// floating 64-bit
+		addHDLModule("FADD64", null, new FADD64(), false);
+		addHDLModule("FSUB64", null, new FSUB64(), false);
+		addHDLModule("FMUL64", null, new FMUL64(), false);
+		addHDLModule("FDIV64", null, new FDIV64(), false);
+		// conversion
+		addHDLModule("FCONV_F2I", null, new FCONV_F2I(), false);
+		addHDLModule("FCONV_D2L", null, new FCONV_D2L(), false);
+		addHDLModule("FCONV_I2F", null, new FCONV_I2F(), false);
+		addHDLModule("FCONV_L2D", null, new FCONV_L2D(), false);
+		addHDLModule("FCONV_F2D", null, new FCONV_F2D(), false);
+		addHDLModule("FCONV_D2F", null, new FCONV_D2F(), false);
 	}
 	
 	public void registUserHDLModule(String name){
