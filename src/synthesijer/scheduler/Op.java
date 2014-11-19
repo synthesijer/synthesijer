@@ -126,17 +126,17 @@ public enum Op {
 		case MINUS: {
 			if(isDouble(lhs) || isDouble(rhs)) return FSUB64;
 			else if(isFloat(lhs) || isFloat(rhs)) return FSUB32;
-			else return ADD;
+			else return SUB;
 		}
 		case MUL: {
 			if(isDouble(lhs) || isDouble(rhs)) return FMUL64;
 			else if(isFloat(lhs) || isFloat(rhs)) return FMUL32;
-			else return ADD;
+			else return MUL;
 		}
 		case DIV: {
 			if(isDouble(lhs) || isDouble(rhs)) return FDIV64;
 			if(isFloat(lhs) || isFloat(rhs)) return FDIV32;
-			else return ADD;
+			else return DIV;
 		}
 		default:
 			return get(o);

@@ -8,10 +8,12 @@ import synthesijer.CompileState;
 import synthesijer.Manager;
 import synthesijer.Manager.HDLModuleInfo;
 import synthesijer.SynthesijerUtils;
+import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Type;
 import synthesijer.ast.expr.Literal;
 import synthesijer.ast.expr.NewArray;
+import synthesijer.ast.expr.NewClassExpr;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
@@ -202,6 +204,21 @@ public class SchedulerInfoCompiler {
 				SynthesijerUtils.info("<<< return to compiling " + this.info.getName());
 			}
 			HDLInstance inst = hm.newModuleInstance(info.hm, name);
+			NewClassExpr expr = (NewClassExpr)v.getVariable().getInitExpr();
+			if(expr.getParameters().size() > 0){
+				NewArray param = (NewArray)(expr.getParameters().get(0));
+				ArrayList<Expr> elem = param.getElems();
+				for(int i = 0; i < elem.size()/2; i ++){
+					String key = ((Literal)elem.get(2*i)).getValueAsStr();
+					String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
+					if(inst.getParameterPair(key) == null){
+						SynthesijerUtils.error(key + " is not defined in " + inst.getSubModule().getName());
+						System.exit(0);
+					}
+					inst.getParameterPair(key).setValue(value);
+				}
+			}
+
 			for(HDLPort p: inst.getSubModule().getPorts()){
 				if(p.isSet(HDLPort.OPTION.EXPORT)){
 					String n = inst.getSignalForPort(p.getName()).getName();

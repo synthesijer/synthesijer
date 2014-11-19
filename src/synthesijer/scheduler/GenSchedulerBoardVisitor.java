@@ -500,20 +500,43 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		return v; 
 	}
 
+	private int getWidth(Type t){
+		if(t instanceof PrimitiveTypeKind){
+			return ((PrimitiveTypeKind) t).getWidth();
+		}else if(t instanceof BitVector){
+			return ((BitVector) t).getWidth();
+		}else{
+			return -1;
+		}
+	}
+	
+	private boolean isFloat(Type t){
+		return t == PrimitiveTypeKind.FLOAT;
+	}
+	
+	private boolean isDouble(Type t){
+		return t == PrimitiveTypeKind.DOUBLE;
+	}
+	
+	private boolean isFloating(Type t){
+		return isFloat(t) || isDouble(t);
+	}
+	
 	private Type getPreferableType(Type t0, Type t1){
-		if(((t0 instanceof PrimitiveTypeKind) && (t1 instanceof PrimitiveTypeKind)) == false){
+		if(t0 == t1){
+			return t0;
+		}
+		if(isFloating(t0) || isFloating(t1)){
+			if(isDouble(t0) || isDouble(t1)) return PrimitiveTypeKind.DOUBLE;
+			return PrimitiveTypeKind.FLOAT; // t0 and/or t1 is float
+		}
+		int w0 = getWidth(t0);
+		int w1 = getWidth(t1);
+		if(w0 < 0 || w1 < 0){
 			SynthesijerUtils.warn("cannot convert:" + t0 + " <-> " + t1 + ", then use " + t0);
 			return t0; // skip
 		}
-		PrimitiveTypeKind pt0 = (PrimitiveTypeKind)t0;
-		PrimitiveTypeKind pt1 = (PrimitiveTypeKind)t1;
-		if(pt0.isInteger() && pt1.isInteger()){ // both integer, select bigger one			
-			return (pt0.getWidth() > pt1.getWidth()) ? t0 : t1;
-		}
-		if(pt0.isFloating() && pt1.isFloating()){ // both floating point, select bigger one			
-			return (pt0.getWidth() > pt1.getWidth()) ? t0 : t1;
-		}
-		return pt0.isFloating() ? t0 : t1;
+		return w0 > w1 ? t0 : t1;
 	}
 	
 	@Override
@@ -680,11 +703,6 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		o.getExpr().accept(this);
 	}
 
-	private boolean isFloating(Type t){
-		if(t instanceof PrimitiveTypeKind == false) return false;
-		return ((PrimitiveTypeKind)t).isFloating();
-	}
-	
 	@Override
 	public void visitTypeCast(TypeCast o) {
 		Operand v = stepIn(o.getExpr());
