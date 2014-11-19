@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.tools.HDLSequencerToDot;
 import synthesijer.hdl.tools.ResourceUsageTable;
 
@@ -29,6 +30,10 @@ public class HDLUtils {
 			s += " ";
 		}
 		return s;
+	}
+	
+	public static HDLValue newValue(int v, int w){
+		return new HDLValue(String.valueOf(v), HDLPrimitiveType.genSignedType(w));
 	}
 	
 	enum Format{

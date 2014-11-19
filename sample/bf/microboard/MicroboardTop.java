@@ -14,8 +14,8 @@ public class MicroboardTop{
 		HDLModule m = new HDLModule("HW", "clk", "reset");
 		HDLPort run_req  = m.newPort("main_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort run_busy = m.newPort("main_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
-		HDLPort tx_dout  = m.newPort("b_io_obj_tx_dout", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
-		HDLPort rx_din   = m.newPort("b_io_obj_rx_din", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+		HDLPort tx_dout  = m.newPort("class_b_0000_class_io_0002_class_obj_0000_class_tx_0000_dout_exp_exp_exp_exp", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+		HDLPort rx_din   = m.newPort("class_b_0000_class_io_0002_class_obj_0000_class_rx_0002_din_exp_exp_exp_exp", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLInstance inst = top.newModuleInstance(m, "U");
 		
 		inst.getSignalForPort("clk").setAssign(null, top.getSysClk().getSignal());

@@ -13,6 +13,7 @@ import synthesijer.ast.expr.Literal;
 import synthesijer.ast.expr.NewArray;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
+import synthesijer.ast.type.BitVector;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
@@ -26,6 +27,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLType;
+import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
@@ -213,6 +215,9 @@ public class SchedulerInfoCompiler {
 				System.out.println("unknown ref type: " + name + ":" + cr.getRefType());
 			}
 			return sig;
+		}else if(type instanceof BitVector){
+			HDLSignal sig = hm.newSignal(name, HDLPrimitiveType.genVectorType(((BitVector) type).getWidth()));
+			return sig;
 		}else{
 			throw new RuntimeException("unsupported type: " + type + " of " + name);
 		}
@@ -348,6 +353,21 @@ public class SchedulerInfoCompiler {
 		}
 		return ret;
 	}
+	
+	private int getBitWidth(Type t){
+		if(t instanceof PrimitiveTypeKind){
+			return ((PrimitiveTypeKind) t).getWidth();
+		}else if(t instanceof BitVector){
+			return ((BitVector) t).getWidth();
+		}else if(t instanceof ArrayRef){
+			return getBitWidth(((ArrayRef) t).getRefType());
+		}else if(t instanceof ArrayType){
+			return getBitWidth(((ArrayType) t).getElemType());
+		}else{
+			System.out.println(t);
+			return -1;
+		}
+	}
 
 	private void genExpr(SchedulerBoard board, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap){
 		switch(item.getOp()){
@@ -372,7 +392,7 @@ public class SchedulerInfoCompiler {
 		case ASSIGN : {
 			Operand[] src = item.getSrcOperand();
 			VariableOperand dest = item.getDestOperand();
-			if(dest.getType() instanceof PrimitiveTypeKind){
+			if(dest.getType() instanceof PrimitiveTypeKind || dest.getType() instanceof BitVector){
 				
 				HDLVariable d;
 				FieldAccessItem fa = fieldAccessChainMap.get(dest.getName());
@@ -536,7 +556,21 @@ public class SchedulerInfoCompiler {
 			break;
 		}
 		case CAST:{
-			System.out.println("CAST is not implemented yet.");
+			TypeCastItem item0 = (TypeCastItem)item;
+			HDLSignal dest = (HDLSignal)(convOperandToHDLExpr(item.getDestOperand()));
+			HDLExpr src = convOperandToHDLExpr(item.getSrcOperand()[0]);
+			int w0 = getBitWidth(item0.orig);
+			int w1 = getBitWidth(item0.target);
+			if(w0 < 0 || w1 < 0){
+				System.out.println(w0);
+				System.out.println(w1);
+				SynthesijerUtils.error("Unsupported CAST: " + item.info());
+			}
+			if(w0 > w1){
+				dest.setAssign(state, hm.newExpr(HDLOp.DROPHEAD, src, HDLUtils.newValue(w0-w1, 32)));
+			}else{
+				dest.setAssign(state, hm.newExpr(HDLOp.PADDINGHEAD, src, HDLUtils.newValue(w0-w1, 32)));
+			}
 			break;
 		}
 		case UNDEFINED :{
@@ -639,16 +673,26 @@ public class SchedulerInfoCompiler {
 					SequencerState call_body = seq.addSequencerState(s.getStateId().getValue()+"_body");
 					MethodInvokeItem item0 = (MethodInvokeItem)item;
 					HDLVariable call_req, call_busy;
-					HDLSignal flag;
+					String flag_name;
 					if(item0.getOp() == Op.EXT_CALL){
 						HDLInstance obj = (HDLInstance)(varTable.get(item0.obj.getName()));
 						call_req = obj.getSignalForPort(item0.name + "_req");
 						call_busy = obj.getSignalForPort(item0.name + "_busy");
-						flag = hm.newSignal(String.format("%s_ext_call_flag_%04d", obj.getName(), item.getStepId()), HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.WIRE);
+						flag_name = String.format("%s_ext_call_flag_%04d", obj.getName(), item.getStepId());
 					}else{
 						call_req = varTable.get(item0.name + "_req_local");
 						call_busy = varTable.get(item0.name + "_busy");
-						flag = hm.newSignal(String.format("%s_call_flag_%04d", item0.name, item.getStepId()), HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.WIRE);
+						flag_name = String.format("%s_call_flag_%04d", item0.name, item.getStepId());
+					}
+					HDLSignal flag = (HDLSignal)varTable.get(flag_name);
+					if(flag == null){
+						flag = hm.newSignal(flag_name, HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.WIRE);
+						flag.setAssign(null, hm.newExpr(HDLOp.EQ,
+					             hm.newExpr(HDLOp.AND,
+					             hm.newExpr(HDLOp.EQ, call_busy, HDLPreDefinedConstant.LOW),
+					             hm.newExpr(HDLOp.EQ, call_req, HDLPreDefinedConstant.LOW)),
+					             HDLPreDefinedConstant.HIGH));
+						varTable.put(flag_name, flag);
 					}
 					
 					// when busy = '0', s -> call_body
@@ -657,11 +701,6 @@ public class SchedulerInfoCompiler {
 					// call_body
 					call_req.setAssign(call_body, 0, HDLPreDefinedConstant.HIGH);
 					call_req.setDefaultValue(HDLPreDefinedConstant.LOW); // otherwise '0'
-					flag.setAssign(null, hm.newExpr(HDLOp.EQ,
-							             hm.newExpr(HDLOp.AND,
-							             hm.newExpr(HDLOp.EQ, call_busy, HDLPreDefinedConstant.LOW),
-							             hm.newExpr(HDLOp.EQ, call_req, HDLPreDefinedConstant.LOW)),
-							             HDLPreDefinedConstant.HIGH));
 					call_body.setMaxConstantDelay(1);
 					if(item0.isNoWait() == true){
 						//System.out.println("no wait:" + call_req);

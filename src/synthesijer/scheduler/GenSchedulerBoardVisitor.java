@@ -467,8 +467,12 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
 		if(isCastRequired(lhs.getType(), rhs.getType()) == true){
-			VariableOperand tmp = addCast(rhs, lhs.getType()); // RHS is casted into corresponding to LHS
-			if(tmp != null) rhs = tmp;
+			if(rhs instanceof VariableOperand){
+				VariableOperand tmp = addCast(rhs, lhs.getType()); // RHS is casted into corresponding to LHS
+				if(tmp != null) rhs = tmp;
+			}else if(rhs instanceof ConstantOperand){
+				((ConstantOperand) rhs).setType(lhs.getType());
+			}
 		}
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{rhs}, (VariableOperand)lhs));
 	}
@@ -523,12 +527,20 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		}else if(isCastRequired(lhs.getType(), rhs.getType()) == true){
 			type = getPreferableType(lhs.getType(), rhs.getType()); // select type
 			if(lhs.getType() != type){
-				VariableOperand tmp = addCast(lhs, type);
-				if(tmp != null) lhs = tmp;
+				if(lhs instanceof VariableOperand){
+					VariableOperand tmp = addCast(lhs, type);
+					if(tmp != null) lhs = tmp;
+				}else if(lhs instanceof ConstantOperand){ // ConstantOperand
+					((ConstantOperand) lhs).setType(type);
+				}
 			}
 			if(rhs.getType() != type){
-				VariableOperand tmp = addCast(rhs, type);
-				if(tmp != null) rhs = tmp;
+				if(rhs instanceof VariableOperand){
+					VariableOperand tmp = addCast(rhs, type);
+					if(tmp != null) rhs = tmp;
+				}else if(rhs instanceof ConstantOperand){ // ConstantOperand
+					((ConstantOperand) rhs).setType(type);
+				}
 			}
 		}else{
 			type = lhs.getType();
@@ -671,9 +683,14 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitTypeCast(TypeCast o) {
 		Operand v = stepIn(o.getExpr());
-		VariableOperand tmp = newVariable("cast_expr", o.getType());
-		parent.addSchedulerItem(new TypeCastItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
-		result = tmp;
+		if(v instanceof VariableOperand){
+			VariableOperand tmp = newVariable("cast_expr", o.getType());
+			parent.addSchedulerItem(new TypeCastItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
+			result = tmp;
+		}else if(v instanceof ConstantOperand){
+			((ConstantOperand) v).setType(o.getType());
+			result = v;
+		}
 	}
 
 	@Override
