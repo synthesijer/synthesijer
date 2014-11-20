@@ -136,6 +136,10 @@ public class SchedulerInfoCompiler {
 			}
 			if(type == PrimitiveTypeKind.VOID) return null; // Void variable is not synthesized.
 			HDLSignal sig = hm.newSignal(name, getHDLType(type));
+			if(v.getVariable() != null && v.getVariable().getInitExpr() instanceof Literal){
+				Literal l = (Literal)(v.getVariable().getInitExpr());
+				sig.setResetValue(new HDLValue(l.getValueAsStr(), (HDLPrimitiveType)sig.getType()));
+			}
 			if(v.getVariable() != null && v.getVariable().isMethodParam()){
 				if(v.getVariable().getMethod().isPrivate()){
 					String prefix = v.getVariable().getMethod().getName();
