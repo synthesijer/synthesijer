@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.7
-# Date: Wed Nov 19 09:44:44 2014
+# Date: Thu Nov 20 12:29:13 2014
 #
 ##############################################################
 #
@@ -12,7 +12,7 @@
 #
 ##############################################################
 #
-#  Generated from component: xilinx.com:ip:floating_point:5.0
+#  Generated from component: xilinx.com:ip:floating_point:6.1
 #
 ##############################################################
 #
@@ -22,13 +22,13 @@ SET asysymbol = true
 SET busformat = BusFormatAngleBracketNotRipped
 SET createndf = false
 SET designentry = Verilog
-SET device = xc7a100t
-SET devicefamily = artix7
+SET device = xc6slx9
+SET devicefamily = spartan6
 SET flowvendor = Other
 SET formalverification = false
 SET foundationsym = false
 SET implementationfiletype = Ngc
-SET package = csg324
+SET package = tqg144
 SET removerpms = false
 SET simulationfiles = Behavioral
 SET speedgrade = -3
@@ -36,22 +36,20 @@ SET verilogsim = true
 SET vhdlsim = false
 # END Project Options
 # BEGIN Select
-SELECT Floating-point xilinx.com:ip:floating_point:5.0
+SELECT Floating-point xilinx.com:ip:floating_point:6.1
 # END Select
 # BEGIN Parameters
 CSET a_precision_type=Double
+CSET a_tuser_width=1
 CSET add_sub_value=Both
+CSET axi_optimize_goal=Resources
+CSET b_tuser_width=1
 CSET c_a_exponent_width=11
 CSET c_a_fraction_width=53
 CSET c_compare_operation=Programmable
-CSET c_has_ce=false
 CSET c_has_divide_by_zero=false
 CSET c_has_invalid_op=false
-CSET c_has_operation_nd=true
-CSET c_has_operation_rfd=false
 CSET c_has_overflow=false
-CSET c_has_rdy=true
-CSET c_has_sclr=false
 CSET c_has_underflow=false
 CSET c_latency=6
 CSET c_mult_usage=No_Usage
@@ -59,14 +57,25 @@ CSET c_optimization=Speed_Optimized
 CSET c_rate=1
 CSET c_result_exponent_width=64
 CSET c_result_fraction_width=0
-CSET c_speed=Maximum_speed
 CSET component_name=fconv_d2l_ip
+CSET flow_control=NonBlocking
+CSET has_a_tlast=false
+CSET has_a_tuser=false
+CSET has_aclken=false
+CSET has_aresetn=false
+CSET has_b_tlast=false
+CSET has_b_tuser=false
+CSET has_operation_tlast=false
+CSET has_operation_tuser=false
+CSET has_result_tready=false
 CSET maximum_latency=true
+CSET operation_tuser_width=1
 CSET operation_type=Float_to_fixed
 CSET result_precision_type=Custom
+CSET result_tlast_behv=Null
 # END Parameters
 # BEGIN Extra information
-MISC pkg_timestamp=2012-07-02T11:22:24Z
+MISC pkg_timestamp=2013-07-22T10:46:33Z
 # END Extra information
 GENERATE
-# CRC: 708a7632
+# CRC: bb982957
