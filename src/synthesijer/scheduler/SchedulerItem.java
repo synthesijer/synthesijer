@@ -237,8 +237,8 @@ class ConvFlotingToIntegerItem extends SchedulerItem{
 	public final Type orig;
 	public final Type target;
 	
-	public ConvFlotingToIntegerItem(SchedulerBoard board, Operand src, VariableOperand dest, Type orig, Type target){
-		super(board, Op.CONV_F2I, new Operand[]{src}, dest);
+	public ConvFlotingToIntegerItem(SchedulerBoard board, Op convOp, Operand src, VariableOperand dest, Type orig, Type target){
+		super(board, convOp, new Operand[]{src}, dest);
 		this.orig = orig;
 		this.target = target;
 	}

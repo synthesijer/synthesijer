@@ -12,7 +12,7 @@ public class FCONV_D2L extends HDLModule{
 	public boolean nd;
 	
 	public FCONV_D2L(){
-		super("synthesijer_fconv_f2i", "clk", "reset");
+		super("synthesijer_fconv_d2l", "clk", "reset");
 		newPort("a",      DIR.IN, HDLPrimitiveType.genVectorType(64));
 		newPort("nd",     DIR.IN, HDLPrimitiveType.genBitType());
 		newPort("result", DIR.OUT, HDLPrimitiveType.genSignedType(64));

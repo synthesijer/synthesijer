@@ -7,8 +7,8 @@ public class Test009{
 		int x;
 		long y;
 
-		fa = 1;
-		fb = 2;
+		fa = 100;
+		fb = 3;
 		fc = fa + fb;
 		x = (int)fc;
 		fc = fa - fb;
@@ -22,8 +22,8 @@ public class Test009{
 		double db;
 		double dc;
 
-		da = 1;
-		db = 2;
+		da = 100;
+		db = 3;
 		dc = da + db;
 		y = (long)dc;
 		dc = da - db;

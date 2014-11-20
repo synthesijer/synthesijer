@@ -708,8 +708,9 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Operand v = stepIn(o.getExpr());
 		if(v instanceof VariableOperand){
 			VariableOperand tmp = newVariable("cast_expr", o.getType());
-			if(isFloating(v.getType()) && isFloating(o.getType()) == false){
-				parent.addSchedulerItem(new ConvFlotingToIntegerItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
+			if(isFloating(v.getType()) && isFloating(o.getType()) == false){ // float -> int
+				Op conv = isFloat(v.getType()) ? Op.CONV_F2I : Op.CONV_D2L;
+				parent.addSchedulerItem(new ConvFlotingToIntegerItem(parent.getBoard(), conv, v, tmp, v.getType(), o.getType()));
 			}else{
 				parent.addSchedulerItem(new TypeCastItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
 			}
