@@ -41,6 +41,11 @@ public class SchedulerInfoCompiler {
 	private SchedulerInfo info;
 	private HDLModule hm;
 	
+	private HDLInstance mul32 = null;
+	private HDLInstance mul64 = null;
+	private HDLInstance div32 = null;
+	private HDLInstance div64 = null;
+	
 	private HDLInstance fadd32 = null;
 	private HDLInstance fsub32 = null;
 	private HDLInstance fmul32 = null;
@@ -357,8 +362,10 @@ public class SchedulerInfoCompiler {
 		case NOP : break;
 		case ADD : ret = HDLOp.ADD;break;
 		case SUB : ret = HDLOp.SUB;break;
-		case MUL : ret = HDLOp.MUL;break;
-		case DIV : break;
+		case MUL32 : break; //ret = HDLOp.MUL;break;
+		case MUL64 : break; // ret = HDLOp.MUL;break;
+		case DIV32 : break;
+		case DIV64 : break;
 		case MOD : break;
 		case LT : ret = HDLOp.LT;break;
 		case LEQ : ret = HDLOp.LEQ;break;
@@ -489,10 +496,6 @@ public class SchedulerInfoCompiler {
 		case NOP :{
 			break;
 		}
-		case DIV :{
-			System.out.println("DIV is not implemented yet.");
-			break;
-		}
 		case MOD :{
 			System.out.println("MOD is not implemented yet.");
 			break;
@@ -619,6 +622,19 @@ public class SchedulerInfoCompiler {
 			System.out.println("UNDEFINED : " + item.info());
 			break;
 		}
+		case MUL32:
+		case MUL64:
+		{
+			Operand[] arg = item.getSrcOperand();
+			HDLInstance inst = getOperationUnit(item.getOp());
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
+			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			dest.setAssign(state, inst.getSignalForPort("result"));
+			break;
+		}
+		case DIV32 :
+		case DIV64 :
 		case FADD32 :
 		case FSUB32 :
 		case FMUL32 :
@@ -629,7 +645,7 @@ public class SchedulerInfoCompiler {
 		case FDIV64 :
 		{
 			Operand[] arg = item.getSrcOperand();
-			HDLInstance inst = getFloatingInstance(item.getOp());
+			HDLInstance inst = getOperationUnit(item.getOp());
 			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
 			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
@@ -646,7 +662,7 @@ public class SchedulerInfoCompiler {
 		case CONV_D2F:
 		{
 			Operand[] arg = item.getSrcOperand();
-			HDLInstance inst = getFloatingInstance(item.getOp());
+			HDLInstance inst = getOperationUnit(item.getOp());
 			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
@@ -787,6 +803,10 @@ public class SchedulerInfoCompiler {
 					call_body.addStateTransit(states[item.getStepId()+1]);
 					break;
 				}
+				case MUL32 :
+				case MUL64 :
+				case DIV32 :
+				case DIV64 :
 				case FADD32 :
 				case FSUB32 :
 				case FMUL32 :
@@ -804,7 +824,7 @@ public class SchedulerInfoCompiler {
 				{
 					s.setMaxConstantDelay(item.getOp().latency);
 					s.addStateTransit(states[item.getStepId()+1]);
-					HDLInstance inst = getFloatingInstance(item.getOp());
+					HDLInstance inst = getOperationUnit(item.getOp());
 					s.setStateExitFlag(inst.getSignalForPort("valid"));
 					break;
 				}
@@ -821,8 +841,47 @@ public class SchedulerInfoCompiler {
 		return states;
 	}
 
-	private HDLInstance getFloatingInstance(Op op){
+	private HDLInstance getOperationUnit(Op op){
 		switch(op){
+		case MUL32:{
+			if(mul32 == null){
+				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("MUL32");
+				mul32 = hm.newModuleInstance(info.hm, "synthesijer_mul32");
+				mul32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+				mul32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+			}
+			return mul32;
+		}
+		case MUL64:{
+			if(mul64 == null){
+				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("MUL64");
+				mul64 = hm.newModuleInstance(info.hm, "synthesijer_mul64");
+				mul64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+				mul64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+			}
+			return mul64;
+		}
+		case DIV32:{
+			if(div32 == null){
+				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("DIV32");
+				div32 = hm.newModuleInstance(info.hm, "synthesijer_div32");
+				div32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+				div32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+				div32.getSignalForPort("a").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
+				div32.getSignalForPort("b").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
+				div32.getSignalForPort("nd").setResetValue(HDLPreDefinedConstant.LOW);
+			}
+			return div32;
+		}
+		case DIV64:{
+			if(div64 == null){
+				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("DIV64");
+				div64 = hm.newModuleInstance(info.hm, "synthesijer_div64");
+				div64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+				div64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+			}
+			return div64;
+		}
 		case FADD32:{
 			if(fadd32 == null){
 				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FADD32");

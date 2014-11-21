@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.7
-# Date: Thu Nov 20 13:02:03 2014
+# Date: Fri Nov 21 00:00:14 2014
 #
 ##############################################################
 #
@@ -53,9 +53,9 @@ CSET divisor_has_tlast=false
 CSET divisor_has_tuser=false
 CSET divisor_tuser_width=1
 CSET divisor_width=64
-CSET flowcontrol=NonBlocking
+CSET flowcontrol=Blocking
 CSET fractional_width=64
-CSET latency=68
+CSET latency=69
 CSET latency_configuration=Automatic
 CSET operand_sign=Signed
 CSET optimizegoal=Performance
@@ -67,4 +67,4 @@ CSET remainder_type=Remainder
 MISC pkg_timestamp=2013-07-22T10:43:42Z
 # END Extra information
 GENERATE
-# CRC: 998cd864
+# CRC: a5e4cb57

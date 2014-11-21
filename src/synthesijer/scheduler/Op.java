@@ -11,8 +11,10 @@ public enum Op {
 	NOP,
 	ADD,
 	SUB,
-	MUL,
-	DIV,
+	MUL32(1),
+	MUL64(1),
+	DIV32(1),
+	DIV64(1),
 	MOD,
 	LT(PrimitiveTypeKind.BOOLEAN),
 	LEQ(PrimitiveTypeKind.BOOLEAN),
@@ -116,6 +118,18 @@ public enum Op {
 		return t == PrimitiveTypeKind.DOUBLE;
 	}
 	
+	private static boolean isLong(Operand operand){
+		Type t = operand.getType();
+		if(t instanceof PrimitiveTypeKind == false) return false;
+		return t == PrimitiveTypeKind.LONG;
+	}
+	
+	private static boolean isInt(Operand operand){
+		Type t = operand.getType();
+		if(t instanceof PrimitiveTypeKind == false) return false;
+		return t == PrimitiveTypeKind.INT;
+	}
+	
 	public static Op get(synthesijer.ast.Op o, Operand lhs, Operand rhs){
 		switch(o){
 		case PLUS: {
@@ -131,12 +145,14 @@ public enum Op {
 		case MUL: {
 			if(isDouble(lhs) || isDouble(rhs)) return FMUL64;
 			else if(isFloat(lhs) || isFloat(rhs)) return FMUL32;
-			else return MUL;
+			if(isLong(lhs) || isLong(rhs)) return MUL64;
+			else return MUL32;
 		}
 		case DIV: {
 			if(isDouble(lhs) || isDouble(rhs)) return FDIV64;
 			if(isFloat(lhs) || isFloat(rhs)) return FDIV32;
-			else return DIV;
+			if(isLong(lhs) || isLong(rhs)) return DIV64;
+			else return DIV32;
 		}
 		default:
 			return get(o);
@@ -148,8 +164,8 @@ public enum Op {
 		case ASSIGN: 
 		case PLUS: return ADD;
 		case MINUS: return SUB;
-		case MUL: return MUL;
-		case DIV: return DIV;
+		case MUL: return MUL32;
+		case DIV: return DIV32;
 		case MOD: return MOD;
 		case COMPEQ: return COMPEQ;
 		case NEQ: return NEQ; 

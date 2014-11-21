@@ -14,6 +14,8 @@ import synthesijer.ast.Module;
 import synthesijer.ast2hdl.GenerateHDLModuleVisitor;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.BlockRAM;
+import synthesijer.lib.DIV32;
+import synthesijer.lib.DIV64;
 import synthesijer.lib.FADD32;
 import synthesijer.lib.FADD64;
 import synthesijer.lib.FCONV_D2F;
@@ -31,6 +33,8 @@ import synthesijer.lib.FSUB64;
 import synthesijer.lib.INPUT1;
 import synthesijer.lib.INPUT16;
 import synthesijer.lib.INPUT32;
+import synthesijer.lib.MUL32;
+import synthesijer.lib.MUL64;
 import synthesijer.lib.OUTPUT1;
 import synthesijer.lib.OUTPUT16;
 import synthesijer.lib.OUTPUT32;
@@ -71,6 +75,11 @@ public enum Manager {
 		addHDLModule("OUTPUT1", null, new OUTPUT1(), false);
 		addHDLModule("OUTPUT16", null, new OUTPUT16(), false);
 		addHDLModule("OUTPUT32", null, new OUTPUT32(), false);
+		// MUL/DIV
+		addHDLModule("MUL32", null, new MUL32(), false);
+		addHDLModule("MUL64", null, new MUL64(), false);
+		addHDLModule("DIV32", null, new DIV32(), false);
+		addHDLModule("DIV64", null, new DIV64(), false);
 		// floating 32-bit
 		addHDLModule("FADD32", null, new FADD32(), false);
 		addHDLModule("FSUB32", null, new FSUB32(), false);
