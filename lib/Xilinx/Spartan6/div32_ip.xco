@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.7
-# Date: Thu Nov 20 23:52:07 2014
+# Date: Fri Nov 21 08:37:19 2014
 #
 ##############################################################
 #
@@ -22,13 +22,13 @@ SET asysymbol = true
 SET busformat = BusFormatAngleBracketNotRipped
 SET createndf = false
 SET designentry = Verilog
-SET device = xc6slx9
+SET device = xc6slx25
 SET devicefamily = spartan6
 SET flowvendor = Other
 SET formalverification = false
 SET foundationsym = false
 SET implementationfiletype = Ngc
-SET package = tqg144
+SET package = csg324
 SET removerpms = false
 SET simulationfiles = Behavioral
 SET speedgrade = -3
@@ -42,7 +42,7 @@ SELECT Divider_Generator xilinx.com:ip:div_gen:4.0
 CSET aclken=false
 CSET algorithm_type=Radix2
 CSET aresetn=true
-CSET clocks_per_division=1
+CSET clocks_per_division=8
 CSET component_name=div32_ip
 CSET divide_by_zero_detect=false
 CSET dividend_and_quotient_width=32
@@ -55,7 +55,7 @@ CSET divisor_tuser_width=1
 CSET divisor_width=32
 CSET flowcontrol=Blocking
 CSET fractional_width=32
-CSET latency=37
+CSET latency=38
 CSET latency_configuration=Automatic
 CSET operand_sign=Signed
 CSET optimizegoal=Performance
@@ -67,4 +67,4 @@ CSET remainder_type=Remainder
 MISC pkg_timestamp=2013-07-22T10:43:42Z
 # END Extra information
 GENERATE
-# CRC: cd9a72b2
+# CRC: 66bd6556

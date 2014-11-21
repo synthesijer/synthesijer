@@ -1,8 +1,6 @@
-module sim
-(
-
-);
-
+`default_nettype none
+`timescale 1ns/1ns
+module sim();
 
   reg  clk = 1'b0;
   reg  reset = 1'b0;
@@ -16,8 +14,6 @@ module sim
   wire  tmp_0003;
   wire  tmp_0004;
   wire  tmp_0005;
-
-
 
   assign tmp_0001 = counter + 1;
   assign tmp_0002 = counter > 3 ? 1'b1 : 1'b0;
@@ -33,7 +29,6 @@ module sim
   #10
   main <= main_IDLE;
   end
-
 
   always @(main) begin
      if (main == main_IDLE) begin
@@ -55,6 +50,52 @@ module sim
     end
   end
 
+   wire run_req, req_001;
+      
+   assign run_req = counter == 100 ? 1'b1 : 1'b0;
+   assign req_001 = counter > 50 ? 1'b1 : 1'b0;
+   
+   Test005 U005(.clk(clk), .reset(reset), .run_req(run_req), .run_busy());
 
+   Test000 U000(.clk(clk),
+		.reset(reset),
+		.ic_in(32'd0),
+		.ic_we(1'b0),
+		.ic_out(),
+		.lc_in(64'd0),
+		.lc_we(1'b0),
+		.lc_out(),
+		.test_ib(32'd3),
+		.test_ia(32'd100),
+		.test_lb(64'd3),
+		.test_la(64'd100),
+		.test_req(req_001),
+		.test_busy()
+		);
+  
+   Test001Sim U001(.clk(clk),
+		   .reset(reset),
+		   .main_req(req_001),
+		   .main_busy()
+		   );
+
+   Test003 U003(.clk(clk),
+		.reset(reset),
+		.test_req(req_001),
+		.test_busy()
+		);
+
+   Test006 U006(.clk(clk),
+		.reset(reset),
+		.test_req(req_001),
+		.test_busy()
+		);
+
+   Test009 U009(.clk(clk),
+		.reset(reset),
+		.test_req(req_001),
+		.test_busy()
+		);
 
 endmodule
+`default_nettype wire

@@ -13,6 +13,8 @@ import java.util.Hashtable;
 import synthesijer.ast.Module;
 import synthesijer.ast2hdl.GenerateHDLModuleVisitor;
 import synthesijer.hdl.HDLModule;
+import synthesijer.lib.ARITH_RSHIFT32;
+import synthesijer.lib.ARITH_RSHIFT64;
 import synthesijer.lib.BlockRAM;
 import synthesijer.lib.DIV32;
 import synthesijer.lib.DIV64;
@@ -33,6 +35,10 @@ import synthesijer.lib.FSUB64;
 import synthesijer.lib.INPUT1;
 import synthesijer.lib.INPUT16;
 import synthesijer.lib.INPUT32;
+import synthesijer.lib.LOGIC_RSHIFT32;
+import synthesijer.lib.LOGIC_RSHIFT64;
+import synthesijer.lib.LSHIFT32;
+import synthesijer.lib.LSHIFT64;
 import synthesijer.lib.MUL32;
 import synthesijer.lib.MUL64;
 import synthesijer.lib.OUTPUT1;
@@ -57,7 +63,6 @@ public enum Manager {
 	private ArrayList<String> userHDLModules = new ArrayList<>();
 		
 	private Manager(){
-		// TODO
 		addHDLModule("BlockRAM1",  null, new BlockRAM(1, 10, 1024), false);
 		addHDLModule("BlockRAM8",  null, new BlockRAM(8, 10, 1024), false);
 		addHDLModule("BlockRAM16", null, new BlockRAM(16, 10, 1024), false);
@@ -97,6 +102,13 @@ public enum Manager {
 		addHDLModule("FCONV_L2D", null, new FCONV_L2D(), false);
 		addHDLModule("FCONV_F2D", null, new FCONV_F2D(), false);
 		addHDLModule("FCONV_D2F", null, new FCONV_D2F(), false);
+		// SHIFT
+		addHDLModule("LSHIFT32", null, new LSHIFT32(), false);
+		addHDLModule("LSHIFT64", null, new LSHIFT64(), false);
+		addHDLModule("LOGIC_RSHIFT32", null, new LOGIC_RSHIFT32(), false);
+		addHDLModule("LOGIC_RSHIFT64", null, new LOGIC_RSHIFT64(), false);
+		addHDLModule("ARITH_RSHIFT32", null, new ARITH_RSHIFT32(), false);
+		addHDLModule("ARITH_RSHIFT64", null, new ARITH_RSHIFT64(), false);
 	}
 	
 	public void registUserHDLModule(String name){

@@ -63,6 +63,13 @@ public class SchedulerInfoCompiler {
 	private HDLInstance f2d = null;
 	private HDLInstance d2f = null;
 	
+	private HDLInstance lshift32 = null;
+	private HDLInstance logic_rshift32 = null;
+	private HDLInstance arith_rshift32 = null;
+	private HDLInstance lshift64 = null;
+	private HDLInstance logic_rshift64 = null;
+	private HDLInstance arith_rshift64 = null;
+	
 	public SchedulerInfoCompiler(SchedulerInfo info, HDLModule hm){
 		this.info = info;
 		this.hm = hm;
@@ -366,16 +373,23 @@ public class SchedulerInfoCompiler {
 		case MUL64 : break; // ret = HDLOp.MUL;break;
 		case DIV32 : break;
 		case DIV64 : break;
-		case MOD : break;
+		case MOD32 : break;
+		case MOD64 : break;
 		case LT : ret = HDLOp.LT;break;
 		case LEQ : ret = HDLOp.LEQ;break;
 		case GT : ret = HDLOp.GT;break;
 		case GEQ : ret = HDLOp.GEQ;break;
 		case COMPEQ : ret = HDLOp.EQ;break;
 		case NEQ : ret = HDLOp.NEQ;break;
-		case LSHIFT : ret = HDLOp.LSHIFT;break;
-		case LOGIC_RSHIFT : ret = HDLOp.LOGIC_RSHIFT;break;
-		case ARITH_RSHIFT : ret = HDLOp.ARITH_RSHIFT;break;
+		case SIMPLE_LSHIFT : ret = HDLOp.LSHIFT;break;
+		case SIMPLE_LOGIC_RSHIFT : ret = HDLOp.LOGIC_RSHIFT;break;
+		case SIMPLE_ARITH_RSHIFT : ret = HDLOp.ARITH_RSHIFT;break;
+		case LSHIFT32 : break;
+		case LOGIC_RSHIFT32 : break;
+		case ARITH_RSHIFT32 : break;
+		case LSHIFT64 : break;
+		case LOGIC_RSHIFT64 : break;
+		case ARITH_RSHIFT64 : break;
 		case JP : break;
 		case JT : break;
 		case RETURN : break;
@@ -494,10 +508,6 @@ public class SchedulerInfoCompiler {
 			}
 		}
 		case NOP :{
-			break;
-		}
-		case MOD :{
-			System.out.println("MOD is not implemented yet.");
 			break;
 		}
 		case JP :{
@@ -622,6 +632,12 @@ public class SchedulerInfoCompiler {
 			System.out.println("UNDEFINED : " + item.info());
 			break;
 		}
+		case LSHIFT32:
+		case LOGIC_RSHIFT32:
+		case ARITH_RSHIFT32:
+		case LSHIFT64:
+		case LOGIC_RSHIFT64:
+		case ARITH_RSHIFT64:
 		case MUL32:
 		case MUL64:
 		{
@@ -635,6 +651,30 @@ public class SchedulerInfoCompiler {
 		}
 		case DIV32 :
 		case DIV64 :
+		{
+			Operand[] arg = item.getSrcOperand();
+			HDLInstance inst = getOperationUnit(item.getOp());
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
+			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
+			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
+			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			dest.setAssign(state, inst.getSignalForPort("quantient"));
+			break;
+		}
+		case MOD32 :
+		case MOD64 :
+		{
+			Operand[] arg = item.getSrcOperand();
+			HDLInstance inst = getOperationUnit(item.getOp());
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
+			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
+			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
+			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			dest.setAssign(state, inst.getSignalForPort("remainder"));
+			break;
+		}
 		case FADD32 :
 		case FSUB32 :
 		case FMUL32 :
@@ -803,10 +843,18 @@ public class SchedulerInfoCompiler {
 					call_body.addStateTransit(states[item.getStepId()+1]);
 					break;
 				}
+				case LSHIFT32 :
+				case LOGIC_RSHIFT32 :
+				case ARITH_RSHIFT32 :
+				case LSHIFT64 :
+				case LOGIC_RSHIFT64 :
+				case ARITH_RSHIFT64 :
 				case MUL32 :
 				case MUL64 :
 				case DIV32 :
 				case DIV64 :
+				case MOD32 :
+				case MOD64 :
 				case FADD32 :
 				case FSUB32 :
 				case FMUL32 :
@@ -841,172 +889,112 @@ public class SchedulerInfoCompiler {
 		return states;
 	}
 
+	private HDLInstance newInstModule(String mName, String uName){
+		HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(mName);
+		HDLInstance inst = hm.newModuleInstance(info.hm, uName);
+		inst.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+		inst.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+		return inst;
+	}
+	
 	private HDLInstance getOperationUnit(Op op){
 		switch(op){
 		case MUL32:{
-			if(mul32 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("MUL32");
-				mul32 = hm.newModuleInstance(info.hm, "synthesijer_mul32");
-				mul32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				mul32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(mul32 == null) mul32 = newInstModule("MUL32", "synthesijer_mul32");
 			return mul32;
 		}
 		case MUL64:{
-			if(mul64 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("MUL64");
-				mul64 = hm.newModuleInstance(info.hm, "synthesijer_mul64");
-				mul64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				mul64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(mul64 == null) mul64 = newInstModule("MUL64", "synthesijer_mul64");
 			return mul64;
 		}
-		case DIV32:{
-			if(div32 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("DIV32");
-				div32 = hm.newModuleInstance(info.hm, "synthesijer_div32");
-				div32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				div32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-				div32.getSignalForPort("a").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
-				div32.getSignalForPort("b").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
-				div32.getSignalForPort("nd").setResetValue(HDLPreDefinedConstant.LOW);
-			}
+		case DIV32:
+		case MOD32:{
+			if(div32 == null) div32 = newInstModule("DIV32", "synthesijer_div32");
 			return div32;
 		}
-		case DIV64:{
-			if(div64 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("DIV64");
-				div64 = hm.newModuleInstance(info.hm, "synthesijer_div64");
-				div64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				div64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+		case DIV64:
+		case MOD64:{
+			if(div64 == null) div64 = newInstModule("DIV64", "synthesijer_div64");
 			return div64;
 		}
 		case FADD32:{
-			if(fadd32 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FADD32");
-				fadd32 = hm.newModuleInstance(info.hm, "synthesijer_fadd32");
-				fadd32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fadd32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(fadd32 == null) fadd32 = newInstModule("FADD32", "synthesijer_fadd32");
 			return fadd32;
 		}
 		case FSUB32:{
-			if(fsub32 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FSUB32");
-				fsub32 = hm.newModuleInstance(info.hm, "synthesijer_fsub32");
-				fsub32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fsub32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(fsub32 == null) fsub32 = newInstModule("FSUB32", "synthesijer_fsub32");
 			return fsub32;
 		}
 		case FMUL32:{
-			if(fmul32 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FMUL32");
-				fmul32 = hm.newModuleInstance(info.hm, "synthesijer_fmul32");
-				fmul32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fmul32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(fmul32 == null) fmul32 = newInstModule("FMUL32", "synthesijer_fmul32");
 			return fmul32;
 		}
 		case FDIV32:{
-			if(fdiv32 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FDIV32");
-				fdiv32 = hm.newModuleInstance(info.hm, "synthesijer_fdiv32");
-				fdiv32.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fdiv32.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(fdiv32 == null) fdiv32 = newInstModule("FDIV32", "synthesijer_fdiv32");
 			return fdiv32;
 		}
 		case FADD64:{
-			if(fadd64 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FADD64");
-				fadd64 = hm.newModuleInstance(info.hm, "synthesijer_fadd64");
-				fadd64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fadd64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(fadd64 == null) fadd64 = newInstModule("FADD64", "synthesijer_fadd64");
 			return fadd64;
 		}
 		case FSUB64:{
-			if(fsub64 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FSUB64");
-				fsub64 = hm.newModuleInstance(info.hm, "synthesijer_fsub64");
-				fsub64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fsub64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
-			return fsub64;
+			if(fsub64 == null) fsub64 = newInstModule("FSUB64", "synthesijer_fsub64");
 		}
 		case FMUL64:{
-			if(fmul64 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FMUL64");
-				fmul64 = hm.newModuleInstance(info.hm, "synthesijer_fmul64");
-				fmul64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fmul64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(fmul64 == null) fmul64 = newInstModule("FMUL64", "synthesijer_fmul64");
 			return fmul64;
 		}
 		case FDIV64:{
-			if(fdiv64 == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FDIV64");
-				fdiv64 = hm.newModuleInstance(info.hm, "synthesijer_fdiv64");
-				fdiv64.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				fdiv64.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(fdiv64 == null) fdiv64 = newInstModule("FDIV64", "synthesijer_fdiv64");
 			return fdiv64;
 		}
 		case CONV_F2I:{
-			if(f2i == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FCONV_F2I");
-				f2i = hm.newModuleInstance(info.hm, "synthesijer_fconv_f2i");
-				f2i.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				f2i.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(f2i == null) f2i = newInstModule("FCONV_F2I", "synthesijer_fconv_f2i");
 			return f2i;
 		}
 		case CONV_I2F:{
-			if(i2f == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FCONV_I2F");
-				i2f = hm.newModuleInstance(info.hm, "synthesijer_fconv_i2f");
-				i2f.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				i2f.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(i2f == null) i2f = newInstModule("FCONV_I2F", "synthesijer_fconv_i2f");
 			return i2f;
 		}
 		case CONV_L2D:{
-			if(l2d == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FCONV_L2D");
-				l2d = hm.newModuleInstance(info.hm, "synthesijer_fconv_l2d");
-				l2d.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				l2d.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(l2d == null) l2d = newInstModule("FCONV_L2D", "synthesijer_fconv_l2d");
 			return l2d;
 		}
 		case CONV_D2L:{
-			if(d2l == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FCONV_D2L");
-				d2l = hm.newModuleInstance(info.hm, "synthesijer_fconv_d2l");
-				d2l.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				d2l.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(d2l == null) d2l = newInstModule("FCONV_D2L", "synthesijer_fconv_d2l");
 			return d2l;
 		}
 		case CONV_F2D:{
-			if(f2d == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FCONV_F2D");
-				f2d = hm.newModuleInstance(info.hm, "synthesijer_fconv_f2d");
-				f2d.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				f2d.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(f2d == null) f2d = newInstModule("FCONV_F2D", "synthesijer_fconv_f2d");
 			return f2d;
 		}
 		case CONV_D2F:{
-			if(d2f == null){
-				HDLModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo("FCONV_D2F");
-				d2f = hm.newModuleInstance(info.hm, "synthesijer_fconv_d2f");
-				d2f.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-				d2f.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			}
+			if(d2f == null) d2f = newInstModule("FCONV_D2F", "synthesijer_fconv_d2f");
 			return d2f;
+		}
+		case LSHIFT32:{
+			if(lshift32 == null) lshift32 = newInstModule("LSHIFT32", "synthesijer_lshift32");
+			return lshift32;
+		}
+		case LOGIC_RSHIFT32:{
+			if(logic_rshift32 == null) logic_rshift32 = newInstModule("LOGIC_RSHIFT32", "synthesijer_logic_rshift32");
+			return logic_rshift32;
+		}
+		case ARITH_RSHIFT32:{
+			if(arith_rshift32 == null) arith_rshift32 = newInstModule("ARITH_RSHIFT32", "synthesijer_arith_rshift32");
+			return arith_rshift32;
+		}
+		case LSHIFT64:{
+			if(lshift64 == null) lshift64 = newInstModule("LSHIFT64", "synthesijer_lshift64");
+			return lshift64;
+		}
+		case LOGIC_RSHIFT64:{
+			if(logic_rshift64 == null) logic_rshift64 = newInstModule("LOGIC_RSHIFT64", "synthesijer_logic_rshift64");
+			return logic_rshift64;
+		}
+		case ARITH_RSHIFT64:{
+			if(arith_rshift64 == null) arith_rshift64 = newInstModule("ARITH_RSHIFT64", "synthesijer_arith_rshift64");
+			return arith_rshift64;
 		}
 		default: return null;
 		}

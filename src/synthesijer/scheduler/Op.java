@@ -15,16 +15,23 @@ public enum Op {
 	MUL64(1),
 	DIV32(1),
 	DIV64(1),
-	MOD,
+	MOD32(1),
+	MOD64(1),
 	LT(PrimitiveTypeKind.BOOLEAN),
 	LEQ(PrimitiveTypeKind.BOOLEAN),
 	GT(PrimitiveTypeKind.BOOLEAN),
 	GEQ(PrimitiveTypeKind.BOOLEAN),
 	COMPEQ(PrimitiveTypeKind.BOOLEAN),
 	NEQ(PrimitiveTypeKind.BOOLEAN),
-	LSHIFT,
-	LOGIC_RSHIFT,
-	ARITH_RSHIFT,
+	SIMPLE_LSHIFT,
+	SIMPLE_LOGIC_RSHIFT,
+	SIMPLE_ARITH_RSHIFT,
+	LSHIFT32(1),
+	LOGIC_RSHIFT32(1),
+	ARITH_RSHIFT32(1),
+	LSHIFT64(1),
+	LOGIC_RSHIFT64(1),
+	ARITH_RSHIFT64(1),
 	JP(true),
 	JT(true),
 	RETURN(true),
@@ -154,6 +161,25 @@ public enum Op {
 			if(isLong(lhs) || isLong(rhs)) return DIV64;
 			else return DIV32;
 		}
+		case MOD: {
+			if(isLong(lhs) || isLong(rhs)) return MOD64;
+			else return MOD32;
+		}
+		case LSHIFT: {
+			if(rhs instanceof ConstantOperand) return SIMPLE_LSHIFT;
+			if(isLong(lhs)) return LSHIFT64;
+			else return LSHIFT32;
+		}
+		case LOGIC_RSHIFT: {
+			if(rhs instanceof ConstantOperand) return SIMPLE_LOGIC_RSHIFT;
+			if(isLong(lhs)) return LOGIC_RSHIFT64;
+			else return LOGIC_RSHIFT32;
+		}
+		case ARITH_RSHIFT: {
+			if(rhs instanceof ConstantOperand) return SIMPLE_ARITH_RSHIFT;
+			if(isLong(lhs)) return ARITH_RSHIFT64;
+			else return ARITH_RSHIFT32;
+		}
 		default:
 			return get(o);
 		}
@@ -166,16 +192,16 @@ public enum Op {
 		case MINUS: return SUB;
 		case MUL: return MUL32;
 		case DIV: return DIV32;
-		case MOD: return MOD;
+		case MOD: return MOD32;
 		case COMPEQ: return COMPEQ;
 		case NEQ: return NEQ; 
 		case GT: return GT;
 		case LT: return LT;
 		case GEQ: return GEQ;
 		case LEQ: return LEQ;
-		case LSHIFT: return LSHIFT;
-		case LOGIC_RSHIFT: return LOGIC_RSHIFT;
-		case ARITH_RSHIFT: return ARITH_RSHIFT;
+		case LSHIFT: return LSHIFT32;
+		case LOGIC_RSHIFT: return LOGIC_RSHIFT32;
+		case ARITH_RSHIFT: return ARITH_RSHIFT32;
 		case AND: return AND;
 		case NOT: return NOT;
 		case LAND: return LAND;

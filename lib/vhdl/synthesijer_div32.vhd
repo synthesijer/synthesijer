@@ -4,13 +4,14 @@ use ieee.numeric_std.all;
 
 entity synthesijer_div32 is
   port (
-    clk    : in  std_logic;
-    reset  : in  std_logic;
-    a      : in  signed(32-1 downto 0);
-    b      : in  signed(32-1 downto 0);
-    nd     : in  std_logic;
-    result : out signed(32-1 downto 0);
-    valid  : out std_logic
+    clk       : in  std_logic;
+    reset     : in  std_logic;
+    a         : in  signed(32-1 downto 0);
+    b         : in  signed(32-1 downto 0);
+    nd        : in  std_logic;
+    quantient : out signed(32-1 downto 0);
+    remainder : out signed(32-1 downto 0);
+    valid     : out std_logic
     );
 end synthesijer_div32;
 
@@ -50,6 +51,7 @@ begin
     );
 
   valid <= valid_tmp;
-  result <= signed(result_tmp(63 downto 32));
+  quantient <= signed(result_tmp(63 downto 32));
+  remainder <= signed(result_tmp(31 downto 0));
   
 end RTL;

@@ -8,7 +8,8 @@ public class DIV64 extends HDLModule{
 	
 	public long a;
 	public long b;
-	public long result;
+	public long quantient;
+	public long remainder;
 	public boolean valid;
 	public boolean nd;
 	
@@ -17,7 +18,8 @@ public class DIV64 extends HDLModule{
 		newPort("a",      DIR.IN,  HDLPrimitiveType.genSignedType(64));
 		newPort("b",      DIR.IN,  HDLPrimitiveType.genSignedType(64));
 		newPort("nd",     DIR.IN,  HDLPrimitiveType.genBitType());
-		newPort("result", DIR.OUT, HDLPrimitiveType.genSignedType(64));
+		newPort("quantient", DIR.OUT, HDLPrimitiveType.genSignedType(64));
+		newPort("remainder", DIR.OUT, HDLPrimitiveType.genSignedType(64));
 		newPort("valid",  DIR.OUT, HDLPrimitiveType.genBitType());
 	}
 

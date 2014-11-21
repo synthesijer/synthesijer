@@ -9,7 +9,8 @@ entity synthesijer_div64 is
     a      : in  signed(64-1 downto 0);
     b      : in  signed(64-1 downto 0);
     nd     : in  std_logic;
-    result : out signed(64-1 downto 0);
+    quantient : out signed(64-1 downto 0);
+    remainder : out signed(64-1 downto 0);
     valid  : out std_logic
     );
 end synthesijer_div64;
@@ -48,6 +49,7 @@ begin
     );
 
   valid <= valid_tmp;
-  result <= signed(result_tmp(127 downto 64));
+  quantient <= signed(result_tmp(127 downto 64));
+  remainder <= signed(result_tmp(63 downto 0));
 
 end RTL;

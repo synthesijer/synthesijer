@@ -5,7 +5,7 @@ public class Test{
   public void run(){
     while(true){
       count++;
-      if(count > 5000000){
+      if(count > 5){
 	count = 0;
 	flag = !flag;
       }

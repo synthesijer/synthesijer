@@ -725,23 +725,31 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	public void visitUnaryExpr(UnaryExpr o) {
 		Operand v = stepIn(o.getArg());
 		ConstantOperand c1 = new ConstantOperand("1", v.getType());
+		ConstantOperand c0 = new ConstantOperand("0", v.getType());
 		switch(o.getOp()){
 		case INC:{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ADD, new Operand[]{v, c1}, tmp));
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
+			result = v;
 			break;
 		}
 		case DEC:{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{v, c1}, tmp));
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
+			result = v;
+			break;
+		}
+		case MINUS:{
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{c0, v}, tmp));
+			result = tmp;
 			break;
 		}
 		default:
 			System.out.println("unknown unary expr:" + o.getOp());
 		}
-		result = v;
 	}
 	
 }
