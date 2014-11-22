@@ -7,7 +7,7 @@ VERILOG_SOURCES = $(SOURCES:.java=.v)
 all: hdl exstick microboard
 
 hdl: $(SOURCES)
-	java -cp $(SYNTHESIJER):. synthesijer.Main $(SOURCES)
+	java -cp $(SYNTHESIJER):. synthesijer.Main --vhdl --verilog $(SOURCES)
 
 exstick: EchoTestTop.java 
 	javac -cp $(SYNTHESIJER):. EchoTestTop.java

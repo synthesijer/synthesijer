@@ -58,25 +58,6 @@ architecture RTL of sim is
   );
  end component Test006;
 
- component Test000
-  port (
-    clk : in std_logic;
-    reset : in std_logic;
-    ic_in : in signed(32-1 downto 0);
-    ic_we : in std_logic;
-    ic_out : out signed(32-1 downto 0);
-    lc_in : in signed(64-1 downto 0);
-    lc_we : in std_logic;
-    lc_out : out signed(64-1 downto 0);
-    test_ib : in signed(32-1 downto 0);
-    test_ia : in signed(32-1 downto 0);
-    test_lb : in signed(64-1 downto 0);
-    test_la : in signed(64-1 downto 0);
-    test_req : in std_logic;
-    test_busy : out std_logic
-  );
- end component Test000;
-
  component Test009
   port (
     clk : in std_logic;
@@ -143,23 +124,6 @@ begin
   );
 
  req_001 <= '1' when counter > 50 else '0';
- U000: Test000
-  port map(
-    clk => clk,
-    reset => reset,
-    ic_in => (others => '0'),
-    ic_we => '0',
-    ic_out => open,
-    lc_in => (others => '0'),
-    lc_we => '0',
-    lc_out => open,
-    test_ib => to_signed(3, 32),
-    test_ia => to_signed(100, 32),
-    test_lb => to_signed(3, 64),
-    test_la => to_signed(100, 64),
-    test_req => req_001,
-    test_busy => open
-  );
   
  U001: Test001Sim
   port map(

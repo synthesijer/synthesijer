@@ -22,6 +22,12 @@ architecture RTL of Test000_dummy is
   port (
     clk : in std_logic;
     reset : in std_logic;
+    x_in : in signed(32-1 downto 0);
+    x_we : in std_logic;
+    x_out : out signed(32-1 downto 0);
+    y_in : in signed(32-1 downto 0);
+    y_we : in std_logic;
+    y_out : out signed(32-1 downto 0);
     ic_in : in signed(32-1 downto 0);
     ic_we : in std_logic;
     ic_out : out signed(32-1 downto 0);
@@ -66,7 +72,9 @@ begin
 	if clk'event and clk = '1' then
 	case to_integer(unsigned(osel)) is
         when 0 => data_out <= X"00000000" & ic_out;
-        when others => data_out <= lc_out;
+        when 1 => data_out <= X"00000000" & x_out;
+        when 3 => data_out <= lc_out;
+        when others => data_out <= y_out;
         end case;
 	end if;
    end process;
@@ -75,6 +83,12 @@ begin
   port map(
     clk => clk,
     reset => reset,
+    x_in => ic_in,
+    x_we => ic_we,
+    x_out => ic_out,
+    y_in => ic_in,
+    y_we => ic_we,
+    y_out => ic_out,
     ic_in => ic_in,
     ic_we => ic_we,
     ic_out => ic_out,

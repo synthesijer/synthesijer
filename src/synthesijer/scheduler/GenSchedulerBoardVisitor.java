@@ -458,7 +458,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	private VariableOperand addCast(Operand v, Type target){
 		Type orig = v.getType();
 		VariableOperand tmp = newVariable("cast_expr", target);
-		parent.addSchedulerItem(new TypeCastItem(parent.getBoard(), v, tmp, orig, target)); // v::orig -> tmp::target
+		parent.addSchedulerItem(TypeCastItem.newCastItem(parent.getBoard(), v, tmp, orig, target)); // v::orig -> tmp::target
 		return tmp;
 	}
 	
@@ -708,12 +708,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Operand v = stepIn(o.getExpr());
 		if(v instanceof VariableOperand){
 			VariableOperand tmp = newVariable("cast_expr", o.getType());
-			if(isFloating(v.getType()) && isFloating(o.getType()) == false){ // float -> int
-				Op conv = isFloat(v.getType()) ? Op.CONV_F2I : Op.CONV_D2L;
-				parent.addSchedulerItem(new ConvFlotingToIntegerItem(parent.getBoard(), conv, v, tmp, v.getType(), o.getType()));
-			}else{
-				parent.addSchedulerItem(new TypeCastItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
-			}
+			parent.addSchedulerItem(TypeCastItem.newCastItem(parent.getBoard(), v, tmp, v.getType(), o.getType()));
 			result = tmp;
 		}else if(v instanceof ConstantOperand){
 			((ConstantOperand) v).setType(o.getType());

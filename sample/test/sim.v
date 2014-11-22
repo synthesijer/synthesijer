@@ -57,22 +57,6 @@ module sim();
    
    Test005 U005(.clk(clk), .reset(reset), .run_req(run_req), .run_busy());
 
-   Test000 U000(.clk(clk),
-		.reset(reset),
-		.ic_in(32'd0),
-		.ic_we(1'b0),
-		.ic_out(),
-		.lc_in(64'd0),
-		.lc_we(1'b0),
-		.lc_out(),
-		.test_ib(32'd3),
-		.test_ia(32'd100),
-		.test_lb(64'd3),
-		.test_la(64'd100),
-		.test_req(req_001),
-		.test_busy()
-		);
-  
    Test001Sim U001(.clk(clk),
 		   .reset(reset),
 		   .main_req(req_001),
@@ -96,6 +80,6 @@ module sim();
 		.test_req(req_001),
 		.test_busy()
 		);
-
+   
 endmodule
 `default_nettype wire

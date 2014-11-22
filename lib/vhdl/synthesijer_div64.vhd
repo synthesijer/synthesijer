@@ -20,6 +20,7 @@ architecture RTL of synthesijer_div64 is
   component div64_ip
     port (
       aclk                   : in  std_logic;
+      aresetn                : in  std_logic;
       s_axis_dividend_tdata  : in  std_logic_vector(64-1 downto 0);
       s_axis_dividend_tvalid : in  std_logic;
       s_axis_dividend_tready : out std_logic;
@@ -34,10 +35,15 @@ architecture RTL of synthesijer_div64 is
   signal result_tmp : std_logic_vector(127 downto 0);
   signal valid_tmp : std_logic;
 
+  signal reset_n : std_logic := '0';
+
 begin
+
+  reset_n <= not reset;
 
   U : div64_ip port map(
     aclk                   => clk,
+    aresetn                => reset_n,
     s_axis_dividend_tdata  => std_logic_vector(a),
     s_axis_dividend_tvalid => nd,
     s_axis_dividend_tready => open,

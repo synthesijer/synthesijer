@@ -15,7 +15,7 @@ entity outputport is
     );
 end inputport;
 
-architecture RTL of inputport is
+architecture RTL of outputport is
 begin
 
   dout <= std_logic_vector(value);

@@ -1,3 +1,4 @@
+`default_nettype none
 
 module simple_dualportram #( parameter WIDTH = 32, DEPTH = 10, WORDS =1024 )
 (
@@ -28,3 +29,5 @@ module simple_dualportram #( parameter WIDTH = 32, DEPTH = 10, WORDS =1024 )
 	end
 
 endmodule
+
+`default_nettype wire

@@ -658,6 +658,7 @@ public class SchedulerInfoCompiler {
 			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
+			inst.getSignalForPort("nd").setResetValue(HDLPreDefinedConstant.LOW);
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("quantient"));
 			break;
@@ -900,100 +901,106 @@ public class SchedulerInfoCompiler {
 	private HDLInstance getOperationUnit(Op op){
 		switch(op){
 		case MUL32:{
-			if(mul32 == null) mul32 = newInstModule("MUL32", "synthesijer_mul32");
+			if(mul32 == null) mul32 = newInstModule("MUL32", "u_synthesijer_mul32");
 			return mul32;
 		}
 		case MUL64:{
-			if(mul64 == null) mul64 = newInstModule("MUL64", "synthesijer_mul64");
+			if(mul64 == null) mul64 = newInstModule("MUL64", "u_synthesijer_mul64");
 			return mul64;
 		}
 		case DIV32:
 		case MOD32:{
-			if(div32 == null) div32 = newInstModule("DIV32", "synthesijer_div32");
+			if(div32 == null){
+				div32 = newInstModule("DIV32", "u_synthesijer_div32");
+				div32.getSignalForPort("b").setResetValue(HDLUtils.newValue(1, 32));
+			}
 			return div32;
 		}
 		case DIV64:
 		case MOD64:{
-			if(div64 == null) div64 = newInstModule("DIV64", "synthesijer_div64");
+			if(div64 == null){
+				div64 = newInstModule("DIV64", "u_synthesijer_div64");
+				div64.getSignalForPort("b").setResetValue(HDLUtils.newValue(1, 64));
+			}
 			return div64;
 		}
 		case FADD32:{
-			if(fadd32 == null) fadd32 = newInstModule("FADD32", "synthesijer_fadd32");
+			if(fadd32 == null) fadd32 = newInstModule("FADD32", "u_synthesijer_fadd32");
 			return fadd32;
 		}
 		case FSUB32:{
-			if(fsub32 == null) fsub32 = newInstModule("FSUB32", "synthesijer_fsub32");
+			if(fsub32 == null) fsub32 = newInstModule("FSUB32", "u_synthesijer_fsub32");
 			return fsub32;
 		}
 		case FMUL32:{
-			if(fmul32 == null) fmul32 = newInstModule("FMUL32", "synthesijer_fmul32");
+			if(fmul32 == null) fmul32 = newInstModule("FMUL32", "u_synthesijer_fmul32");
 			return fmul32;
 		}
 		case FDIV32:{
-			if(fdiv32 == null) fdiv32 = newInstModule("FDIV32", "synthesijer_fdiv32");
+			if(fdiv32 == null) fdiv32 = newInstModule("FDIV32", "u_synthesijer_fdiv32");
 			return fdiv32;
 		}
 		case FADD64:{
-			if(fadd64 == null) fadd64 = newInstModule("FADD64", "synthesijer_fadd64");
+			if(fadd64 == null) fadd64 = newInstModule("FADD64", "u_synthesijer_fadd64");
 			return fadd64;
 		}
 		case FSUB64:{
-			if(fsub64 == null) fsub64 = newInstModule("FSUB64", "synthesijer_fsub64");
+			if(fsub64 == null) fsub64 = newInstModule("FSUB64", "u_synthesijer_fsub64");
 		}
 		case FMUL64:{
-			if(fmul64 == null) fmul64 = newInstModule("FMUL64", "synthesijer_fmul64");
+			if(fmul64 == null) fmul64 = newInstModule("FMUL64", "u_synthesijer_fmul64");
 			return fmul64;
 		}
 		case FDIV64:{
-			if(fdiv64 == null) fdiv64 = newInstModule("FDIV64", "synthesijer_fdiv64");
+			if(fdiv64 == null) fdiv64 = newInstModule("FDIV64", "u_synthesijer_fdiv64");
 			return fdiv64;
 		}
 		case CONV_F2I:{
-			if(f2i == null) f2i = newInstModule("FCONV_F2I", "synthesijer_fconv_f2i");
+			if(f2i == null) f2i = newInstModule("FCONV_F2I", "u_synthesijer_fconv_f2i");
 			return f2i;
 		}
 		case CONV_I2F:{
-			if(i2f == null) i2f = newInstModule("FCONV_I2F", "synthesijer_fconv_i2f");
+			if(i2f == null) i2f = newInstModule("FCONV_I2F", "u_synthesijer_fconv_i2f");
 			return i2f;
 		}
 		case CONV_L2D:{
-			if(l2d == null) l2d = newInstModule("FCONV_L2D", "synthesijer_fconv_l2d");
+			if(l2d == null) l2d = newInstModule("FCONV_L2D", "u_synthesijer_fconv_l2d");
 			return l2d;
 		}
 		case CONV_D2L:{
-			if(d2l == null) d2l = newInstModule("FCONV_D2L", "synthesijer_fconv_d2l");
+			if(d2l == null) d2l = newInstModule("FCONV_D2L", "u_synthesijer_fconv_d2l");
 			return d2l;
 		}
 		case CONV_F2D:{
-			if(f2d == null) f2d = newInstModule("FCONV_F2D", "synthesijer_fconv_f2d");
+			if(f2d == null) f2d = newInstModule("FCONV_F2D", "u_synthesijer_fconv_f2d");
 			return f2d;
 		}
 		case CONV_D2F:{
-			if(d2f == null) d2f = newInstModule("FCONV_D2F", "synthesijer_fconv_d2f");
+			if(d2f == null) d2f = newInstModule("FCONV_D2F", "u_synthesijer_fconv_d2f");
 			return d2f;
 		}
 		case LSHIFT32:{
-			if(lshift32 == null) lshift32 = newInstModule("LSHIFT32", "synthesijer_lshift32");
+			if(lshift32 == null) lshift32 = newInstModule("LSHIFT32", "u_synthesijer_lshift32");
 			return lshift32;
 		}
 		case LOGIC_RSHIFT32:{
-			if(logic_rshift32 == null) logic_rshift32 = newInstModule("LOGIC_RSHIFT32", "synthesijer_logic_rshift32");
+			if(logic_rshift32 == null) logic_rshift32 = newInstModule("LOGIC_RSHIFT32", "u_synthesijer_logic_rshift32");
 			return logic_rshift32;
 		}
 		case ARITH_RSHIFT32:{
-			if(arith_rshift32 == null) arith_rshift32 = newInstModule("ARITH_RSHIFT32", "synthesijer_arith_rshift32");
+			if(arith_rshift32 == null) arith_rshift32 = newInstModule("ARITH_RSHIFT32", "u_synthesijer_arith_rshift32");
 			return arith_rshift32;
 		}
 		case LSHIFT64:{
-			if(lshift64 == null) lshift64 = newInstModule("LSHIFT64", "synthesijer_lshift64");
+			if(lshift64 == null) lshift64 = newInstModule("LSHIFT64", "u_synthesijer_lshift64");
 			return lshift64;
 		}
 		case LOGIC_RSHIFT64:{
-			if(logic_rshift64 == null) logic_rshift64 = newInstModule("LOGIC_RSHIFT64", "synthesijer_logic_rshift64");
+			if(logic_rshift64 == null) logic_rshift64 = newInstModule("LOGIC_RSHIFT64", "u_synthesijer_logic_rshift64");
 			return logic_rshift64;
 		}
 		case ARITH_RSHIFT64:{
-			if(arith_rshift64 == null) arith_rshift64 = newInstModule("ARITH_RSHIFT64", "synthesijer_arith_rshift64");
+			if(arith_rshift64 == null) arith_rshift64 = newInstModule("ARITH_RSHIFT64", "u_synthesijer_arith_rshift64");
 			return arith_rshift64;
 		}
 		default: return null;

@@ -1,6 +1,7 @@
 package synthesijer.scheduler;
 
 import synthesijer.ast.Type;
+import synthesijer.ast.type.PrimitiveTypeKind;
 
 
 /**
@@ -218,8 +219,8 @@ class TypeCastItem extends SchedulerItem{
 	public final Type orig;
 	public final Type target;
 	
-	public TypeCastItem(SchedulerBoard board, Operand src, VariableOperand dest, Type orig, Type target){
-		super(board, Op.CAST, new Operand[]{src}, dest);
+	private TypeCastItem(SchedulerBoard board, Op op, Operand src, VariableOperand dest, Type orig, Type target){
+		super(board, op, new Operand[]{src}, dest);
 		this.orig = orig;
 		this.target = target;
 	}
@@ -230,23 +231,30 @@ class TypeCastItem extends SchedulerItem{
 		return s;
 	}
 	
-}
-
-class ConvFlotingToIntegerItem extends SchedulerItem{
+	private static boolean isFloat(Type t){
+		return t == PrimitiveTypeKind.FLOAT;
+	}
 	
-	public final Type orig;
-	public final Type target;
+	private static boolean isDouble(Type t){
+		return t == PrimitiveTypeKind.DOUBLE;
+	}
 	
-	public ConvFlotingToIntegerItem(SchedulerBoard board, Op convOp, Operand src, VariableOperand dest, Type orig, Type target){
-		super(board, convOp, new Operand[]{src}, dest);
-		this.orig = orig;
-		this.target = target;
+	private static boolean isFloating(Type t){
+		return isFloat(t) || isDouble(t);
 	}
 
-	public String info(){
-		String s = super.info();
-		s += " (" + orig + "->" + target + ")";
-		return s;
+	public static TypeCastItem newCastItem(SchedulerBoard board, Operand src, VariableOperand dest, Type orig, Type target){
+		Op op;
+		if(isFloating(orig) == true && isFloating(target) == false){ // floating -> integer
+			op = isFloat(orig) ? Op.CONV_F2I : Op.CONV_D2L;
+		}else if(isFloating(orig) == false && isFloating(target) == true){ // integer -> floating
+			op = isFloat(target) ? Op.CONV_I2F : Op.CONV_L2D;
+		}else if(isFloating(orig) == true && isFloating(target) == true){ // floating -> floating
+			op = isFloat(orig) ? Op.CONV_F2D : Op.CONV_D2F;
+		}else{
+			op = Op.CAST;
+		}
+		return new TypeCastItem(board, op, src, dest, orig, target);
 	}
 	
 }

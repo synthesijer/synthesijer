@@ -35,11 +35,15 @@ architecture RTL of synthesijer_div32 is
   signal result_tmp : std_logic_vector(63 downto 0);
   signal valid_tmp : std_logic;
 
+  signal reset_n : std_logic := '0';
+
 begin
+
+  reset_n <= not reset;
 
   U : div32_ip port map(
     aclk                   => clk,
-    aresetn                => not reset,
+    aresetn                => reset_n,
     s_axis_dividend_tdata  => std_logic_vector(a),
     s_axis_dividend_tvalid => nd,
     s_axis_dividend_tready => open,
