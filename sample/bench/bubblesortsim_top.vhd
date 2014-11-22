@@ -28,9 +28,9 @@ architecture RTL of bubblesortsim_top is
     port (
       clk : in std_logic;
       reset : in std_logic;
-      field_finish_flag_output : out std_logic;
-      field_finish_flag_input : in std_logic;
-      field_finish_flag_input_we : in std_logic;
+      finish_flag_out : out std_logic;
+      finish_flag_in : in std_logic;
+      finish_flag_we : in std_logic;
       run_req : in std_logic;
       run_busy : out std_logic;
       start_req : in std_logic;
@@ -49,9 +49,9 @@ begin
   U: BubbleSortSim port map(
     clk => clk,
     reset => reset,
-    field_finish_flag_output => finish_flag,
-    field_finish_flag_input => '0',
-    field_finish_flag_input_we => '0',
+    finish_flag_out => finish_flag,
+    finish_flag_in => '0',
+    finish_flag_we => '0',
     run_req => '1',
     run_busy => open,
     start_req => '0',
