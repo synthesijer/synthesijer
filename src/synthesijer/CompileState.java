@@ -9,12 +9,17 @@ package synthesijer;
 public enum CompileState{
 	
 	/**
-	 * just loaded.
+	 * Just loaded.
 	 */
 	INITIALIZE(0),
 	
 	/**
-	 * an HDL corresponding the source file has been generated. 
+	 * waits for loading the corresponding user-defined HDL module. 
+	 */
+	WAIT_FOR_LOADING(50),
+	
+	/**
+	 * An HDL corresponding the source file has been generated. 
 	 */
 	GENERATE_HDL(100);
 	

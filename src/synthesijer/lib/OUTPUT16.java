@@ -12,10 +12,10 @@ public class OUTPUT16 extends HDLModule{
 	public short value;
 	
 	public OUTPUT16(){
-		super("outputport", "clk", "reset");
+		super("outputport16", "clk", "reset");
 		newParameter("WIDTH", HDLPrimitiveType.genIntegerType(), String.valueOf(16));
 		newPort("value",  DIR.IN, HDLPrimitiveType.genSignedType(16));
-		newPort("dout",  DIR.OUT, HDLPrimitiveType.genVectorType(32), EnumSet.of(HDLPort.OPTION.EXPORT));
+		newPort("dout",  DIR.OUT, HDLPrimitiveType.genVectorType(16), EnumSet.of(HDLPort.OPTION.EXPORT));
 	}
 
 }

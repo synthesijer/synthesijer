@@ -10,6 +10,10 @@ public class Test001{
 		return x + y;
 	}
 	
+	public int add2(int x, int y){
+		return add(x, y);
+	}
+
 	public int acc2(int num, int y){
 		for(int i = 0; i < num; i++){
 			x += y;

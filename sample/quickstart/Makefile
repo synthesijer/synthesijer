@@ -1,13 +1,11 @@
 SYNTHESIJER ?= ../../bin
 
-SOURCES = led.java counter.java
+SOURCES = Test.java Top.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 
 led: $(SOURCES)
-	java -cp $(SYNTHESIJER) synthesijer.Main $(SOURCES)
-	javac -cp $(SYNTHESIJER):. led_top.java
-	java -cp $(SYNTHESIJER):. led_top
+	java -cp $(SYNTHESIJER) synthesijer.Main --vhdl --verilog $(SOURCES)
 
 clean:
 	-rm -f *.class

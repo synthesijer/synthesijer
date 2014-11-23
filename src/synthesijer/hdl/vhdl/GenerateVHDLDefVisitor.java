@@ -3,6 +3,7 @@ package synthesijer.hdl.vhdl;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 
+import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
@@ -40,7 +41,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		if(o.getSubModule().getParameters().length > 0){
 			genGenericList(dest, offset+2, o.getSubModule().getParameters());
 		}
-		genPortList(dest, offset+2, o.getSubModule().getPorts());
+		genPortList(dest, offset+2, o.getSubModule().getPorts(), (o.getSubModule().getParameters().length > 0));
 		HDLUtils.println(dest, offset, String.format("end component %s;", o.getSubModule().getName()));
 	}
 
@@ -62,12 +63,13 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, ");");
 	}
 
-	private void genPortList(PrintWriter dest, int offset, HDLPort[] ports){
+	private void genPortList(PrintWriter dest, int offset, HDLPort[] ports, boolean paramFlag){
 		HDLUtils.println(dest, offset, "port (");
 		String sep = "";
 		for(HDLPort p: ports){
 			dest.print(sep);
-			p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			//p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			HDLUtils.print(dest, offset+2, String.format("%s : %s %s", p.getName(), p.getDir().getVHDL(), ((HDLPrimitiveType)p.getType()).getVHDL(paramFlag)));
 			sep = ";\n";
 		}
 		HDLUtils.println(dest, 0, "");
@@ -79,7 +81,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 		HDLUtils.println(dest, offset, String.format("entity %s is", o.getName()));
 		if(o.getPorts().length > 0){
-			genPortList(dest, offset+2, o.getPorts());
+			genPortList(dest, offset+2, o.getPorts(), false);
 		}
 		HDLUtils.println(dest, offset, String.format("end %s;", o.getName()));
 		HDLUtils.nl(dest);

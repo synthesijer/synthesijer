@@ -18,4 +18,5 @@ clean:
 	-rm -f *.vcd
 	-rm -f work-obj93.cf
 	-rm -f *.svg
+	-rm -f *.txt
 

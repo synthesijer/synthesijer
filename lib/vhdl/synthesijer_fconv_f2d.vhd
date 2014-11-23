@@ -8,7 +8,7 @@ entity synthesijer_fconv_f2d is
     reset  : in  std_logic;
     a      : in  std_logic_vector(32-1 downto 0);
     nd     : in  std_logic;
-    result : out signed(64-1 downto 0);
+    result : out std_logic_vector(64-1 downto 0);
     valid  : out std_logic
     );
 end synthesijer_fconv_f2d;

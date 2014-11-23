@@ -35,3 +35,4 @@ clean:
 	-rm -f primesim_top 
 	-rm -f bubblesortsim_top
 	-rm -f mergesortsim_top
+	-rm -f *.txt

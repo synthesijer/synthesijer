@@ -2,9 +2,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity inputport is
+entity inputport16 is
   generic (
-    WIDTH : integer := 32
+    WIDTH : integer := 16
     );
   port (
     clk   : in std_logic;
@@ -13,9 +13,9 @@ entity inputport is
     din   : in  std_logic_vector(WIDTH-1 downto 0);
     value : out signed(WIDTH-1 downto 0)
     );
-end inputport;
+end inputport16;
 
-architecture RTL of inputport is
+architecture RTL of inputport16 is
 begin
 
   value <= signed(din);

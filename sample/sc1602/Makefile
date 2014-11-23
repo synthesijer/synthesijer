@@ -18,6 +18,7 @@ clean:
 	-rm -f *.o
 	-rm -f sim
 	-rm -f *.vcd
+	-rm -f *.txt
 	-rm -f work-obj93.cf
 	-rm -f SC1602TestKC705.vhd
 	-rm -f SC1602TestKC705.v

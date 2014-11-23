@@ -25,3 +25,4 @@ clean:
 	-rm -f sim
 	-rm -f *.vcd
 	-rm -f work-obj93.cf
+	-rm -f *.txt

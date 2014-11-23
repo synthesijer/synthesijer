@@ -32,7 +32,8 @@ public class HDLValue implements HDLLiteral{
 					System.out.println(v);
 					System.out.println(this.getValue() + ":" + type.getWidth() + "," + v.length() + "-" + (type.getWidth()/4));
 				}
-				return String.format("X\"%s\"", v.substring(v.length()-type.getWidth()/4, v.length()));
+				String s = String.format("X\"%s\"", v.substring(v.length()-type.getWidth()/4, v.length()));
+				return s;
 			}else{
 				String v = "";
 				for(int i = 0; i < 64; i++){ v += "0"; }

@@ -1,6 +1,6 @@
 public class SC1602Test {
 
-	SC1602Wrapper obj = new SC1602Wrapper();
+	private final SC1602Wrapper obj = new SC1602Wrapper();
 
 	public void test() {
 		obj.req = false;

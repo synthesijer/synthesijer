@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity outputport is
+entity inputport32 is
   generic (
     WIDTH : integer := 32
     );
@@ -10,14 +10,14 @@ entity outputport is
     clk   : in std_logic;
     reset : in std_logic;
 
-    dout  : out std_logic_vector(WIDTH-1 downto 0);
-    value : in  signed(WIDTH-1 downto 0)
+    din   : in  std_logic_vector(WIDTH-1 downto 0);
+    value : out signed(WIDTH-1 downto 0)
     );
-end inputport;
+end inputport32;
 
-architecture RTL of outputport is
+architecture RTL of inputport32 is
 begin
 
-  dout <= std_logic_vector(value);
+  value <= signed(din);
   
 end RTL;

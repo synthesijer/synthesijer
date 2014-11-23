@@ -213,7 +213,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 
 	@Override
 	public void visitTypeCast(TypeCast o) {
-		dest.printf("<expr kind=\"%s\"/>", "TypeCast");
+		dest.printf("<expr kind=\"%s\">", "TypeCast");
 		o.getExpr().accept(this);
 		dest.printf("</expr>", "TypeCast");
 	}

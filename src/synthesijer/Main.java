@@ -25,8 +25,6 @@ public class Main {
 
 		openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
 
-//		int err = compiler.compile(args);
-//		int err = openjdk.com.sun.tools.javac.Main.compile(args);
 		int err = compiler.compile(opt.getArgs());
 		
 		boolean optimizeFlag = !opt.flag("no-optimize");
@@ -43,7 +41,6 @@ public class Main {
 		if(err == 0){
 			dump("dump000.xml");
 			Manager.INSTANCE.preprocess();
-			dump("dump001.xml");
 			Manager.INSTANCE.generate(optimizeFlag);
 			if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
 			if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);

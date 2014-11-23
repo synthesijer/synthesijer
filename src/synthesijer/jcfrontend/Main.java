@@ -97,11 +97,14 @@ public class Main {
 			addThread(module);
 		}
 
+		Manager.INSTANCE.addModule(module, syntheisizeFlag);			
+		/*
 		if(syntheisizeFlag){
 			Manager.INSTANCE.addModule(module);			
 		}else{
 			Manager.INSTANCE.registUserHDLModule(decl.sym.toString());
 		}
+		*/
 	}
 
 	// TODO experimental

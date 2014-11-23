@@ -12,7 +12,7 @@ public class INPUT16 extends HDLModule{
 	public short value;
 	
 	public INPUT16(){
-		super("inputport", "clk", "reset");
+		super("inputport16", "clk", "reset");
 		newParameter("WIDTH", HDLPrimitiveType.genIntegerType(), String.valueOf(16));
 		newPort("value",  DIR.OUT, HDLPrimitiveType.genSignedType(16));
 		newPort("din",  DIR.IN, HDLPrimitiveType.genVectorType(16), EnumSet.of(HDLPort.OPTION.EXPORT));

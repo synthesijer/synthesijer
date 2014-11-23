@@ -15,12 +15,12 @@ public class ConstantOperand implements Operand{
 			case FLOAT:
 				float f = Float.parseFloat(value);
 				this.value = String.valueOf(Float.floatToRawIntBits(f));
-				System.out.printf("float: %s -> %s(%08x)\n", value, this.value, Float.floatToRawIntBits(f));
+				//System.out.printf("float: %s -> %s(%08x)\n", value, this.value, Float.floatToRawIntBits(f));
 				break;
 			case DOUBLE:
 				double d = Float.parseFloat(value);
 				this.value = String.valueOf(Double.doubleToLongBits(d));
-				System.out.printf("double: %s -> %s(%016x)\n", value, this.value, Double.doubleToRawLongBits(d));
+				//System.out.printf("double: %s -> %s(%016x)\n", value, this.value, Double.doubleToRawLongBits(d));
 				break;
 			default:
 				this.value = value;

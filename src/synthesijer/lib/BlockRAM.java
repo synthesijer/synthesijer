@@ -15,14 +15,14 @@ public class BlockRAM extends HDLModule{
 		
 		newPort("length",  DIR.OUT, HDLPrimitiveType.genSignedType(32));
 		newPort("address", DIR.IN,  HDLPrimitiveType.genSignedType(32));
-		newPort("din",     DIR.IN,  HDLPrimitiveType.genSignedType(width));
-		newPort("dout",    DIR.OUT, HDLPrimitiveType.genSignedType(width));
+		newPort("din",     DIR.IN,  HDLPrimitiveType.genSignedType(width, "WIDTH-1", "0"));
+		newPort("dout",    DIR.OUT, HDLPrimitiveType.genSignedType(width, "WIDTH-1", "0"));
 		newPort("we",      DIR.IN,  HDLPrimitiveType.genBitType());
 		newPort("oe",      DIR.IN,  HDLPrimitiveType.genBitType());
 		
 		newPort("address_b", DIR.IN,  HDLPrimitiveType.genSignedType(32));
-		newPort("din_b",     DIR.IN,  HDLPrimitiveType.genSignedType(width));
-		newPort("dout_b",    DIR.OUT, HDLPrimitiveType.genSignedType(width));
+		newPort("din_b",     DIR.IN,  HDLPrimitiveType.genSignedType(width, "WIDTH-1", "0"));
+		newPort("dout_b",    DIR.OUT, HDLPrimitiveType.genSignedType(width, "WIDTH-1", "0"));
 		newPort("we_b",      DIR.IN,  HDLPrimitiveType.genBitType());
 		newPort("oe_b",      DIR.IN,  HDLPrimitiveType.genBitType());
 	}

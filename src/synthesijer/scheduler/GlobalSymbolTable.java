@@ -16,7 +16,6 @@ public enum GlobalSymbolTable {
 	Hashtable<String, ClassInfo> map = new Hashtable<>();
 	
 	public void add(Module m){
-//		SynthesijerUtils.info("set: " + m.getName());
 		ClassInfo i = new ClassInfo();
 		map.put(m.getName(), i);
 		
@@ -29,7 +28,6 @@ public enum GlobalSymbolTable {
 	}
 	
 	public void add(String name, HDLModule m){
-//		SynthesijerUtils.info("set(as RAW Module): " + name);
 		ClassInfo i = new ClassInfo();
 		map.put(name, i);
 		for(HDLPort p: m.getPorts()){

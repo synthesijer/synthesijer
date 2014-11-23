@@ -12,7 +12,7 @@ public class OUTPUT32 extends HDLModule{
 	public int value;
 	
 	public OUTPUT32(){
-		super("outputport", "clk", "reset");
+		super("outputport32", "clk", "reset");
 		newParameter("WIDTH", HDLPrimitiveType.genIntegerType(), String.valueOf(32));
 		newPort("value",  DIR.IN, HDLPrimitiveType.genSignedType(32));
 		newPort("dout",  DIR.OUT, HDLPrimitiveType.genVectorType(32), EnumSet.of(HDLPort.OPTION.EXPORT));
