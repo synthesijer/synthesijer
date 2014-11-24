@@ -574,7 +574,6 @@ public class SchedulerInfoCompiler {
 			for(int i = 0; i < params.length; i++){
 				HDLSignal t = list.get(i).local;
 				HDLExpr s = convOperandToHDLExpr(params[i]);
-				System.out.println(t.getName() + " <- " + s.getVHDL());
 				t.setAssign(state, 0, s);
 			}
 			if(item0.getDestOperand().getType() != PrimitiveTypeKind.VOID){
