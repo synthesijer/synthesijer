@@ -2,9 +2,9 @@
 public class Firefly extends Thread{
 
   boolean flag = false;
-  final int PERIOD = 500;
+  private final static int PERIOD = 500;
 
-  pivate void sleep(){
+  private void my_sleep(){
     for(int k = 0; k < 400; k++){ ; }
   }
 
@@ -13,25 +13,25 @@ public class Firefly extends Thread{
       for(int i = 0; i < PERIOD; i++){
 	for(int j = 0; j < i; j++){
 	  flag = true;
-	  sleep();
+	  my_sleep();
 	}
 	for(int j = 0; j < PERIOD-i; j++){
 	  flag = false;
-	  sleep();
+	  my_sleep();
 	}
       }
       for(int i = 0; i < PERIOD; i++){
 	for(int j = 0; j < PERIOD-i; j++){
 	  flag = true;
-	  sleep();
+	  my_sleep();
 	}
 	for(int j = 0; j < i; j++){
 	  flag = false;
-	  sleep();
+	  my_sleep();
 	}
       }
-      sleep();
-      sleep();
+      my_sleep();
+      my_sleep();
     }
   }
 

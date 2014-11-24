@@ -1,4 +1,4 @@
-public class Test001Sim2{
+public class Test001Sim{
 	
 	
 	public static void main(String... args){

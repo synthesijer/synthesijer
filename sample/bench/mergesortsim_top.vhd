@@ -7,8 +7,6 @@ end mergesortsim_top;
 
 architecture RTL of mergesortsim_top is
 
-
-
   signal clk : std_logic := '0';
   signal reset : std_logic := '0';
   signal counter : signed(32-1 downto 0) := (others => '0');

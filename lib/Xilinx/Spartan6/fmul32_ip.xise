@@ -21,10 +21,10 @@
     </file>
     <file xil_pn:name="fmul32_ip.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="1"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="4"/>
-      <association xil_pn:name="PostMapSimulation" xil_pn:seqID="4"/>
-      <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="4"/>
-      <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="3"/>
+      <association xil_pn:name="PostMapSimulation" xil_pn:seqID="3"/>
+      <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="3"/>
+      <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="3"/>
     </file>
   </files>
 
@@ -51,8 +51,8 @@
     <!--                                                                                  -->
     <property xil_pn:name="PROP_DesignName" xil_pn:value="fmul32_ip" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_DevFamilyPMName" xil_pn:value="spartan6" xil_pn:valueState="default"/>
-    <property xil_pn:name="PROP_intProjectCreationTimestamp" xil_pn:value="2014-11-22T20:06:46" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="PROP_intWbtProjectID" xil_pn:value="534A10D661D47611056F3F417D93EBB3" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_intProjectCreationTimestamp" xil_pn:value="2014-11-24T16:09:47" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_intWbtProjectID" xil_pn:value="9E4C1C3A0ECBE3A5A63DC057E6D40990" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_intWorkingDirLocWRTProjDir" xil_pn:value="Same" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_intWorkingDirUsed" xil_pn:value="No" xil_pn:valueState="non-default"/>
   </properties>

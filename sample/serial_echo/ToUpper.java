@@ -9,7 +9,12 @@ public class ToUpper{
 		tx.wr = false;
 		while(true){
 			while(rx.rd == false) ;
-			tx.din = (byte)(rx.dout - (byte)0x20);
+			byte b = rx.dout;
+			if(b >= (byte)'a' && b <= (byte)'z'){
+				tx.din = (byte)(b - (byte)0x20);
+			}else{
+				tx.din = b;
+			}
 			tx.wr = true;
 			tx.wr = false;
 			while(tx.ready == false) ;

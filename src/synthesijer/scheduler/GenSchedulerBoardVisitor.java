@@ -157,16 +157,17 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		SchedulerItem ret = v.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // exit from this block
 		ret.setBranchId(exitId);
 		lastItem = v.lastItem; // update last item
+		if(entryId < 0) entryId = v.entryId;
 		return v;
 	}
-	
+
 	private Operand stepIn(Expr expr){
 		GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this);
 		expr.accept(v);
 		Operand o = v.getOperand();
 		return o;
 	}
-
+	
 //	private SchedulerItem entry, exit;
 
 	@Override
@@ -227,25 +228,33 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 
 	@Override
 	public void visitForStatement(ForStatement o) {
+		GenSchedulerBoardVisitor forVisitor = new GenSchedulerBoardVisitor(this, board, exitId, breakId, continueId);
+		//GenSchedulerBoardVisitor forVisitor = this;
+		if(entryId > 0) forVisitor.entryId = entryId; // copy entryID when entryId is already settled.
 		for (Statement s : o.getInitializations()) {
-			s.accept(this);
+			s.accept(forVisitor);
 		}
-		int afterInitId = lastItem.getStepId(); // return point for "for loop"
+		int afterInitId = forVisitor.lastItem.getStepId(); // return point for "for loop"
+		if(entryId == -1) entryId = forVisitor.entryId; // copy entryID when entryId is not settled yet.
 		
-		Operand flag = stepIn(o.getCondition());
-		SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
-		SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		Operand flag = forVisitor.stepIn(o.getCondition());
+		SchedulerItem fork = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		
-		int beforeUpdateId = lastItem.getStepId(); // entry point for updte statements
+		int beforeUpdateId = forVisitor.lastItem.getStepId(); // entry point for updte statements
 		for (Statement s : o.getUpdates()){
-			s.accept(this);
+			s.accept(forVisitor);
 		}
-		SchedulerItem loop_back = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		SchedulerItem loop_back = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		loop_back.setBranchId(afterInitId+1); // after loop body and update, back to condition checking
 		
-		GenSchedulerBoardVisitor v = stepIn(o.getBody(), beforeUpdateId+1, join.getStepId(), beforeUpdateId);
+		GenSchedulerBoardVisitor v = forVisitor.stepIn(o.getBody(), beforeUpdateId+1, join.getStepId(), beforeUpdateId);
 		fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
-		join.setBranchId(lastItem.getStepId()+1); // next
+		join.setBranchId(forVisitor.lastItem.getStepId()+1); // next
+		//lastItem = forVisitor.lastItem;
+		//varTable = preservVarTable;
+//		forVisitor.entryId = entryTmp;
+		lastItem = forVisitor.lastItem; // write-back
 	}
 
 	@Override

@@ -1,3 +1,4 @@
 NET reset       LOC = V4  | IOSTANDARD = LVCMOS33 | PULLDOWN;    # "USER_RESET"
 NET clk         LOC = C10 | IOSTANDARD = LVCMOS33;               # "CLOCK_Y3"
-NET flag_return LOC = P4  | IOSTANDARD = LVCMOS33;               # "GPIO_LED_1"
+NET q0 LOC = P4  | IOSTANDARD = LVCMOS33;               # "GPIO_LED_1"
+NET q1 LOC = L6  | IOSTANDARD = LVCMOS33;               # "GPIO_LED_2"
