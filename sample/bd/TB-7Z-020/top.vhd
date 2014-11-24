@@ -473,36 +473,36 @@ architecture STRUCTURE of top is
     port (
       clk : in std_logic;
       reset : in std_logic;
-      obj_obj_obj_forbid : in std_logic;
-      obj_obj_obj_axi_reader_ARADDR : out std_logic_vector(32-1 downto 0);
-      obj_obj_obj_axi_reader_ARLEN : out std_logic_vector(8-1 downto 0);
-      obj_obj_obj_axi_reader_ARVALID : out std_logic;
-      obj_obj_obj_axi_reader_ARREADY : in std_logic;
-      obj_obj_obj_axi_reader_ARSIZE : out std_logic_vector(3-1 downto 0);
-      obj_obj_obj_axi_reader_ARBURST : out std_logic_vector(2-1 downto 0);
-      obj_obj_obj_axi_reader_ARCACHE : out std_logic_vector(4-1 downto 0);
-      obj_obj_obj_axi_reader_ARPROT : out std_logic_vector(3-1 downto 0);
-      obj_obj_obj_axi_reader_RDATA : in std_logic_vector(32-1 downto 0);
-      obj_obj_obj_axi_reader_RRESP : in std_logic_vector(2-1 downto 0);
-      obj_obj_obj_axi_reader_RLAST : in std_logic;
-      obj_obj_obj_axi_reader_RVALID : in std_logic;
-      obj_obj_obj_axi_reader_RREADY : out std_logic;
-      obj_obj_obj_axi_writer_AWADDR : out std_logic_vector(32-1 downto 0);
-      obj_obj_obj_axi_writer_AWLEN : out std_logic_vector(8-1 downto 0);
-      obj_obj_obj_axi_writer_AWVALID : out std_logic;
-      obj_obj_obj_axi_writer_AWSIZE : out std_logic_vector(3-1 downto 0);
-      obj_obj_obj_axi_writer_AWBURST : out std_logic_vector(2-1 downto 0);
-      obj_obj_obj_axi_writer_AWCACHE : out std_logic_vector(4-1 downto 0);
-      obj_obj_obj_axi_writer_AWPROT : out std_logic_vector(3-1 downto 0);
-      obj_obj_obj_axi_writer_AWREADY : in std_logic;
-      obj_obj_obj_axi_writer_WDATA : out std_logic_vector(32-1 downto 0);
-      obj_obj_obj_axi_writer_WLAST : out std_logic;
-      obj_obj_obj_axi_writer_WVALID : out std_logic;
-      obj_obj_obj_axi_writer_WREADY : in std_logic;
-      obj_obj_obj_axi_writer_WSTRB : out std_logic_vector(4-1 downto 0);
-      obj_obj_obj_axi_writer_BRESP : in std_logic_vector(2-1 downto 0);
-      obj_obj_obj_axi_writer_BVALID : in std_logic;
-      obj_obj_obj_axi_writer_BREADY : out std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_forbid_exp_exp_exp : in std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARADDR_exp_exp_exp : out std_logic_vector(32-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARLEN_exp_exp_exp : out std_logic_vector(8-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARVALID_exp_exp_exp : out std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARREADY_exp_exp_exp : in std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARSIZE_exp_exp_exp : out std_logic_vector(3-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARBURST_exp_exp_exp : out std_logic_vector(2-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARCACHE_exp_exp_exp : out std_logic_vector(4-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARPROT_exp_exp_exp : out std_logic_vector(3-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RDATA_exp_exp_exp : in std_logic_vector(32-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RRESP_exp_exp_exp : in std_logic_vector(2-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RLAST_exp_exp_exp : in std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RVALID_exp_exp_exp : in std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RREADY_exp_exp_exp : out std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWADDR_exp_exp_exp : out std_logic_vector(32-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWLEN_exp_exp_exp : out std_logic_vector(8-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWVALID_exp_exp_exp : out std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWSIZE_exp_exp_exp : out std_logic_vector(3-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWBURST_exp_exp_exp : out std_logic_vector(2-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWCACHE_exp_exp_exp : out std_logic_vector(4-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWPROT_exp_exp_exp : out std_logic_vector(3-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWREADY_exp_exp_exp : in std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WDATA_exp_exp_exp : out std_logic_vector(32-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WLAST_exp_exp_exp : out std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WVALID_exp_exp_exp : out std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WREADY_exp_exp_exp : in std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WSTRB_exp_exp_exp : out std_logic_vector(4-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BRESP_exp_exp_exp : in std_logic_vector(2-1 downto 0);
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BVALID_exp_exp_exp : in std_logic;
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BREADY_exp_exp_exp : out std_logic;
       run_req : in std_logic;
       run_busy : out std_logic
       );
@@ -1087,36 +1087,36 @@ begin
     port map(
       clk                            => FCLK_CLK0,
       reset                          => not FCLK_RESET0_N,
-      obj_obj_obj_forbid             => obj_forbid,
-      obj_obj_obj_axi_reader_ARADDR  => obj_axi_reader_ARADDR,
-      obj_obj_obj_axi_reader_ARLEN   => obj_axi_reader_ARLEN,
-      obj_obj_obj_axi_reader_ARVALID => obj_axi_reader_ARVALID,
-      obj_obj_obj_axi_reader_ARREADY => obj_axi_reader_ARREADY,
-      obj_obj_obj_axi_reader_ARSIZE  => obj_axi_reader_ARSIZE,
-      obj_obj_obj_axi_reader_ARBURST => obj_axi_reader_ARBURST,
-      obj_obj_obj_axi_reader_ARCACHE => obj_axi_reader_ARCACHE,
-      obj_obj_obj_axi_reader_ARPROT  => obj_axi_reader_ARPROT,
-      obj_obj_obj_axi_reader_RDATA   => obj_axi_reader_RDATA,
-      obj_obj_obj_axi_reader_RRESP   => obj_axi_reader_RRESP,
-      obj_obj_obj_axi_reader_RLAST   => obj_axi_reader_RLAST,
-      obj_obj_obj_axi_reader_RVALID  => obj_axi_reader_RVALID,
-      obj_obj_obj_axi_reader_RREADY  => obj_axi_reader_RREADY,
-      obj_obj_obj_axi_writer_AWADDR  => obj_axi_writer_AWADDR,
-      obj_obj_obj_axi_writer_AWLEN   => obj_axi_writer_AWLEN,
-      obj_obj_obj_axi_writer_AWVALID => obj_axi_writer_AWVALID,
-      obj_obj_obj_axi_writer_AWSIZE  => obj_axi_writer_AWSIZE,
-      obj_obj_obj_axi_writer_AWBURST => obj_axi_writer_AWBURST,
-      obj_obj_obj_axi_writer_AWCACHE => obj_axi_writer_AWCACHE,
-      obj_obj_obj_axi_writer_AWPROT  => obj_axi_writer_AWPROT,
-      obj_obj_obj_axi_writer_AWREADY => obj_axi_writer_AWREADY,
-      obj_obj_obj_axi_writer_WDATA   => obj_axi_writer_WDATA,
-      obj_obj_obj_axi_writer_WLAST   => obj_axi_writer_WLAST,
-      obj_obj_obj_axi_writer_WVALID  => obj_axi_writer_WVALID,
-      obj_obj_obj_axi_writer_WREADY  => obj_axi_writer_WREADY,
-      obj_obj_obj_axi_writer_WSTRB   => obj_axi_writer_WSTRB,
-      obj_obj_obj_axi_writer_BRESP   => obj_axi_writer_BRESP,
-      obj_obj_obj_axi_writer_BVALID  => obj_axi_writer_BVALID,
-      obj_obj_obj_axi_writer_BREADY  => obj_axi_writer_BREADY,
+      class_obj_0002_class_obj_0000_class_obj_0000_forbid_exp_exp_exp             => obj_forbid,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARADDR_exp_exp_exp  => obj_axi_reader_ARADDR,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARLEN_exp_exp_exp   => obj_axi_reader_ARLEN,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARVALID_exp_exp_exp => obj_axi_reader_ARVALID,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARREADY_exp_exp_exp => obj_axi_reader_ARREADY,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARSIZE_exp_exp_exp  => obj_axi_reader_ARSIZE,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARBURST_exp_exp_exp => obj_axi_reader_ARBURST,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARCACHE_exp_exp_exp => obj_axi_reader_ARCACHE,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARPROT_exp_exp_exp  => obj_axi_reader_ARPROT,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RDATA_exp_exp_exp   => obj_axi_reader_RDATA,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RRESP_exp_exp_exp   => obj_axi_reader_RRESP,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RLAST_exp_exp_exp   => obj_axi_reader_RLAST,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RVALID_exp_exp_exp  => obj_axi_reader_RVALID,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RREADY_exp_exp_exp  => obj_axi_reader_RREADY,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWADDR_exp_exp_exp  => obj_axi_writer_AWADDR,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWLEN_exp_exp_exp   => obj_axi_writer_AWLEN,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWVALID_exp_exp_exp => obj_axi_writer_AWVALID,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWSIZE_exp_exp_exp  => obj_axi_writer_AWSIZE,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWBURST_exp_exp_exp => obj_axi_writer_AWBURST,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWCACHE_exp_exp_exp => obj_axi_writer_AWCACHE,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWPROT_exp_exp_exp  => obj_axi_writer_AWPROT,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWREADY_exp_exp_exp => obj_axi_writer_AWREADY,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WDATA_exp_exp_exp   => obj_axi_writer_WDATA,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WLAST_exp_exp_exp   => obj_axi_writer_WLAST,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WVALID_exp_exp_exp  => obj_axi_writer_WVALID,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WREADY_exp_exp_exp  => obj_axi_writer_WREADY,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WSTRB_exp_exp_exp   => obj_axi_writer_WSTRB,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BRESP_exp_exp_exp   => obj_axi_writer_BRESP,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BVALID_exp_exp_exp  => obj_axi_writer_BVALID,
+      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BREADY_exp_exp_exp  => obj_axi_writer_BREADY,
       run_req                        => test_req,
       run_busy                       => open
       );

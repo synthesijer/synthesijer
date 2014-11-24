@@ -228,6 +228,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
 				int shift = toImmValue(args[1]);
+				if(args[0] instanceof HDLValue){
+					int value = toImmValue(args[0]);
+					HDLValue tmp = new HDLValue(String.valueOf(value >> shift), (HDLPrimitiveType)args[0].getType());
+					return tmp.getVHDL();
+				}
 				if(shift >= 1){
 					return String.format("(%d-1 downto %d => %s(%d)) & %s(%d downto %d)",
 							shift,
@@ -246,6 +251,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
 				int shift = toImmValue(args[1]);
+				if(args[0] instanceof HDLValue){
+					int value = toImmValue(args[0]);
+					HDLValue tmp = new HDLValue(String.valueOf(value >>> shift), (HDLPrimitiveType)args[0].getType());
+					return tmp.getVHDL();
+				}
 				if(shift >= 1){
 					return String.format("(%d-1 downto %d => '0') & %s(%d downto %d)",
 							shift,
@@ -262,6 +272,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
 				int shift = toImmValue(args[1]);
+				if(args[0] instanceof HDLValue){
+					int value = toImmValue(args[0]);
+					HDLValue tmp = new HDLValue(String.valueOf(value << shift), (HDLPrimitiveType)args[0].getType());
+					return tmp.getVHDL();
+				}
 				if(shift >= 1){
 					return String.format("%s(%d downto %d) & (%d-1 downto %d => '0')",
 							args[0].getResultExpr().getVHDL(),
@@ -324,6 +339,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
 				int shift = toImmValue(args[1]);
+				if(args[0] instanceof HDLValue){
+					int value = toImmValue(args[0]);
+					HDLValue tmp = new HDLValue(String.valueOf(value >> shift), (HDLPrimitiveType)args[0].getType());
+					return tmp.getVerilogHDL();
+				}
 				if(shift >= 1){
 					String pad = getPaddingBitInVerilog(args[0].getResultExpr().getVerilogHDL(), t0.getWidth(), shift);
 					return String.format("{%s%s[%d:%d]}",
@@ -340,6 +360,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
 				int shift = toImmValue(args[1]);
+				if(args[0] instanceof HDLValue){
+					int value = toImmValue(args[0]);
+					HDLValue tmp = new HDLValue(String.valueOf(value >>> shift), (HDLPrimitiveType)args[0].getType());
+					return tmp.getVerilogHDL();
+				}
 				if(shift >= 1){
 					return String.format("{%d'b0,%s[%d:%d]}",
 							shift,
@@ -355,6 +380,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
 				//int shift = Integer.parseInt(((HDLValue)((HDLCombinationExpr)(args[1])).args[0]).getValue());
 				int shift = toImmValue(args[1]);
+				if(args[0] instanceof HDLValue){
+					int value = toImmValue(args[0]);
+					HDLValue tmp = new HDLValue(String.valueOf(value << shift), (HDLPrimitiveType)args[0].getType());
+					return tmp.getVerilogHDL();
+				}
 				if(shift >= 1){
 					String s = String.format("{%s[%d:%d],%d'b0}",
 							args[0].getResultExpr().getVerilogHDL(),
