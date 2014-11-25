@@ -32,5 +32,26 @@ public class Test009{
 		y = (long)dc;
 		dc = da / db;
 		y = (long)dc;
+
+		dc = da + fb;
+		y = (long)dc;
+		fc = (float)(da + fb);
+		x = (int)fc;
+		
+		if(fa > fb){ x = 1; }else{ x = 0; }
+		if(fa < fb){ x = 0; }else{ x = 1; }
+		if(fa == fb){ x = 0; }else{ x = 1; }
+		if(fa != fb){ x = 1; }else{ x = 0; }
+		if(fa >= fb){ x = 1; }else{ x = 0; }
+		if(fa <= fb){ x = 0; }else{ x = 1; }
+
+		if(da > db){ x = 1; }else{ x = 0; }
+		if(da < db){ x = 0; }else{ x = 1; }
+		if(da == db){ x = 0; }else{ x = 1; }
+		if(da != db){ x = 1; }else{ x = 0; }
+		if(da >= db){ x = 1; }else{ x = 0; }
+		if(da <= db){ x = 0; }else{ x = 1; }
+
+		if(da == fa){ x = 1; }else{ x = 0; }
 	}
 }

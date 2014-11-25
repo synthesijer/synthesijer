@@ -94,6 +94,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	private SchedulerItem lastItem;
 	
 	private final Hashtable<String, VariableOperand> varTable = new Hashtable<>();
+	private final ArrayList<VariableOperand> varList = new ArrayList<>();
 	
 	private SchedulerItem methodExit;
 	
@@ -105,7 +106,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		this.exitId = -1;
 		this.continueId = -1;		
 		this.breakId = -1;
-		info.addVarTable(varTable);
+		info.addVarTable(varList);
 	}
 
 	private GenSchedulerBoardVisitor(GenSchedulerBoardVisitor parent, SchedulerBoard board, int exitId, int breakId, int continueId) {
@@ -118,7 +119,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		this.lastItem = parent.lastItem;
 		this.breakId = breakId;
 		this.continueId = continueId;		
-		info.addVarTable(varTable);
+		info.addVarTable(varList);
 	}
 
 	public IdentifierGenerator getIdGen(){
@@ -149,6 +150,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	
 	public void addVariable(String name, VariableOperand v){
 		varTable.put(name, v);
+		varList.add(v);
 	}
 	
 	private GenSchedulerBoardVisitor stepIn(Statement stmt, int exitId, int breakId, int continueId){
@@ -421,6 +423,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		VariableOperand v = new VariableOperand(vName, t, o.getVariable());
 		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
 		varTable.put(o.getName(), v);
+		varList.add(v);
 		if (o.getInitExpr() != null){
 			Operand src = stepIn(o.getInitExpr());
 			
@@ -617,29 +620,35 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Operand rhs = stepIn(o.getRhs());
 		Type type;
 		Op op = Op.get(o.getOp(), lhs, rhs);
-		if(op.isForcedType()){
-			type = op.getType();
-		}else if(isCastRequired(lhs.getType(), rhs.getType()) == true){
+		
+		
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true){
 			type = getPreferableType(lhs.getType(), rhs.getType()); // select type
-			if(lhs.getType() != type){
-				if(lhs instanceof VariableOperand){
-					VariableOperand tmp = parent.addCast(lhs, type);
-					if(tmp != null) lhs = tmp;
-				}else if(lhs instanceof ConstantOperand){ // ConstantOperand
-					((ConstantOperand) lhs).setType(type);
-				}
-			}
-			if(rhs.getType() != type){
-				if(rhs instanceof VariableOperand){
-					VariableOperand tmp = parent.addCast(rhs, type);
-					if(tmp != null) rhs = tmp;
-				}else if(rhs instanceof ConstantOperand){ // ConstantOperand
-					((ConstantOperand) rhs).setType(type);
-				}
-			}
 		}else{
 			type = lhs.getType();
 		}
+		
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true && lhs.getType() != type){
+			if(lhs instanceof VariableOperand){
+				VariableOperand tmp = parent.addCast(lhs, type);
+				if(tmp != null) lhs = tmp;
+			}else if(lhs instanceof ConstantOperand){ // ConstantOperand
+				((ConstantOperand) lhs).setType(type);
+			}
+		}
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true && rhs.getType() != type){
+			if(rhs instanceof VariableOperand){
+				VariableOperand tmp = parent.addCast(rhs, type);
+				if(tmp != null) rhs = tmp;
+			}else if(rhs instanceof ConstantOperand){ // ConstantOperand
+				((ConstantOperand) rhs).setType(type);
+			}
+		}
+		
+		if(op.isForcedType()){
+			type = op.getType();
+		}
+
 		result = newVariable("binary_expr", type);
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, (VariableOperand)result));
 	}

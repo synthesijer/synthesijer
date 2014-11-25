@@ -7,7 +7,7 @@ public class SchedulerInfo {
 	
 	private ArrayList<SchedulerBoard> boardsList = new ArrayList<>();
 	
-	private ArrayList<Hashtable<String, VariableOperand>> varTableList = new ArrayList<>();
+	private ArrayList<ArrayList<VariableOperand>> varTableList = new ArrayList<>();
 	
 	private final String name;
 	
@@ -24,15 +24,15 @@ public class SchedulerInfo {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Hashtable<String, VariableOperand>[] getVarTableList(){
-		return varTableList.toArray(new Hashtable[]{});
+	public ArrayList<VariableOperand>[] getVarTableList(){
+		return varTableList.toArray(new ArrayList[]{});
 	}
 
 	public void addBoard(SchedulerBoard b){
 		boardsList.add(b);
 	}
 
-	public void addVarTable(Hashtable<String, VariableOperand> t){
+	public void addVarTable(ArrayList<VariableOperand> t){
 		varTableList.add(t);
 	}
 		

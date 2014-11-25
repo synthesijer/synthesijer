@@ -64,6 +64,18 @@ public enum Op {
 	CONV_L2D(1),
 	CONV_F2D(1),
 	CONV_D2F(1),
+	FLT32(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FLEQ32(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FGT32(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FGEQ32(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FCOMPEQ32(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FNEQ32(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FLT64(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FLEQ64(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FGT64(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FGEQ64(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FCOMPEQ64(false, 1, PrimitiveTypeKind.BOOLEAN),
+	FNEQ64(false, 1, PrimitiveTypeKind.BOOLEAN),
 	UNDEFINED;
 	
 	public final boolean isBranch; 
@@ -180,6 +192,37 @@ public enum Op {
 			if(isLong(lhs)) return ARITH_RSHIFT64;
 			else return ARITH_RSHIFT32;
 		}
+		case COMPEQ:{
+			if(isDouble(lhs) || isDouble(rhs)) return FCOMPEQ64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FCOMPEQ32;
+			else return COMPEQ;
+		}
+		case NEQ:{
+			if(isDouble(lhs) || isDouble(rhs)) return FNEQ64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FNEQ32;
+			else return NEQ;
+		}
+		case GT:{
+			if(isDouble(lhs) || isDouble(rhs)) return FGT64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FGT32;
+			else return GT;
+		}
+		case LT:{
+			if(isDouble(lhs) || isDouble(rhs)) return FLT64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FLT32;
+			else return LT;
+		}
+		case GEQ:{
+			if(isDouble(lhs) || isDouble(rhs)) return FGEQ64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FGEQ32;
+			else return GEQ;
+		}
+		case LEQ:{
+			if(isDouble(lhs) || isDouble(rhs)) return FLEQ64;
+			else if(isFloat(lhs) || isFloat(rhs)) return FLEQ32;
+			else return LEQ;
+		}
+
 		default:
 			return get(o);
 		}

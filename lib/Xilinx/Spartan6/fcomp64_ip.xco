@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.7
-# Date: Tue Nov 25 06:33:46 2014
+# Date: Tue Nov 25 06:42:51 2014
 #
 ##############################################################
 #
@@ -51,13 +51,13 @@ CSET c_has_divide_by_zero=false
 CSET c_has_invalid_op=false
 CSET c_has_overflow=false
 CSET c_has_underflow=false
-CSET c_latency=9
+CSET c_latency=2
 CSET c_mult_usage=No_Usage
 CSET c_optimization=Speed_Optimized
 CSET c_rate=1
-CSET c_result_exponent_width=11
-CSET c_result_fraction_width=53
-CSET component_name=fmul64_ip
+CSET c_result_exponent_width=1
+CSET c_result_fraction_width=0
+CSET component_name=fcomp64_ip
 CSET flow_control=NonBlocking
 CSET has_a_tlast=false
 CSET has_a_tuser=false
@@ -70,12 +70,12 @@ CSET has_operation_tuser=false
 CSET has_result_tready=false
 CSET maximum_latency=true
 CSET operation_tuser_width=1
-CSET operation_type=Multiply
-CSET result_precision_type=Double
+CSET operation_type=Compare
+CSET result_precision_type=Custom
 CSET result_tlast_behv=Null
 # END Parameters
 # BEGIN Extra information
 MISC pkg_timestamp=2013-07-22T10:46:33Z
 # END Extra information
 GENERATE
-# CRC: afa9bdf6
+# CRC: f18bcf60

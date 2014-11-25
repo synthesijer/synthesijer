@@ -18,6 +18,8 @@ import synthesijer.lib.DIV32;
 import synthesijer.lib.DIV64;
 import synthesijer.lib.FADD32;
 import synthesijer.lib.FADD64;
+import synthesijer.lib.FCOMP32;
+import synthesijer.lib.FCOMP64;
 import synthesijer.lib.FCONV_D2F;
 import synthesijer.lib.FCONV_D2L;
 import synthesijer.lib.FCONV_F2D;
@@ -104,6 +106,9 @@ public enum Manager {
 		addHDLModule("LOGIC_RSHIFT64", null, new LOGIC_RSHIFT64(), false);
 		addHDLModule("ARITH_RSHIFT32", null, new ARITH_RSHIFT32(), false);
 		addHDLModule("ARITH_RSHIFT64", null, new ARITH_RSHIFT64(), false);
+		// COMP
+		addHDLModule("FCOMP32", null, new FCOMP32(), false);
+		addHDLModule("FCOMP64", null, new FCOMP64(), false);
 	}
 	
 	public void addModule(Module m, boolean synthesisFlag){
