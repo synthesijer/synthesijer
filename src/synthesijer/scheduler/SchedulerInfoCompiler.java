@@ -412,6 +412,7 @@ public class SchedulerInfoCompiler {
 		case XOR : ret = HDLOp.XOR;break;
 		case LNOT : ret = HDLOp.NOT;break;
 		case ARRAY_ACCESS : break;
+		case ARRAY_INDEX : break;
 		case CALL : break;
 		case EXT_CALL : break;
 		case FIELD_ACCESS : break;
@@ -571,6 +572,28 @@ public class SchedulerInfoCompiler {
 				dest.setAssign(state, 2, dout);
 			}
 			
+			break;
+		}
+		case ARRAY_INDEX :{
+
+			Operand src[] = item.getSrcOperand();
+			
+			HDLSignal addr = null;
+			if(varTable.get(((VariableOperand)src[0]).getName()) instanceof HDLInstance){
+				// local memory
+				HDLInstance array;
+				array = (HDLInstance)(varTable.get(((VariableOperand)src[0]).getName()));
+				addr = array.getSignalForPort("address_b");
+			}else{
+				// external memory (through Field Access)
+				FieldAccessItem fa = fieldAccessChainMap.get(((VariableOperand)src[0]).getName());
+				HDLInstance obj = (HDLInstance)(varTable.get(fa.obj.getName()));
+				addr = obj.getSignalForPort(fa.name + "_address");
+			}
+			
+			HDLExpr index = convOperandToHDLExpr(src[1]);
+			addr.setAssign(state, index);
+	
 			break;
 		}
 		case CALL :{

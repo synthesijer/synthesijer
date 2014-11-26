@@ -59,6 +59,10 @@ public class SchedulerItem {
 		return op;
 	}
 	
+	public void overwriteOp(Op op){
+		this.op = op;
+	}
+	
 	public String getBoardName(){
 		return board.getName();
 	}
@@ -92,6 +96,10 @@ public class SchedulerItem {
 	
 	public Operand[] getSrcOperand(){
 		return src;
+	}
+
+	public boolean hasSrcOperand(){
+		return src != null && src.length > 0;
 	}
 
 	public VariableOperand getDestOperand(){

@@ -44,6 +44,7 @@ public enum Op {
 	XOR,
 	LNOT,
 	ARRAY_ACCESS,
+	ARRAY_INDEX,
 	CALL,
 	EXT_CALL,
 	FIELD_ACCESS,

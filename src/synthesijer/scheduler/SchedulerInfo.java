@@ -1,7 +1,6 @@
 package synthesijer.scheduler;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 public class SchedulerInfo {
 	
@@ -27,7 +26,7 @@ public class SchedulerInfo {
 	public ArrayList<VariableOperand>[] getVarTableList(){
 		return varTableList.toArray(new ArrayList[]{});
 	}
-
+	
 	public void addBoard(SchedulerBoard b){
 		boardsList.add(b);
 	}

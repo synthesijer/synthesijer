@@ -49,6 +49,7 @@ import synthesijer.scheduler.GlobalSymbolTable;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
+import synthesijer.scheduler.opt.ConvArrayAccessToArrayIndex;
 
 public enum Manager {
 	
@@ -160,8 +161,8 @@ public enum Manager {
 	}
 	
 	private void dumpSchedulerInfo(SchedulerInfo si, String postfix){
-		try(PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board" + postfix + ".txt")));
-				PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board" + postfix + ".dot")))){
+		try(PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".txt")));
+				PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")))){
 				dot.println("digraph {");
 				for(SchedulerBoard b: si.getBoardsList()){
 					b.dump(txt);
@@ -239,7 +240,26 @@ public enum Manager {
 		}
 	}
 	
+	private void optimize(SynthesijerModuleInfo info){
+		if(info.sysnthesisFlag == false){
+			// skip, nothing to do
+			return;
+		}
+		ConvArrayAccessToArrayIndex obj = new ConvArrayAccessToArrayIndex(info.getSchedulerInfo());
+		info.setSchedulerInfo(obj.opt());
+		dumpSchedulerInfo(info.getSchedulerInfo(), "conv_array_access");
+	}
+	
+	private void optimizeAll(){
+		for(SynthesijerModuleInfo info: modules.values()){
+			optimize(info);
+		}
+	}
+	
 	public void generate(boolean optimizeFlag){
+		if(optimizeFlag){
+			optimizeAll();
+		}
 		compileSchedulerInfoAll();
 	}
 
