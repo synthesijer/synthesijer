@@ -18,11 +18,6 @@ public class SchedulerItem {
 	private final SchedulerBoard board;
 	
 	/**
-	 * the index value in schedulerBoard. 
-	 */
-	private int stepID;
-
-	/**
 	 * operator
 	 */
 	private Op op;
@@ -42,6 +37,8 @@ public class SchedulerItem {
 	 */
 	private int[] branchIDs;
 	
+	private SchedulerSlot slot;
+	
 	/**
 	 * 
 	 * @param op operator
@@ -53,6 +50,14 @@ public class SchedulerItem {
 		this.op = op;
 		this.src = src;
 		this.dest = dest;
+	}
+	
+	public void setSlot(SchedulerSlot slot){
+		this.slot = slot;
+	}
+
+	public SchedulerSlot getSlot(){
+		return slot;
 	}
 	
 	public Op getOp(){
@@ -67,17 +72,19 @@ public class SchedulerItem {
 		return board.getName();
 	}
 	
+	public int getStepId(){
+		return getSlot().getStepId();
+	}
+	
+/*
 	public void setStepId(int id){
 		this.stepID = id;
 		if(op.isBranch == false){
 			branchIDs = new int[]{id + 1}; 
 		}
 	}
-
-	public int getStepId(){
-		return this.stepID;
-	}
-
+*/
+	
 	public void setBranchId(int id){
 		branchIDs = new int[]{id}; 
 	}
@@ -125,7 +132,8 @@ public class SchedulerItem {
 	private String branchList(){
 		String s = "";
 		String sep = "";
-		for(int id: branchIDs){
+		//for(int id: branchIDs){
+		for(int id: getSlot().getNextStep()){
 			//s += String.format("%s%s_%04d", sep, getBoardName(), id);
 			s += String.format("%s%04d", sep, id);
 			sep = ", ";
@@ -134,7 +142,7 @@ public class SchedulerItem {
 	}
 
 	public String info(){
-		String s = String.format("%s_%04d: op=%s, src=%s, dest=%s, next=%s", getBoardName(), stepID, op, srcInfo(), destInfo(), branchList());
+		String s = String.format("%s_%04d: op=%s, src=%s, dest=%s, next=%s", getBoardName(), getStepId(), op, srcInfo(), destInfo(), branchList());
 		return s;
 	}
 

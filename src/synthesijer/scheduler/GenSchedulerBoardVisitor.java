@@ -183,6 +183,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 			SchedulerBoard b = new SchedulerBoard(m.getName(), m);
 			info.addBoard(b);
 			this.methodExit = b.addItemInNewSlot(new SchedulerItem(b, Op.METHOD_EXIT, null, null));
+			this.methodExit.setBranchId(methodExit.getStepId()+1);
 			// breakId and continueId will not be defined for method
 			GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this, b, methodExit.getStepId(), -1, -1);
 			m.accept(child);

@@ -10,34 +10,30 @@ import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
-public class ConvArrayAccessToArrayIndex {
+public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 	
-	private final SchedulerInfo orig;
-	private final SchedulerInfo result;
-	
-	public ConvArrayAccessToArrayIndex(SchedulerInfo info){
-		this.orig = info;
-		result = new SchedulerInfo(info.getName());
+	public SchedulerInfo opt(SchedulerInfo info){
+		SchedulerInfo result = new SchedulerInfo(info.getName());
 		ArrayList<VariableOperand>[] vars = info.getVarTableList();
 		for(ArrayList<VariableOperand> v: vars){
 			result.addVarTable(v);
 		}
-	}
-
-	public SchedulerInfo opt(){
-		for(SchedulerBoard b: orig.getBoardsList()){
+		for(SchedulerBoard b: info.getBoardsList()){
 			result.addBoard(conv(b));
 		}
 		return result;
 	}
 	
+	public String getKey(){
+		return "conv_array_access";
+	}
+	
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = new SchedulerBoard(src.getName(), src.getMethod());
 		for(SchedulerSlot slot: src.getSlots()){
-			SchedulerSlot newSlot = new SchedulerSlot();
+			SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 			for(SchedulerItem item: slot.getItems()){
-				SchedulerItem newItem = conv(src, item);
-				newSlot.addItem(conv(src, newItem));
+				newSlot.addItem(conv(src, item));
 			}
 			ret.addSlot(newSlot);
 		}

@@ -47,9 +47,13 @@ public class SchedulerBoard {
 	 * @return the added item
 	 */
 	public SchedulerItem addItemInNewSlot(SchedulerItem item){
-		item.setStepId(slots.size());
-		SchedulerSlot slot = new SchedulerSlot();
+		SchedulerSlot slot = new SchedulerSlot(slots.size());
+		if(item.isBranchOp() == false){
+			item.setBranchId(slot.getStepId() + 1);
+		}
+		//item.setStepId(slots.size());
 		slot.addItem(item);
+		item.setSlot(slot);
 		slots.add(slot);
 		return item;
 	}

@@ -6,7 +6,7 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 public enum Op {
 	
 	METHOD_ENTRY(true),
-	METHOD_EXIT,
+	METHOD_EXIT(true),
 	ASSIGN,
 	NOP,
 	ADD,
@@ -43,7 +43,7 @@ public enum Op {
 	OR,
 	XOR,
 	LNOT,
-	ARRAY_ACCESS,
+	ARRAY_ACCESS(1),
 	ARRAY_INDEX,
 	CALL,
 	EXT_CALL,

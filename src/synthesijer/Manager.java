@@ -50,6 +50,8 @@ import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
 import synthesijer.scheduler.opt.ConvArrayAccessToArrayIndex;
+import synthesijer.scheduler.opt.PackArrayWriteAccess;
+import synthesijer.scheduler.opt.SchedulerInfoOptimizer;
 
 public enum Manager {
 	
@@ -240,14 +242,18 @@ public enum Manager {
 		}
 	}
 	
+	private void optimize(SchedulerInfoOptimizer obj, SynthesijerModuleInfo info){
+		info.setSchedulerInfo(obj.opt(info.getSchedulerInfo()));
+		dumpSchedulerInfo(info.getSchedulerInfo(), obj.getKey());
+	}
+	
 	private void optimize(SynthesijerModuleInfo info){
 		if(info.sysnthesisFlag == false){
 			// skip, nothing to do
 			return;
 		}
-		ConvArrayAccessToArrayIndex obj = new ConvArrayAccessToArrayIndex(info.getSchedulerInfo());
-		info.setSchedulerInfo(obj.opt());
-		dumpSchedulerInfo(info.getSchedulerInfo(), "conv_array_access");
+		optimize(new ConvArrayAccessToArrayIndex(), info); 
+		optimize(new PackArrayWriteAccess(), info); 
 	}
 	
 	private void optimizeAll(){
