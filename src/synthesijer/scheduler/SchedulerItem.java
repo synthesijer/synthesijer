@@ -154,7 +154,7 @@ public class SchedulerItem {
 		String s = String.format("%s_%04d: op=%s, src=%s, dest=%s, next=%s", getBoardName(), getStepId(), op, srcInfo(), destInfo(), branchList());
 		return s;
 	}
-
+	
 }
 
 class MethodEntryItem extends SchedulerItem{

@@ -47,7 +47,8 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		for(SchedulerSlot s: slots){
 			int[] ids = s.getNextStep();
 			for(int id: ids){
-				SchedulerSlot target = map.get(id);
+				//SchedulerSlot target = map.get(id);
+				SchedulerSlot target = map.get(s.getStepId());
 				Integer v = degrees.get(target);
 				if(v == null){
 					degrees.put(target, 1);
@@ -124,6 +125,7 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 	
 	private void parallelize(SchedulerBoard board, ArrayList<SchedulerSlot> bb, Hashtable<Integer, Integer> id_map){
 		SchedulerSlot target = null;
+		SchedulerSlot prev = null;
 		Hashtable<SchedulerSlot, ArrayList<SchedulerSlot>> dependents = analyze(bb);
 		ArrayList<SchedulerSlot> restList = bb;
 		ArrayList<SchedulerSlot> genList = new ArrayList<>();
@@ -152,13 +154,15 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 				}
 			}
 			restList = tmpList;
+			if(prev != null && target != null) for(SchedulerItem item: prev.getItems()){ item.setBranchId(target.getStepId());}
+			prev = target;
 			target = null; // next
 		}
-		for(SchedulerSlot s: genList){
-			for(SchedulerItem i: s.getItems()){
-				i.remapBranchIds(id_map);
-			}
-		}
+//		for(SchedulerSlot s: genList){
+//			for(SchedulerItem i: s.getItems()){
+//				i.remapBranchIds(id_map);
+//			}
+//		}
 	}
 	
 	private boolean isExcept(SchedulerItem item){
@@ -228,6 +232,7 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		Hashtable<SchedulerSlot, Integer> degrees = getEntryDegrees(slots);
 		ArrayList<SchedulerSlot> bb = null;
 		Hashtable<Integer, Integer> id_map = new Hashtable<>();
+		SchedulerSlot prev = null;
 		for(int i = 0; i < slots.length; i++){
 			SchedulerSlot slot = slots[i];
 			Integer d = degrees.get(i);
@@ -239,16 +244,18 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 				// the slot should be registered as a new slot
 				SchedulerSlot newSlot = copySlots(slot);
 				ret.addSlot(newSlot);
+//				if(prev != null) for(SchedulerItem item: prev.getItems()){ item.setBranchId(newSlot.getStepId());}
 				for(SchedulerItem item: newSlot.getItems()){
 					item.remapBranchIds(id_map);
 				}
 				bb = null; // reset
-				continue;
+				prev = newSlot;
+			}else{
+				if(bb == null){
+					bb = new ArrayList<>();
+				}
+				bb.add(slot);
 			}
-			if(bb == null){
-				bb = new ArrayList<>();
-			}
-			bb.add(slot);
 		}
 		if(bb != null && bb.size() > 0){
 			parallelize(ret, bb, id_map);
