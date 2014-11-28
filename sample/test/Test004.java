@@ -5,6 +5,7 @@ public class Test004 extends Thread{
 	}
 
 	public void break_test(){
+		int i = 0;
 		while(true){
 		  i++;
 		  if(i == 10) break;
@@ -12,6 +13,7 @@ public class Test004 extends Thread{
 	}
 
 	public void continue_test(){
+		int i = 0;
 		while(true){
 		  if(i == 10) continue;
 		  i++;

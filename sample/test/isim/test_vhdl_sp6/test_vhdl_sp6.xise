@@ -192,19 +192,19 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="150"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fconv_d2f_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="12"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="10"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="158"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fconv_d2l_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="11"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="9"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="162"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fconv_f2d_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="10"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="8"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="166"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fconv_f2i_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="9"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="7"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="174"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fconv_i2f_ip.xco" xil_pn:type="FILE_COREGEN">
@@ -216,27 +216,27 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="182"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fdiv32_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="8"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="6"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="186"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fdiv64_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="7"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="5"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="190"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fmul32_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="6"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="4"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="194"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fmul64_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="5"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="3"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="198"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fsub32_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="2"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="202"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fsub64_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="3"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="1"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="206"/>
     </file>
     <file xil_pn:name="../../sim000.vhd" xil_pn:type="FILE_VHDL">
@@ -272,11 +272,11 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="190"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fcomp32_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="195"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="12"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="195"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/fcomp64_ip.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="196"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="11"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="196"/>
     </file>
     <file xil_pn:name="../../../../lib/Xilinx/Spartan6/div32_ip.xise" xil_pn:type="FILE_COREGENISE">

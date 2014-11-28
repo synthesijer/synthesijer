@@ -363,8 +363,9 @@ public class SchedulerInfoCompiler {
 		
 		Hashtable<String, FieldAccessItem> fieldAccessChainMap = new Hashtable<>();
 		for(SchedulerSlot slot: board.getSlots()){
+			int id = slot.getStepId();
 			for(SchedulerItem item: slot.getItems()){
-				genExpr(board, item, states.get(item.getStepId()), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap);
+				genExpr(board, item, states.get(id), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap);
 			}
 		}
 		

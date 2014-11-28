@@ -67,6 +67,25 @@ architecture RTL of sim is
   );
  end component Test009;
 
+ component Test004
+  port (
+    clk : in std_logic;
+    reset : in std_logic;
+    run_req : in std_logic;
+    run_busy : out std_logic;
+    break_test_req : in std_logic;
+    break_test_busy : out std_logic;
+    continue_test_req : in std_logic;
+    continue_test_busy : out std_logic;
+    start_req : in std_logic;
+    start_busy : out std_logic;
+    join_req : in std_logic;
+    join_busy : out std_logic;
+    yield_req : in std_logic;
+    yield_busy : out std_logic
+  );
+ end component Test004;
+
  signal run_req, run_busy: std_logic;
 
  signal req_001 : std_logic := '0';
@@ -156,4 +175,23 @@ begin
     test_req => req_001,
     test_busy => open
   );
+
+ U004: Test004
+  port map(
+    clk => clk,
+    reset => reset,
+    run_req => '0',
+    run_busy => open,
+    break_test_req => '1',
+    break_test_busy => open,
+    continue_test_req => '1',
+    continue_test_busy => open,
+    start_req => '1',
+    start_busy => open,
+    join_req => '0',
+    join_busy => open,
+    yield_req => '0',
+    yield_busy => open
+  );
+
 end RTL;

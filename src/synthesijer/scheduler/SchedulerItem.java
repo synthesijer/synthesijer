@@ -1,5 +1,7 @@
 package synthesijer.scheduler;
 
+import java.util.Hashtable;
+
 import synthesijer.ast.Type;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
@@ -91,6 +93,13 @@ public class SchedulerItem {
 	
 	public void setBranchIds(int[] ids){
 		branchIDs = ids; 
+	}
+	
+	public void remapBranchIds(Hashtable<Integer, Integer> map){
+		for(int i = 0; i < branchIDs.length; i++){
+			Integer r = map.get(branchIDs[i]);
+			if(r != null) branchIDs[i] = r;
+		}
 	}
 
 	public int[] getBranchId(){

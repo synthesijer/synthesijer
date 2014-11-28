@@ -75,4 +75,26 @@ public class SchedulerSlot {
 			}
 		}
 	}
+	
+	public Operand[] getSrcOperands(){
+		ArrayList<Operand> operand = new ArrayList<>();
+		for(SchedulerItem item: items){
+			Operand[] src = item.getSrcOperand();
+			if(src == null) continue;
+			for(Operand o: src){
+				operand.add(o);
+			}
+		}
+		return operand.toArray(new Operand[]{});
+	}
+	
+	public Operand[] getDestOperands(){
+		ArrayList<Operand> operand = new ArrayList<>();
+		for(SchedulerItem item: items){
+			Operand d = item.getDestOperand();
+			operand.add(d);
+		}
+		return operand.toArray(new Operand[]{});
+	}
+	
 }

@@ -244,7 +244,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		SchedulerItem fork = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
 		SchedulerItem join = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		
-		int beforeUpdateId = forVisitor.lastItem.getStepId(); // entry point for updte statements
+		int beforeUpdateId = forVisitor.lastItem.getStepId(); // entry point for update statements
 		for (Statement s : o.getUpdates()){
 			s.accept(forVisitor);
 		}
@@ -764,6 +764,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			item = new MethodInvokeItem(parent.getBoard(), o.getMethodName(), list, tmp, callee_args);
 		}
 		parent.addSchedulerItem(item);
+		item.setBranchId(item.getStepId() + 1);
 		item.setNoWait(o.getTargetMethod().isNoWait());
 		result = tmp;
 	}
