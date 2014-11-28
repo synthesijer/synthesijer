@@ -441,11 +441,6 @@ public class SchedulerInfoCompiler {
 		}
 	}
 	
-	private boolean isFloating(Type t){
-		if(t instanceof PrimitiveTypeKind == false) return false;
-		return ((PrimitiveTypeKind)t).isFloating();
-	}
-
 	private void genExpr(SchedulerBoard board, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap){
 		switch(item.getOp()){
 		case METHOD_ENTRY:{

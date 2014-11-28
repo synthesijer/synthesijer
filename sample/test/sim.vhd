@@ -168,13 +168,13 @@ begin
     test_busy => open
   );
 
- U009: Test009
-  port map(
-    clk => clk,
-    reset => reset,
-    test_req => req_001,
-    test_busy => open
-  );
+-- U009: Test009
+--  port map(
+--    clk => clk,
+--    reset => reset,
+--    test_req => req_001,
+--    test_busy => open
+--  );
 
  U004: Test004
   port map(

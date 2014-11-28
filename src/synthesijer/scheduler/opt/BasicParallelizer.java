@@ -3,7 +3,6 @@ package synthesijer.scheduler.opt;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
@@ -48,7 +47,7 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		for(SchedulerSlot s: slots){
 			int[] ids = s.getNextStep();
 			for(int id: ids){
-				SchedulerSlot target = map.get(s.getStepId());
+				SchedulerSlot target = map.get(id);
 				Integer v = degrees.get(target);
 				if(v == null){
 					degrees.put(target, 1);
