@@ -47,8 +47,8 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		for(SchedulerSlot s: slots){
 			int[] ids = s.getNextStep();
 			for(int id: ids){
-				//SchedulerSlot target = map.get(id);
-				SchedulerSlot target = map.get(s.getStepId());
+				SchedulerSlot target = map.get(id);
+				//SchedulerSlot target = map.get(s.getStepId());
 				Integer v = degrees.get(target);
 				if(v == null){
 					degrees.put(target, 1);
@@ -123,7 +123,7 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		return true;
 	}
 	
-	private void parallelize(SchedulerBoard board, ArrayList<SchedulerSlot> bb, Hashtable<Integer, Integer> id_map){
+	private SchedulerSlot parallelize(SchedulerBoard board, ArrayList<SchedulerSlot> bb, Hashtable<Integer, Integer> id_map){
 		SchedulerSlot target = null;
 		SchedulerSlot prev = null;
 		Hashtable<SchedulerSlot, ArrayList<SchedulerSlot>> dependents = analyze(bb);
@@ -163,6 +163,7 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 //				i.remapBranchIds(id_map);
 //			}
 //		}
+		return prev;
 	}
 	
 	private boolean isExcept(SchedulerItem item){
@@ -239,12 +240,12 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 			if(d == null) d = 0;
 			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0 || d > 1 || slot.getItems().length > 1 || isExcept(slot.getItems()[0])){
 				if(bb != null && bb.size() > 0){
-					parallelize(ret, bb, id_map);
+					prev = parallelize(ret, bb, id_map);
 				}
 				// the slot should be registered as a new slot
 				SchedulerSlot newSlot = copySlots(slot);
 				ret.addSlot(newSlot);
-//				if(prev != null) for(SchedulerItem item: prev.getItems()){ item.setBranchId(newSlot.getStepId());}
+				if(bb != null && prev != null) for(SchedulerItem item: prev.getItems()){ item.setBranchId(newSlot.getStepId());}
 				for(SchedulerItem item: newSlot.getItems()){
 					item.remapBranchIds(id_map);
 				}
