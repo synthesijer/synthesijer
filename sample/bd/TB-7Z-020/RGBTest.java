@@ -18,8 +18,8 @@ public class RGBTest {
 	}
 	
 
-	private void paint_sincurve(int offset){
-		int c_id = 0;
+	private void paint_sincurve(int offset, int c_offset){
+		int c_id = c_offset;
 	    for(int i = 0; i < (1920 >> 2); i++){ // 1920 / 4
 	    	int x = i << 2; // i * 4
 	    	int y = sin.sintable[(i+offset)&0x0000007F]; // %128
@@ -38,11 +38,13 @@ public class RGBTest {
 		
 		init_colortbl();
 		
+		int c = 0;
+		
 		while(true){
-			paint_sincurve(0);
-			paint_sincurve(32);
-			paint_sincurve(64);
-			paint_sincurve(96);
+			paint_sincurve(0, c);
+			paint_sincurve(32, c);
+			paint_sincurve(64, c);
+			paint_sincurve(96, c);
 			sleep(100);
 			obj.flush();
 		}

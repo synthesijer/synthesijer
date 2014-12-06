@@ -1,6 +1,7 @@
 package synthesijer.scheduler.opt;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import synthesijer.scheduler.Op;
@@ -227,17 +228,27 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		}
 	}
 	
+	private void dumpDegree(String name, Hashtable<SchedulerSlot, Integer> degrees){
+		System.out.println("**** " + name);
+		Enumeration<SchedulerSlot> e = degrees.keys();
+		while(e.hasMoreElements()){
+			SchedulerSlot s = e.nextElement();
+			System.out.println(s.getStepId() + " -> " + degrees.get(s));
+		}
+	}
+	
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = new SchedulerBoard(src.getName(), src.getMethod());
 		SchedulerSlot[] slots = src.getSlots();
 		Hashtable<SchedulerSlot, Integer> degrees = getEntryDegrees(slots);
+		//dumpDegree(src.getName(), degrees);
 		ArrayList<SchedulerSlot> bb = null;
 		Hashtable<Integer, Integer> id_map = new Hashtable<>();
 		SchedulerSlot prev = null;
 		for(int i = 0; i < slots.length; i++){
 			SchedulerSlot slot = slots[i];
-			Integer d = degrees.get(i);
-			if(d == null) d = 0;
+			Integer d = degrees.get(slot);
+			//if(d == null) d = 0;
 			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0 || d > 1 || slot.getItems().length > 1 || isExcept(slot.getItems()[0])){
 				if(bb != null && bb.size() > 0){
 					prev = parallelize(ret, bb, id_map);
