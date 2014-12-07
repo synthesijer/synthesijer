@@ -43,7 +43,7 @@ public class RGBTest {
 		while(true){
 			paint_sincurve(0, c);
 			paint_sincurve(32, c);
-			paint_sincurve(64, c);
+			paint_sincurve(64, 0);
 			paint_sincurve(96, c);
 			sleep(100);
 			obj.flush();
