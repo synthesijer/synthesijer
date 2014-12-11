@@ -50,7 +50,7 @@ public class Main {
 	
 	private static void printHelp(){
 		System.out.println();
-		System.out.printf("Synthesijer: %d.%d.%d", Constant.minorVersion, Constant.minorVersion, Constant.revVersion);
+		System.out.printf("Synthesijer: %d.%d.%d", Constant.majorVersion, Constant.minorVersion, Constant.revVersion);
 		System.out.println();
 		System.out.println();
 		System.out.println("Usage: java [-cp classpath] Synthesijer.Main [options] sources");
