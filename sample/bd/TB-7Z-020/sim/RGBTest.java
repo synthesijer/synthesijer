@@ -43,10 +43,10 @@ public class RGBTest {
 			paint_sincurve(32, c_id);
 			paint_sincurve(64, c_id);
 			paint_sincurve(96, c_id);
-			sleep(100);
+			sleep(100000000);
 			obj.flush();
-	    	c_id = c_id + 1;
-	    	if(c_id == 6) c_id = 0;
+//	    	c_id = c_id + 1;
+//	    	if(c_id == 6) c_id = 0;
 		}
 	}
 	

@@ -20,7 +20,6 @@ public class TestFrame extends JFrame{
 	private byte[] buffer = new byte[1920*1080*3];
 	
 	public void pset(int x, int y, int rgb){
-		System.out.printf("%d, %d => %d\n", x, y, 3*(x+y*1920)+2);
 		buffer[3*(x+y*1920)+0] = (byte)((rgb >>  0) & 0x000000FF);
 		buffer[3*(x+y*1920)+1] = (byte)((rgb >>  8) & 0x000000FF);
 		buffer[3*(x+y*1920)+2] = (byte)((rgb >> 16) & 0x000000FF);
@@ -62,11 +61,8 @@ public class TestFrame extends JFrame{
 		
 	public static void main(String[] args){
 		TestFrame canvas = new TestFrame();
-		System.out.println("fefe");
 		canvas.fill_rect(0, 0, 100, 100, 0x00FF0000);
-		System.out.println("fefe");
 		canvas.flush();
-		System.out.println("fefe");
 	}
 
 }

@@ -1,4 +1,5 @@
-SYNTHESIJER ?= ../../../../synthesijer-applications/bin:../../../bin:.
+SYNTHESIJER ?= ../../../bin
+CLASSPATH = $(SYNTHESIJER):../../../../synthesijer-applications/bin:.
 
 SOURCES = ../../../../synthesijer-applications/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
           ../../../../synthesijer-applications/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \
@@ -9,7 +10,7 @@ VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 
 all: $(SOURCES)
-	java -cp $(SYNTHESIJER) synthesijer.Main --verilog --vhdl $(SOURCES)
+	java -cp $(CLASSPATH) synthesijer.Main --verilog --vhdl $(SOURCES)
 
 clean:
 	-rm -f *.class

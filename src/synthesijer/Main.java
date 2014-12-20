@@ -53,7 +53,7 @@ public class Main {
 		System.out.printf("Synthesijer: %d.%d.%d", Constant.majorVersion, Constant.minorVersion, Constant.revVersion);
 		System.out.println();
 		System.out.println();
-		System.out.println("Usage: java [-cp classpath] Synthesijer.Main [options] sources");
+		System.out.println("Usage: java [-cp classpath] synthesijer.Main [options] sources");
 		System.out.println();
 		System.out.println("Options:");
 		System.out.println("  -h, --help: print this help");
