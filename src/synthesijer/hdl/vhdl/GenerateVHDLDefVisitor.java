@@ -100,9 +100,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		
 		HDLUtils.nl(dest);
 		for(HDLPort p: o.getPorts()){
-			if(p.isSet(OPTION.NO_SIG) == false){
-				p.getSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
-			}
+			if(p.isSet(OPTION.NO_SIG)) continue;
+			if(p.getSignal() == null) continue;
+			p.getSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
 		}
 		HDLUtils.nl(dest);
 		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }

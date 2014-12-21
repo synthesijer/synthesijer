@@ -30,9 +30,14 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 		}
 		this.dir = dir;
 		this.type = type;
+		
+//		if(dir != DIR.INOUT){ // forced "no_sig"
+//			opt.add(OPTION.NO_SIG);
+//		}
+
 		options = opt;
 		
-		if(options.contains(OPTION.NO_SIG) == false){
+		if(options.contains(OPTION.NO_SIG) == false && dir != DIR.INOUT){
 			if(dir == DIR.OUT){
 				this.sig = new HDLSignal(m, name + "_sig", type, HDLSignal.ResourceKind.REGISTER);
 			}else{

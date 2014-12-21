@@ -43,6 +43,7 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 	public void visitHDLModule(HDLModule o) {
 		for(HDLPort p: o.getPorts()){
 			if(p.isSet(HDLPort.OPTION.NO_SIG)) continue; // nothing to do
+			if(p.getSignal() == null) continue; // nothing to do
 			p.getSignal().accept(new GenerateVerilogDefVisitor(dest, offset));
 		}
 		HDLUtils.nl(dest);

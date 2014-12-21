@@ -114,7 +114,9 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLPort(HDLPort o) {
 		if(o.isSet(HDLPort.OPTION.NO_SIG)) return; // nothing to do
-		if(o.isOutput()){
+		if(o.getDir() == HDLPort.DIR.INOUT){
+			return;
+		}else if(o.isOutput()){
 			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), o.getSignal().getName()));
 		}else{
 			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getSignal().getName(), o.getName()));

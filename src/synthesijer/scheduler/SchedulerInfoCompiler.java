@@ -249,7 +249,11 @@ public class SchedulerInfoCompiler {
 				if(p.isSet(HDLPort.OPTION.EXPORT)){
 					String n = inst.getSignalForPort(p.getName()).getName();
 					HDLPort export = hm.newPort(n + "_exp", p.getDir(), p.getType(), EnumSet.of(HDLPort.OPTION.EXPORT));
-					if(p.getDir() == HDLPort.DIR.OUT){
+					if(p.getDir() == HDLPort.DIR.INOUT || p.isSet(HDLPort.OPTION.NO_SIG)){
+						hm.rmSignal(inst.getSignalForPort(p.getName()));
+						inst.rmPortPair(inst.getPortPair(p));
+						inst.addPortPair(export, p);
+					}else if(p.getDir() == HDLPort.DIR.OUT){
 						export.getSignal().setAssign(null, inst.getSignalForPort(p.getName()));
 					}else{
 						inst.getSignalForPort(p.getName()).setAssign(null, export.getSignal());
