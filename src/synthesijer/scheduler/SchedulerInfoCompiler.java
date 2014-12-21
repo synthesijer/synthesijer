@@ -14,6 +14,7 @@ import synthesijer.ast.Type;
 import synthesijer.ast.expr.Literal;
 import synthesijer.ast.expr.NewArray;
 import synthesijer.ast.expr.NewClassExpr;
+import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
@@ -144,6 +145,16 @@ public class SchedulerInfoCompiler {
 		return list;
 	}
 	
+	private HDLExpr convExprToHDLExpr(Expr expr, HDLPrimitiveType type){
+		if(expr instanceof Literal){
+			return new HDLValue(((Literal)expr).getValueAsStr(), type);
+		}else if(expr instanceof TypeCast){
+			return convExprToHDLExpr(((TypeCast)expr).getExpr(), type);
+		}else{
+			return null;
+		}
+	}
+	
 	private HDLVariable genHDLVariable(VariableOperand v){
 		String name = v.getName();
 		Type type = v.getType();
@@ -155,11 +166,16 @@ public class SchedulerInfoCompiler {
 			if(type == PrimitiveTypeKind.VOID) return null; // Void variable is not synthesized.
 			HDLSignal sig = hm.newSignal(name, getHDLType(type));
 			if(v.getVariable() != null){
-				if(v.getVariable().getInitExpr() instanceof Literal){
-					Literal l = (Literal)(v.getVariable().getInitExpr());
-					sig.setResetValue(new HDLValue(l.getValueAsStr(), (HDLPrimitiveType)sig.getType()));
-//				}else if(v.getVariable().getInitExpr() != null){
-//					SynthesijerUtils.warn("can use only litral for initial value:" + v.getVariable().getInitExpr());
+//				if(v.getVariable().getInitExpr() instanceof Literal){
+				if(v.getVariable().getInitExpr() != null && v.getVariable().getInitExpr().isConstant()){
+					HDLExpr e = convExprToHDLExpr(v.getVariable().getInitExpr(), (HDLPrimitiveType)sig.getType());
+					if(e == null){
+						SynthesijerUtils.warn("initial value is not allowed:" + v.getVariable().getInitExpr());
+					}else{
+						sig.setResetValue(e);
+					}
+				}else{
+					SynthesijerUtils.warn("only litral for initial value is allowd: " + v.getName() + ":" + v.getVariable().getInitExpr());
 				}
 			}
 			if(v.getVariable() != null && v.getVariable().isMethodParam()){
