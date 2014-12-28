@@ -170,12 +170,12 @@ public class SchedulerInfoCompiler {
 				if(v.getVariable().getInitExpr() != null && v.getVariable().getInitExpr().isConstant()){
 					HDLExpr e = convExprToHDLExpr(v.getVariable().getInitExpr(), (HDLPrimitiveType)sig.getType());
 					if(e == null){
-						SynthesijerUtils.warn("initial value is not allowed:" + v.getVariable().getInitExpr());
+						//SynthesijerUtils.warn("initial value is not allowed:" + v.getVariable().getInitExpr());
 					}else{
 						sig.setResetValue(e);
 					}
 				}else{
-					SynthesijerUtils.warn("only litral for initial value is allowd: " + v.getName() + ":" + v.getVariable().getInitExpr());
+					//SynthesijerUtils.warn("only litral for initial value is allowd: " + v.getName() + ":" + v.getVariable().getInitExpr());
 				}
 			}
 			if(v.getVariable() != null && v.getVariable().isMethodParam()){
