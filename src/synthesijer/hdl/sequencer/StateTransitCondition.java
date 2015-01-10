@@ -32,7 +32,15 @@ public class StateTransitCondition{
 	public String getCondExprAsVHDL(){
 		String s = "";
 		if(cond != null){
-			s = String.format("%s = '1'", cond.getResultExpr().getVHDL());
+			if(cond.getResultExpr().getType().isBit()){
+				s = String.format("%s = '1'", cond.getResultExpr().getVHDL());
+			}else{
+				if(cond.getResultExpr().getType().isVector()){
+					s = String.format("signed(%s) /= 0", cond.getResultExpr().getVHDL());
+				}else{
+					s = String.format("%s /= 0", cond.getResultExpr().getVHDL());
+				}
+			}
 		}
 		return s;
 	}
@@ -40,7 +48,11 @@ public class StateTransitCondition{
 	public String getCondExprAsVerilogHDL(){
 		String s = "";
 		if(cond != null){
-			s = String.format("%s == 1'b1", cond.getResultExpr().getVHDL());
+			if(cond.getResultExpr().getType().isBit()){
+				s = String.format("%s == 1'b1", cond.getResultExpr().getVerilogHDL());
+			}else{
+				s = String.format("%s != 0", cond.getResultExpr().getVerilogHDL());
+			}
 		}
 		return s;
 	}

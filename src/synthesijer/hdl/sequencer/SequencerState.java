@@ -2,7 +2,6 @@ package synthesijer.hdl.sequencer;
 
 import java.util.ArrayList;
 
-import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
@@ -39,9 +38,9 @@ public class SequencerState{
 
 	public void addStateTransit(HDLExpr expr, SequencerState d){
 		transitions.add(new StateTransitCondition(key, id, expr, d));
-		if(expr == null) return;
-		if(expr.getType().isBit()) return;
-		SynthesijerUtils.error(String.format("%s is not allowed, only bit type is allowd", expr));
+		//if(expr == null) return;
+		//if(expr.getType().isBit()) return;
+		//SynthesijerUtils.error(String.format("%s is not allowed, only bit type is allowd", expr));
 	}
 
 	public void addStateTransit(SequencerState dest){
@@ -74,7 +73,16 @@ public class SequencerState{
 			sep = " and ";
 		}
 		if(exitFlag != null){
-			s += sep + String.format("%s = '1'", exitFlag.getVHDL());
+			System.out.println(exitFlag);
+			if(exitFlag.getType().isBit()){
+				s += sep + String.format("%s = '1'", exitFlag.getVHDL());
+			}else{
+				if(exitFlag.getType().isVector()){
+					s += sep + String.format("signed(%s) /= 0", exitFlag.getVHDL());
+				}else{
+					s += sep + String.format("%s /= 0", exitFlag.getVHDL());
+				}
+			}
 		}
 		return s;
 	}
@@ -87,7 +95,11 @@ public class SequencerState{
 			sep = " && ";
 		}
 		if(exitFlag != null){
-			s += sep + String.format("%s == 1'b1", exitFlag.getVerilogHDL());
+			if(exitFlag.getType().isBit()){
+				s += sep + String.format("%s = 1'b1", exitFlag.getVerilogHDL());
+			}else{
+				s += sep + String.format("%s != 0", exitFlag.getVerilogHDL());
+			}
 		}
 		return s;
 	}

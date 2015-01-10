@@ -247,7 +247,17 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 			}else{
 				str = String.format("%s = %s and %s = %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
 			}
-			if(cond != null) str += " and " + cond.getResultExpr().getVHDL() + " = '1'";
+			if(cond != null){
+				if(cond.getResultExpr().getType().isBit()){
+					str += " and " + cond.getResultExpr().getVHDL() + " = '1'";
+				}else{
+					if(cond.getResultExpr().getType().isVector()){
+						str += " and singed(" + cond.getResultExpr().getVHDL() + ")" + " /= 0";
+					}else{
+						str += " and " + cond.getResultExpr().getVHDL() + " /= 0";
+					}
+				}
+			}
 			return str;
 		}
 
@@ -261,7 +271,13 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 			}else{
 				str = String.format("%s == %s && %s == %d", s.getKey().getName(), s.getStateId().getValue(), s.getSequencer().getDelayCounter().getName(), count);
 			}
-			if(cond != null) str += " && " + cond.getResultExpr().getVerilogHDL() + " == 1'b1";
+			if(cond != null){
+				if(cond.getResultExpr().getType().isBit()){
+					str += " && " + cond.getResultExpr().getVerilogHDL() + " == 1'b1";
+				}else{
+					str += " && " + cond.getResultExpr().getVerilogHDL() + " != 0";
+				}
+			}
 			return str;
 		}
 		
