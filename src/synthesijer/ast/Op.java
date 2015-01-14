@@ -7,6 +7,7 @@ public enum Op{
 	ASSIGN("=", HDLOp.UNDEFINED),
 	PLUS("+", HDLOp.ADD),
 	MINUS("-", HDLOp.SUB),
+	SIGN_MINUS("---", HDLOp.SUB),
 	MUL("*", HDLOp.MUL),
 	DIV("/", HDLOp.UNDEFINED),
 	MOD("%", HDLOp.UNDEFINED),
@@ -51,6 +52,7 @@ public enum Op{
 		if(ASSIGN.name.equals(opName))      return Op.ASSIGN;
 		else if(PLUS.name.equals(opName))   return Op.PLUS;
 		else if(MINUS.name.equals(opName))  return Op.MINUS;
+		else if(SIGN_MINUS.name.equals(opName))  return Op.MINUS;
 		else if(MUL.name.equals(opName))    return Op.MUL;
 		else if(DIV.name.equals(opName))    return Op.DIV;
 		else if(MOD.name.equals(opName))    return Op.MOD;

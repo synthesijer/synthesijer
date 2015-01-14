@@ -73,7 +73,7 @@ public class SequencerState{
 			sep = " and ";
 		}
 		if(exitFlag != null){
-			System.out.println(exitFlag);
+			//System.out.println(exitFlag);
 			if(exitFlag.getType().isBit()){
 				s += sep + String.format("%s = '1'", exitFlag.getVHDL());
 			}else{

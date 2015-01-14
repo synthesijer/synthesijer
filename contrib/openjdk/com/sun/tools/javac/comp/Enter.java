@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1999, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1999, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -34,7 +34,7 @@ import openjdk.com.sun.tools.javac.code.Scope.*;
 import openjdk.com.sun.tools.javac.code.Symbol.*;
 import openjdk.com.sun.tools.javac.code.Type.*;
 import openjdk.com.sun.tools.javac.jvm.*;
-import openjdk.com.sun.tools.javac.main.RecognizedOptions.PkgInfo;
+import openjdk.com.sun.tools.javac.main.Option.PkgInfo;
 import openjdk.com.sun.tools.javac.tree.*;
 import openjdk.com.sun.tools.javac.tree.JCTree.*;
 import openjdk.com.sun.tools.javac.util.*;
@@ -49,7 +49,7 @@ import static openjdk.com.sun.tools.javac.code.Kinds.*;
  *  the symbol table. The pass consists of two phases, organized as
  *  follows:
  *
- *  <p>In the first phase, all class symbols are intered into their
+ *  <p>In the first phase, all class symbols are entered into their
  *  enclosing scope, descending recursively down the tree for classes
  *  which are members of other classes. The class symbols are given a
  *  MemberEnter object as completer.
@@ -77,12 +77,12 @@ import static openjdk.com.sun.tools.javac.code.Kinds.*;
  *
  *  <p>Classes migrate from one phase to the next via queues:
  *
- *  <pre>
+ *  <pre>{@literal
  *  class enter -> (Enter.uncompleted)         --> member enter (1)
  *              -> (MemberEnter.halfcompleted) --> member enter (2)
  *              -> (Todo)                      --> attribute
  *                                              (only for toplevel classes)
- *  </pre>
+ *  }</pre>
  *
  *  <p><b>This is NOT part of any supported API.
  *  If you write code that depends on this, you do so at your own risk.
@@ -105,6 +105,7 @@ public class Enter extends JCTree.Visitor {
     Names names;
     JavaFileManager fileManager;
     PkgInfo pkginfoOpt;
+    TypeEnvs typeEnvs;
 
     private final Todo todo;
 
@@ -131,20 +132,19 @@ public class Enter extends JCTree.Visitor {
 
         predefClassDef = make.ClassDef(
             make.Modifiers(PUBLIC),
-            syms.predefClass.name, null, null, null, null);
+            syms.predefClass.name,
+            List.<JCTypeParameter>nil(),
+            null,
+            List.<JCExpression>nil(),
+            List.<JCTree>nil());
         predefClassDef.sym = syms.predefClass;
         todo = Todo.instance(context);
         fileManager = context.get(JavaFileManager.class);
 
         Options options = Options.instance(context);
         pkginfoOpt = PkgInfo.get(options);
+        typeEnvs = TypeEnvs.instance(context);
     }
-
-    /** A hashtable mapping classes and packages to the environments current
-     *  at the points of their definitions.
-     */
-    Map<TypeSymbol,Env<AttrContext>> typeEnvs =
-            new HashMap<TypeSymbol,Env<AttrContext>>();
 
     /** Accessor for typeEnvs
      */
@@ -157,7 +157,7 @@ public class Enter extends JCTree.Visitor {
         Env<AttrContext> lintEnv = localEnv;
         while (lintEnv.info.lint == null)
             lintEnv = lintEnv.next;
-        localEnv.info.lint = lintEnv.info.lint.augment(sym.attributes_field, sym.flags());
+        localEnv.info.lint = lintEnv.info.lint.augment(sym);
         return localEnv;
     }
 
@@ -228,7 +228,7 @@ public class Enter extends JCTree.Visitor {
      *  only, and members go into the class member scope.
      */
     Scope enterScope(Env<AttrContext> env) {
-        return (env.tree.getTag() == JCTree.CLASSDEF)
+        return (env.tree.hasTag(JCTree.Tag.CLASSDEF))
             ? ((JCClassDecl) env.tree).sym.members_field
             : env.info.scope;
     }
@@ -284,10 +284,12 @@ public class Enter extends JCTree.Visitor {
                                                              JavaFileObject.Kind.SOURCE);
         if (tree.pid != null) {
             tree.packge = reader.enterPackage(TreeInfo.fullName(tree.pid));
-            if (tree.packageAnnotations.nonEmpty() || pkginfoOpt == PkgInfo.ALWAYS) {
+            if (tree.packageAnnotations.nonEmpty()
+                    || pkginfoOpt == PkgInfo.ALWAYS
+                    || tree.docComments != null) {
                 if (isPkgInfo) {
                     addEnv = true;
-                } else {
+                } else if (tree.packageAnnotations.nonEmpty()){
                     log.error(tree.packageAnnotations.head.pos(),
                               "pkg.annotations.sb.in.package-info.java");
                 }
@@ -312,7 +314,7 @@ public class Enter extends JCTree.Visitor {
                                 tree.packge);
                     if (addEnv || (tree0.packageAnnotations.isEmpty() &&
                                    tree.docComments != null &&
-                                   tree.docComments.get(tree) != null)) {
+                                   tree.docComments.hasComment(tree))) {
                         typeEnvs.put(tree.packge, topEnv);
                     }
                 }

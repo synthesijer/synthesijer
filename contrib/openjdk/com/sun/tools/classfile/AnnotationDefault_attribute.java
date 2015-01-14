@@ -58,3 +58,4 @@ public class AnnotationDefault_attribute extends Attribute {
 
     public final Annotation.element_value default_value;
 }
+

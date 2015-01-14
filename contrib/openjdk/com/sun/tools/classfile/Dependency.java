@@ -71,7 +71,19 @@ public interface Dependency {
          * dependency analysis.
          * @return the name of the class containing the location.
          */
+        String getName();
+
+        /**
+         * Get the fully-qualified name of the class containing the location.
+         * @return the fully-qualified name of the class containing the location.
+         */
         String getClassName();
+
+        /**
+         * Get the package name of the class containing the location.
+         * @return the package name of the class containing the location.
+         */
+        String getPackageName();
     }
 
 
@@ -87,3 +99,4 @@ public interface Dependency {
      */
     Location getTarget();
 }
+

@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 
 import net.wasamon.mjlib.util.GetOpt;
 import net.wasamon.mjlib.util.GetOptException;
+import openjdk.com.sun.tools.javac.main.Main.Result;
 import synthesijer.Manager.OutputFormat;
 
 /**
@@ -25,7 +26,7 @@ public class Main {
 
 		openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
 
-		int err = compiler.compile(opt.getArgs());
+		Result result = compiler.compile(opt.getArgs());
 		
 		boolean optimizeFlag = !opt.flag("no-optimize");
 		boolean vhdlFlag = opt.flag("vhdl");
@@ -38,14 +39,14 @@ public class Main {
 			vhdlFlag = true;
 		}
 		
-		if(err == 0){
+		if(result.isOK()){
 			dump("dump000.xml");
 			Manager.INSTANCE.preprocess();
 			Manager.INSTANCE.generate(optimizeFlag);
 			if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
 			if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
 		}
-		System.exit(err);
+		System.exit(result.exitCode);
 	}
 	
 	private static void printHelp(){

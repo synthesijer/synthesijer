@@ -67,3 +67,4 @@ public abstract class RuntimeParameterAnnotations_attribute extends Attribute {
 
     public final Annotation[][] parameter_annotations;
 }
+
