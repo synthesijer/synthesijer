@@ -3,7 +3,7 @@ package synthesijer.hdl.vhdl;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 
-import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.Constant;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLLiteral;
@@ -57,7 +57,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLParameter p: params){
 			dest.print(sep);
 			p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
-			sep = ";\n";
+			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
@@ -70,7 +70,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			dest.print(sep);
 			//p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
 			HDLUtils.print(dest, offset+2, String.format("%s : %s %s", p.getName(), p.getDir().getVHDL(), ((HDLPrimitiveType)p.getType()).getVHDL(paramFlag)));
-			sep = ";\n";
+			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
@@ -152,9 +152,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLValue s: o.getItems()){
 			HDLUtils.print(dest, 0, sep);
 			HDLUtils.print(dest, offset+2, String.format("%s", s.getVHDL()));
-			sep = ",\n";
+			sep = "," + Constant.BR;
 		}
-		HDLUtils.println(dest, offset, String.format("\n  );"));
+		HDLUtils.println(dest, offset, String.format("%s  );", Constant.BR));
 	}
 
 }

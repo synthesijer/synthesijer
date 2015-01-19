@@ -2,6 +2,7 @@ package synthesijer.hdl.vhdl;
 
 import java.io.PrintWriter;
 
+import synthesijer.Constant;
 import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
@@ -48,7 +49,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 				HDLUtils.print(dest, 0, sep);
 				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.param.getValue()));
 			}
-			sep = ",\n";
+			sep = "," + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ")");
@@ -60,7 +61,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		for(HDLInstance.PortPair pair: o.getPairs()){
 			HDLUtils.print(dest, 0, sep);
 			HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.port.getName(), pair.item.getName()));
-			sep = ",\n";
+			sep = "," + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");

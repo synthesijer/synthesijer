@@ -2,12 +2,11 @@ package synthesijer.hdl.verilog;
 
 import java.io.PrintWriter;
 
+import synthesijer.Constant;
 import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLInstance.ParamPair;
-import synthesijer.hdl.sequencer.SequencerState;
-import synthesijer.hdl.sequencer.StateTransitCondition;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLParameter;
@@ -18,6 +17,8 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.HDLTreeVisitor;
 import synthesijer.hdl.HDLUserDefinedType;
 import synthesijer.hdl.HDLUtils;
+import synthesijer.hdl.sequencer.SequencerState;
+import synthesijer.hdl.sequencer.StateTransitCondition;
 
 public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
@@ -47,7 +48,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 				HDLUtils.print(dest, 0, sep);
 				HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.param.getName(), pair.param.getValue()));
 			}
-			sep = ",\n";
+			sep = "," + Constant.BR;
 		}
 		
 		HDLUtils.println(dest, 0, "");
@@ -60,7 +61,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		for(HDLInstance.PortPair pair: o.getPairs()){
 			HDLUtils.print(dest, 0, sep);
 			HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.port.getName(), pair.item.getName()));
-			sep = ",\n";
+			sep = "," + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
@@ -89,9 +90,9 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		for(HDLParameter p: o.getParameters()){
 			dest.print(sep);
 			p.accept(new GenerateVerilogDefVisitor(dest, offset+2));
-			sep = ",\n";
+			sep = "," + Constant.BR;
 		}
-		HDLUtils.println(dest, offset, "\n)");
+		HDLUtils.println(dest, offset, Constant.BR + ")");
 	}
 
 	private void genPortList(HDLModule o){
@@ -100,9 +101,9 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		for(HDLPort p: o.getPorts()){
 			dest.print(sep);
 			p.accept(new GenerateVerilogDefVisitor(dest, offset+2));
-			sep = ",\n";
+			sep = "," + Constant.BR;
 		}
-		HDLUtils.println(dest, offset, "\n);");
+		HDLUtils.println(dest, offset, Constant.BR + ");");
 	}
 	
 	@Override
