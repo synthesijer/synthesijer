@@ -857,6 +857,7 @@ public class SchedulerInfoCompiler {
 					Method m = board.getMethod();
 					if(m.getWaitWithMethod() == null){ // independent method (normal)
 						s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
+						busy_port_sig.setAssign(s, HDLPreDefinedConstant.LOW);
 					}else{ // must wait for other method.
 						HDLVariable flag = varTable.get(m.getWaitWithMethod().getName() + "_busy");
 						HDLExpr unlock = hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW); // the waiting method has been done.
