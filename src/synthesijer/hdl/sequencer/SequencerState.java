@@ -96,7 +96,7 @@ public class SequencerState{
 		}
 		if(exitFlag != null){
 			if(exitFlag.getType().isBit()){
-				s += sep + String.format("%s = 1'b1", exitFlag.getVerilogHDL());
+				s += sep + String.format("%s == 1'b1", exitFlag.getVerilogHDL());
 			}else{
 				s += sep + String.format("%s != 0", exitFlag.getVerilogHDL());
 			}

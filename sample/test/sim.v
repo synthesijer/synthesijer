@@ -75,11 +75,19 @@ module sim();
 		.test_busy()
 		);
 
+/*
    Test009 U009(.clk(clk),
 		.reset(reset),
 		.test_req(req_001),
 		.test_busy()
 		);
+*/
    
+   Test010 U010(.clk(clk),
+		.reset(reset),
+		.test_req(req_001),
+		.test_busy()
+		);
+
 endmodule
 `default_nettype wire
