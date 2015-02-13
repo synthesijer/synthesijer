@@ -809,8 +809,17 @@ public class SchedulerInfoCompiler {
 
 	private void genMethodCtrlSignals(SchedulerBoard board){
 
+		// generating a busy port signal
+		if(board.getMethod().isPrivate() == false){ // public
+			HDLPort busy_port = hm.newPort(board.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+			busy_port.getSignal().setResetValue(HDLPreDefinedConstant.HIGH);
+			varTable.put(busy_port.getName(), busy_port.getSignal());
+		}else{ // private
+			HDLSignal busy_sig = hm.newSignal(board.getName() + "_busy", HDLPrimitiveType.genBitType());
+			varTable.put(busy_sig.getName(), busy_sig);
+		}
+		
 		if(board.getMethod().isAuto()){
-			// skip, an auto method has no ctrl. signals
 			return; 
 		}
 		
@@ -818,15 +827,10 @@ public class SchedulerInfoCompiler {
 		HDLSignal req_local = hm.newSignal(board.getName() + "_req_local", HDLPrimitiveType.genBitType());
 		if(board.getMethod().isPrivate() == false){ // public
 			HDLPort req_port = hm.newPort(board.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
-			HDLPort busy_port = hm.newPort(board.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
-			busy_port.getSignal().setResetValue(HDLPreDefinedConstant.HIGH);
 			varTable.put(req_port.getName(), req_port.getSignal());
-			varTable.put(busy_port.getName(), busy_port.getSignal());
 			req_flag.setAssign(null, hm.newExpr(HDLOp.OR, req_local, req_port.getSignal()));
 		}else{ // private
 			req_flag.setAssign(null, req_local);
-			HDLSignal busy_sig = hm.newSignal(board.getName() + "_busy", HDLPrimitiveType.genBitType());
-			varTable.put(busy_sig.getName(), busy_sig);
 		}
 		
 		varTable.put(req_flag.getName(), req_flag);
