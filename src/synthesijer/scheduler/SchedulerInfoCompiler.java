@@ -809,6 +809,10 @@ public class SchedulerInfoCompiler {
 
 	private void genMethodCtrlSignals(SchedulerBoard board){
 
+		if(board.getMethod().isAuto()){
+			return; 
+		}
+		
 		// generating a busy port signal
 		if(board.getMethod().isPrivate() == false){ // public
 			HDLPort busy_port = hm.newPort(board.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
@@ -818,11 +822,7 @@ public class SchedulerInfoCompiler {
 			HDLSignal busy_sig = hm.newSignal(board.getName() + "_busy", HDLPrimitiveType.genBitType());
 			varTable.put(busy_sig.getName(), busy_sig);
 		}
-		
-		if(board.getMethod().isAuto()){
-			return; 
-		}
-		
+				
 		HDLSignal req_flag = hm.newSignal(board.getName() + "_req_flag", HDLPrimitiveType.genBitType());
 		HDLSignal req_local = hm.newSignal(board.getName() + "_req_local", HDLPrimitiveType.genBitType());
 		if(board.getMethod().isPrivate() == false){ // public
@@ -861,12 +861,16 @@ public class SchedulerInfoCompiler {
 					Method m = board.getMethod();
 					if(m.getWaitWithMethod() == null){ // independent method (normal)
 						s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
-						busy_port_sig.setAssign(s, HDLPreDefinedConstant.LOW);
+						if(board.getMethod().isAuto() == false){
+							busy_port_sig.setAssign(s, HDLPreDefinedConstant.LOW);
+						}
 					}else{ // must wait for other method.
 						HDLVariable flag = varTable.get(m.getWaitWithMethod().getName() + "_busy");
 						HDLExpr unlock = hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW); // the waiting method has been done.
 						s.addStateTransit(unlock, states.get(item.getSlot().getNextStep()[0]));
-						busy_port_sig.setAssign(s, hm.newExpr(HDLOp.IF, unlock, HDLPreDefinedConstant.LOW, HDLPreDefinedConstant.HIGH));
+						if(board.getMethod().isAuto() == false){
+							busy_port_sig.setAssign(s, hm.newExpr(HDLOp.IF, unlock, HDLPreDefinedConstant.LOW, HDLPreDefinedConstant.HIGH));
+						}
 					}
 					break;
 				}
