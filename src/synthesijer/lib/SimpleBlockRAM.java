@@ -7,7 +7,7 @@ import synthesijer.hdl.HDLPrimitiveType;
 public class SimpleBlockRAM extends HDLModule{
 	
 	public SimpleBlockRAM(int width, int depth, int length){
-		super("simple_dualportram", "clk", "reset");
+		super("singleportram", "clk", "reset");
 		
 		newParameter("WIDTH", HDLPrimitiveType.genIntegerType(), String.valueOf(width));
 		newParameter("DEPTH", HDLPrimitiveType.genIntegerType(), String.valueOf(depth));

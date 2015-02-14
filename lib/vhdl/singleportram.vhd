@@ -2,7 +2,7 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity simple_dualportram is
+entity singleportram is
   
   generic (
     DEPTH : integer := 10;
@@ -11,20 +11,19 @@ entity simple_dualportram is
   );
 
   port (
-    clk        : in  std_logic;
-    reset      : in  std_logic;
-    we_b       : in  std_logic;
-    oe_b       : in  std_logic;
-    length     : out signed(31 downto 0);
-    raddress_b : in  signed(31 downto 0);
-    waddress_b : in  signed(31 downto 0);
-    dout_b     : out signed(WIDTH-1 downto 0);
-    din_b      : in  signed(WIDTH-1 downto 0)
+    clk       : in  std_logic;
+    reset     : in  std_logic;
+    we_b      : in  std_logic;
+    oe_b      : in  std_logic;
+    length    : out signed(31 downto 0);
+    address_b : in  signed(31 downto 0);
+    dout_b    : out signed(WIDTH-1 downto 0);
+    din_b     : in  signed(WIDTH-1 downto 0)
     );
 
-end simple_dualportram;
+end singleportram;
 
-architecture RTL of simple_dualportram is
+architecture RTL of singleportram is
 
   type ram_type is array (WORDS-1 downto 0) of std_logic_vector (WIDTH-1 downto 0);
   signal RAM: ram_type := (others => (others => '0'));
@@ -40,7 +39,7 @@ begin  -- RTL
   begin  -- process
     if clk'event and clk = '1' then  -- rising clock edge
       if we_b = '1' then
-        RAM(to_integer(unsigned(waddress_b(DEPTH-1 downto 0)))) <= std_logic_vector(din_b);
+        RAM(to_integer(unsigned(address_b(DEPTH-1 downto 0)))) <= std_logic_vector(din_b);
       end if;
     end if;
   end process;
@@ -48,7 +47,7 @@ begin  -- RTL
   process (clk)
   begin  -- process
     if clk'event and clk = '1' then  -- rising clock edge
-      q <= RAM(to_integer(unsigned(raddress_b(DEPTH-1 downto 0))));
+      q <= RAM(to_integer(unsigned(address_b(DEPTH-1 downto 0))));
     end if;
   end process;
 

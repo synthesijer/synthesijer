@@ -9,7 +9,7 @@ module inputport16
     input wire 		  reset,
 
     input wire [WIDTH-1:0] din,
-    output signed [WIDHT-1:0] value
+    output signed [WIDTH-1:0] value
     );
    
    assign value = din;
