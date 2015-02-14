@@ -9,7 +9,7 @@ module inputport32
     input wire 		  reset,
 
     input wire [WIDTH-1:0] din,
-    output signed [WIDTH-1:0] value
+    output wire signed [WIDTH-1:0] value
     );
    
    assign value = din;
