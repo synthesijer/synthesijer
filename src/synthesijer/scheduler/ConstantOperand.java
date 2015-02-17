@@ -7,9 +7,12 @@ public class ConstantOperand implements Operand{
 	
 	private final String value;
 	
+	private final String origValue;
+	
 	private Type type;
 	
 	public ConstantOperand(String value, Type type){
+		this.origValue = value;
 		if(type instanceof PrimitiveTypeKind){
 			switch((PrimitiveTypeKind)type){
 			case FLOAT:
@@ -43,7 +46,11 @@ public class ConstantOperand implements Operand{
 	public String getValue(){
 		return value;
 	}
-	
+
+	public String getOrigValue(){
+		return origValue;
+	}
+
 	@Override
 	public String info(){
 		return value + ":" + type;

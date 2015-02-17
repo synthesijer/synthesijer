@@ -437,7 +437,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 						if(tmp != null) src = tmp;
 					}else if(src instanceof ConstantOperand){
 						// regenerate constant with appropriate type info.
-						src = new ConstantOperand(((ConstantOperand) src).getValue(), v.getType());
+						src = new ConstantOperand(((ConstantOperand) src).getOrigValue(), v.getType());
 					}
 				}
 			}
@@ -798,7 +798,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			result = parent.addCast(v, o.getType());
 		}else if(v instanceof ConstantOperand){
 			//System.out.println(((ConstantOperand) v).getValue());
-			result = new ConstantOperand(((ConstantOperand) v).getValue(), o.getType());
+			result = new ConstantOperand(((ConstantOperand) v).getOrigValue(), o.getType());
 		}
 	}
 

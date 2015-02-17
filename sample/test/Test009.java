@@ -7,6 +7,10 @@ public class Test009{
 		int x;
 		long y;
 
+		float fd = 10.0f;
+		float fe = 30.0F;
+		fa = 10.0f;
+		fa = 30.0F;
 		fa = 100;
 		fb = 3;
 		fc = fa + fb;
@@ -22,6 +26,12 @@ public class Test009{
 		double db;
 		double dc;
 
+		double dd = 10.0d;
+		double de = 30.0D;
+		double df = 40.0f;
+		double dg = 50.0F;
+		da = 10.0d;
+		da = 30.0D;
 		da = 100;
 		db = 3;
 		dc = da + db;

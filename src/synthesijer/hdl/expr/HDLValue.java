@@ -19,6 +19,29 @@ public class HDLValue implements HDLLiteral{
 	public String getValue(){
 		return value;
 	}
+	
+	private long asLongValue(){
+		try{
+			long v = 0L;
+			if(value.contains(".")){
+				if(type.getWidth() == 64){
+					v = Double.doubleToLongBits(Double.parseDouble(value));
+				}else if(type.getWidth() == 32){
+					v = Float.floatToIntBits(Float.parseFloat(value));
+				}else{
+					String msg = "HDLExpr contains floating value: " + value + ", but width is not 32 or 64";
+					System.err.println(msg);
+					throw new RuntimeException(msg);
+				}
+			}else{
+				v = Long.parseLong(value);
+			}
+			return v;
+		}catch(NumberFormatException e){
+			System.err.println("HDLExpr contains illegal value: " + value);
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Override
 	public String getVHDL() {
@@ -26,7 +49,8 @@ public class HDLValue implements HDLLiteral{
 		case VECTOR:
 		case SIGNED: {
 			if(type.getWidth()%4 == 0){
-				String v = String.format("%016x", Long.parseLong(value));
+				//String v = String.format("%016x", Long.parseLong(value));
+				String v = String.format("%016x", asLongValue());
 				//System.out.printf("%s => %s => %s\n", value, v, v.substring(v.length()-type.getWidth()/4, v.length()));
 				if(v.length()-type.getWidth()/4 < 0){
 					System.out.println(v);
@@ -37,7 +61,8 @@ public class HDLValue implements HDLLiteral{
 			}else{
 				String v = "";
 				for(int i = 0; i < 64; i++){ v += "0"; }
-				v += Long.toBinaryString(Long.parseLong(value));
+				//v += Long.toBinaryString(Long.parseLong(value));
+				v += Long.toBinaryString(asLongValue());
 				return String.format("\"%s\"", v.substring(v.length()-type.getWidth(), v.length()));
 			}
 		}
@@ -62,12 +87,14 @@ public class HDLValue implements HDLLiteral{
 		case VECTOR:
 		case SIGNED:{
 			if(type.getWidth()%4 == 0){
-				String v = String.format("%064x", Long.parseLong(value));
+				//String v = String.format("%064x", Long.parseLong(value));
+				String v = String.format("%064x", asLongValue());
 				return String.format("%d'h%s", type.getWidth(), v.substring(v.length()-type.getWidth()/4, v.length()));
 			}else{
 				String v = "";
 				for(int i = 0; i < 64; i++){ v += "0"; }
-				v += Long.toBinaryString(Long.parseLong(value));
+				//v += Long.toBinaryString(Long.parseLong(value));
+				v += Long.toBinaryString(asLongValue());
 				return String.format("%d'b%s", type.getWidth(), v.substring(v.length()-type.getWidth(), v.length()));
 			}
 		}
