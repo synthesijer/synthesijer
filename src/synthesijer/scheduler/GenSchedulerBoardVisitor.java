@@ -561,7 +561,9 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		Operand rhs = stepIn(o.getRhs());
 		//VariableOperand tmp = newVariable("binary_expr", stepIn(lhs.getType()));
 		VariableOperand tmp = newVariable("binary_expr", lhs.getType());
-		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.get(o.getOp()), new Operand[]{lhs,rhs}, tmp));
+		Op op = Op.get(o.getOp(), lhs, rhs);
+		//parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.get(o.getOp()), new Operand[]{lhs,rhs}, tmp));
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, tmp));
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)lhs));
 		result = lhs;
 	}

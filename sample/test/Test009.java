@@ -21,6 +21,10 @@ public class Test009{
 		x = (int)fc;
 		fc = fa / fb;
 		x = (int)fc;
+		fc += fa;
+		fc -= fa;
+		fc *= fa;
+		fc /= fa;
 
 		double da;
 		double db;
@@ -42,6 +46,10 @@ public class Test009{
 		y = (long)dc;
 		dc = da / db;
 		y = (long)dc;
+		dc += da;
+		dc -= da;
+		dc *= da;
+		dc /= da;
 
 		dc = da + fb;
 		y = (long)dc;
