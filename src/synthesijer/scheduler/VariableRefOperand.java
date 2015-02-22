@@ -7,7 +7,7 @@ public class VariableRefOperand extends VariableOperand{
 	private final VariableOperand ref; 
 	
 	public VariableRefOperand(String name, Type type, VariableOperand ref){
-		super(name, type, null);
+		super(name, type);
 		this.ref = ref;
 	}
 

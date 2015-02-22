@@ -1,7 +1,7 @@
 package synthesijer.scheduler;
 
+import synthesijer.ast.Expr;
 import synthesijer.ast.Type;
-import synthesijer.ast.Variable;
 
 public class VariableOperand implements Operand{
 	
@@ -9,16 +9,34 @@ public class VariableOperand implements Operand{
 	
 	private final Type type;
 	
-	private final Variable var;
+	private final Expr initExpr;
+	
+	private final boolean publicFlag;
+	
+	private final boolean globalConstantFlag;
+
+	private final boolean methodParamFlag;
+	
+	private final String origName;
+	
+	private final String methodName;
+	
+	private final boolean privateMethodFlag;
 	
 	public VariableOperand(String name, Type type){
-		this(name, type, null);
+		this(name, type, null, false, false, false, name, null, false);
 	}
 
-	public VariableOperand(String name, Type type, Variable var){
+	public VariableOperand(String name, Type type, Expr initExpr, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag){
 		this.name = name;
 		this.type = type;
-		this.var = var;
+		this.initExpr = initExpr;
+		this.publicFlag = publicFlag;
+		this.globalConstantFlag = globalConstantFlag;
+		this.methodParamFlag = methodParamFlag;
+		this.origName = origName;
+		this.methodName = methodName;
+		this.privateMethodFlag = privateMethodFlag;
 	}
 
 	public String getName(){
@@ -30,8 +48,32 @@ public class VariableOperand implements Operand{
 		return type;
 	}
 	
-	public Variable getVariable(){
-		return var;
+	public Expr getInitExpr(){
+		return initExpr;
+	}
+	
+	public boolean isPublic(){
+		return publicFlag;
+	}
+	
+	public boolean isGlobalConstant(){
+		return globalConstantFlag;
+	}
+
+	public boolean isMethodParam(){
+		return methodParamFlag;
+	}
+	
+	public String getOrigName(){
+		return origName;
+	}
+
+	public String getMethodName(){
+		return methodName;
+	}
+	
+	public boolean isPrivateMethod(){
+		return privateMethodFlag;
 	}
 
 	@Override

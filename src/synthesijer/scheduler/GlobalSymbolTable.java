@@ -69,7 +69,11 @@ class VariableInfo{
 	HDLPort port;
 	
 	public VariableInfo(Variable v){
-		var = new VariableOperand(v.getName(), v.getType(), v);
+		if(v.getMethod() != null){
+			var = new VariableOperand(v.getName(), v.getType(), v.getInitExpr(), v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), v.getMethod().isPrivate());
+		}else{
+			var = new VariableOperand(v.getName(), v.getType(), v.getInitExpr(), v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), null, false);
+		}
 	}
 
 	public VariableInfo(HDLPort p){

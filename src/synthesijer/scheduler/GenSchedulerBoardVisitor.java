@@ -12,6 +12,7 @@ import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstTypeVisitor;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
+import synthesijer.ast.Variable;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
@@ -417,11 +418,17 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	@Override
 	public void visitVariableDecl(VariableDecl o) {
 		//Type t = stepIn(o.getVariable().getType());
-		Type t = o.getVariable().getType();
+		Variable vv = o.getVariable();
+		Type t = vv.getType();
 		String prefix = o.getScope().getMethod() == null ? "class" : o.getScope().getMethod().getName();
 		String vName;
 		vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
-		VariableOperand v = new VariableOperand(vName, t, o.getVariable());
+		VariableOperand v;
+		if(vv.getMethod() != null){
+			v = new VariableOperand(vName, t, o.getVariable().getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate());
+		}else{
+			v = new VariableOperand(vName, t, o.getVariable().getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false);
+		}
 		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
 		varTable.put(o.getName(), v);
 		varList.add(v);
@@ -729,7 +736,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(klass, o.getIdent().getSymbol());
 			type = var.var.getType();
 			tmp = newVariable("field_access", type);
-			Operand v = stepIn(var.var.getVariable().getInitExpr());
+			Operand v = stepIn(var.var.getInitExpr());
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, tmp));
 		}
 		

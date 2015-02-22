@@ -3,6 +3,7 @@ package synthesijer.scheduler;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Hashtable;
+import java.util.Optional;
 
 import synthesijer.CompileState;
 import synthesijer.Manager;
@@ -93,8 +94,8 @@ public class SchedulerInfoCompiler {
 	private void genDeclarations(){
 		for(ArrayList<VariableOperand> t: info.getVarTableList()){
 			for(VariableOperand v: t){
-				HDLVariable var = genHDLVariable(v);
-				if(var != null) varTable.put(v.getName(), var);
+				Optional<HDLVariable> var = Optional.ofNullable(genHDLVariable(v));
+				var.ifPresent(x -> varTable.put(v.getName(), x));
 			}
 		}
 	}
@@ -165,34 +166,31 @@ public class SchedulerInfoCompiler {
 			}
 			if(type == PrimitiveTypeKind.VOID) return null; // Void variable is not synthesized.
 			HDLSignal sig = hm.newSignal(name, getHDLType(type));
-			if(v.getVariable() != null){
-//				if(v.getVariable().getInitExpr() instanceof Literal){
-				if(v.getVariable().getInitExpr() != null && v.getVariable().getInitExpr().isConstant()){
-					HDLExpr e = convExprToHDLExpr(v.getVariable().getInitExpr(), (HDLPrimitiveType)sig.getType());
-					if(e == null){
-						//SynthesijerUtils.warn("initial value is not allowed:" + v.getVariable().getInitExpr());
-					}else{
-						sig.setResetValue(e);
-					}
+			if(v.getInitExpr() != null && v.getInitExpr().isConstant()){
+				HDLExpr e = convExprToHDLExpr(v.getInitExpr(), (HDLPrimitiveType)sig.getType());
+				if(e == null){
+					//SynthesijerUtils.warn("initial value is not allowed:" + v.getVariable().getInitExpr());
 				}else{
-					//SynthesijerUtils.warn("only litral for initial value is allowd: " + v.getName() + ":" + v.getVariable().getInitExpr());
+					sig.setResetValue(e);
 				}
+			}else{
+				//SynthesijerUtils.warn("only litral for initial value is allowd: " + v.getName() + ":" + v.getVariable().getInitExpr());
 			}
-			if(v.getVariable() != null && v.getVariable().isMethodParam()){
-				if(v.getVariable().getMethod().isPrivate()){
-					String prefix = v.getVariable().getMethod().getName();
-					String n = prefix + "_" + v.getVariable().getName();
+			if(v.isMethodParam()){
+				if(v.isPrivateMethod()){
+					String prefix = v.getMethodName();
+					String n = prefix + "_" + v.getOrigName();
 					HDLSignal local = hm.newSignal(n + "_local", getHDLType(type));
 					getMethodParamPairList(prefix).add(new Pair(sig, null, local));
 				}else{
-					String prefix = v.getVariable().getMethod().getName();
-					String n = prefix + "_" + v.getVariable().getName();
+					String prefix = v.getMethodName();
+					String n = prefix + "_" + v.getOrigName();
 					HDLPort port = hm.newPort(n, HDLPort.DIR.IN, getHDLType(type));
 					HDLSignal local = hm.newSignal(n + "_local", getHDLType(type));
 					getMethodParamPairList(prefix).add(new Pair(sig, port, local));
 				}
-			}else if(v.getVariable() != null && v.getVariable().isPublic() && (!v.getVariable().isGlobalConstant())){
-				String n = v.getVariable().getName();
+			}else if(v.isPublic() && (!v.isGlobalConstant())){
+				String n = v.getOrigName();
 				HDLPort din = hm.newPort(n + "_in", HDLPort.DIR.IN, getHDLType(type));
 				HDLPort we = hm.newPort(n + "_we", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 				HDLPort dout = hm.newPort(n + "_out", HDLPort.DIR.OUT, getHDLType(type));
@@ -205,7 +203,7 @@ public class SchedulerInfoCompiler {
 			return sig;
 		}else if(type instanceof ArrayType){
 			HDLInstance array = genHDLVariable(name, (ArrayType)type);
-			NewArray expr = (NewArray)(v.getVariable().getInitExpr());
+			NewArray expr = (NewArray)(v.getInitExpr());
 			if(expr.getDimExpr().get(0) instanceof Literal){
 				Literal value = (Literal)(expr.getDimExpr().get(0));
 				array.getParameterPair("WORDS").setValue(value.getValueAsStr());
@@ -216,8 +214,8 @@ public class SchedulerInfoCompiler {
 				SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + expr.getDimExpr());
 				SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
 			}
-			if(v.getVariable() != null && v.getVariable().isPublic() && (!v.getVariable().isGlobalConstant())){
-				String n = v.getVariable().getName();
+			if(v.isPublic() && (!v.isGlobalConstant())){
+				String n = v.getOrigName();
 				HDLPort addr = hm.newPort(n + "_address", HDLPort.DIR.IN, array.getSignalForPort("address").getType());
 				HDLPort we = hm.newPort(n + "_we", HDLPort.DIR.IN, array.getSignalForPort("we").getType());
 				HDLPort oe = hm.newPort(n + "_oe", HDLPort.DIR.IN, array.getSignalForPort("oe").getType());
@@ -246,7 +244,7 @@ public class SchedulerInfoCompiler {
 				SynthesijerUtils.info("<<< return to compiling " + this.info.getName());
 			}
 			HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
-			NewClassExpr expr = (NewClassExpr)v.getVariable().getInitExpr();
+			NewClassExpr expr = (NewClassExpr)v.getInitExpr();
 			if(expr.getParameters().size() > 0){
 				NewArray param = (NewArray)(expr.getParameters().get(0));
 				ArrayList<Expr> elem = param.getElems();
