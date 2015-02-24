@@ -368,16 +368,8 @@ public class SchedulerInfoCompiler {
 	}
 	
 	private void genExprs(SchedulerBoard board, Hashtable<Integer, SequencerState> states){
-		Method m = board.getMethod();
 		HDLSignal return_sig = null;
-		if(m.getType() != PrimitiveTypeKind.VOID){
-			if(board.getMethod().isPrivate() == false){
-				HDLPort return_port = hm.newPort(board.getName() + "_return", HDLPort.DIR.OUT, getHDLType(m.getType()));
-				return_sig = return_port.getSignal();
-			}else{
-				return_sig = hm.newSignal(board.getName() + "_return", getHDLType(m.getType()));
-			}
-		}
+		return_sig = returnSigTable.get(board);
 		
 		Hashtable<String, FieldAccessItem> fieldAccessChainMap = new Hashtable<>();
 		for(SchedulerSlot slot: board.getSlots()){
@@ -804,8 +796,21 @@ public class SchedulerInfoCompiler {
 		HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
 		dest.setAssign(state, inst.getSignalForPort("result"));
 	}
+	
+	private Hashtable<SchedulerBoard, HDLSignal> returnSigTable = new Hashtable<>();
 
 	private void genMethodCtrlSignals(SchedulerBoard board){
+		Method m = board.getMethod();
+	
+		if(m.getType() != PrimitiveTypeKind.VOID){
+			if(board.getMethod().isPrivate() == false){
+				HDLPort return_port = hm.newPort(board.getName() + "_return", HDLPort.DIR.OUT, getHDLType(m.getType()));
+				returnSigTable.put(board, return_port.getSignal());
+			}else{
+				HDLSignal return_sig = hm.newSignal(board.getName() + "_return", getHDLType(m.getType()));
+				returnSigTable.put(board, return_sig);
+			}
+		}
 
 		if(board.getMethod().isAuto()){
 			return; 
