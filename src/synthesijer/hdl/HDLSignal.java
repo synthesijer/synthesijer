@@ -111,10 +111,24 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	public boolean isIgnore(){
 		return ignoreFlag;
 	}
+	
+	private void remove(SequencerState s){
+		ArrayList<AssignmentCondition> dup = new ArrayList<>();
+		for(AssignmentCondition c: conditions){
+			if(c.getSequencerState().equals(s)){
+				dup.add(c);
+			}
+		}
+		for(AssignmentCondition d: dup){
+			conditions.remove(d);
+		}
+	}
+	
 
 	@Override
 	public void setAssign(SequencerState s, HDLExpr expr){
 		if(s != null){
+			remove(s);
 			AssignmentCondition c = new AssignmentCondition(s, expr);
 			conditions.add(c);
 		}else{

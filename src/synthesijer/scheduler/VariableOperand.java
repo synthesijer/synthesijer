@@ -1,5 +1,7 @@
 package synthesijer.scheduler;
 
+import java.util.Hashtable;
+
 import synthesijer.ast.Expr;
 import synthesijer.ast.Type;
 
@@ -22,6 +24,10 @@ public class VariableOperand implements Operand{
 	private final String methodName;
 	
 	private final boolean privateMethodFlag;
+	
+	private boolean chaining = false;
+	
+	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
 	
 	public VariableOperand(String name, Type type){
 		this(name, type, null, false, false, false, name, null, false);
@@ -74,6 +80,20 @@ public class VariableOperand implements Operand{
 	
 	public boolean isPrivateMethod(){
 		return privateMethodFlag;
+	}
+	
+	public void setChaining(SchedulerItem ctx, SchedulerItem pred){
+		chaining = true;
+		predItemMap.put(ctx, pred);
+	}
+	
+	@Override
+	public boolean isChaining(SchedulerItem ctx){
+		return predItemMap.containsKey(ctx);
+	}
+
+	public SchedulerItem getPredItem(SchedulerItem ctx){
+		return predItemMap.get(ctx);
 	}
 
 	@Override

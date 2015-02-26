@@ -7,5 +7,7 @@ public interface Operand {
 	public String info();
 	
 	public Type getType();
+	
+	public boolean isChaining(SchedulerItem ctx);
 
 }

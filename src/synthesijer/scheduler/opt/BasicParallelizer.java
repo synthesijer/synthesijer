@@ -13,6 +13,8 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class BasicParallelizer implements SchedulerInfoOptimizer{
+	
+	public static final boolean DEBUG = false;
 
 	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = new SchedulerInfo(info.getName());
@@ -241,7 +243,9 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		SchedulerBoard ret = new SchedulerBoard(src.getName(), src.getMethod());
 		SchedulerSlot[] slots = src.getSlots();
 		Hashtable<SchedulerSlot, Integer> degrees = getEntryDegrees(slots);
-		//dumpDegree(src.getName(), degrees);
+		if(DEBUG){
+			dumpDegree(src.getName(), degrees);
+		}
 		ArrayList<SchedulerSlot> bb = null;
 		Hashtable<Integer, Integer> id_map = new Hashtable<>();
 		SchedulerSlot prev = null;

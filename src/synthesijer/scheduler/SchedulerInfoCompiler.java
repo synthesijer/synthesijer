@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Hashtable;
 import java.util.Optional;
 
+import scala.Predef;
 import synthesijer.CompileState;
 import synthesijer.Manager;
 import synthesijer.Manager.SynthesijerModuleInfo;
@@ -346,20 +347,31 @@ public class SchedulerInfoCompiler {
 		return null;
 	}
 	
+	private Hashtable<SchedulerItem, HDLExpr> predExprMap;
 	private void genStatemachines(){
 		for(SchedulerBoard board: info.getBoardsList()){		
 			genMethodCtrlSignals(board);
 		}
 		for(SchedulerBoard board: info.getBoardsList()){
+			predExprMap = new Hashtable<>();
 			Hashtable<Integer, SequencerState> states = genStatemachine(board);
 			genExprs(board, states);
 		}
 	}
 		
-	private HDLExpr convOperandToHDLExpr(Operand o){
+	private HDLExpr convOperandToHDLExpr(SchedulerItem item, Operand o){
 		HDLExpr ret;
 		if(o instanceof VariableOperand){
-			ret = varTable.get(((VariableOperand)o).getName());
+			if(o.isChaining(item)){
+				SchedulerItem pred = ((VariableOperand)o).getPredItem(item);
+				if(predExprMap.containsKey(pred)){
+					ret = predExprMap.get(pred);
+				}else{
+					ret = varTable.get(((VariableOperand)o).getName());	
+				}
+			}else{
+				ret = varTable.get(((VariableOperand)o).getName());
+			}
 		}else{ // instanceof ConstantOperand
 			ConstantOperand c = (ConstantOperand)o;
 			ret = new HDLValue(c.getValue(), (HDLPrimitiveType)getHDLType(c.getType()));
@@ -370,12 +382,11 @@ public class SchedulerInfoCompiler {
 	private void genExprs(SchedulerBoard board, Hashtable<Integer, SequencerState> states){
 		HDLSignal return_sig = null;
 		return_sig = returnSigTable.get(board);
-		
 		Hashtable<String, FieldAccessItem> fieldAccessChainMap = new Hashtable<>();
 		for(SchedulerSlot slot: board.getSlots()){
 			int id = slot.getStepId();
 			for(SchedulerItem item: slot.getItems()){
-				genExpr(board, item, states.get(id), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap);
+				genExpr(board, item, states.get(id), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap, predExprMap);
 			}
 		}
 		
@@ -451,7 +462,7 @@ public class SchedulerInfoCompiler {
 		}
 	}
 	
-	private void genExpr(SchedulerBoard board, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap){
+	private void genExpr(SchedulerBoard board, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap, Hashtable<SchedulerItem, HDLExpr> predExprMap){
 		switch(item.getOp()){
 		case METHOD_ENTRY:{
 			if(paramList != null){
@@ -493,10 +504,12 @@ public class SchedulerInfoCompiler {
 						}
 					}
 				}else{
-					d = (HDLVariable)(convOperandToHDLExpr(dest));
+					d = (HDLVariable)(convOperandToHDLExpr(item, dest));
 				}
 				if(d != null){
-					d.setAssign(state, convOperandToHDLExpr(src[0]));
+					HDLExpr expr = convOperandToHDLExpr(item, src[0]);
+					d.setAssign(state, expr);
+					predExprMap.put(item, expr);
 				}
 				
 			}else if(dest.getType() instanceof ArrayRef){
@@ -523,7 +536,7 @@ public class SchedulerInfoCompiler {
 
 				we.setAssign(state, HDLPreDefinedConstant.HIGH);
 				we.setDefaultValue(HDLPreDefinedConstant.LOW);
-				din.setAssign(state, convOperandToHDLExpr(src[0]));
+				din.setAssign(state, convOperandToHDLExpr(item, src[0]));
 			}else{
 				SynthesijerUtils.warn("Unsupported ASSIGN: " + item.info());
 			}
@@ -540,7 +553,7 @@ public class SchedulerInfoCompiler {
 		case RETURN : {
 			if(return_sig == null) break;
 			Operand[] src = item.getSrcOperand();
-			return_sig.setAssign(state, convOperandToHDLExpr(src[0]));
+			return_sig.setAssign(state, convOperandToHDLExpr(item, src[0]));
 		}
 		case SELECT :{
 			break;
@@ -548,7 +561,7 @@ public class SchedulerInfoCompiler {
 		case ARRAY_ACCESS :{
 
 			state.setMaxConstantDelay(2);
-			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			Operand src[] = item.getSrcOperand();
 			
 			HDLSignal addr = null, oe = null, dout = null;
@@ -568,7 +581,7 @@ public class SchedulerInfoCompiler {
 				dout = obj.getSignalForPort(fa.name + "_dout");
 			}
 
-			HDLExpr index = convOperandToHDLExpr(src[1]);
+			HDLExpr index = convOperandToHDLExpr(item, src[1]);
 			addr.setAssign(state, 0, index);
 			if(oe != null){
 				oe.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
@@ -597,7 +610,7 @@ public class SchedulerInfoCompiler {
 				addr = obj.getSignalForPort(fa.name + "_address");
 			}
 			
-			HDLExpr index = convOperandToHDLExpr(src[1]);
+			HDLExpr index = convOperandToHDLExpr(item, src[1]);
 			addr.setAssign(state, index);
 	
 			break;
@@ -608,12 +621,12 @@ public class SchedulerInfoCompiler {
 			ArrayList<Pair> list = getMethodParamPairList(item0.name);
 			for(int i = 0; i < params.length; i++){
 				HDLSignal t = list.get(i).local;
-				HDLExpr s = convOperandToHDLExpr(params[i]);
+				HDLExpr s = convOperandToHDLExpr(item, params[i]);
 				t.setAssign(state.getTransitions().get(0).getDestState(), 0, s);  // should set in ***_body
 				//t.setAssign(state, 0, s);
 			}
 			if(item0.getDestOperand().getType() != PrimitiveTypeKind.VOID){
-				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item0.getDestOperand());
+				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item0.getDestOperand());
 				HDLSignal ret = hm.getSignal(item0.name + "_return");
 				if(ret == null) ret = hm.getPort(item0.name + "_return").getSignal();
 				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should read in ***_body
@@ -626,11 +639,11 @@ public class SchedulerInfoCompiler {
 			Operand[] params = item0.getSrcOperand();
 			for(int i = 0; i < item0.args.length; i++){
 				HDLSignal t = obj.getSignalForPort(item0.name + "_" + item0.args[i]);
-				t.setAssign(state.getTransitions().get(0).getDestState(), 0, convOperandToHDLExpr(params[i]));  // should set in ***_body
+				t.setAssign(state.getTransitions().get(0).getDestState(), 0, convOperandToHDLExpr(item, params[i]));  // should set in ***_body
 				//t.setAssign(state, 0, convOperandToHDLExpr(params[i]));
 			}
 			if(item0.getDestOperand().getType() != PrimitiveTypeKind.VOID){ // non-void function
-				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item0.getDestOperand());
+				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item0.getDestOperand());
 				HDLSignal ret = obj.getSignalForPort(item0.name + "_return");
 				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should read in ***_body
 				//dest.setAssign(state, ret);
@@ -642,7 +655,7 @@ public class SchedulerInfoCompiler {
 			HDLInstance obj = (HDLInstance)(varTable.get(item0.obj.getName()));
 			HDLSignal src = obj.getSignalForPort(item0.name); // only for array.length
 			if(src == null) src = obj.getSignalForPort(item0.name + "_out"); // normal 
-			HDLExpr dest = convOperandToHDLExpr(item0.getDestOperand());
+			HDLExpr dest = convOperandToHDLExpr(item, item0.getDestOperand());
 			if(dest instanceof HDLSignal && src != null){
 				HDLSignal d = (HDLSignal)dest;
 				d.setAssign(state, src);
@@ -661,18 +674,20 @@ public class SchedulerInfoCompiler {
 		}
 		case CAST:{
 			TypeCastItem item0 = (TypeCastItem)item;
-			HDLSignal dest = (HDLSignal)(convOperandToHDLExpr(item.getDestOperand()));
-			HDLExpr src = convOperandToHDLExpr(item.getSrcOperand()[0]);
+			HDLSignal dest = (HDLSignal)(convOperandToHDLExpr(item, item.getDestOperand()));
+			HDLExpr src = convOperandToHDLExpr(item, item.getSrcOperand()[0]);
 			int w0 = getBitWidth(item0.orig);
 			int w1 = getBitWidth(item0.target);
 			if(w0 < 0 || w1 < 0){
 				SynthesijerUtils.error("Unsupported CAST: " + item.info());
 			}
+			HDLExpr expr; 
 			if(w0 > w1){
-				dest.setAssign(state, hm.newExpr(HDLOp.DROPHEAD, src, HDLUtils.newValue(w0-w1, 32)));
+				expr = hm.newExpr(HDLOp.DROPHEAD, src, HDLUtils.newValue(w0-w1, 32));
 			}else{
-				dest.setAssign(state, hm.newExpr(HDLOp.PADDINGHEAD, src, HDLUtils.newValue(w1-w0, 32)));
+				expr = hm.newExpr(HDLOp.PADDINGHEAD, src, HDLUtils.newValue(w1-w0, 32));
 			}
+			dest.setAssign(state, expr);
 			break;
 		}
 		case UNDEFINED :{
@@ -690,9 +705,9 @@ public class SchedulerInfoCompiler {
 		{
 			Operand[] arg = item.getSrcOperand();
 			HDLInstance inst = getOperationUnit(item.getOp());
-			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
-			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
-			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
+			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("result"));
 			break;
 		}
@@ -701,12 +716,12 @@ public class SchedulerInfoCompiler {
 		{
 			Operand[] arg = item.getSrcOperand();
 			HDLInstance inst = getOperationUnit(item.getOp());
-			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
-			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
+			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
 			inst.getSignalForPort("nd").setResetValue(HDLPreDefinedConstant.LOW);
-			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("quantient"));
 			break;
 		}
@@ -715,11 +730,11 @@ public class SchedulerInfoCompiler {
 		{
 			Operand[] arg = item.getSrcOperand();
 			HDLInstance inst = getOperationUnit(item.getOp());
-			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
-			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
+			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
-			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("remainder"));
 			break;
 		}
@@ -734,11 +749,11 @@ public class SchedulerInfoCompiler {
 		{
 			Operand[] arg = item.getSrcOperand();
 			HDLInstance inst = getOperationUnit(item.getOp());
-			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
-			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
+			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
-			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("result"));
 			break;
 		}
@@ -751,10 +766,10 @@ public class SchedulerInfoCompiler {
 		{
 			Operand[] arg = item.getSrcOperand();
 			HDLInstance inst = getOperationUnit(item.getOp());
-			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
+			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
-			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("result"));
 			break;
 		}
@@ -771,16 +786,19 @@ public class SchedulerInfoCompiler {
 		case FCOMPEQ64: genCompUnitExpr(item, FCOMP64.EQ, state);  break;
 		case FNEQ64:    genCompUnitExpr(item, FCOMP64.NEQ, state); break;
 		default: {
+//			System.out.println(item.info());
 			HDLOp op = convOp2HDLOp(item.getOp());
 //			if(op == HDLOp.UNDEFINED) return;
-			HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item.getDestOperand()));
+			HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
 			Operand[] src = item.getSrcOperand();
 			int nums = op.getArgNums();
-			if(nums == 1){
-				dest.setAssign(state, hm.newExpr(op, convOperandToHDLExpr(src[0])));  
-			}else{
-				dest.setAssign(state, hm.newExpr(op, convOperandToHDLExpr(src[0]), convOperandToHDLExpr(src[1])));  
-			}
+			
+			HDLExpr expr = (nums == 1) ?
+				hm.newExpr(op, convOperandToHDLExpr(item, src[0])) :
+				hm.newExpr(op, convOperandToHDLExpr(item, src[0]), convOperandToHDLExpr(item, src[1]));
+			
+			dest.setAssign(state, expr);
+			predExprMap.put(item, expr);
 		}
 		}
 	}
@@ -788,12 +806,12 @@ public class SchedulerInfoCompiler {
 	private void genCompUnitExpr(SchedulerItem item, int opcode, SequencerState state){
 		Operand[] arg = item.getSrcOperand();
 		HDLInstance inst = getOperationUnit(item.getOp());
-		inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(arg[0]));
-		inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(arg[1]));
+		inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
+		inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 		inst.getSignalForPort("opcode").setAssign(state, 0, HDLUtils.newValue(opcode, 8));
 		inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 		inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
-		HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item.getDestOperand());
+		HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 		dest.setAssign(state, inst.getSignalForPort("result"));
 	}
 	
@@ -890,15 +908,15 @@ public class SchedulerInfoCompiler {
 				case SELECT:{
 					SelectItem item0 = (SelectItem)item;
 					for(int i = 0; i < item0.pat.length; i++){
-						HDLExpr cond = convOperandToHDLExpr(item0.target);
-						HDLExpr pat = convOperandToHDLExpr(item0.pat[i]);
+						HDLExpr cond = convOperandToHDLExpr(item, item0.target);
+						HDLExpr pat = convOperandToHDLExpr(item, item0.pat[i]);
 						s.addStateTransit(hm.newExpr(HDLOp.EQ, cond, pat), states.get(item.getSlot().getNextStep()[i]));
 					}
 					s.addStateTransit(states.get(item0.getSlot().getNextStep()[item0.pat.length]));
 					break;
 				}
 				case JT:{
-					HDLExpr flag = convOperandToHDLExpr(item.getSrcOperand()[0]);
+					HDLExpr flag = convOperandToHDLExpr(item, item.getSrcOperand()[0]);
 					s.addStateTransit(hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.HIGH), states.get(item.getSlot().getNextStep()[0]));
 					s.addStateTransit(hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW), states.get(item.getSlot().getNextStep()[1]));
 					break;

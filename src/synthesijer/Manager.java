@@ -55,6 +55,7 @@ import synthesijer.scheduler.opt.BasicParallelizer;
 import synthesijer.scheduler.opt.ConvArrayAccessToArrayIndex;
 import synthesijer.scheduler.opt.PackArrayWriteAccess;
 import synthesijer.scheduler.opt.SchedulerInfoOptimizer;
+import synthesijer.scheduler.opt.SimpleChaining;
 
 public enum Manager {
 	
@@ -262,6 +263,7 @@ public enum Manager {
 		optimize(new ConvArrayAccessToArrayIndex(), info); 
 		optimize(new PackArrayWriteAccess(), info); 
 		optimize(new BasicParallelizer(), info); 
+		optimize(new SimpleChaining(), info); 
 	}
 	
 	private void optimizeAll(){

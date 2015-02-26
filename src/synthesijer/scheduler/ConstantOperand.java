@@ -55,6 +55,10 @@ public class ConstantOperand implements Operand{
 	public String info(){
 		return value + ":" + type;
 	}
-
+	
+	@Override
+	public boolean isChaining(SchedulerItem ctx){
+		return false;
+	}
 
 }
