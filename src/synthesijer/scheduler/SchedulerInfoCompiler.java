@@ -371,6 +371,7 @@ public class SchedulerInfoCompiler {
 					//ret = predExprMap.get(pred);
 					ret = predExprMap.get(pred).getResultExpr();
 				}else{
+					SynthesijerUtils.warn("detected chaining, but chained expression is not found.");
 					ret = varTable.get(((VariableOperand)o).getName());	
 				}
 			}else{
@@ -543,7 +544,9 @@ public class SchedulerInfoCompiler {
 
 				we.setAssign(state, HDLPreDefinedConstant.HIGH);
 				we.setDefaultValue(HDLPreDefinedConstant.LOW);
-				din.setAssign(state, convOperandToHDLExpr(item, src[0]));
+				HDLExpr expr = convOperandToHDLExpr(item, src[0]);
+				din.setAssign(state, expr);
+				predExprMap.put(item, expr);
 			}else{
 				SynthesijerUtils.warn("Unsupported ASSIGN: " + item.info());
 			}
@@ -696,10 +699,13 @@ public class SchedulerInfoCompiler {
 			HDLExpr expr; 
 			if(w0 > w1){
 				expr = hm.newExpr(HDLOp.DROPHEAD, src, HDLUtils.newValue(w0-w1, 32));
-			}else{
+			}else if(w0 < w1){
 				expr = hm.newExpr(HDLOp.PADDINGHEAD, src, HDLUtils.newValue(w1-w0, 32));
+			}else{
+				expr = src; 
 			}
 			dest.setAssign(state, expr);
+			predExprMap.put(item, expr);
 			break;
 		}
 		case UNDEFINED :{
