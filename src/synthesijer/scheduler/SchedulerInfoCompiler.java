@@ -599,6 +599,7 @@ public class SchedulerInfoCompiler {
 			}
 			if(dout != null){
 				dest.setAssign(state, 2, dout);
+				predExprMap.put(item, dout);
 			}
 			
 			break;
@@ -640,6 +641,7 @@ public class SchedulerInfoCompiler {
 				HDLSignal ret = hm.getSignal(item0.name + "_return");
 				if(ret == null) ret = hm.getPort(item0.name + "_return").getSignal();
 				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should read in ***_body
+				predExprMap.put(item, ret);
 			}
 			break;
 		}
@@ -657,6 +659,7 @@ public class SchedulerInfoCompiler {
 				HDLSignal ret = obj.getSignalForPort(item0.name + "_return");
 				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should read in ***_body
 				//dest.setAssign(state, ret);
+				predExprMap.put(item, ret);
 			}
 			break;
 		}
@@ -669,6 +672,7 @@ public class SchedulerInfoCompiler {
 			if(dest instanceof HDLSignal && src != null){
 				HDLSignal d = (HDLSignal)dest;
 				d.setAssign(state, src);
+				predExprMap.put(item, src);
 			}else{
 				// just ref
 			}
@@ -727,6 +731,7 @@ public class SchedulerInfoCompiler {
 			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("result"));
+			predExprMap.put(item, inst.getSignalForPort("result"));
 			break;
 		}
 		case DIV32 :
@@ -741,6 +746,7 @@ public class SchedulerInfoCompiler {
 			inst.getSignalForPort("nd").setResetValue(HDLPreDefinedConstant.LOW);
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("quantient"));
+			predExprMap.put(item, inst.getSignalForPort("quantient"));
 			break;
 		}
 		case MOD32 :
@@ -754,6 +760,7 @@ public class SchedulerInfoCompiler {
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("remainder"));
+			predExprMap.put(item, inst.getSignalForPort("remainder"));
 			break;
 		}
 		case FADD32 :
@@ -773,6 +780,7 @@ public class SchedulerInfoCompiler {
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("result"));
+			predExprMap.put(item, inst.getSignalForPort("result"));
 			break;
 		}
 		case CONV_F2I:
@@ -789,6 +797,7 @@ public class SchedulerInfoCompiler {
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			dest.setAssign(state, inst.getSignalForPort("result"));
+			predExprMap.put(item, inst.getSignalForPort("result"));
 			break;
 		}
 		case FLT32:     genCompUnitExpr(item, FCOMP32.LT, state);  break;
@@ -831,6 +840,7 @@ public class SchedulerInfoCompiler {
 		inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
 		HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 		dest.setAssign(state, inst.getSignalForPort("result"));
+		predExprMap.put(item, inst.getSignalForPort("result"));
 	}
 	
 	private Hashtable<SchedulerBoard, HDLSignal> returnSigTable = new Hashtable<>();
