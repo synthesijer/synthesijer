@@ -67,19 +67,15 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		Hashtable<Operand, SchedulerItem> predItem = new Hashtable<>();
 		SchedulerSlot newSlot = null;
 		
-		System.out.println("----BB------");
 		int last = 0;
 		for(SchedulerSlot s: bb){
 			last = s.getNextStep()[0];
-			System.out.println("slot:" + s.getStepId() + "->" + last);
 			for(SchedulerItem item : s.getItems()){
-				System.out.println("  " + item.info());
 				int num = item.getSrcOperand().length;
 				for(int i = 0; i < num; i++){
 					Operand o = item.getSrcOperand()[i];
 					if((o instanceof VariableOperand) && predItem.containsKey(o)){
 						((VariableOperand)o).setChaining(item, predItem.get(o));
-						System.out.println("   <- " + predItem.get(o).info());
 					}
 				}
 				predItem.put(item.getDestOperand(), item);				
@@ -93,13 +89,9 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 				}
 			}
 		}
-		System.out.println("-new-");
 		for(SchedulerItem item: newSlot.getItems()){
 			item.setBranchId(last);
-			System.out.println(item.info());
 		}
-		System.out.println("end of BB---");
-		System.out.println();
 		return newSlot;
 	}
 	
@@ -172,8 +164,6 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		for(int i = 0; i < slots.length; i++){
 			SchedulerSlot slot = slots[i];
 			Integer d = degrees.get(slot);
-			System.out.println("check:");
-			slot.dump(System.out);
 			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0 || d > 1 || isExcept(slot.getItems()[0])){
 				if(bb != null && bb.size() > 0){
 					ret.addSlot(chaining(bb));
@@ -184,7 +174,6 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 				if(bb == null){
 					bb = new ArrayList<>();
 				}
-				System.out.println("add");
 				bb.add(slot);
 			}
 		}

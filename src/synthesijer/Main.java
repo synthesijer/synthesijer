@@ -18,7 +18,7 @@ import synthesijer.Manager.OutputFormat;
 public class Main {
 	
 	public static void main(String... args) throws GetOptException{
-		GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:", args);
+		GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining", args);
 		if(opt.flag("h") || opt.flag("help")){
 			printHelp();
 			System.exit(0);
@@ -28,9 +28,11 @@ public class Main {
 
 		Result result = compiler.compile(opt.getArgs());
 		
-		boolean optimizeFlag = !opt.flag("no-optimize");
 		boolean vhdlFlag = opt.flag("vhdl");
 		boolean verilogFlag = opt.flag("verilog");
+		Options options = new Options();
+		options.optimizing = !opt.flag("no-optimize");
+		options.chaining = opt.flag("chaining");
 		if(opt.flag("config")){
 			System.out.println("config: " + opt.getValue("config"));
 		}
@@ -42,7 +44,7 @@ public class Main {
 		if(result.isOK()){
 			dump("dump000.xml");
 			Manager.INSTANCE.preprocess();
-			Manager.INSTANCE.generate(optimizeFlag);
+			Manager.INSTANCE.generate(options);
 			if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
 			if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
 		}

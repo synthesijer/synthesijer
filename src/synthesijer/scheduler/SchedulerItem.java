@@ -130,6 +130,7 @@ public class SchedulerItem {
 		String sep = "";
 		for(Operand o: src){
 			s += sep + o.info();
+			if(o.isChaining(this)) s+= ":chain";
 			sep = ", ";
 		}
 		return s;

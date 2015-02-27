@@ -3,9 +3,10 @@ SYNTHESIJER ?= ../../bin
 SOURCES = led.java counter.java FireFly.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+OPT = --chaining
 
 led: $(SOURCES)
-	java -cp $(SYNTHESIJER) synthesijer.Main $(SOURCES)
+	java -cp $(SYNTHESIJER) synthesijer.Main $(OPT) $(SOURCES)
 	javac -cp $(SYNTHESIJER):. led_top.java
 	java -cp $(SYNTHESIJER):. led_top
 

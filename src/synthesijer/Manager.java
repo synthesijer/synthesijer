@@ -255,26 +255,28 @@ public enum Manager {
 		dumpSchedulerInfo(info.getSchedulerInfo(), obj.getKey());
 	}
 	
-	private void optimize(SynthesijerModuleInfo info){
+	private void optimize(SynthesijerModuleInfo info, Options opt){
 		if(info.sysnthesisFlag == false){
 			// skip, nothing to do
 			return;
 		}
 		optimize(new ConvArrayAccessToArrayIndex(), info); 
 		optimize(new PackArrayWriteAccess(), info); 
-		optimize(new BasicParallelizer(), info); 
-		optimize(new SimpleChaining(), info); 
-	}
-	
-	private void optimizeAll(){
-		for(SynthesijerModuleInfo info: modules.values()){
-			optimize(info);
+		optimize(new BasicParallelizer(), info);
+		if(opt.chaining){
+			optimize(new SimpleChaining(), info);
 		}
 	}
 	
-	public void generate(boolean optimizeFlag){
-		if(optimizeFlag){
-			optimizeAll();
+	private void optimizeAll(Options opt){
+		for(SynthesijerModuleInfo info: modules.values()){
+			optimize(info, opt);
+		}
+	}
+	
+	public void generate(Options opt){
+		if(opt.optimizing){
+			optimizeAll(opt);
 		}
 		compileSchedulerInfoAll();
 	}

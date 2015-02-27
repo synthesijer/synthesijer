@@ -3,9 +3,10 @@ SYNTHESIJER ?= ../../bin
 SOURCES = SC1602Test.java SC1602Wrapper.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+OPT = --chaining
 
 all:
-	java -cp $(SYNTHESIJER):. synthesijer.Main --vhld --verilog $(SOURCES)
+	java -cp $(SYNTHESIJER):. synthesijer.Main --vhld --verilog $(OPT) $(SOURCES)
 	javac -cp $(SYNTHESIJER):. SC1602TestKC705.java
 	java -cp $(SYNTHESIJER):. SC1602TestKC705
 

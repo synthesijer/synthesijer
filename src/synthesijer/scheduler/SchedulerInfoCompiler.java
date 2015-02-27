@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import scala.Predef;
 import synthesijer.CompileState;
+import synthesijer.IdentifierGenerator;
 import synthesijer.Manager;
 import synthesijer.Manager.SynthesijerModuleInfo;
 import synthesijer.SynthesijerUtils;
@@ -359,13 +360,16 @@ public class SchedulerInfoCompiler {
 		}
 	}
 		
+	
+	private IdentifierGenerator constIdGen = new IdentifierGenerator();
 	private HDLExpr convOperandToHDLExpr(SchedulerItem item, Operand o){
 		HDLExpr ret;
 		if(o instanceof VariableOperand){
 			if(o.isChaining(item)){
 				SchedulerItem pred = ((VariableOperand)o).getPredItem(item);
 				if(predExprMap.containsKey(pred)){
-					ret = predExprMap.get(pred);
+					//ret = predExprMap.get(pred);
+					ret = predExprMap.get(pred).getResultExpr();
 				}else{
 					ret = varTable.get(((VariableOperand)o).getName());	
 				}
@@ -374,7 +378,10 @@ public class SchedulerInfoCompiler {
 			}
 		}else{ // instanceof ConstantOperand
 			ConstantOperand c = (ConstantOperand)o;
-			ret = new HDLValue(c.getValue(), (HDLPrimitiveType)getHDLType(c.getType()));
+			HDLPrimitiveType type = (HDLPrimitiveType)getHDLType(c.getType());
+			//HDLSignal tmp = hm.newSignal(String.format("constant_%04d", constIdGen.id()), type);
+			//tmp.setAssign(null, new HDLValue(c.getValue(), type));
+			ret = new HDLValue(c.getValue(), type);
 		}
 		return ret;
 	}
@@ -676,6 +683,11 @@ public class SchedulerInfoCompiler {
 			TypeCastItem item0 = (TypeCastItem)item;
 			HDLSignal dest = (HDLSignal)(convOperandToHDLExpr(item, item.getDestOperand()));
 			HDLExpr src = convOperandToHDLExpr(item, item.getSrcOperand()[0]);
+			if(src instanceof HDLValue){
+				HDLSignal tmp = hm.newSignal(String.format("const_%04d", constIdGen.id()), (HDLPrimitiveType)src.getType());
+				tmp.setAssign(null, src);
+				src = tmp;
+			}
 			int w0 = getBitWidth(item0.orig);
 			int w1 = getBitWidth(item0.target);
 			if(w0 < 0 || w1 < 0){

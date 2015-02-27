@@ -3,9 +3,10 @@ SYNTHESIJER ?= ../../bin
 SOURCES = Test.java Top.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+OPT = --chaining
 
 led: $(SOURCES)
-	java -cp $(SYNTHESIJER) synthesijer.Main --vhdl --verilog $(SOURCES)
+	java -cp $(SYNTHESIJER) synthesijer.Main --vhdl --verilog $(OPT) $(SOURCES)
 
 clean:
 	-rm -f *.class

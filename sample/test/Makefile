@@ -3,9 +3,10 @@ SYNTHESIJER ?= ../../bin
 SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+OPT = --chaining
 
 all: $(SOURCES)
-	java -cp $(SYNTHESIJER) synthesijer.Main --verilog --vhdl $(SOURCES)
+	java -cp $(SYNTHESIJER) synthesijer.Main --verilog --vhdl $(OPT) $(SOURCES)
 
 ghdl64: $(VHDL_SOURCES)
 	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd

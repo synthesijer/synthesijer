@@ -3,11 +3,12 @@ SYNTHESIJER ?= ../../bin
 SOURCES = EchoTest.java RS232C_RX_Wrapper.java RS232C_TX_Wrapper.java ToUpper.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+OPT = --chaining
 
 all: hdl exstick microboard
 
 hdl: $(SOURCES)
-	java -cp $(SYNTHESIJER):. synthesijer.Main --vhdl --verilog $(SOURCES)
+	java -cp $(SYNTHESIJER):. synthesijer.Main --vhdl --verilog $(OPT) $(SOURCES)
 
 exstick: EchoTestTop.java 
 	javac -cp $(SYNTHESIJER):. EchoTestTop.java
