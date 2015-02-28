@@ -71,7 +71,11 @@ public class SchedulerItem {
 	public void overwriteOp(Op op){
 		this.op = op;
 	}
-	
+
+	public void overwriteSrc(int index, Operand o){
+		this.src[index] = o;
+	}
+
 	public String getBoardName(){
 		return board.getName();
 	}
