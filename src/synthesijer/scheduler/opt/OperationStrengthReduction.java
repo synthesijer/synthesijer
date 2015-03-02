@@ -35,7 +35,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		for(SchedulerSlot slot: src.getSlots()){
 			SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 			for(SchedulerItem item: slot.getItems()){
-				newSlot.addItem(conv(src, item));
+				newSlot.addItem(conv(item));
 			}
 			ret.addSlot(newSlot);
 		}
@@ -50,10 +50,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		return ((int)log2(x)) == log2(x);
 	}
 	
-	public SchedulerItem conv(SchedulerBoard board, SchedulerItem item){
-		if(item.getOp() != Op.MUL32){
-			return item;
-		}
+	private SchedulerItem convMulToShift(SchedulerItem item){
 		Operand[] src = item.getSrcOperand();
 		if(src[0] instanceof VariableOperand && src[1] instanceof VariableOperand){
 			return item;
@@ -64,7 +61,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		ConstantOperand k = (src[0] instanceof ConstantOperand) ? (ConstantOperand)src[0] : (ConstantOperand)src[1];
 		VariableOperand v = (src[0] instanceof VariableOperand) ? (VariableOperand)src[0] : (VariableOperand)src[1];
 		long value = Long.parseLong(k.getValue());
-		if(isPowerOfTwo(value) == false){
+		if(value < 0 || isPowerOfTwo(value) == false){
 			return item;
 		}
 		int shift = (int)log2(value);
@@ -72,5 +69,31 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		item.overwriteSrc(0, v);
 		item.overwriteSrc(1, new ConstantOperand(String.valueOf(shift), k.getType()));
 		return item;
+	}
+	
+	private SchedulerItem convDivToShift(SchedulerItem item){
+		Operand[] src = item.getSrcOperand();
+		if((src[0] instanceof VariableOperand && src[1] instanceof ConstantOperand) == false){
+			return item;
+		}
+		ConstantOperand k = (ConstantOperand)src[1];
+		long value = Long.parseLong(k.getValue());
+		if(value < 0 || isPowerOfTwo(value) == false){
+			return item;
+		}
+		int shift = (int)log2(value);
+		item.overwriteOp(Op.SIMPLE_ARITH_RSHIFT);
+		item.overwriteSrc(1, new ConstantOperand(String.valueOf(shift), k.getType()));
+		return item;
+	}
+	
+	public SchedulerItem conv(SchedulerItem item){
+		if(item.getOp() == Op.MUL32 || item.getOp() == Op.MUL64){
+			return convMulToShift(item);
+		}else if(item.getOp() == Op.DIV32 || item.getOp() == Op.DIV64){
+			return convDivToShift(item);
+		}else{
+			return item;
+		}
 	}
 }
