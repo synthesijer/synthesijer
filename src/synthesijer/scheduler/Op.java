@@ -38,6 +38,7 @@ public enum Op {
 	SELECT(true), // switch selector
 	AND,
 	NOT,
+	MSB_FLAP,
 	LAND,
 	LOR,
 	OR,

@@ -57,7 +57,7 @@ public class HDLCombinationExpr implements HDLExpr{
 		}else if(t1.getKind().hasWdith() && t1.getKind().isPrimitive()){
 			t = t2;
 		}else if(t1.getKind() == HDLType.KIND.BIT && t2.getKind() == HDLType.KIND.BIT){
-			return t1;
+			t = t1;
 		}else{
 		}
 		return t;
@@ -105,6 +105,7 @@ public class HDLCombinationExpr implements HDLExpr{
 		}else{
 			switch(op){
 			case NOT:
+			case MSB_FLAP:
 				return args[0].getType();
 			case REF:
 				return HDLPrimitiveType.genBitType();
@@ -187,6 +188,11 @@ public class HDLCombinationExpr implements HDLExpr{
 			switch(op){
 			case NOT:
 				return String.format("%s %s", op.getVHDL(), args[0].getResultExpr().getVHDL());
+			case MSB_FLAP: {
+				String v = args[0].getResultExpr().getVHDL();
+				HDLPrimitiveType t = (HDLPrimitiveType)(args[0].getResultExpr().getType());
+				return String.format("(not %s[%d-1]) & %s[%d-2 downto 0]", v, t.getWidth(), v, t.getWidth());
+			}
 			case REF:
 				return String.format("%s(%s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
 			case IF:{
@@ -315,6 +321,11 @@ public class HDLCombinationExpr implements HDLExpr{
 			switch(op){
 			case NOT:
 				return String.format("%s%s", op.getVerilogHDL(), args[0].getResultExpr().getVHDL());
+			case MSB_FLAP: {
+				String v = args[0].getResultExpr().getVerilogHDL();
+				HDLPrimitiveType t = (HDLPrimitiveType)(args[0].getResultExpr().getType());
+				return String.format("{(~%s[%d-1]), %s[%d-2:0]}", v, t.getWidth(), v, t.getWidth());
+			}
 			case REF:
 				return String.format("%s[%s]", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 			case IF:

@@ -833,7 +833,11 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		}
 		case MINUS:{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
-			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{c0, v}, tmp));
+			if(isFloat(tmp.getType())){
+				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.MSB_FLAP, new Operand[]{v}, tmp));
+			}else{
+				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{c0, v}, tmp));
+			}
 			result = tmp;
 			break;
 		}

@@ -48,6 +48,8 @@ public class Test000{
 	x = (int)fc;
 	fc = fa / fb;
 	x = (int)fc;
+	fc = -fa;
+	x = (int)fc;
 
 	double da, db, dc;
 	da = la;
@@ -60,6 +62,8 @@ public class Test000{
 	dc = da * db;
 	y = (long)dc;
 	dc = da / db;
+	y = (long)dc;
+	dc = -da;
 	y = (long)dc;
 
     }

@@ -436,6 +436,7 @@ public class SchedulerInfoCompiler {
 		case SELECT : break;
 		case AND : ret = HDLOp.AND;break;
 		case NOT : ret = HDLOp.NOT;break;
+		case MSB_FLAP : ret = HDLOp.MSB_FLAP;break;
 		case LAND : ret = HDLOp.AND;break;
 		case LOR : ret = HDLOp.OR;break;
 		case OR : ret = HDLOp.OR;break;
