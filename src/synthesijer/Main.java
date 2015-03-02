@@ -67,7 +67,7 @@ public class Main {
 		System.out.println("  (If you specify neither --vhdl nor --verilog, --vhdl is selected.)");
 		System.out.println("  --config=file: thespecified file is used for compiler settings");
 		System.out.println("  --no-optimize: do not apply any optimizations");
-		System.out.println("  --chaining: do opeartion chain in greeding manner");
+		System.out.println("  --chaining: do opeartion chain in greedy manner");
 		System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
 		System.out.println();
 		System.out.println("Please access to http://synthesijer.sorceforge.net/ for more information.");
