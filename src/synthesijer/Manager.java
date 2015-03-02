@@ -261,7 +261,9 @@ public enum Manager {
 			// skip, nothing to do
 			return;
 		}
-		optimize(new OperationStrengthReduction(), info); 
+		if(opt.operation_strength_reduction){
+			optimize(new OperationStrengthReduction(), info);
+		}
 		optimize(new ConvArrayAccessToArrayIndex(), info); 
 		optimize(new PackArrayWriteAccess(), info); 
 		optimize(new BasicParallelizer(), info);

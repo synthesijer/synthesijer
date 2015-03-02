@@ -33,6 +33,8 @@ public class Main {
 		Options options = new Options();
 		options.optimizing = !opt.flag("no-optimize");
 		options.chaining = opt.flag("chaining");
+		options.operation_strength_reduction = opt.flag("operation_strength_reduction");
+
 		if(opt.flag("config")){
 			System.out.println("config: " + opt.getValue("config"));
 		}
