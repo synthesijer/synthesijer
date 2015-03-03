@@ -21,7 +21,7 @@ public class Main {
 	
 	public static void main(String... args) throws GetOptException{
 		GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,ip-exact:,vendor:,libname:", args);
-		if(opt.flag("h") || opt.flag("help")){
+		if(opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0){
 			printHelp();
 			System.exit(0);
 		}
