@@ -8,6 +8,8 @@ import net.wasamon.mjlib.util.GetOpt;
 import net.wasamon.mjlib.util.GetOptException;
 import openjdk.com.sun.tools.javac.main.Main.Result;
 import synthesijer.Manager.OutputFormat;
+import synthesijer.hdl.HDLModule;
+import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 
 /**
  * The user interface for Synthesijer.
@@ -18,7 +20,7 @@ import synthesijer.Manager.OutputFormat;
 public class Main {
 	
 	public static void main(String... args) throws GetOptException{
-		GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining", args);
+		GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,ip-exact:,vendor:,libname:", args);
 		if(opt.flag("h") || opt.flag("help")){
 			printHelp();
 			System.exit(0);
@@ -34,6 +36,20 @@ public class Main {
 		options.optimizing = !opt.flag("no-optimize");
 		options.chaining = opt.flag("chaining");
 		options.operation_strength_reduction = opt.flag("operation_strength_reduction");
+		boolean packaging = false;
+		String packageTop = "";
+		if(opt.flag("ip-exact")){
+			packageTop = opt.getValue("ip-exact");
+			packaging = true;
+		}
+		String vendor = "synthesijer";
+		if(opt.flag("vendor")){
+			vendor = opt.getValue("vendor");
+		}
+		String libname = "user";
+		if(opt.flag("libname")){
+			libname = opt.getValue("user");
+		}
 
 		if(opt.flag("config")){
 			System.out.println("config: " + opt.getValue("config"));
@@ -49,6 +65,10 @@ public class Main {
 			Manager.INSTANCE.generate(options);
 			if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
 			if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
+			if(packaging){
+				HDLModule m = Manager.INSTANCE.searchHDLModuleInfo(packageTop).getHDLModule();
+				HDLModuleToComponentXML.conv(m, null, vendor, libname);
+			}
 		}
 		System.exit(result.exitCode);
 	}
