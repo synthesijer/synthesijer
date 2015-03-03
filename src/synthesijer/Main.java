@@ -89,6 +89,9 @@ public class Main {
 		System.out.println("  --no-optimize: do not apply any optimizations");
 		System.out.println("  --chaining: do opeartion chain in greedy manner");
 		System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
+		System.out.println("  --ip-exact=TOP: generates a IP package template for \"TOP\" module");
+		System.out.println("  --vendor=name: to specify vendor id for generating a IP package");
+		System.out.println("  --libname=name: to specify library name for generating a IP package");
 		System.out.println();
 		System.out.println("Please access to http://synthesijer.sorceforge.net/ for more information.");
 		System.out.println();

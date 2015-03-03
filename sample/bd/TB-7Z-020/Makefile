@@ -8,9 +8,10 @@ SOURCES = ../../../../synthesijer-applications/src/synthesijer/lib/axi/SimpleAXI
           SinTableRom.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+OPT = --chaining --ip-exact=RGBTest
 
 all: $(SOURCES)
-	java -cp $(CLASSPATH) synthesijer.Main --verilog --vhdl $(SOURCES)
+	java -cp $(CLASSPATH) synthesijer.Main --verilog --vhdl $(OPT) $(SOURCES)
 
 clean:
 	-rm -f *.class
