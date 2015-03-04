@@ -33,6 +33,7 @@ import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.HDLSequencer;
 import synthesijer.hdl.HDLSignal;
+import synthesijer.hdl.HDLSignalBinding;
 import synthesijer.hdl.HDLType;
 import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.HDLVariable;
@@ -260,7 +261,7 @@ public class SchedulerInfoCompiler {
 					inst.getParameterPair(key).setValue(value);
 				}
 			}
-
+			Hashtable<HDLSignalBinding, HDLSignalBinding> exportBindingMap = new Hashtable<>();
 			for(HDLPort p: inst.getSubModule().getPorts()){
 				if(p.isSet(HDLPort.OPTION.EXPORT)){
 					String n = inst.getSignalForPort(p.getName()).getName();
@@ -273,6 +274,18 @@ public class SchedulerInfoCompiler {
 						export.getSignal().setAssign(null, inst.getSignalForPort(p.getName()));
 					}else{
 						inst.getSignalForPort(p.getName()).setAssign(null, export.getSignal());
+					}
+					if(p.isBinded()){
+						HDLSignalBinding b = p.getSignalBinding();
+						HDLSignalBinding e = null;
+						if(exportBindingMap.containsKey(b) == false){
+							// only first time for this binding
+							e = b.export(inst.getName());
+							exportBindingMap.put(b, e);
+						}else{
+							e = exportBindingMap.get(b);
+						}
+						e.set(export, b.get(p));
 					}
 				}
 			}

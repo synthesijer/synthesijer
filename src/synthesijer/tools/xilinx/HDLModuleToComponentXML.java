@@ -8,6 +8,7 @@ import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort;
 import synthesijer.hdl.HDLPrimitiveType;
+import synthesijer.hdl.HDLSignalBinding;
 import synthesijer.hdl.HDLType;
 
 public class HDLModuleToComponentXML {
@@ -72,12 +73,21 @@ public class HDLModuleToComponentXML {
 			for(String s: libs) src.add(s);
 		}
 		ArrayList<HDLModule> requires = listOfRequires(module);
+
 		for(HDLModule m: requires){
 			src.add("src/" + m.getName() + ".vhd");
 		}
 		src.add("src/" + module.getName() + ".vhd");
 		
-		GenComponentXML o = new GenComponentXML(vendor, lib, module.getName(), 1, 0, list.toArray(new PortInfo[0]), src.toArray(new String[0]));
+		ArrayList<HDLSignalBinding> bindings = new ArrayList<>();
+		for(HDLPort p: module.getPorts()){
+			if(p.isBinded()){
+				HDLSignalBinding b = p.getSignalBinding();
+				if(bindings.contains(b) == false) bindings.add(b);
+			}
+		}
+		
+		GenComponentXML o = new GenComponentXML(vendor, lib, module.getName(), 1, 0, list.toArray(new PortInfo[0]), src.toArray(new String[0]), bindings.toArray(new HDLSignalBinding[0]));
 		
 		File basedir = new File(o.getCoreUniqName());
 		basedir.mkdir();

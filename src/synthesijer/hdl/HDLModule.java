@@ -24,6 +24,7 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	private ArrayList<HDLInstance> submodules = new ArrayList<>();
 	private ArrayList<HDLExpr> exprs = new ArrayList<>();
 	private ArrayList<HDLParameter> parameters = new ArrayList<>();
+	private ArrayList<HDLSignalBinding> bindings = new ArrayList<>();
 	
 	private HDLPort sysClk; 
 	private HDLPort sysReset; 
@@ -221,6 +222,14 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 			if(s.getStateKey().getName().equals(name)) return s;
 		}
 		return null;
+	}
+	
+	public void addSignalBinding(HDLSignalBinding binding){
+		bindings.add(binding);
+	}
+	
+	public HDLSignalBinding[] getSignalBindings(){
+		return bindings.toArray(new HDLSignalBinding[0]);
 	}
 	
 	public void genVHDL(PrintWriter dest){

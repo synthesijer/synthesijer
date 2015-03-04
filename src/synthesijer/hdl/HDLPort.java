@@ -17,6 +17,8 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 	
 	private final EnumSet<OPTION> options;
 	
+	private HDLSignalBinding binding = null;
+	
 	HDLPort(HDLModule m, String name, DIR dir, HDLType type, EnumSet<OPTION> opt){
 		this(m, name, "", dir, type, opt);
 	}
@@ -112,6 +114,17 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 		return str;
 	}
 	
+	public void setSignalBinding(HDLSignalBinding b){
+		this.binding = b;
+	}
+	
+	public boolean isBinded(){
+		return !(binding == null);
+	}
+	
+	public HDLSignalBinding getSignalBinding(){
+		return binding;
+	}
 	
 	@Override
 	public void accept(HDLTreeVisitor v) {

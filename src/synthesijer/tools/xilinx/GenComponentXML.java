@@ -1,6 +1,7 @@
 package synthesijer.tools.xilinx;
 
 import java.io.File;
+import java.util.Enumeration;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,6 +16,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import synthesijer.hdl.HDLPort;
+import synthesijer.hdl.HDLSignalBinding;
+
 public class GenComponentXML {
 
 	private Document document;
@@ -24,11 +28,12 @@ public class GenComponentXML {
 	public final String CORE_NAME;
 	public final PortInfo[] ports;
 	public final String[] files;
+	public final HDLSignalBinding[] bindings;
 	
 	public final int MajorVersion;
 	public final int MinorVersion; 
 
-	public GenComponentXML(String vendor, String lib, String core, int major, int minor, PortInfo[] ports, String[] files) {
+	public GenComponentXML(String vendor, String lib, String core, int major, int minor, PortInfo[] ports, String[] files, HDLSignalBinding[] bindings) {
 		this.VENDOR_NAME = vendor;
 		this.LIBRARY_NAME = lib;
 		this.CORE_NAME = core;
@@ -36,6 +41,7 @@ public class GenComponentXML {
 		this.MinorVersion = minor;
 		this.ports = ports;
 		this.files = files;
+		this.bindings = bindings;
 		
 		try {
 			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -50,6 +56,15 @@ public class GenComponentXML {
 		root.appendChild(genTextNode("spirit:library", LIBRARY_NAME));
 		root.appendChild(genTextNode("spirit:name", CORE_NAME));
 		root.appendChild(genTextNode("spirit:version", MajorVersion + "." + MinorVersion));
+		if(bindings.length > 0){
+			root.appendChild(genBusInterfaces());
+		}
+		if(hasAddressSpaces()){
+			root.appendChild(genAddressSpaces());
+		}
+		if(hasMemoryMaps()){
+			root.appendChild(genMemoryMaps());
+		}
 		root.appendChild(genModel());
 		root.appendChild(genFileSets());
 		root.appendChild(genTextNode("spirit:description", getCoreUniqName()));
@@ -57,6 +72,20 @@ public class GenComponentXML {
 		root.appendChild(genVendorExtensions());
 	}
 	
+	private boolean hasAddressSpaces(){
+		for(HDLSignalBinding b: bindings){
+			if(b.hasAddressSpace()) return true;
+		}
+		return false;
+	}
+
+	private boolean hasMemoryMaps(){
+		for(HDLSignalBinding b: bindings){
+			if(b.hasMemoryMap()) return true;
+		}
+		return false;
+	}
+
 	public String getCoreUniqName(){
 		return CORE_NAME + "_" + "v" + MajorVersion + "_" + MinorVersion; 
 	}
@@ -84,6 +113,123 @@ public class GenComponentXML {
 		return element;
 	}
 	
+	public Element genBusInterfaces(){
+		Element element = document.createElement("spirit:busInterfaces");
+		for(HDLSignalBinding b: bindings){
+			Element e0 = document.createElement("spirit:busInterface");
+			element.appendChild(e0);
+			e0.appendChild(genTextNode("spirit:name", b.getName()));
+			e0.appendChild(
+					genTextNode("spirit:busType", "",
+							new ParameterPair[]{
+							   new ParameterPair("spirit:vendor", b.getVendor()),
+							   new ParameterPair("spirit:library", b.getLibrary()),
+							   new ParameterPair("spirit:name", b.getBusTypeName()),
+							   new ParameterPair("spirit:version", b.getVersion()),
+					}));
+			e0.appendChild(
+					genTextNode("spirit:abstractionType", "",
+							new ParameterPair[]{
+							   new ParameterPair("spirit:vendor", b.getVendor()),
+							   new ParameterPair("spirit:library", b.getLibrary()),
+							   new ParameterPair("spirit:name", b.getBusAbstractionTypeName()),
+							   new ParameterPair("spirit:version", b.getVersion()),
+					}));
+			if(b.isMaster()){
+				Element e1 = document.createElement("spirit:master");
+				e0.appendChild(e1);
+				if(b.hasAddressSpace()){
+					e1.appendChild(genTextNode("spirit:addressSpaceRef", "",
+							new ParameterPair[]{ new ParameterPair("spirit:addressSpaceRef", b.getName()) }));
+				}
+			}else{
+				Element e1 = document.createElement("spirit:slave");
+				e0.appendChild(e1);
+				if(b.hasMemoryMap()){
+					e1.appendChild(genTextNode("spirit:memoryMapRef", "",
+							new ParameterPair[]{ new ParameterPair("spirit:memoryMapRef", b.getName()) }));
+				}
+			}
+			e0.appendChild(genPortMaps(b));
+		}
+		return element; 
+	}
+	
+	private Element genPortMaps(HDLSignalBinding b){
+		Element element = document.createElement("spirit:portMaps");
+		Enumeration<HDLPort> keys = b.getKeys();
+		while(keys.hasMoreElements()){
+			HDLPort p = keys.nextElement();
+			String logicalName = b.get(p);
+			Element e0 = document.createElement("spirit:portMap");
+			element.appendChild(e0);
+			{
+				Element e1 = document.createElement("spirit:logicalPort");
+				e0.appendChild(e1);
+				e1.appendChild(genTextNode("spirit:name", logicalName));
+			}
+			{
+				Element e1 = document.createElement("spirit:physicalPort");
+				e0.appendChild(e1);
+				e1.appendChild(genTextNode("spirit:name", p.getName()));
+			}
+		}
+		return element;
+	}
+	
+	private Element genAddressSpaces(){
+		Element element = document.createElement("spirit:addressSpaces");
+		for(HDLSignalBinding b: bindings){
+			if(b.hasAddressSpace() == false) continue;
+			Element e0 = document.createElement("spirit:addressSpace");
+			element.appendChild(e0);
+			e0.appendChild(genTextNode("spirit:name", b.getName()));
+			e0.appendChild(genTextNode("spirit:range", "4294967296",
+					new ParameterPair[]{
+					  new ParameterPair("spirit:format", "long"),
+					  new ParameterPair("spirit:resolve", "user")
+			}));
+			e0.appendChild(genTextNode("spirit:width", "32",
+					new ParameterPair[]{
+					  new ParameterPair("spirit:format", "long"),
+					  new ParameterPair("spirit:resolve", "user")
+			}));
+		}
+		return element;
+	}
+
+	private Element genMemoryMaps(){
+		Element element = document.createElement("spirit:memoryMaps");
+		for(HDLSignalBinding b: bindings){
+			if(b.hasMemoryMap() == false) continue;
+			Element e0 = document.createElement("spirit:memoryMap");
+			element.appendChild(e0);
+			e0.appendChild(genTextNode("spirit:name", b.getName()));
+			Element e1 = document.createElement("spirit:addressBlock");
+			e0.appendChild(e1);
+			{
+				e1.appendChild(genTextNode("spirit:name", b.getAddressBlockName()));
+				e1.appendChild(genTextNode("spirit:baseAddress", "0",
+						new ParameterPair[]{
+					  	  new ParameterPair("spirit:format", "bitString"),
+					  	  new ParameterPair("spirit:resolve", "user"),
+					  	  new ParameterPair("spirit:bitStringLength", "32"),
+				}));
+				e1.appendChild(genTextNode("spirit:range", "4294967296",
+						new ParameterPair[]{
+						  new ParameterPair("spirit:format", "long"),
+						  new ParameterPair("spirit:resolve", "user")
+				}));
+				e1.appendChild(genTextNode("spirit:width", "32",
+						new ParameterPair[]{
+						  new ParameterPair("spirit:format", "long"),
+						  new ParameterPair("spirit:resolve", "user")
+				}));
+			}
+		}
+		return element;
+	}
+
 	private Element genModel(){
 		Element element = document.createElement("spirit:model");
 		element.appendChild(genViews());
@@ -312,7 +458,7 @@ public class GenComponentXML {
 				new PortInfo("q", "out", "std_logic") };
 		String[] files = new String[]{"test.vhd", "top.vhd"};
 
-		GenComponentXML o = new GenComponentXML("vendor", "user", "test", 1, 0, ports, files);
+		GenComponentXML o = new GenComponentXML("vendor", "user", "test", 1, 0, ports, files, new HDLSignalBinding[0]);
 		// XMLファイルの作成
 		File file = new File("component.xml");
 		o.write(file);
