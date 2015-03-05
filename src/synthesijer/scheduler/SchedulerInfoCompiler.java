@@ -1137,6 +1137,7 @@ public class SchedulerInfoCompiler {
 		}
 		case FSUB64:{
 			if(fsub64 == null) fsub64 = newInstModule("FSUB64", "u_synthesijer_fsub64");
+			return fsub64;
 		}
 		case FMUL64:{
 			if(fmul64 == null) fmul64 = newInstModule("FMUL64", "u_synthesijer_fmul64");
