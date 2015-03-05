@@ -826,6 +826,20 @@ public class SchedulerInfoCompiler {
 		case FGEQ64:    genCompUnitExpr(item, FCOMP64.GEQ, state); break;
 		case FCOMPEQ64: genCompUnitExpr(item, FCOMP64.EQ, state);  break;
 		case FNEQ64:    genCompUnitExpr(item, FCOMP64.NEQ, state); break;
+		case MSB_FLAP:{
+			HDLOp op = convOp2HDLOp(item.getOp());
+			HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
+			HDLExpr src = convOperandToHDLExpr(item, item.getSrcOperand()[0]);
+			if(src instanceof HDLValue){
+				HDLSignal tmp = hm.newSignal(String.format("const_%04d", constIdGen.id()), (HDLPrimitiveType)src.getType());
+				tmp.setAssign(null, src);
+				src = tmp;
+			}
+			HDLExpr expr = hm.newExpr(op, src);
+			dest.setAssign(state, expr);
+			predExprMap.put(item, expr);
+			break;
+		}
 		default: {
 //			System.out.println(item.info());
 			HDLOp op = convOp2HDLOp(item.getOp());
@@ -835,11 +849,11 @@ public class SchedulerInfoCompiler {
 			int nums = op.getArgNums();
 			
 			HDLExpr expr = (nums == 1) ?
-				hm.newExpr(op, convOperandToHDLExpr(item, src[0])) :
-				hm.newExpr(op, convOperandToHDLExpr(item, src[0]), convOperandToHDLExpr(item, src[1]));
-			
-			dest.setAssign(state, expr);
-			predExprMap.put(item, expr);
+					hm.newExpr(op, convOperandToHDLExpr(item, src[0])) :
+					hm.newExpr(op, convOperandToHDLExpr(item, src[0]), convOperandToHDLExpr(item, src[1]));
+				
+				dest.setAssign(state, expr);
+				predExprMap.put(item, expr);
 		}
 		}
 	}

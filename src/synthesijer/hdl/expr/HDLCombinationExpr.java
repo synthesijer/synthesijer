@@ -191,7 +191,7 @@ public class HDLCombinationExpr implements HDLExpr{
 			case MSB_FLAP: {
 				String v = args[0].getResultExpr().getVHDL();
 				HDLPrimitiveType t = (HDLPrimitiveType)(args[0].getResultExpr().getType());
-				return String.format("(not %s[%d-1]) & %s[%d-2 downto 0]", v, t.getWidth(), v, t.getWidth());
+				return String.format("(not %s(%d-1)) & %s(%d-2 downto 0)", v, t.getWidth(), v, t.getWidth());
 			}
 			case REF:
 				return String.format("%s(%s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());

@@ -580,6 +580,12 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		parent.addVariable(v.getName(), v);
 		return v; 
 	}
+	
+	private VariableOperand newVariable(String key, Type t, Expr initExpr){
+		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, initExpr, false, false, false, null, "", false);
+		parent.addVariable(v.getName(), v);
+		return v; 
+	}
 
 	private VariableRefOperand newVariableRef(String key, Type t, VariableOperand ref){
 		VariableRefOperand v = new VariableRefOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, ref);
@@ -833,7 +839,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		}
 		case MINUS:{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
-			if(isFloat(tmp.getType())){
+			if(isFloating(tmp.getType())){
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.MSB_FLAP, new Operand[]{v}, tmp));
 			}else{
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{c0, v}, tmp));
