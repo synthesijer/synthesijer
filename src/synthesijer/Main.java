@@ -8,6 +8,7 @@ import net.wasamon.mjlib.util.GetOpt;
 import net.wasamon.mjlib.util.GetOptException;
 import openjdk.com.sun.tools.javac.main.Main.Result;
 import synthesijer.Manager.OutputFormat;
+import synthesijer.Manager.SynthesijerModuleInfo;
 import synthesijer.hdl.HDLModule;
 import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 
@@ -66,8 +67,13 @@ public class Main {
 			if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
 			if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
 			if(packaging){
-				HDLModule m = Manager.INSTANCE.searchHDLModuleInfo(packageTop).getHDLModule();
-				HDLModuleToComponentXML.conv(m, null, vendor, libname);
+				SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(packageTop);
+				if(info == null){
+					SynthesijerUtils.warn("unknown module for ip-exact: " + packageTop);
+				}else{
+					HDLModule m = info.getHDLModule();
+					HDLModuleToComponentXML.conv(m, null, vendor, libname);
+				}
 			}
 		}
 		System.exit(result.exitCode);
