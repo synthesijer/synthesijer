@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.Hashtable;
 import java.util.Optional;
 
-import scala.Predef;
 import synthesijer.CompileState;
 import synthesijer.IdentifierGenerator;
 import synthesijer.Manager;
@@ -654,7 +653,7 @@ public class SchedulerInfoCompiler {
 				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item0.getDestOperand());
 				HDLSignal ret = hm.getSignal(item0.name + "_return");
 				if(ret == null) ret = hm.getPort(item0.name + "_return").getSignal();
-				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should read in ***_body
+				dest.setAssign(state.getTransitions().get(0).getDestState().getTransitions().get(0).getDestState(), ret); // should read in ***_wait
 				predExprMap.put(item, ret);
 			}
 			break;
@@ -671,7 +670,7 @@ public class SchedulerInfoCompiler {
 			if(item0.getDestOperand().getType() != PrimitiveTypeKind.VOID){ // non-void function
 				HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item0.getDestOperand());
 				HDLSignal ret = obj.getSignalForPort(item0.name + "_return");
-				dest.setAssign(state.getTransitions().get(0).getDestState(), ret); // should read in ***_body
+				dest.setAssign(state.getTransitions().get(0).getDestState().getTransitions().get(0).getDestState(), ret); // should read in ***_wait
 				//dest.setAssign(state, ret);
 				predExprMap.put(item, ret);
 			}
@@ -923,6 +922,15 @@ public class SchedulerInfoCompiler {
 		HDLVariable req_flag = varTable.get(board.getName() + "_req_flag");
 		HDLVariable busy_port_sig = varTable.get(board.getName() + "_busy");
 		
+		HDLSignal req_flag_d = hm.newSignal(req_flag.getName() + "_d", req_flag.getType());
+		req_flag_d.setAssignForSequencer(seq, req_flag);
+		
+		HDLSignal req_flag_edge = hm.newSignal(req_flag.getName() + "_edge", req_flag.getType());
+		req_flag_edge.setAssign(null, hm.newExpr(HDLOp.AND, req_flag, hm.newExpr(HDLOp.NOT, req_flag_d)));
+		
+		SequencerState methodEntryState = null;
+		SequencerState methodIdleState = null;
+		
 		for(SchedulerSlot slot: board.getSlots()){
 			states.put(slot.getStepId(), seq.addSequencerState(id.get(slot.getStepId())));
 		}
@@ -930,6 +938,7 @@ public class SchedulerInfoCompiler {
 			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0) continue;
 			states.get(slot.getStepId()).addStateTransit(states.get(slot.getNextStep()[0]));
 		}
+		
 		for(SchedulerSlot slot: board.getSlots()){
 			for(SchedulerItem item: slot.getItems()){
 				SequencerState s = states.get(item.getStepId());
@@ -949,6 +958,7 @@ public class SchedulerInfoCompiler {
 							busy_port_sig.setAssign(s, hm.newExpr(HDLOp.IF, unlock, HDLPreDefinedConstant.LOW, HDLPreDefinedConstant.HIGH));
 						}
 					}
+					methodIdleState = s;
 					break;
 				}
 				case METHOD_ENTRY:{
@@ -956,9 +966,11 @@ public class SchedulerInfoCompiler {
 					if(m.isAuto()){
 						s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 					}else{
-						s.addStateTransit(req_flag, states.get(item.getSlot().getNextStep()[0]));
-						busy_port_sig.setAssign(s, req_flag);
+						s.addStateTransit(hm.newExpr(HDLOp.OR, req_flag, req_flag_d), states.get(item.getSlot().getNextStep()[0]));
+						//s.addStateTransit(req_flag, states.get(item.getSlot().getNextStep()[0]));
+						busy_port_sig.setAssign(s, hm.newExpr(HDLOp.OR, req_flag, req_flag_d));
 					}
+					methodEntryState = s;
 					break;
 				}
 				case SELECT:{
@@ -984,6 +996,7 @@ public class SchedulerInfoCompiler {
 				case EXT_CALL:
 				{
 					SequencerState call_body = seq.addSequencerState(s.getStateId().getValue()+"_body");
+					SequencerState call_wait = seq.addSequencerState(s.getStateId().getValue()+"_wait");
 					MethodInvokeItem item0 = (MethodInvokeItem)item;
 					HDLVariable call_req, call_busy;
 					String flag_name;
@@ -1009,18 +1022,25 @@ public class SchedulerInfoCompiler {
 					}
 					
 					// when busy = '0', s -> call_body
-					s.addStateTransit(hm.newExpr(HDLOp.EQ, call_busy, HDLPreDefinedConstant.LOW), call_body);
+// recur					
+//					s.addStateTransit(hm.newExpr(HDLOp.EQ, call_busy, HDLPreDefinedConstant.LOW), call_body);
+					s.addStateTransit(call_body);
 					
 					// call_body
-					call_req.setAssign(call_body, 0, HDLPreDefinedConstant.HIGH);
+//					call_req.setAssign(call_body, 0, HDLPreDefinedConstant.HIGH);
+					call_req.setAssign(call_body, HDLPreDefinedConstant.HIGH);
 					call_req.setDefaultValue(HDLPreDefinedConstant.LOW); // otherwise '0'
-					call_body.setMaxConstantDelay(1);
+//					call_body.setMaxConstantDelay(1);
 					if(item0.isNoWait() == true){
 						//System.out.println("no wait:" + call_req);
+						call_body.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 					}else{
-						call_body.setStateExitFlag(flag);
+//						call_body.setStateExitFlag(flag);
+						call_body.addStateTransit(call_wait);
+						call_wait.addStateTransit(flag, states.get(item.getSlot().getNextStep()[0]));
+//						call_wait.setStateExitFlag(flag);
 					}
-					call_body.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
+//					call_body.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 					break;
 				}
 				case LSHIFT32 :
@@ -1092,6 +1112,16 @@ public class SchedulerInfoCompiler {
 			}
 		}
 		seq.getIdleState().addStateTransit(states.get(0));
+		
+		if(methodEntryState != null && methodIdleState != null){
+			HDLSignal sig = methodEntryState.getKey();  
+			sig.setAssignForSequencer(seq,
+					hm.newExpr(HDLOp.AND, hm.newExpr(HDLOp.NEQ, sig, methodIdleState.getStateId()),
+					hm.newExpr(HDLOp.AND, hm.newExpr(HDLOp.NEQ, sig, methodEntryState.getStateId()),
+					req_flag_edge)),
+							methodEntryState.getStateId());
+		}
+
 		return states;
 	}
 

@@ -157,6 +157,14 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			HDLUtils.println(dest, offset+2, String.format("when others => null;"));
 			HDLUtils.println(dest, offset, String.format("end case;"));
 		}
+		for(HDLSequencer.Pair p: o.getSeqExprList()){
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", p.dest.getVHDL(), p.expr.getResultExpr().getVHDL()));
+		}
+		for(HDLSequencer.Triple t: o.getSeqCondExprList()){
+			HDLUtils.println(dest, offset, String.format("if (%s) = '1' then", t.cond.getVHDL()));
+			HDLUtils.println(dest, offset + 2, String.format("%s <= %s;", t.dest.getVHDL(), t.expr.getResultExpr().getVHDL()));
+			HDLUtils.println(dest, offset, String.format("end if;"));
+		}
 	}
 	
 	private void genSyncSequencerBody(HDLSequencer o, int offset){

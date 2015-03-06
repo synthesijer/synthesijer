@@ -124,6 +124,15 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 		}
 	}
 	
+	@Override
+	public void setAssignForSequencer(HDLSequencer s, HDLExpr cond, HDLExpr expr) {
+		s.addSeqCondExpr(this, cond, expr);
+	}
+
+	@Override
+	public void setAssignForSequencer(HDLSequencer s, HDLExpr expr){
+		s.addSeqExpr(this, expr);
+	}
 
 	@Override
 	public void setAssign(SequencerState s, HDLExpr expr){

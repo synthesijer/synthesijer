@@ -13,6 +13,8 @@ public class HDLSequencer implements HDLTree{
 	private final HDLSignal stateKey;
 	private final HDLUserDefinedType stateType;
 	private ArrayList<SequencerState> states;
+	private ArrayList<Pair> seqExprList = new ArrayList<>();
+	private ArrayList<Triple> seqCondExprList = new ArrayList<>();
 	private SequencerState idle;
 	private int timestep = -1;
 	
@@ -73,5 +75,42 @@ public class HDLSequencer implements HDLTree{
 	@Override
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLSequencer(this);
+	}
+	
+	public void addSeqExpr(HDLSignal dest, HDLExpr expr){
+		seqExprList.add(new Pair(dest, expr));
+	}
+
+	public void addSeqCondExpr(HDLSignal dest, HDLExpr cond, HDLExpr expr){
+		seqCondExprList.add(new Triple(dest, cond, expr));
+	}
+
+	public Pair[] getSeqExprList(){
+		return seqExprList.toArray(new Pair[0]);
+	}
+	
+	public Triple[] getSeqCondExprList(){
+		return seqCondExprList.toArray(new Triple[0]);
+	}
+
+	
+	public class Pair{
+		public final HDLSignal dest;
+		public final HDLExpr expr;
+		public Pair(HDLSignal d, HDLExpr e){
+			this.dest = d;
+			this.expr = e;
+		}
+	}
+	
+	public class Triple{
+		public final HDLSignal dest;
+		public final HDLExpr cond;
+		public final HDLExpr expr;
+		public Triple(HDLSignal d, HDLExpr c, HDLExpr e){
+			this.dest = d;
+			this.cond = c;
+			this.expr = e;
+		}
 	}
 }

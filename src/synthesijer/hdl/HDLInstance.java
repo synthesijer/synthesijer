@@ -74,6 +74,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		genPortSignals();
 	}
 	
+	@Override
 	public String getName(){
 		return name;
 	}
@@ -161,6 +162,12 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	}
 
 	@Override
+	public void setAssignForSequencer(HDLSequencer s, HDLExpr expr){
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
 	public void setAssign(SequencerState s, HDLExpr expr) {
 		// TODO Auto-generated method stub
 		
@@ -218,6 +225,12 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	public HDLSignal[] getSrcSignals() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setAssignForSequencer(HDLSequencer s, HDLExpr cond, HDLExpr expr) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

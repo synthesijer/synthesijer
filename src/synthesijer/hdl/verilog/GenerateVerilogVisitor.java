@@ -180,6 +180,14 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 			}
 			HDLUtils.println(dest, offset, String.format("endcase"));
 		}
+		for(HDLSequencer.Pair p: o.getSeqExprList()){
+			HDLUtils.println(dest, offset, String.format("%s <= %s;", p.dest.getVerilogHDL(), p.expr.getResultExpr().getVerilogHDL()));
+		}
+		for(HDLSequencer.Triple t: o.getSeqCondExprList()){
+			HDLUtils.println(dest, offset, String.format("if(%s == 1'b1) begin", t.cond.getVerilogHDL()));
+			HDLUtils.println(dest, offset + 2, String.format("%s <= %s;", t.dest.getVerilogHDL(), t.expr.getResultExpr().getVerilogHDL()));
+			HDLUtils.println(dest, offset, String.format("end"));
+		}
 	}
 	
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
