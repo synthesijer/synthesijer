@@ -102,21 +102,35 @@ public class SchedulerInfoCompiler {
 		}
 	}
 	
-	private HDLInstance genHDLVariable(String name, ArrayType t){
+	private HDLInstance genHDLVariable(String name, ArrayType t, boolean publicFlag){
 		Manager.SynthesijerModuleInfo info = null;
 		Type t0 = t.getElemType();
 		if(t0 instanceof PrimitiveTypeKind == false){
 			throw new RuntimeException("unsupported type: " + t);
 		}
-		switch((PrimitiveTypeKind)t0){
-		case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM1");  break;
-		case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM8");  break;
-		case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM16"); break;
-		case INT:     info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM32"); break;
-		case LONG:    info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM64"); break;
-		case FLOAT:   info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM32"); break;
-		case DOUBLE:  info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM64"); break;
-		default: throw new RuntimeException("unsupported type: " + t);
+		PrimitiveTypeKind pt = (PrimitiveTypeKind)t0;
+		if(publicFlag){
+			switch(pt){
+			case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM1");  break;
+			case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM8");  break;
+			case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM16"); break;
+			case INT:     info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM32"); break;
+			case LONG:    info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM64"); break;
+			case FLOAT:   info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM32"); break;
+			case DOUBLE:  info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM64"); break;
+			default: throw new RuntimeException("unsupported type: " + t);
+			}
+		}else{
+			switch(pt){
+			case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM1");  break;
+			case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM8");  break;
+			case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM16"); break;
+			case INT:     info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM32"); break;
+			case LONG:    info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM64"); break;
+			case FLOAT:   info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM32"); break;
+			case DOUBLE:  info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM64"); break;
+			default: throw new RuntimeException("unsupported type: " + t);
+			}
 		}
 		HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
 		inst.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
@@ -204,7 +218,7 @@ public class SchedulerInfoCompiler {
 			}
 			return sig;
 		}else if(type instanceof ArrayType){
-			HDLInstance array = genHDLVariable(name, (ArrayType)type);
+			HDLInstance array = genHDLVariable(name, (ArrayType)type, v.isPublic());
 			NewArray expr = (NewArray)(v.getInitExpr());
 			if(expr.getDimExpr().get(0) instanceof Literal){
 				Literal value = (Literal)(expr.getDimExpr().get(0));
@@ -1004,7 +1018,8 @@ public class SchedulerInfoCompiler {
 						HDLInstance obj = (HDLInstance)(varTable.get(item0.obj.getName()));
 						call_req = obj.getSignalForPort(item0.name + "_req");
 						call_busy = obj.getSignalForPort(item0.name + "_busy");
-						flag_name = String.format("%s_ext_call_flag_%04d", obj.getName(), item.getStepId());
+						//flag_name = String.format("%s_ext_call_flag_%04d", obj.getName(), item.getStepId());
+						flag_name = String.format("%s_ext_call_flag_%04d", item0.name, item.getStepId());
 					}else{
 						call_req = varTable.get(item0.name + "_req_local");
 						call_busy = varTable.get(item0.name + "_busy");
@@ -1025,10 +1040,12 @@ public class SchedulerInfoCompiler {
 // recur					
 //					s.addStateTransit(hm.newExpr(HDLOp.EQ, call_busy, HDLPreDefinedConstant.LOW), call_body);
 					s.addStateTransit(call_body);
+					call_req.setAssign(s, HDLPreDefinedConstant.HIGH);
+					call_req.setDefaultValue(HDLPreDefinedConstant.LOW); // otherwise '0'
 					
 					// call_body
 //					call_req.setAssign(call_body, 0, HDLPreDefinedConstant.HIGH);
-					call_req.setAssign(call_body, HDLPreDefinedConstant.HIGH);
+					call_req.setAssign(call_body, HDLPreDefinedConstant.LOW);
 					call_req.setDefaultValue(HDLPreDefinedConstant.LOW); // otherwise '0'
 //					call_body.setMaxConstantDelay(1);
 					if(item0.isNoWait() == true){

@@ -425,9 +425,9 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
 		VariableOperand v;
 		if(vv.getMethod() != null){
-			v = new VariableOperand(vName, t, o.getVariable().getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate());
+			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate());
 		}else{
-			v = new VariableOperand(vName, t, o.getVariable().getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false);
+			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false);
 		}
 		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
 		varTable.put(o.getName(), v);
