@@ -13,6 +13,7 @@ public class SimpleBlockRAM extends HDLModule{
 		newParameter("DEPTH", HDLPrimitiveType.genIntegerType(), String.valueOf(depth));
 		newParameter("WORDS", HDLPrimitiveType.genIntegerType(), String.valueOf(length));
 		
+		newPort("length",  DIR.OUT, HDLPrimitiveType.genSignedType(32));
 		newPort("address_b", DIR.IN,  HDLPrimitiveType.genSignedType(32));
 		newPort("din_b",     DIR.IN,  HDLPrimitiveType.genSignedType(width));
 		newPort("dout_b",    DIR.OUT, HDLPrimitiveType.genSignedType(width));

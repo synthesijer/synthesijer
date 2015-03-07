@@ -933,14 +933,17 @@ public class SchedulerInfoCompiler {
 		IdGen id = new IdGen("S");
 		Hashtable<Integer, SequencerState> states = new Hashtable<>();
 		
-		HDLVariable req_flag = varTable.get(board.getName() + "_req_flag");
-		HDLVariable busy_port_sig = varTable.get(board.getName() + "_busy");
-		
-		HDLSignal req_flag_d = hm.newSignal(req_flag.getName() + "_d", req_flag.getType());
-		req_flag_d.setAssignForSequencer(seq, req_flag);
-		
-		HDLSignal req_flag_edge = hm.newSignal(req_flag.getName() + "_edge", req_flag.getType());
-		req_flag_edge.setAssign(null, hm.newExpr(HDLOp.AND, req_flag, hm.newExpr(HDLOp.NOT, req_flag_d)));
+		HDLVariable busy_port_sig = null, req_flag = null, req_flag_d = null, req_flag_edge = null;
+		if(board.getMethod().isAuto() == false){
+			req_flag = varTable.get(board.getName() + "_req_flag");
+			busy_port_sig = varTable.get(board.getName() + "_busy");
+			
+			req_flag_d = hm.newSignal(req_flag.getName() + "_d", req_flag.getType());
+			req_flag_d.setAssignForSequencer(seq, req_flag);
+			
+			req_flag_edge = hm.newSignal(req_flag.getName() + "_edge", req_flag.getType());
+			req_flag_edge.setAssign(null, hm.newExpr(HDLOp.AND, req_flag, hm.newExpr(HDLOp.NOT, req_flag_d)));
+		}
 		
 		SequencerState methodEntryState = null;
 		SequencerState methodIdleState = null;
@@ -1040,12 +1043,10 @@ public class SchedulerInfoCompiler {
 // recur					
 //					s.addStateTransit(hm.newExpr(HDLOp.EQ, call_busy, HDLPreDefinedConstant.LOW), call_body);
 					s.addStateTransit(call_body);
-					call_req.setAssign(s, HDLPreDefinedConstant.HIGH);
-					call_req.setDefaultValue(HDLPreDefinedConstant.LOW); // otherwise '0'
 					
 					// call_body
 //					call_req.setAssign(call_body, 0, HDLPreDefinedConstant.HIGH);
-					call_req.setAssign(call_body, HDLPreDefinedConstant.LOW);
+					call_req.setAssign(call_body, HDLPreDefinedConstant.HIGH);
 					call_req.setDefaultValue(HDLPreDefinedConstant.LOW); // otherwise '0'
 //					call_body.setMaxConstantDelay(1);
 					if(item0.isNoWait() == true){
@@ -1130,13 +1131,15 @@ public class SchedulerInfoCompiler {
 		}
 		seq.getIdleState().addStateTransit(states.get(0));
 		
-		if(methodEntryState != null && methodIdleState != null){
-			HDLSignal sig = methodEntryState.getKey();  
-			sig.setAssignForSequencer(seq,
-					hm.newExpr(HDLOp.AND, hm.newExpr(HDLOp.NEQ, sig, methodIdleState.getStateId()),
-					hm.newExpr(HDLOp.AND, hm.newExpr(HDLOp.NEQ, sig, methodEntryState.getStateId()),
-					req_flag_edge)),
-							methodEntryState.getStateId());
+		if(board.getMethod().isAuto() == false){
+			if(methodEntryState != null && methodIdleState != null){
+				HDLSignal sig = methodEntryState.getKey();  
+				sig.setAssignForSequencer(seq,
+						hm.newExpr(HDLOp.AND, hm.newExpr(HDLOp.NEQ, sig, methodIdleState.getStateId()),
+								hm.newExpr(HDLOp.AND, hm.newExpr(HDLOp.NEQ, sig, methodEntryState.getStateId()),
+										req_flag_edge)),
+										methodEntryState.getStateId());
+			}
 		}
 
 		return states;
