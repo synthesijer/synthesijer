@@ -6,7 +6,7 @@ VERILOG_SOURCES = $(SOURCES:.java=.v)
 OPT = --chaining --ip-exact=SC1602Test
 
 all:
-	java -cp $(SYNTHESIJER):. synthesijer.Main --vhld --verilog $(OPT) $(SOURCES)
+	java -cp $(SYNTHESIJER):. synthesijer.Main --vhdl --verilog $(OPT) $(SOURCES)
 	javac -cp $(SYNTHESIJER):. SC1602TestKC705.java
 	java -cp $(SYNTHESIJER):. SC1602TestKC705
 
