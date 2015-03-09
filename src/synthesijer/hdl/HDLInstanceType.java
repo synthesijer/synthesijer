@@ -63,4 +63,10 @@ public class HDLInstanceType implements HDLType{
 		return false;
 	}
 
+	@Override
+	public boolean isDigit() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

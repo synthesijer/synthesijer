@@ -8,14 +8,23 @@ import synthesijer.hdl.HDLTreeVisitor;
 
 public class HDLValue implements HDLLiteral{
 	
-	private final HDLPrimitiveType type;
+	private final HDLPrimitiveType type, actualType;
 	private final String value;
 	
 	public HDLValue(String value, HDLPrimitiveType type){
+		this(value, type, type);
+	}
+
+	public HDLValue(String value, HDLPrimitiveType type, HDLPrimitiveType actualType){
 		this.value = value;
 		this.type = type;
+		this.actualType = actualType;
 	}
 	
+	public String toString(){
+		return String.format("HDLValue:: value=%s, type=%s, actualType=%s", value, type, actualType);
+	}
+
 	public String getValue(){
 		return value;
 	}
@@ -125,7 +134,7 @@ public class HDLValue implements HDLLiteral{
 
 	@Override
 	public HDLPrimitiveType getType() {
-		return type;
+		return actualType;
 	}
 	
 	@Override

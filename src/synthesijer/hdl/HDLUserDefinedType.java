@@ -102,4 +102,10 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
 		return false;
 	}
 
+	@Override
+	public boolean isDigit() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -69,7 +69,23 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLPort p: ports){
 			dest.print(sep);
 			//p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
-			HDLUtils.print(dest, offset+2, String.format("%s : %s %s", p.getName(), p.getDir().getVHDL(), ((HDLPrimitiveType)p.getType()).getVHDL(paramFlag)));
+			HDLUtils.print(dest, offset+2, String.format("%s : %s %s", p.getName(), p.getDir().getVHDL(), ((HDLPrimitiveType)p.getType()).getVHDL()));
+			sep = ";" + Constant.BR;
+		}
+		HDLUtils.println(dest, 0, "");
+		HDLUtils.println(dest, offset, ");");
+	}
+
+	private void genParamList(PrintWriter dest, int offset, HDLParameter[] params, boolean paramFlag){
+		HDLUtils.println(dest, offset, "generic (");
+		String sep = "";
+		for(HDLParameter p: params){
+			dest.print(sep);
+			//p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			HDLUtils.print(dest, offset+2, String.format("%s : %s := %s",
+					p.getName(),
+					((HDLPrimitiveType)p.getType()).getVHDL(),
+					p.getValue()));
 			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
@@ -80,6 +96,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	public void visitHDLModule(HDLModule o) {
 
 		HDLUtils.println(dest, offset, String.format("entity %s is", o.getName()));
+		if(o.getParameters().length > 0){
+			genParamList(dest, offset+2, o.getParameters(), false);
+		}
 		if(o.getPorts().length > 0){
 			genPortList(dest, offset+2, o.getPorts(), false);
 		}

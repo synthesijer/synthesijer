@@ -61,6 +61,10 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		return kind == KIND.INTEGER;
 	}
 	
+	public boolean isDigit(){
+		return kind == KIND.DIGIT;
+	}
+	
 	public int getWidth(){
 		return width;
 	}
@@ -83,6 +87,10 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 
 	public static HDLPrimitiveType genIntegerType(){
 		return new HDLPrimitiveType(KIND.INTEGER, 0);
+	}
+
+	public static HDLPrimitiveType genDigitType(){
+		return new HDLPrimitiveType(KIND.DIGIT, 0);
 	}
 
 	public static HDLPrimitiveType genStringType(){
@@ -108,11 +116,13 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 			return HDLPreDefinedConstant.LOW;
 		}else if(kind == KIND.INTEGER){
 			return HDLPreDefinedConstant.INTEGER_ZERO;
+		}else if(kind == KIND.DIGIT){
+			return HDLPreDefinedConstant.INTEGER_ZERO;
 		}else{
 			return null;
 		}
 	}
-	
+/*	
 	public String getVHDL(boolean paramFlag){
 		if(paramFlag == false) return getVHDL();
 		switch(kind){
@@ -123,13 +133,14 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		default: return "UNKNOWN";
 		}
 	}
-
+*/
 	public String getVHDL(){
 		switch(kind){
 		case VECTOR: return String.format("std_logic_vector(%d-1 downto 0)", width);
 		case BIT:    return String.format("std_logic");
 		case SIGNED: return String.format("signed(%d-1 downto 0)", width);
 		case INTEGER: return "integer";
+		case DIGIT: return "integer";
 		default: return "UNKNOWN";
 		}
 	}
@@ -140,6 +151,7 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		case BIT:    return String.format("");
 		case SIGNED: return String.format("signed [%d-1 : 0]", width, end);
 		case INTEGER: return "";
+		case DIGIT: return "";
 		default: return "UNKNOWN";
 		}
 	}

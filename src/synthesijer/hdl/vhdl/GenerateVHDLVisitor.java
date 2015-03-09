@@ -325,17 +325,24 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	}
 	
 	private String adjustTypeFor(HDLSignal dest, HDLExpr expr){
-		if(expr instanceof HDLValue) return expr.getVHDL();
+		if(expr instanceof HDLValue && !expr.getType().isDigit()) return expr.getVHDL();
 		if(expr instanceof HDLPreDefinedConstant) return expr.getVHDL();
 		if(dest.getType().getKind() == expr.getType().getKind()){
 			return expr.getVHDL();
 		}else{
+			String src = expr.getVHDL();
+			if(expr instanceof HDLValue &&
+               expr.getType().isDigit() &&
+               dest.getType() instanceof HDLPrimitiveType &&
+               (dest.getType().isVector()) || (dest.getType().isSigned())){
+				src = String.format("to_signed(%s, %d)", src, ((HDLPrimitiveType)dest.getType()).getWidth());
+			}
 			if(dest.getType().isBit()){
-				return String.format("std_logic(%s)", expr.getVHDL());
+				return String.format("std_logic(%s)", src);
 			}else if(dest.getType().isVector()){
-				return String.format("std_logic_vector(%s)", expr.getVHDL());
+				return String.format("std_logic_vector(%s)", src);
 			}else if(dest.getType().isSigned()){
-				return String.format("signed(%s)", expr.getVHDL());
+				return String.format("signed(%s)", src);
 			}else{
 				SynthesijerUtils.error("cannot assign:" + dest + " <- " + expr);
 				throw new RuntimeException("cannot assign:" + dest + " <- " + expr);

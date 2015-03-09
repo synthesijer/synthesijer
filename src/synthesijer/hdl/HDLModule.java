@@ -72,6 +72,13 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		return param;
 	}
 	
+	public HDLParameter getParamterByName(String name){
+		for(HDLParameter p: parameters){
+			if(p.getName().equals(name)) return p;
+		}
+		return null;
+	}
+	
 	public HDLParameter[] getParameters(){
 		return parameters.toArray(new HDLParameter[]{});
 	}

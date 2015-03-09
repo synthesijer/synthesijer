@@ -10,7 +10,7 @@ public interface HDLType {
 	public boolean isEqual(HDLType t);
 	
 	public enum KIND {
-		VECTOR, BIT, SIGNED, USERDEF, INTEGER, STRING, UNKNOWN;
+		VECTOR, BIT, SIGNED, USERDEF, INTEGER, STRING, DIGIT, UNKNOWN;
 		
 		public boolean hasWdith(){
 			switch (this) {
@@ -28,6 +28,7 @@ public interface HDLType {
 			case BIT:
 			case SIGNED:
 			case INTEGER:
+			case DIGIT:
 			case STRING:
 				return true;
 			default:
@@ -43,5 +44,6 @@ public interface HDLType {
 	public boolean isVector();
 	public boolean isSigned();
 	public boolean isInteger();
+	public boolean isDigit();
 	
 }
