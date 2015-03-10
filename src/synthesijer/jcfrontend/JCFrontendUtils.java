@@ -22,7 +22,17 @@ public class JCFrontendUtils {
 		}
 		return false;
 	}
-	
+
+	public static JCAnnotation getAnnotation(List<JCAnnotation> annotations, String key){
+		for(JCAnnotation a: annotations){
+			if(a.getAnnotationType() instanceof JCIdent){
+				Symbol s = ((JCIdent)(a.getAnnotationType())).sym;
+				if(s.toString().endsWith(key)) return a;
+			}
+		}
+		return null;
+	}
+
 	public static boolean isSynchronized(JCModifiers mods){
 		if(mods == null) return false;
 		return (mods.flags & Flags.SYNCHRONIZED) == Flags.SYNCHRONIZED;

@@ -45,13 +45,18 @@ public class HDLSequencer implements HDLTree{
 		return (timestep > 0);
 	}
 	
-	public SequencerState addSequencerState(String id){
-		HDLValue value = stateType.addItem(stateKey.getName()+"_"+id);
+	public SequencerState addSequencerState(String id, boolean flag){
+		String n = flag ? stateKey.getName()+"_"+id : id;
+		HDLValue value = stateType.addItem(n);
 		SequencerState s = new SequencerState(this, stateKey, value);
 		states.add(s);
 		return s;
 	}
-	
+
+	public SequencerState addSequencerState(String id){
+		return addSequencerState(id, true);
+	}
+
 	public HDLModule getModule(){
 		return module;
 	}

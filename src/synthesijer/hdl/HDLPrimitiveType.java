@@ -122,7 +122,7 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 			return null;
 		}
 	}
-/*	
+	
 	public String getVHDL(boolean paramFlag){
 		if(paramFlag == false) return getVHDL();
 		switch(kind){
@@ -133,7 +133,7 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		default: return "UNKNOWN";
 		}
 	}
-*/
+
 	public String getVHDL(){
 		switch(kind){
 		case VECTOR: return String.format("std_logic_vector(%d-1 downto 0)", width);

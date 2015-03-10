@@ -40,8 +40,8 @@ public class HDLCombinationExpr implements HDLExpr{
 	}
 	
 	private HDLType getPriorType(HDLType t1, HDLType t2){
-		//System.out.println(t1);
-		//System.out.println(t2);
+		if(t1 == null && t2 != null) return t2;
+		if(t1 != null && t2 == null) return t2;
 		HDLType t = null;
 		if(t1.getKind().hasWdith() && t1.getKind().isPrimitive() && t2.getKind().hasWdith() && t2.getKind().isPrimitive()){
 			boolean signFlag = false;

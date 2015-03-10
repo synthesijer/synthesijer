@@ -2,6 +2,7 @@ package synthesijer.scheduler;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Optional;
 
@@ -46,39 +47,6 @@ public class SchedulerInfoCompiler {
 	
 	private SchedulerInfo info;
 	private HDLModule hm;
-	
-	private HDLInstance mul32 = null;
-	private HDLInstance mul64 = null;
-	private HDLInstance div32 = null;
-	private HDLInstance div64 = null;
-	
-	private HDLInstance fadd32 = null;
-	private HDLInstance fsub32 = null;
-	private HDLInstance fmul32 = null;
-	private HDLInstance fdiv32 = null;
-	
-	private HDLInstance fadd64 = null;
-	private HDLInstance fsub64 = null;
-	private HDLInstance fmul64 = null;
-	private HDLInstance fdiv64 = null;
-	
-	private HDLInstance f2i = null;
-	private HDLInstance i2f = null;
-	private HDLInstance d2l = null;
-	private HDLInstance l2d = null;
-	private HDLInstance f2d = null;
-	private HDLInstance d2f = null;
-	
-	private HDLInstance lshift32 = null;
-	private HDLInstance logic_rshift32 = null;
-	private HDLInstance arith_rshift32 = null;
-	private HDLInstance lshift64 = null;
-	private HDLInstance logic_rshift64 = null;
-	private HDLInstance arith_rshift64 = null;
-	
-	private HDLInstance fcomp32 = null;
-	private HDLInstance fcomp64 = null;
-
 	
 	public SchedulerInfoCompiler(SchedulerInfo info, HDLModule hm){
 		this.info = info;
@@ -190,7 +158,7 @@ public class SchedulerInfoCompiler {
 					sig.setResetValue(e);
 				}
 			}else{
-				//SynthesijerUtils.warn("only litral for initial value is allowd: " + v.getName() + ":" + v.getVariable().getInitExpr());
+				//SynthesijerUtils.warn("only litral for initial value is allowed: " + v.getName() + ":" + v.getVariable().getInitExpr());
 			}
 			if(v.isMethodParam()){
 				if(v.isPrivateMethod()){
@@ -381,11 +349,46 @@ public class SchedulerInfoCompiler {
 		}
 		for(SchedulerBoard board: info.getBoardsList()){
 			predExprMap = new Hashtable<>();
-			Hashtable<Integer, SequencerState> states = genStatemachine(board);
-			genExprs(board, states);
+			HardwareResource resource = new HardwareResource();
+			Hashtable<Integer, SequencerState> returnTable = new Hashtable<>();
+			Hashtable<Integer, SequencerState> states = genStatemachine(board, resource, returnTable);
+			genExprs(board, states, resource, returnTable);
 		}
 	}
+
+	class HardwareResource{
+		private HDLInstance mul32 = null;
+		private HDLInstance mul64 = null;
+		private HDLInstance div32 = null;
+		private HDLInstance div64 = null;
 		
+		private HDLInstance fadd32 = null;
+		private HDLInstance fsub32 = null;
+		private HDLInstance fmul32 = null;
+		private HDLInstance fdiv32 = null;
+		
+		private HDLInstance fadd64 = null;
+		private HDLInstance fsub64 = null;
+		private HDLInstance fmul64 = null;
+		private HDLInstance fdiv64 = null;
+		
+		private HDLInstance f2i = null;
+		private HDLInstance i2f = null;
+		private HDLInstance d2l = null;
+		private HDLInstance l2d = null;
+		private HDLInstance f2d = null;
+		private HDLInstance d2f = null;
+		
+		private HDLInstance lshift32 = null;
+		private HDLInstance logic_rshift32 = null;
+		private HDLInstance arith_rshift32 = null;
+		private HDLInstance lshift64 = null;
+		private HDLInstance logic_rshift64 = null;
+		private HDLInstance arith_rshift64 = null;
+		
+		private HDLInstance fcomp32 = null;
+		private HDLInstance fcomp64 = null;
+	}
 	
 	private IdentifierGenerator constIdGen = new IdentifierGenerator();
 	private HDLExpr convOperandToHDLExpr(SchedulerItem item, Operand o){
@@ -413,14 +416,14 @@ public class SchedulerInfoCompiler {
 		return ret;
 	}
 	
-	private void genExprs(SchedulerBoard board, Hashtable<Integer, SequencerState> states){
+	private void genExprs(SchedulerBoard board, Hashtable<Integer, SequencerState> states, HardwareResource resource, Hashtable<Integer, SequencerState> returnTable){
 		HDLSignal return_sig = null;
 		return_sig = returnSigTable.get(board);
 		Hashtable<String, FieldAccessItem> fieldAccessChainMap = new Hashtable<>();
 		for(SchedulerSlot slot: board.getSlots()){
 			int id = slot.getStepId();
 			for(SchedulerItem item: slot.getItems()){
-				genExpr(board, item, states.get(id), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap, predExprMap);
+				genExpr(board, resource, item, states.get(id), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap, predExprMap, returnTable);
 			}
 		}
 		
@@ -497,7 +500,7 @@ public class SchedulerInfoCompiler {
 		}
 	}
 	
-	private void genExpr(SchedulerBoard board, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap, Hashtable<SchedulerItem, HDLExpr> predExprMap){
+	private void genExpr(SchedulerBoard board, HardwareResource resource, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap, Hashtable<SchedulerItem, HDLExpr> predExprMap, Hashtable<Integer, SequencerState> returnTable){
 		switch(item.getOp()){
 		case METHOD_ENTRY:{
 			if(paramList != null){
@@ -669,6 +672,10 @@ public class SchedulerInfoCompiler {
 				if(ret == null) ret = hm.getPort(item0.name + "_return").getSignal();
 				dest.setAssign(state.getTransitions().get(0).getDestState().getTransitions().get(0).getDestState(), ret); // should read in ***_wait
 				predExprMap.put(item, ret);
+				SequencerState retState = returnTable.get(item0.getStepId());
+				if(retState != null){
+					dest.setAssign(retState, ret); // should read in ***_wait
+				}
 			}
 			break;
 		}
@@ -687,6 +694,10 @@ public class SchedulerInfoCompiler {
 				dest.setAssign(state.getTransitions().get(0).getDestState().getTransitions().get(0).getDestState(), ret); // should read in ***_wait
 				//dest.setAssign(state, ret);
 				predExprMap.put(item, ret);
+				SequencerState retState = returnTable.get(item0.getStepId());
+				if(retState != null){
+					dest.setAssign(retState, ret); // should read in ***_wait
+				}
 			}
 			break;
 		}
@@ -753,7 +764,7 @@ public class SchedulerInfoCompiler {
 		case MUL64:
 		{
 			Operand[] arg = item.getSrcOperand();
-			HDLInstance inst = getOperationUnit(item.getOp());
+			HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
@@ -765,7 +776,7 @@ public class SchedulerInfoCompiler {
 		case DIV64 :
 		{
 			Operand[] arg = item.getSrcOperand();
-			HDLInstance inst = getOperationUnit(item.getOp());
+			HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
@@ -780,7 +791,7 @@ public class SchedulerInfoCompiler {
 		case MOD64 :
 		{
 			Operand[] arg = item.getSrcOperand();
-			HDLInstance inst = getOperationUnit(item.getOp());
+			HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
@@ -800,7 +811,7 @@ public class SchedulerInfoCompiler {
 		case FDIV64 :
 		{
 			Operand[] arg = item.getSrcOperand();
-			HDLInstance inst = getOperationUnit(item.getOp());
+			HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 			inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
@@ -818,7 +829,7 @@ public class SchedulerInfoCompiler {
 		case CONV_D2F:
 		{
 			Operand[] arg = item.getSrcOperand();
-			HDLInstance inst = getOperationUnit(item.getOp());
+			HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 			inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 			inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 			inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
@@ -827,18 +838,18 @@ public class SchedulerInfoCompiler {
 			predExprMap.put(item, inst.getSignalForPort("result"));
 			break;
 		}
-		case FLT32:     genCompUnitExpr(item, FCOMP32.LT, state);  break;
-		case FLEQ32:    genCompUnitExpr(item, FCOMP32.LEQ, state); break;
-		case FGT32:     genCompUnitExpr(item, FCOMP32.GT, state);  break;
-		case FGEQ32:    genCompUnitExpr(item, FCOMP32.GEQ, state); break;
-		case FCOMPEQ32: genCompUnitExpr(item, FCOMP32.EQ, state);  break;
-		case FNEQ32:    genCompUnitExpr(item, FCOMP32.NEQ, state); break;
-		case FLT64:     genCompUnitExpr(item, FCOMP64.LT, state);  break;
-		case FLEQ64:    genCompUnitExpr(item, FCOMP64.LEQ, state); break;
-		case FGT64:     genCompUnitExpr(item, FCOMP64.GT, state);  break;
-		case FGEQ64:    genCompUnitExpr(item, FCOMP64.GEQ, state); break;
-		case FCOMPEQ64: genCompUnitExpr(item, FCOMP64.EQ, state);  break;
-		case FNEQ64:    genCompUnitExpr(item, FCOMP64.NEQ, state); break;
+		case FLT32:     genCompUnitExpr(item, FCOMP32.LT, state, resource, board);  break;
+		case FLEQ32:    genCompUnitExpr(item, FCOMP32.LEQ, state, resource, board); break;
+		case FGT32:     genCompUnitExpr(item, FCOMP32.GT, state, resource, board);  break;
+		case FGEQ32:    genCompUnitExpr(item, FCOMP32.GEQ, state, resource, board); break;
+		case FCOMPEQ32: genCompUnitExpr(item, FCOMP32.EQ, state, resource, board);  break;
+		case FNEQ32:    genCompUnitExpr(item, FCOMP32.NEQ, state, resource, board); break;
+		case FLT64:     genCompUnitExpr(item, FCOMP64.LT, state, resource, board);  break;
+		case FLEQ64:    genCompUnitExpr(item, FCOMP64.LEQ, state, resource, board); break;
+		case FGT64:     genCompUnitExpr(item, FCOMP64.GT, state, resource, board);  break;
+		case FGEQ64:    genCompUnitExpr(item, FCOMP64.GEQ, state, resource, board); break;
+		case FCOMPEQ64: genCompUnitExpr(item, FCOMP64.EQ, state, resource, board);  break;
+		case FNEQ64:    genCompUnitExpr(item, FCOMP64.NEQ, state, resource, board); break;
 		case MSB_FLAP:{
 			HDLOp op = convOp2HDLOp(item.getOp());
 			HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
@@ -871,9 +882,9 @@ public class SchedulerInfoCompiler {
 		}
 	}
 	
-	private void genCompUnitExpr(SchedulerItem item, int opcode, SequencerState state){
+	private void genCompUnitExpr(SchedulerItem item, int opcode, SequencerState state, HardwareResource resource, SchedulerBoard board){
 		Operand[] arg = item.getSrcOperand();
-		HDLInstance inst = getOperationUnit(item.getOp());
+		HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 		inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 		inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
 		inst.getSignalForPort("opcode").setAssign(state, 0, HDLUtils.newValue(opcode, 8));
@@ -925,15 +936,30 @@ public class SchedulerInfoCompiler {
 		
 		varTable.put(req_flag.getName(), req_flag);
 		varTable.put(req_local.getName(), req_local);
+		
+		if(m.hasCallStack()){
+			HDLInstance stack = newInstModule("SimpleBlockRAM16", m.getName() + "_call_stack_memory");
+			stack.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+			stack.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+			int size = m.getCallStackSize();
+			stack.getParameterPair("WORDS").setValue(String.valueOf(size));
+			int depth = (int)Math.ceil(Math.log(size) / Math.log(2.0));
+			stack.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+			stack.getSignalForPort("address_b").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
+			stack.getSignalForPort("we_b").setResetValue(HDLPreDefinedConstant.LOW);
+		}
 
 	}
 	
-	private Hashtable<Integer, SequencerState> genStatemachine(SchedulerBoard board){
+	private Hashtable<Integer, SequencerState> genStatemachine(SchedulerBoard board, HardwareResource resource, Hashtable<Integer, SequencerState> returnTable){
 		HDLSequencer seq = hm.newSequencer(board.getName() + "_method");
 		IdGen id = new IdGen("S");
 		Hashtable<Integer, SequencerState> states = new Hashtable<>();
+		Method m = board.getMethod();
 		
 		HDLVariable busy_port_sig = null, req_flag = null, req_flag_d = null, req_flag_edge = null;
+		HDLInstance call_stack = hm.getModuleInstance(board.getName() + "_call_stack_memory");
+
 		if(board.getMethod().isAuto() == false){
 			req_flag = varTable.get(board.getName() + "_req_flag");
 			busy_port_sig = varTable.get(board.getName() + "_busy");
@@ -953,33 +979,48 @@ public class SchedulerInfoCompiler {
 		}
 		for(SchedulerSlot slot: board.getSlots()){
 			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0) continue;
+			if(slot.getStepId() == 0) continue;
 			states.get(slot.getStepId()).addStateTransit(states.get(slot.getNextStep()[0]));
 		}
-		
+
 		for(SchedulerSlot slot: board.getSlots()){
 			for(SchedulerItem item: slot.getItems()){
 				SequencerState s = states.get(item.getStepId());
 				switch(item.getOp()){
 				case METHOD_EXIT: {
-					Method m = board.getMethod();
-					if(m.getWaitWithMethod() == null){ // independent method (normal)
+					HDLExpr unlock = null;
+					HDLExpr wait_with_unlock = null;
+
+					if(m.getWaitWithMethod() != null){ // must wait for other method, such as join
+						HDLVariable flag = varTable.get(m.getWaitWithMethod().getName() + "_busy");
+						wait_with_unlock = hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW); // the waiting method has been done.
+						unlock = wait_with_unlock;
+					}
+					
+					if(m.hasCallStack()){
+						HDLExpr stack_bottom = hm.newExpr(HDLOp.EQ, call_stack.getSignalForPort("address_b"), HDLPreDefinedConstant.INTEGER_ZERO);
+						// unlock is updated with this stack bottom condition 
+						unlock = (unlock == null) ? stack_bottom : hm.newExpr(HDLOp.AND, stack_bottom, unlock);
+					}
+					
+					if(unlock != null){
+						s.addStateTransit(unlock, states.get(item.getSlot().getNextStep()[0]));
+					}else{
 						s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
-						if(board.getMethod().isAuto() == false){
+					}
+					
+					if(board.getMethod().isAuto() == false){
+						if(unlock != null){
+							busy_port_sig.setAssign(s, hm.newExpr(HDLOp.IF, unlock, HDLPreDefinedConstant.LOW, HDLPreDefinedConstant.HIGH));
+						}else{
 							busy_port_sig.setAssign(s, HDLPreDefinedConstant.LOW);
 						}
-					}else{ // must wait for other method.
-						HDLVariable flag = varTable.get(m.getWaitWithMethod().getName() + "_busy");
-						HDLExpr unlock = hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW); // the waiting method has been done.
-						s.addStateTransit(unlock, states.get(item.getSlot().getNextStep()[0]));
-						if(board.getMethod().isAuto() == false){
-							busy_port_sig.setAssign(s, hm.newExpr(HDLOp.IF, unlock, HDLPreDefinedConstant.LOW, HDLPreDefinedConstant.HIGH));
-						}
 					}
+
 					methodIdleState = s;
 					break;
 				}
 				case METHOD_ENTRY:{
-					Method m = board.getMethod();
 					if(m.isAuto()){
 						s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 					}else{
@@ -1012,8 +1053,8 @@ public class SchedulerInfoCompiler {
 				case CALL:
 				case EXT_CALL:
 				{
-					SequencerState call_body = seq.addSequencerState(s.getStateId().getValue()+"_body");
-					SequencerState call_wait = seq.addSequencerState(s.getStateId().getValue()+"_wait");
+					SequencerState call_body = seq.addSequencerState(s.getStateId().getValue()+"_body", false);
+					SequencerState call_wait = seq.addSequencerState(s.getStateId().getValue()+"_wait", false);
 					MethodInvokeItem item0 = (MethodInvokeItem)item;
 					HDLVariable call_req, call_busy;
 					String flag_name;
@@ -1059,6 +1100,21 @@ public class SchedulerInfoCompiler {
 //						call_wait.setStateExitFlag(flag);
 					}
 //					call_body.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
+					
+					if(call_stack != null){
+						HDLSignal addr = call_stack.getSignalForPort("address_b");
+						HDLSignal we = call_stack.getSignalForPort("we_b");
+						HDLSignal wdata = call_stack.getSignalForPort("din_b");
+						we.setAssign(s, HDLPreDefinedConstant.HIGH);
+						we.setDefaultValue(HDLPreDefinedConstant.LOW); // others
+						int retPoint = item.getStepId();
+						wdata.setAssign(s, new HDLValue(String.valueOf(retPoint), HDLPrimitiveType.genSignedType(16)));
+						addr.setAssign(s, hm.newExpr(HDLOp.ADD, addr, HDLPreDefinedConstant.INTEGER_ONE));
+						SequencerState call_ret = seq.addSequencerState(s.getStateId().getValue()+"_ret", false);
+						call_ret.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
+						returnTable.put(retPoint, call_ret);
+					}
+					
 					break;
 				}
 				case LSHIFT32 :
@@ -1102,7 +1158,7 @@ public class SchedulerInfoCompiler {
 				{
 					s.setMaxConstantDelay(item.getOp().latency);
 					s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
-					HDLInstance inst = getOperationUnit(item.getOp());
+					HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 					s.setStateExitFlag(inst.getSignalForPort("valid"));
 					break;
 				}
@@ -1142,6 +1198,33 @@ public class SchedulerInfoCompiler {
 			}
 		}
 
+		if(m.hasCallStack()){
+			HDLExpr unlock = null;
+			
+			if(m.getWaitWithMethod() != null){ // must wait for other method, such as join
+				HDLVariable flag = varTable.get(m.getWaitWithMethod().getName() + "_busy");
+				unlock = hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW); // the waiting method has been done.
+			}
+			Enumeration<Integer> i = returnTable.keys();
+			HDLSignal top = call_stack.getSignalForPort("dout_b");
+			HDLExpr stack_bottom = hm.newExpr(HDLOp.EQ, call_stack.getSignalForPort("address_b"), HDLPreDefinedConstant.INTEGER_ZERO);
+			HDLExpr not_stack_bottom = hm.newExpr(HDLOp.NOT, stack_bottom);
+			while(i.hasMoreElements()){
+				int nk = i.nextElement();
+				SequencerState ns = returnTable.get(nk);
+				HDLExpr cond = hm.newExpr(HDLOp.AND, not_stack_bottom, hm.newExpr(HDLOp.EQ, top, new HDLValue(String.valueOf(nk), HDLPrimitiveType.genSignedType(16))));
+				cond = (unlock == null) ? cond : hm.newExpr(HDLOp.AND, unlock, cond);
+				methodIdleState.addStateTransit(cond, ns);
+			}
+			HDLSignal addr = call_stack.getSignalForPort("address_b");
+			HDLExpr dec = hm.newExpr(HDLOp.SUB, addr, HDLPreDefinedConstant.INTEGER_ONE);
+			if(unlock != null){
+				addr.setAssign(methodIdleState, hm.newExpr(HDLOp.AND, not_stack_bottom, unlock), dec);
+			}else{
+				addr.setAssign(methodIdleState, not_stack_bottom, dec);
+			}
+		}
+
 		return states;
 	}
 
@@ -1153,111 +1236,111 @@ public class SchedulerInfoCompiler {
 		return inst;
 	}
 	
-	private HDLInstance getOperationUnit(Op op){
+	private HDLInstance getOperationUnit(Op op, HardwareResource resource, String name){
 		switch(op){
 		case MUL32:{
-			if(mul32 == null) mul32 = newInstModule("MUL32", "u_synthesijer_mul32");
-			return mul32;
+			if(resource.mul32 == null) resource.mul32 = newInstModule("MUL32", "u_synthesijer_mul32" + "_" + name);
+			return resource.mul32;
 		}
 		case MUL64:{
-			if(mul64 == null) mul64 = newInstModule("MUL64", "u_synthesijer_mul64");
-			return mul64;
+			if(resource.mul64 == null) resource.mul64 = newInstModule("MUL64", "u_synthesijer_mul64" + "_" + name);
+			return resource.mul64;
 		}
 		case DIV32:
 		case MOD32:{
-			if(div32 == null){
-				div32 = newInstModule("DIV32", "u_synthesijer_div32");
-				div32.getSignalForPort("b").setResetValue(HDLUtils.newValue(1, 32));
+			if(resource.div32 == null){
+				resource.div32 = newInstModule("DIV32", "u_synthesijer_div32" + "_" + name);
+				resource.div32.getSignalForPort("b").setResetValue(HDLUtils.newValue(1, 32));
 			}
-			return div32;
+			return resource.div32;
 		}
 		case DIV64:
 		case MOD64:{
-			if(div64 == null){
-				div64 = newInstModule("DIV64", "u_synthesijer_div64");
-				div64.getSignalForPort("b").setResetValue(HDLUtils.newValue(1, 64));
+			if(resource.div64 == null){
+				resource.div64 = newInstModule("DIV64", "u_synthesijer_div64" + "_" + name);
+				resource.div64.getSignalForPort("b").setResetValue(HDLUtils.newValue(1, 64));
 			}
-			return div64;
+			return resource.div64;
 		}
 		case FADD32:{
-			if(fadd32 == null) fadd32 = newInstModule("FADD32", "u_synthesijer_fadd32");
-			return fadd32;
+			if(resource.fadd32 == null) resource.fadd32 = newInstModule("FADD32", "u_synthesijer_fadd32" + "_" + name);
+			return resource.fadd32;
 		}
 		case FSUB32:{
-			if(fsub32 == null) fsub32 = newInstModule("FSUB32", "u_synthesijer_fsub32");
-			return fsub32;
+			if(resource.fsub32 == null) resource.fsub32 = newInstModule("FSUB32", "u_synthesijer_fsub32" + "_" + name);
+			return resource.fsub32;
 		}
 		case FMUL32:{
-			if(fmul32 == null) fmul32 = newInstModule("FMUL32", "u_synthesijer_fmul32");
-			return fmul32;
+			if(resource.fmul32 == null) resource.fmul32 = newInstModule("FMUL32", "u_synthesijer_fmul32" + "_" + name);
+			return resource.fmul32;
 		}
 		case FDIV32:{
-			if(fdiv32 == null) fdiv32 = newInstModule("FDIV32", "u_synthesijer_fdiv32");
-			return fdiv32;
+			if(resource.fdiv32 == null) resource.fdiv32 = newInstModule("FDIV32", "u_synthesijer_fdiv32" + "_" + name);
+			return resource.fdiv32;
 		}
 		case FADD64:{
-			if(fadd64 == null) fadd64 = newInstModule("FADD64", "u_synthesijer_fadd64");
-			return fadd64;
+			if(resource.fadd64 == null) resource.fadd64 = newInstModule("FADD64", "u_synthesijer_fadd64" + "_" + name);
+			return resource.fadd64;
 		}
 		case FSUB64:{
-			if(fsub64 == null) fsub64 = newInstModule("FSUB64", "u_synthesijer_fsub64");
-			return fsub64;
+			if(resource.fsub64 == null) resource.fsub64 = newInstModule("FSUB64", "u_synthesijer_fsub64" + "_" + name);
+			return resource.fsub64;
 		}
 		case FMUL64:{
-			if(fmul64 == null) fmul64 = newInstModule("FMUL64", "u_synthesijer_fmul64");
-			return fmul64;
+			if(resource.fmul64 == null) resource.fmul64 = newInstModule("FMUL64", "u_synthesijer_fmul64" + "_" + name);
+			return resource.fmul64;
 		}
 		case FDIV64:{
-			if(fdiv64 == null) fdiv64 = newInstModule("FDIV64", "u_synthesijer_fdiv64");
-			return fdiv64;
+			if(resource.fdiv64 == null) resource.fdiv64 = newInstModule("FDIV64", "u_synthesijer_fdiv64" + "_" + name);
+			return resource.fdiv64;
 		}
 		case CONV_F2I:{
-			if(f2i == null) f2i = newInstModule("FCONV_F2I", "u_synthesijer_fconv_f2i");
-			return f2i;
+			if(resource.f2i == null) resource.f2i = newInstModule("FCONV_F2I", "u_synthesijer_fconv_f2i" + "_" + name);
+			return resource.f2i;
 		}
 		case CONV_I2F:{
-			if(i2f == null) i2f = newInstModule("FCONV_I2F", "u_synthesijer_fconv_i2f");
-			return i2f;
+			if(resource.i2f == null) resource.i2f = newInstModule("FCONV_I2F", "u_synthesijer_fconv_i2f" + "_" + name);
+			return resource.i2f;
 		}
 		case CONV_L2D:{
-			if(l2d == null) l2d = newInstModule("FCONV_L2D", "u_synthesijer_fconv_l2d");
-			return l2d;
+			if(resource.l2d == null) resource.l2d = newInstModule("FCONV_L2D", "u_synthesijer_fconv_l2d" + "_" + name);
+			return resource.l2d;
 		}
 		case CONV_D2L:{
-			if(d2l == null) d2l = newInstModule("FCONV_D2L", "u_synthesijer_fconv_d2l");
-			return d2l;
+			if(resource.d2l == null) resource.d2l = newInstModule("FCONV_D2L", "u_synthesijer_fconv_d2l" + "_" + name);
+			return resource.d2l;
 		}
 		case CONV_F2D:{
-			if(f2d == null) f2d = newInstModule("FCONV_F2D", "u_synthesijer_fconv_f2d");
-			return f2d;
+			if(resource.f2d == null) resource.f2d = newInstModule("FCONV_F2D", "u_synthesijer_fconv_f2d" + "_" + name);
+			return resource.f2d;
 		}
 		case CONV_D2F:{
-			if(d2f == null) d2f = newInstModule("FCONV_D2F", "u_synthesijer_fconv_d2f");
-			return d2f;
+			if(resource.d2f == null) resource.d2f = newInstModule("FCONV_D2F", "u_synthesijer_fconv_d2f" + "_" + name);
+			return resource.d2f;
 		}
 		case LSHIFT32:{
-			if(lshift32 == null) lshift32 = newInstModule("LSHIFT32", "u_synthesijer_lshift32");
-			return lshift32;
+			if(resource.lshift32 == null) resource.lshift32 = newInstModule("LSHIFT32", "u_synthesijer_lshift32" + "_" + name);
+			return resource.lshift32;
 		}
 		case LOGIC_RSHIFT32:{
-			if(logic_rshift32 == null) logic_rshift32 = newInstModule("LOGIC_RSHIFT32", "u_synthesijer_logic_rshift32");
-			return logic_rshift32;
+			if(resource.logic_rshift32 == null) resource.logic_rshift32 = newInstModule("LOGIC_RSHIFT32", "u_synthesijer_logic_rshift32" + "_" + name);
+			return resource.logic_rshift32;
 		}
 		case ARITH_RSHIFT32:{
-			if(arith_rshift32 == null) arith_rshift32 = newInstModule("ARITH_RSHIFT32", "u_synthesijer_arith_rshift32");
-			return arith_rshift32;
+			if(resource.arith_rshift32 == null) resource.arith_rshift32 = newInstModule("ARITH_RSHIFT32", "u_synthesijer_arith_rshift32" + "_" + name);
+			return resource.arith_rshift32;
 		}
 		case LSHIFT64:{
-			if(lshift64 == null) lshift64 = newInstModule("LSHIFT64", "u_synthesijer_lshift64");
-			return lshift64;
+			if(resource.lshift64 == null) resource.lshift64 = newInstModule("LSHIFT64", "u_synthesijer_lshift64" + "_" + name);
+			return resource.lshift64;
 		}
 		case LOGIC_RSHIFT64:{
-			if(logic_rshift64 == null) logic_rshift64 = newInstModule("LOGIC_RSHIFT64", "u_synthesijer_logic_rshift64");
-			return logic_rshift64;
+			if(resource.logic_rshift64 == null) resource.logic_rshift64 = newInstModule("LOGIC_RSHIFT64", "u_synthesijer_logic_rshift64" + "_" + name);
+			return resource.logic_rshift64;
 		}
 		case ARITH_RSHIFT64:{
-			if(arith_rshift64 == null) arith_rshift64 = newInstModule("ARITH_RSHIFT64", "u_synthesijer_arith_rshift64");
-			return arith_rshift64;
+			if(resource.arith_rshift64 == null) resource.arith_rshift64 = newInstModule("ARITH_RSHIFT64", "u_synthesijer_arith_rshift64" + "_" + name);
+			return resource.arith_rshift64;
 		}
 		case FLT32:
 		case FLEQ32:
@@ -1265,8 +1348,8 @@ public class SchedulerInfoCompiler {
 		case FGEQ32:
 		case FCOMPEQ32:
 		case FNEQ32:{
-			if(fcomp32 == null) fcomp32 = newInstModule("FCOMP32", "u_synthesijer_fcomp32");
-			return fcomp32;
+			if(resource.fcomp32 == null) resource.fcomp32 = newInstModule("FCOMP32", "u_synthesijer_fcomp32" + "_" + name);
+			return resource.fcomp32;
 		}
 		case FLT64:
 		case FLEQ64:
@@ -1274,8 +1357,8 @@ public class SchedulerInfoCompiler {
 		case FGEQ64:
 		case FCOMPEQ64:
 		case FNEQ64:{
-			if(fcomp64 == null) fcomp64 = newInstModule("FCOMP64", "u_synthesijer_fcomp64");
-			return fcomp64;
+			if(resource.fcomp64 == null) resource.fcomp64 = newInstModule("FCOMP64", "u_synthesijer_fcomp64" + "_" + name);
+			return resource.fcomp64;
 		}
 		default: return null;
 		}

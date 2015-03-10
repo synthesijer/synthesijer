@@ -69,7 +69,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLPort p: ports){
 			dest.print(sep);
 			//p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
-			HDLUtils.print(dest, offset+2, String.format("%s : %s %s", p.getName(), p.getDir().getVHDL(), ((HDLPrimitiveType)p.getType()).getVHDL()));
+			HDLUtils.print(dest, offset+2, String.format("%s : %s %s", p.getName(), p.getDir().getVHDL(), ((HDLPrimitiveType)p.getType()).getVHDL(paramFlag)));
 			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");

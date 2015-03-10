@@ -87,8 +87,10 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	public HDLExpr getResetValue(){
 		if(resetValue != null){
 			return resetValue;
-		}else{
+		}else if(type != null){
 			return type.getDefaultValue();
+		}else{
+			return null;
 		}
 	}
 

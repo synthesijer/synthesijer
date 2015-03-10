@@ -332,9 +332,9 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		}else{
 			String src = expr.getVHDL();
 			if(expr instanceof HDLValue &&
-               expr.getType().isDigit() &&
-               dest.getType() instanceof HDLPrimitiveType &&
-               (dest.getType().isVector()) || (dest.getType().isSigned())){
+					expr.getType().isDigit() &&
+					dest.getType() instanceof HDLPrimitiveType &&
+					(dest.getType().isVector() || dest.getType().isSigned())){
 				src = String.format("to_signed(%s, %d)", src, ((HDLPrimitiveType)dest.getType()).getWidth());
 			}
 			if(dest.getType().isBit()){

@@ -186,7 +186,16 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	public HDLInstance[] getModuleInstances(){
 		return submodules.toArray(new HDLInstance[]{});
 	}
-		
+
+	public HDLInstance getModuleInstance(String key){
+		for(HDLInstance inst: submodules){
+			if(inst.getName().equals(key)){
+				return inst;
+			}
+		}
+		return null;
+	}
+
 	private int uniqId = 1;
 	
 	public int getExprUniqueId(){

@@ -22,6 +22,8 @@ public class Method implements Scope, SynthesijerAstTree{
 	private boolean parallelFlag;
 	private boolean noWaitFlag;
 	private boolean constructorFlag;
+	private boolean callStackFlag;
+	private int callStackSize;
 	
 	private Statemachine stateMachine;
 	
@@ -206,4 +208,20 @@ public class Method implements Scope, SynthesijerAstTree{
 		return v;
 	}
 
+	public void setCallStackFlag(boolean f){
+		callStackFlag = f;
+	}
+
+	public boolean hasCallStack(){
+		return callStackFlag;
+	}
+
+	public void setCallStackSize(int v){
+		callStackSize = v;
+	}
+
+	public int getCallStackSize(){
+		return callStackSize;
+	}
+	
 }

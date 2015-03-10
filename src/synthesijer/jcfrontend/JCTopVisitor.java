@@ -3,7 +3,10 @@ package synthesijer.jcfrontend;
 import java.util.List;
 
 import openjdk.com.sun.tools.javac.tree.JCTree;
+import openjdk.com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import openjdk.com.sun.tools.javac.tree.JCTree.JCAssign;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCStatement;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCVariableDecl;
@@ -15,6 +18,7 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.type.MySelfType;
+import synthesijer.rt.CallStack;
 
 /**
  * A visitor to generate an instance of Module from a given instance of JCClassDecl.
@@ -69,6 +73,22 @@ public class JCTopVisitor extends Visitor{
 		m.setParallelFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "parallel"));
 		m.setNoWaitFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "no_wait"));
 		m.setConstructorFlag(JCFrontendUtils.isConstructor(decl));
+		if(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "CallStack")){
+			m.setCallStackFlag(true);
+			JCAnnotation a = JCFrontendUtils.getAnnotation(decl.mods.annotations, "CallStack");
+			for(JCExpression expr: a.args){
+				if(expr instanceof JCAssign){
+					JCAssign assign = (JCAssign)expr;
+					m.setCallStackSize(Integer.parseInt(assign.rhs.toString()));
+				}else{
+					SynthesijerUtils.warn("unexpected argument for @CallStack: " + expr);
+					SynthesijerUtils.warn("Use \"value=immidiate\" or \"immidiate\"");
+				}
+			}
+		}else{
+			m.setCallStackFlag(false);
+		}
+		
 		
 		for(JCStatement stmt: decl.body.getStatements()){
 			JCStmtVisitor visitor = new JCStmtVisitor(m);
