@@ -29,7 +29,7 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 	}
 	
 	public SchedulerBoard conv(SchedulerBoard src){
-		SchedulerBoard ret = new SchedulerBoard(src.getName(), src.getMethod());
+		SchedulerBoard ret = src.genSameEnvBoard();
 		for(SchedulerSlot slot: src.getSlots()){
 			SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 			for(SchedulerItem item: slot.getItems()){

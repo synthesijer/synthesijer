@@ -157,7 +157,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 	}
 	
 	public SchedulerBoard conv(SchedulerBoard src){
-		SchedulerBoard ret = new SchedulerBoard(src.getName(), src.getMethod());
+		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
 		Hashtable<SchedulerSlot, Integer> degrees = getEntryDegrees(slots);
 		ArrayList<SchedulerSlot> bb = null;

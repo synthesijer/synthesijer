@@ -121,6 +121,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		this.breakId = breakId;
 		this.continueId = continueId;		
 		info.addVarTable(varList);
+		board.addVarTable(varList);
 	}
 
 	public IdentifierGenerator getIdGen(){

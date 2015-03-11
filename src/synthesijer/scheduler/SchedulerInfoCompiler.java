@@ -107,10 +107,12 @@ public class SchedulerInfoCompiler {
 	}
 	
 	private class Pair{
+		public final VariableOperand orig; // the VariableOperand in given source
 		public final HDLSignal reg; // the actual signal for the method.
 		public final HDLPort port;  // port from outside
 		public final HDLSignal local; // signal for local invocation
-		public Pair(HDLSignal reg, HDLPort port, HDLSignal local){
+		public Pair(VariableOperand v, HDLSignal reg, HDLPort port, HDLSignal local){
+			this.orig = v;
 			this.reg = reg;
 			this.port = port;
 			this.local = local;
@@ -128,6 +130,14 @@ public class SchedulerInfoCompiler {
 			list = paramListMap.get(methodName);
 		}
 		return list;
+	}
+	
+	private Pair getMethodParamPair(String methodName, String v){
+		ArrayList<Pair> list = getMethodParamPairList(methodName);
+		for(Pair p: list){
+			if(p.orig.getOrigName().equals(v)) return p;
+		}
+		return null;
 	}
 	
 	private HDLExpr convExprToHDLExpr(Expr expr, HDLPrimitiveType type){
@@ -165,13 +175,13 @@ public class SchedulerInfoCompiler {
 					String prefix = v.getMethodName();
 					String n = prefix + "_" + v.getOrigName();
 					HDLSignal local = hm.newSignal(n + "_local", getHDLType(type));
-					getMethodParamPairList(prefix).add(new Pair(sig, null, local));
+					getMethodParamPairList(prefix).add(new Pair(v, sig, null, local));
 				}else{
 					String prefix = v.getMethodName();
 					String n = prefix + "_" + v.getOrigName();
 					HDLPort port = hm.newPort(n, HDLPort.DIR.IN, getHDLType(type));
 					HDLSignal local = hm.newSignal(n + "_local", getHDLType(type));
-					getMethodParamPairList(prefix).add(new Pair(sig, port, local));
+					getMethodParamPairList(prefix).add(new Pair(v, sig, port, local));
 				}
 			}else if(v.isPublic() && (!v.isGlobalConstant())){
 				String n = v.getOrigName();
@@ -938,17 +948,56 @@ public class SchedulerInfoCompiler {
 		varTable.put(req_local.getName(), req_local);
 		
 		if(m.hasCallStack()){
-			HDLInstance stack = newInstModule("SimpleBlockRAM16", m.getName() + "_call_stack_memory");
-			stack.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
-			stack.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-			int size = m.getCallStackSize();
-			stack.getParameterPair("WORDS").setValue(String.valueOf(size));
-			int depth = (int)Math.ceil(Math.log(size) / Math.log(2.0));
-			stack.getParameterPair("DEPTH").setValue(String.valueOf(depth));
-			stack.getSignalForPort("address_b").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
-			stack.getSignalForPort("we_b").setResetValue(HDLPreDefinedConstant.LOW);
+			HDLInstance call_stack = genStackForRecursiveCall(m.getName() + "_call_stack_memory", m.getCallStackSize(), 16);
+			for(ArrayList<VariableOperand> list: board.getVarTableList()){
+				for(VariableOperand v: list){
+					if(v.getMethodName() == null){
+						continue; // skip non-user defined variable
+					}
+					HDLVariable hv = varTable.get(v.getName());
+					if(hv.getType() instanceof HDLPrimitiveType){
+						HDLInstance inst = genStackForRecursiveCall(hv.getName() + "_call_stack_memory", m.getCallStackSize(), ((HDLPrimitiveType)hv.getType()).getWidth());
+						callStackMap.put(hv, inst);
+					}else{
+						SynthesijerUtils.warn("cannot preserve non-primitive type variable for recursive call:" + v);
+					}
+				}
+			}
 		}
-
+	}
+	
+	private Hashtable<HDLVariable, HDLInstance> callStackMap = new Hashtable<>();
+	
+	private HDLInstance genStackForRecursiveCall(String name, int size, int width){
+		HDLInstance stack;
+		switch(width){
+		case 1:
+			stack = newInstModule("SimpleBlockRAM1", name);
+			break;
+		case 8:
+			stack = newInstModule("SimpleBlockRAM8", name);
+			break;
+		case 16:
+			stack = newInstModule("SimpleBlockRAM16", name);
+			break;
+		case 32:
+			stack = newInstModule("SimpleBlockRAM32", name);
+			break;
+		case 64:
+			stack = newInstModule("SimpleBlockRAM64", name);
+			break;
+		default:
+			SynthesijerUtils.warn("SchedulerInfoCompiler: might be generated unexpected stack:" + name);
+			stack = newInstModule("SimpleBlockRAM32", name);
+		}
+		stack.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+		stack.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+		stack.getParameterPair("WORDS").setValue(String.valueOf(size));
+		int depth = (int)Math.ceil(Math.log(size) / Math.log(2.0));
+		stack.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+		stack.getSignalForPort("address_b").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
+		stack.getSignalForPort("we_b").setResetValue(HDLPreDefinedConstant.LOW);
+		return stack;
 	}
 	
 	private Hashtable<Integer, SequencerState> genStatemachine(SchedulerBoard board, HardwareResource resource, Hashtable<Integer, SequencerState> returnTable){
@@ -1108,8 +1157,24 @@ public class SchedulerInfoCompiler {
 						we.setAssign(s, HDLPreDefinedConstant.HIGH);
 						we.setDefaultValue(HDLPreDefinedConstant.LOW); // others
 						int retPoint = item.getStepId();
-						wdata.setAssign(s, new HDLValue(String.valueOf(retPoint), HDLPrimitiveType.genSignedType(16)));
-						addr.setAssign(s, hm.newExpr(HDLOp.ADD, addr, HDLPreDefinedConstant.INTEGER_ONE));
+						HDLValue retPointValue = new HDLValue(String.valueOf(retPoint), HDLPrimitiveType.genSignedType(16));
+						wdata.setAssign(s, retPointValue);
+						HDLExpr addr_expr = hm.newExpr(HDLOp.ADD, addr, HDLPreDefinedConstant.INTEGER_ONE);
+						addr.setAssign(s, addr_expr);
+
+						Enumeration<HDLVariable> preserve = callStackMap.keys();
+						while(preserve.hasMoreElements()){
+							HDLVariable src = preserve.nextElement();
+							HDLInstance inst = callStackMap.get(src);
+							HDLSignal a = inst.getSignalForPort("address_b");
+							HDLSignal w = inst.getSignalForPort("we_b");
+							HDLSignal d = inst.getSignalForPort("din_b");
+							w.setAssign(s, HDLPreDefinedConstant.HIGH);
+							w.setDefaultValue(HDLPreDefinedConstant.LOW); // others
+							d.setAssign(s, src);
+							a.setAssign(s, addr_expr);
+						}
+						
 						SequencerState call_ret = seq.addSequencerState(s.getStateId().getValue()+"_ret", false);
 						call_ret.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 						returnTable.put(retPoint, call_ret);
@@ -1216,6 +1281,7 @@ public class SchedulerInfoCompiler {
 				cond = (unlock == null) ? cond : hm.newExpr(HDLOp.AND, unlock, cond);
 				methodIdleState.addStateTransit(cond, ns);
 			}
+
 			HDLSignal addr = call_stack.getSignalForPort("address_b");
 			HDLExpr dec = hm.newExpr(HDLOp.SUB, addr, HDLPreDefinedConstant.INTEGER_ONE);
 			if(unlock != null){
@@ -1223,6 +1289,22 @@ public class SchedulerInfoCompiler {
 			}else{
 				addr.setAssign(methodIdleState, not_stack_bottom, dec);
 			}
+			
+			Enumeration<HDLVariable> preserve = callStackMap.keys();
+			while(preserve.hasMoreElements()){
+				HDLVariable src = preserve.nextElement();
+				HDLInstance inst = callStackMap.get(src);
+				HDLSignal a = inst.getSignalForPort("address_b");
+				HDLSignal d = inst.getSignalForPort("dout_b");
+				if(unlock != null){
+					src.setAssign(methodIdleState, hm.newExpr(HDLOp.AND, not_stack_bottom, unlock), d);
+					a.setAssign(methodIdleState, hm.newExpr(HDLOp.AND, not_stack_bottom, unlock), dec);
+				}else{
+					src.setAssign(methodIdleState, not_stack_bottom, d);
+					a.setAssign(methodIdleState, not_stack_bottom, dec);
+				}
+			}
+			
 		}
 
 		return states;

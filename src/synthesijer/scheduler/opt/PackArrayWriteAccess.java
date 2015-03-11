@@ -37,7 +37,7 @@ public class PackArrayWriteAccess implements SchedulerInfoOptimizer{
 	}
 	
 	public SchedulerBoard conv(SchedulerBoard src){
-		SchedulerBoard ret = new SchedulerBoard(src.getName(), src.getMethod());
+		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
 		int i = 0;
 		while(i < slots.length){

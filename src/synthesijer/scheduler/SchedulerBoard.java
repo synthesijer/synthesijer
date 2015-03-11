@@ -23,10 +23,18 @@ public class SchedulerBoard {
 	 */
 	private ArrayList<SchedulerSlot> slots;
 	
-	public SchedulerBoard(String name, Method m){
+	private ArrayList<ArrayList<VariableOperand>> varTableList = new ArrayList<>();
+	
+	SchedulerBoard(String name, Method m){
 		this.name = name;
 		this.method = m;
 		this.slots = new ArrayList<SchedulerSlot>();
+	}
+	
+	public SchedulerBoard genSameEnvBoard() {
+		SchedulerBoard b = new SchedulerBoard(name, method);
+		b.varTableList = varTableList;
+		return b;
 	}
 	
 	public String getName(){
@@ -40,7 +48,16 @@ public class SchedulerBoard {
 	public SchedulerSlot[] getSlots(){
 		return slots.toArray(new SchedulerSlot[]{});
 	}
-	
+
+	public void addVarTable(ArrayList<VariableOperand> t){
+		varTableList.add(t);
+	}
+
+	@SuppressWarnings("unchecked")
+	public ArrayList<VariableOperand>[] getVarTableList(){
+		return varTableList.toArray(new ArrayList[]{});
+	}
+
 	/**
 	 * adds an item into the container with a new slot, and set stepId into the item.
 	 * @param item

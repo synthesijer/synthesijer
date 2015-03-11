@@ -22,18 +22,12 @@ public class Test011{
 		return b;
 	}
 	
-	private int[] stack_n = new int[100];
-	private int level;
 	@CallStack(100)
 	public int f(int n){
 		if(n == 0){
 			return 1;
 		}else{
-		        stack_n[level] = n; // preserve
-			level++;
 			int ret = f(n-1); // recursive call
-			level--;
-			n = stack_n[level]; // recovery
 			return n * ret;
 		}
 	}
