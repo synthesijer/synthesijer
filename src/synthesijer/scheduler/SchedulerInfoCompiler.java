@@ -354,14 +354,18 @@ public class SchedulerInfoCompiler {
 	
 	private Hashtable<SchedulerItem, HDLExpr> predExprMap;
 	private void genStatemachines(){
-		for(SchedulerBoard board: info.getBoardsList()){		
-			genMethodCtrlSignals(board);
+		Hashtable<SchedulerBoard, Hashtable<HDLVariable, HDLInstance>> callStackMaps = new Hashtable<>();
+		for(SchedulerBoard board: info.getBoardsList()){
+			Hashtable<HDLVariable, HDLInstance> callStackMap = new Hashtable<>();
+			callStackMaps.put(board, callStackMap);
+			genMethodCtrlSignals(board, callStackMap);
 		}
 		for(SchedulerBoard board: info.getBoardsList()){
 			predExprMap = new Hashtable<>();
 			HardwareResource resource = new HardwareResource();
 			Hashtable<Integer, SequencerState> returnTable = new Hashtable<>();
-			Hashtable<Integer, SequencerState> states = genStatemachine(board, resource, returnTable);
+			Hashtable<HDLVariable, HDLInstance> callStackMap = callStackMaps.get(board);
+			Hashtable<Integer, SequencerState> states = genStatemachine(board, resource, returnTable, callStackMap);
 			genExprs(board, states, resource, returnTable);
 		}
 	}
@@ -907,7 +911,7 @@ public class SchedulerInfoCompiler {
 	
 	private Hashtable<SchedulerBoard, HDLSignal> returnSigTable = new Hashtable<>();
 
-	private void genMethodCtrlSignals(SchedulerBoard board){
+	private void genMethodCtrlSignals(SchedulerBoard board, Hashtable<HDLVariable, HDLInstance> callStackMap){
 		Method m = board.getMethod();
 	
 		if(m.getType() != PrimitiveTypeKind.VOID){
@@ -965,9 +969,7 @@ public class SchedulerInfoCompiler {
 			}
 		}
 	}
-	
-	private Hashtable<HDLVariable, HDLInstance> callStackMap = new Hashtable<>();
-	
+		
 	private HDLInstance genStackForRecursiveCall(String name, int size, int width){
 		HDLInstance stack;
 		switch(width){
@@ -1000,7 +1002,7 @@ public class SchedulerInfoCompiler {
 		return stack;
 	}
 	
-	private Hashtable<Integer, SequencerState> genStatemachine(SchedulerBoard board, HardwareResource resource, Hashtable<Integer, SequencerState> returnTable){
+	private Hashtable<Integer, SequencerState> genStatemachine(SchedulerBoard board, HardwareResource resource, Hashtable<Integer, SequencerState> returnTable, Hashtable<HDLVariable, HDLInstance> callStackMap){
 		HDLSequencer seq = hm.newSequencer(board.getName() + "_method");
 		IdGen id = new IdGen("S");
 		Hashtable<Integer, SequencerState> states = new Hashtable<>();
@@ -1161,7 +1163,6 @@ public class SchedulerInfoCompiler {
 						wdata.setAssign(s, retPointValue);
 						HDLExpr addr_expr = hm.newExpr(HDLOp.ADD, addr, HDLPreDefinedConstant.INTEGER_ONE);
 						addr.setAssign(s, addr_expr);
-
 						Enumeration<HDLVariable> preserve = callStackMap.keys();
 						while(preserve.hasMoreElements()){
 							HDLVariable src = preserve.nextElement();

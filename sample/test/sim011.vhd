@@ -29,6 +29,7 @@ architecture RTL of sim011 is
     fact_x : in signed(32-1 downto 0);
     fib_n : in signed(32-1 downto 0);
     f_n : in signed(32-1 downto 0);
+    g_n : in signed(32-1 downto 0);
     fact_return : out signed(32-1 downto 0);
     fact_busy : out std_logic;
     fact_req : in std_logic;
@@ -37,7 +38,10 @@ architecture RTL of sim011 is
     fib_req : in std_logic;
     f_return : out signed(32-1 downto 0);
     f_busy : out std_logic;
-    f_req : in std_logic
+    f_req : in std_logic;
+    g_return : out signed(32-1 downto 0);
+    g_busy : out std_logic;
+    g_req : in std_logic
   );
  end component Test011;
 
@@ -101,6 +105,7 @@ begin
     fact_x => to_signed(6, 32),
     fib_n => to_signed(40, 32),
     f_n => to_signed(6, 32),
+    g_n => to_signed(10, 32),
     fact_return => open,
     fact_busy => open,
     fact_req => req_001,
@@ -109,7 +114,10 @@ begin
     fib_req => req_001,
     f_return => open,
     f_busy => open,
-    f_req => run_req
+    f_req => run_req,
+    g_return => open,
+    g_busy => open,
+    g_req => run_req
   );
 
   process(clk)

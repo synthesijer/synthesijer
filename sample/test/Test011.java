@@ -27,8 +27,20 @@ public class Test011{
 		if(n == 0){
 			return 1;
 		}else{
-			int ret = f(n-1); // recursive call
-			return n * ret;
+			return n * f(n-1);
+		}
+	}
+
+	@CallStack(10000)
+	public int g(int n){
+		if(n == 0){
+			return 1;
+		}else if(n == 1){
+			return 1;
+		}else{
+			int a = g(n-1);
+			int b = g(n-2);
+			return a + b;
 		}
 	}
 }
