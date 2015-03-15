@@ -184,7 +184,7 @@ public class GenComponentXML {
 			Element e0 = document.createElement("spirit:addressSpace");
 			element.appendChild(e0);
 			e0.appendChild(genTextNode("spirit:name", b.getName()));
-			e0.appendChild(genTextNode("spirit:range", "4294967296",
+			e0.appendChild(genTextNode("spirit:range", String.valueOf(b.getRange()), //"4294967296",
 					new ParameterPair[]{
 					  new ParameterPair("spirit:format", "long"),
 					  new ParameterPair("spirit:resolve", "user")
@@ -215,7 +215,7 @@ public class GenComponentXML {
 					  	  new ParameterPair("spirit:resolve", "user"),
 					  	  new ParameterPair("spirit:bitStringLength", "32"),
 				}));
-				e1.appendChild(genTextNode("spirit:range", "4294967296",
+				e1.appendChild(genTextNode("spirit:range", String.valueOf(b.getRange()), //"4294967296",
 						new ParameterPair[]{
 						  new ParameterPair("spirit:format", "long"),
 						  new ParameterPair("spirit:resolve", "user")
@@ -343,7 +343,7 @@ public class GenComponentXML {
 			e0.appendChild(genTextNode("spirit:name", s));
 			e0.appendChild(genTextNode("spirit:fileType", "vhdlSource"));
 			e0.appendChild(genTextNode("spirit:isIncludeFile", "false"));
-			e0.appendChild(genTextNode("spirit:logicalName", "xil_defaultlib"));
+			e0.appendChild(genTextNode("spirit:logicalName", getCoreUniqName())); // "xil_defaultlib"));
 			element.appendChild(e0);
 		}
 		return element;

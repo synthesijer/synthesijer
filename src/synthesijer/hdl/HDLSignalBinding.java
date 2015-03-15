@@ -53,5 +53,7 @@ public abstract class HDLSignalBinding {
 	public abstract boolean hasMemoryMap();
 	
 	public abstract String getAddressBlockName();
+	
+	public abstract long getRange();
 
 }

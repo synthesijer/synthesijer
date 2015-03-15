@@ -218,8 +218,7 @@ public enum Manager {
 	private HDLModule loadUserHDLModule(String s){
 		try {
 			Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
-			
-			Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
+				Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
 			Object obj = ct.newInstance(new Object[]{new String[]{}});
 			if(!(obj instanceof HDLModule)){
 				System.err.printf("unsupported type: %s (%s)", obj, obj.getClass());
