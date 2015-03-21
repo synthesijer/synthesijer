@@ -7,21 +7,19 @@ CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_APPLICATIONS)/bin:.
 SOURCES = $(SYNTHESIJER_APPLICATIONS)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
           $(SYNTHESIJER_APPLICATIONS)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \
           $(SYNTHESIJER_APPLICATIONS)/src/synthesijer/lib/axi/AXILiteSlave32RTL.java \
-          Test.java
+          AXIHP_MEMCPY.java
 
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
-OPT = --ip-exact=Test
+OPT = --ip-exact=AXIHP_MEMCPY
 
 all: $(SOURCES)
 	java -cp $(CLASSPATH) synthesijer.Main --verilog --vhdl $(OPT) $(SOURCES)
-	mkdir -p Test_v1_0
-	mkdir -p Test_v1_0/src
-	cp *.vhd Test_v1_0/src/
-	cp $(SYNTHESIJER_VHDL_LIBS)/singleportram.vhd Test_v1_0/src/
-	cp $(SYNTHESIJER_VHDL_LIBS)/dualportram.vhd Test_v1_0/src/
-	cp $(SYNTHESIJER_APPLICATIONS)/hdl/vhdl/axi_lite_slave_32.vhd Test_v1_0/src/
-	cp $(SYNTHESIJER_APPLICATIONS)/hdl/vhdl/simple_axi_memiface_32.vhd Test_v1_0/src/
+	cp *.vhd AXIHP_MEMCPY_v1_0/src/
+	cp $(SYNTHESIJER_VHDL_LIBS)/singleportram.vhd AXIHP_MEMCPY_v1_0/src/
+	cp $(SYNTHESIJER_VHDL_LIBS)/dualportram.vhd AXIHP_MEMCPY_v1_0/src/
+	cp $(SYNTHESIJER_APPLICATIONS)/hdl/vhdl/axi_lite_slave_32.vhd AXIHP_MEMCPY_v1_0/src/
+	cp $(SYNTHESIJER_APPLICATIONS)/hdl/vhdl/simple_axi_memiface_32.vhd AXIHP_MEMCPY_v1_0/src/
 
 clean:
 	-rm -f *.class
@@ -36,4 +34,4 @@ clean:
 	-rm -f synthesijer_lib_axi_SimpleAXIMemIface32RTLTest.v
 	-rm -f synthesijer_lib_axi_SimpleAXIMemIface32RTLTest.vhd
 	-rm -f synthesijer_lib_axi_AXILiteSlave32RTL.vhd
-	-rm -rf Test_v1_0
+	-rm -rf AXIHP_MEMCPY_v1_0

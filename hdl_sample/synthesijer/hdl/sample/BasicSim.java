@@ -38,7 +38,8 @@ public class BasicSim extends HDLSimModule{
 		clk.setAssign(s0, HDLPreDefinedConstant.HIGH);
 		
 		HDLExpr expr = newExpr(HDLOp.ADD, counter, 1);
-		counter.setAssign(ss, expr);
+		//counter.setAssign(ss, expr);
+		counter.setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
 		counter.setAssign(s0, expr);
 		
 		reset.setResetValue(HDLPreDefinedConstant.LOW);
@@ -54,6 +55,10 @@ public class BasicSim extends HDLSimModule{
 	
 	protected HDLExpr after(int value){
 		return newExpr(HDLOp.GT, counter, value);
+	}
+
+	protected HDLExpr at(int value){
+		return newExpr(HDLOp.EQ, counter, value);
 	}
 
 	protected HDLExpr during(int value0, int value1){
