@@ -156,6 +156,14 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		}
 	}
 	
+	private boolean hasVolatile(SchedulerSlot slot){
+		for(SchedulerItem item: slot.getItems()){
+			VariableOperand o = item.getDestOperand();
+			if(o.isVolatileFlag() || o.isPublic()) return true;
+		}
+		return false;
+	}
+	
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
@@ -164,7 +172,13 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		for(int i = 0; i < slots.length; i++){
 			SchedulerSlot slot = slots[i];
 			Integer d = degrees.get(slot);
-			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0 || d > 1 || isExcept(slot.getItems()[0])){
+			if(slot.hasBranchOp() ||
+			   slot.getNextStep().length > 1 ||
+			   slot.getLatency() > 0 ||
+			   d > 1 ||
+			   isExcept(slot.getItems()[0]) ||
+			   hasVolatile(slot)
+			   ){
 				if(bb != null && bb.size() > 0){
 					ret.addSlot(chaining(bb));
 				}

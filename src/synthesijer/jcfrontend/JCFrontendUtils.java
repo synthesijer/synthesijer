@@ -48,6 +48,11 @@ public class JCFrontendUtils {
 		return (mods.flags & Flags.FINAL) == Flags.FINAL;
 	}
 
+	public static boolean isVolatile(JCModifiers mods){
+		if(mods == null) return false;
+		return (mods.flags & Flags.VOLATILE) == Flags.VOLATILE;
+	}
+
 	public static boolean isGlobalConstant(JCModifiers mods){
 		if(mods == null) return false;
 		boolean f = true;

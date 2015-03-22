@@ -25,15 +25,17 @@ public class VariableOperand implements Operand{
 	
 	private final boolean privateMethodFlag;
 	
+	private final boolean volatileFlag;
+	
 	private boolean chaining = false;
 	
 	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
 	
 	public VariableOperand(String name, Type type){
-		this(name, type, null, false, false, false, name, null, false);
+		this(name, type, null, false, false, false, name, null, false, false);
 	}
 
-	public VariableOperand(String name, Type type, Expr initExpr, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag){
+	public VariableOperand(String name, Type type, Expr initExpr, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag, boolean volatileFlag){
 		this.name = name;
 		this.type = type;
 		this.initExpr = initExpr;
@@ -43,6 +45,7 @@ public class VariableOperand implements Operand{
 		this.origName = origName;
 		this.methodName = methodName;
 		this.privateMethodFlag = privateMethodFlag;
+		this.volatileFlag = volatileFlag;
 	}
 
 	public String getName(){
@@ -81,7 +84,11 @@ public class VariableOperand implements Operand{
 	public boolean isPrivateMethod(){
 		return privateMethodFlag;
 	}
-	
+
+	public boolean isVolatileFlag(){
+		return volatileFlag;
+	}
+
 	public void setChaining(SchedulerItem ctx, SchedulerItem pred){
 		chaining = true;
 		predItemMap.put(ctx, pred);

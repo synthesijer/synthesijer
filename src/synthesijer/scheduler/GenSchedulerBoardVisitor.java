@@ -426,9 +426,9 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
 		VariableOperand v;
 		if(vv.getMethod() != null){
-			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate());
+			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile());
 		}else{
-			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false);
+			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile());
 		}
 		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
 		varTable.put(o.getName(), v);
@@ -583,7 +583,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	}
 	
 	private VariableOperand newVariable(String key, Type t, Expr initExpr){
-		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, initExpr, false, false, false, null, "", false);
+		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, initExpr, false, false, false, null, "", false, false);
 		parent.addVariable(v.getName(), v);
 		return v; 
 	}

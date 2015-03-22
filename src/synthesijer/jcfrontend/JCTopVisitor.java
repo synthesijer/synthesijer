@@ -18,7 +18,6 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.Type;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.type.MySelfType;
-import synthesijer.rt.CallStack;
 
 /**
  * A visitor to generate an instance of Module from a given instance of JCClassDecl.

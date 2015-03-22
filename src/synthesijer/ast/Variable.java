@@ -8,6 +8,7 @@ public class Variable{
 	private final Expr init;
 	private boolean flagGlobalConstant = false;
 	private boolean flagPublic = false;
+	private boolean flagVolatile = false;
 	private boolean flagMethodParam = false;
 	private String uniqName = null;
 	
@@ -46,7 +47,15 @@ public class Variable{
 	public boolean isPublic(){
 		return flagPublic;
 	}
-	
+
+	public void setVolatile(boolean f){
+		flagVolatile = f;
+	}
+
+	public boolean isVolatile(){
+		return flagVolatile;
+	}
+
 	public void setMethodParam(boolean f){
 		flagMethodParam = f;
 	}

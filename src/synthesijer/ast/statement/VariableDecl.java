@@ -14,6 +14,7 @@ public class VariableDecl extends ExprContainStatement{
 	private final Expr init;
 	private boolean flagGlobalConstant = false;
 	private boolean flagPublic = false;
+	private boolean flagVolatile = false;
 	private boolean flagMethodParam = false;
 	
 	public VariableDecl(Scope scope, String name, Type type, Expr init){
@@ -47,7 +48,16 @@ public class VariableDecl extends ExprContainStatement{
 	public boolean isPublic(){
 		return flagPublic;
 	}
+
+	public void setVolatile(boolean f){
+		flagVolatile = f;
+		var.setVolatile(f);
+	}
 	
+	public boolean isVolatile(){
+		return flagVolatile;
+	}
+
 	public void setMethodParam(boolean f){
 		flagMethodParam = f;
 		var.setMethodParam(f);

@@ -189,6 +189,9 @@ public class JCStmtVisitor extends Visitor{
 		if(JCFrontendUtils.isPrivate(that.mods) == false && scope instanceof Module){
 			tmp.setPublic(true);
 		}
+		if(JCFrontendUtils.isVolatile(that.mods)){
+			tmp.setVolatile(true);
+		}
 		scope.addVariableDecl(tmp);
 		stmt = tmp;
 	}
