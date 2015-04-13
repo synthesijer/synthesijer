@@ -862,7 +862,6 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	
 	@Override
 	public void visitCondExpr(CondExpr o) {
-		System.out.println("condexpr");
 		Operand cond = stepIn(o.getCond());
 		Operand t = stepIn(o.getTruePart());
 		Operand f = stepIn(o.getFalsePart());
