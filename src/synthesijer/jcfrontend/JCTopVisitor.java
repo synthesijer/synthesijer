@@ -88,11 +88,12 @@ public class JCTopVisitor extends Visitor{
 			m.setCallStackFlag(false);
 		}
 		
-		
-		for(JCStatement stmt: decl.body.getStatements()){
-			JCStmtVisitor visitor = new JCStmtVisitor(m);
-			stmt.accept(visitor);
-			m.getBody().addStatement(visitor.getStatement());
+		if(decl.body != null){
+			for(JCStatement stmt: decl.body.getStatements()){
+				JCStmtVisitor visitor = new JCStmtVisitor(m);
+				stmt.accept(visitor);
+				m.getBody().addStatement(visitor.getStatement());
+			}
 		}
 		
 		module.addMethod(m);

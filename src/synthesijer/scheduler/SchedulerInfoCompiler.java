@@ -225,20 +225,22 @@ public class SchedulerInfoCompiler {
 			}
 			return array;
 		}else if(type instanceof ComponentType){
+			NewClassExpr expr = (NewClassExpr)v.getInitExpr();
 			ComponentType c = (ComponentType)type;
-			Manager.SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(c.getName());
+			//String instName = c.getName();
+			String instName = expr.getClassName();
+			Manager.SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(instName);
 			if(info == null){
-				SynthesijerUtils.error(c.getName() + " is not found.");
+				SynthesijerUtils.error(instName + " is not found.");
 				Manager.INSTANCE.HDLModuleInfoList();
 				System.exit(0);
 			}
 			if(info.getCompileState().isBefore(CompileState.GENERATE_HDL)){
 				SynthesijerUtils.info("enters into >>>");
-				Manager.INSTANCE.compileSchedulerInfo(c.getName());
+				Manager.INSTANCE.compileSchedulerInfo(instName);
 				SynthesijerUtils.info("<<< return to compiling " + this.info.getName());
 			}
 			HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
-			NewClassExpr expr = (NewClassExpr)v.getInitExpr();
 			if(expr.getParameters().size() > 0){
 				NewArray param = (NewArray)(expr.getParameters().get(0));
 				ArrayList<Expr> elem = param.getElems();
