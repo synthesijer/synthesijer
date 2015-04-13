@@ -17,6 +17,7 @@ import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
 import synthesijer.ast.expr.BinaryExpr;
+import synthesijer.ast.expr.CondExpr;
 import synthesijer.ast.expr.FieldAccess;
 import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.Literal;
@@ -859,6 +860,16 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		}
 	}
 	
+	@Override
+	public void visitCondExpr(CondExpr o) {
+		System.out.println("condexpr");
+		Operand cond = stepIn(o.getCond());
+		Operand t = stepIn(o.getTruePart());
+		Operand f = stepIn(o.getFalsePart());
+		VariableOperand tmp = newVariable("cond_expr", t.getType());
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.COND, new Operand[]{cond, t, f}, tmp));
+		result = tmp; 
+	}
 }
 
 class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {

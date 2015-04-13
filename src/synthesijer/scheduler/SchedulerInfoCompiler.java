@@ -764,6 +764,17 @@ public class SchedulerInfoCompiler {
 			predExprMap.put(item, expr);
 			break;
 		}
+		case COND:{
+			HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
+			Operand[] src = item.getSrcOperand();
+			HDLExpr expr = hm.newExpr(HDLOp.IF,
+					convOperandToHDLExpr(item, src[0]),
+					convOperandToHDLExpr(item, src[1]),
+					convOperandToHDLExpr(item, src[2]));
+			dest.setAssign(state, expr);
+			predExprMap.put(item, expr);
+			break;
+		}
 		case UNDEFINED :{
 			System.out.println("UNDEFINED : " + item.info());
 			break;

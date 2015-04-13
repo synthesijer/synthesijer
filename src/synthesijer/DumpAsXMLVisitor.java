@@ -12,6 +12,7 @@ import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
 import synthesijer.ast.expr.BinaryExpr;
+import synthesijer.ast.expr.CondExpr;
 import synthesijer.ast.expr.FieldAccess;
 import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.Literal;
@@ -109,7 +110,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		dest.printf("</index>");
 		dest.printf("</expr>", "ArrayAccess");
 	}
-
+	
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
 		dest.printf("<expr kind=\"%s\">", "AssignExpr");
@@ -225,6 +226,15 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		o.getArg().accept(this);
 		dest.printf("</arg>\n");
 		dest.printf("</expr>\n");
+	}
+	
+	@Override
+	public void visitCondExpr(CondExpr o){
+		dest.printf("<type kind=\"select\">\n");
+		dest.printf("<cond>\n"); o.getCond().accept(this); dest.printf("</cond>\n"); 
+		dest.printf("<true>\n"); o.getTruePart().accept(this); dest.printf("</true>\n"); 
+		dest.printf("<false>\n"); o.getFalsePart().accept(this); dest.printf("</false>\n"); 
+		dest.printf("</type>\n");
 	}
 
 	@Override
@@ -399,6 +409,5 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
 		dest.printf("<type kind=\"primitive\" name=\"%s\"/>\n", o.toString());
 	}
-
 
 }

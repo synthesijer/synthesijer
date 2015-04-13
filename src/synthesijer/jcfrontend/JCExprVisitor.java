@@ -5,6 +5,7 @@ import openjdk.com.sun.tools.javac.tree.JCTree.JCArrayAccess;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCAssign;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCAssignOp;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCBinary;
+import openjdk.com.sun.tools.javac.tree.JCTree.JCConditional;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCIdent;
@@ -25,6 +26,7 @@ import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
 import synthesijer.ast.expr.BinaryExpr;
+import synthesijer.ast.expr.CondExpr;
 import synthesijer.ast.expr.FieldAccess;
 import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.Literal;
@@ -190,6 +192,14 @@ public class JCExprVisitor extends Visitor{
 		for(JCExpression arg: that.args){
 			tmp.addParam(stepIn(arg));
 		}
+		expr = tmp;
+	}
+	
+    public void visitConditional(JCConditional that){
+		CondExpr tmp = new CondExpr(scope);
+		tmp.setCond(stepIn(that.cond));
+		tmp.setTruePart(stepIn(that.truepart));
+		tmp.setFalsePart(stepIn(that.falsepart));
 		expr = tmp;
 	}
 

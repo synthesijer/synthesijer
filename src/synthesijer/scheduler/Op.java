@@ -52,6 +52,7 @@ public enum Op {
 	BREAK,
 	CONTINUE,
 	CAST,
+	COND,
 	FADD32(1),
 	FSUB32(1),
 	FMUL32(1),

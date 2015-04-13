@@ -36,6 +36,7 @@ public enum Op{
 	JC("jc", HDLOp.UNDEFINED),
 	JEQ("jeq", HDLOp.UNDEFINED),
 	J("j", HDLOp.UNDEFINED),
+	SELECT("select", HDLOp.UNDEFINED),
 	UNDEFINED("UNDEFINED", HDLOp.UNDEFINED);
 	
 	private final String name;

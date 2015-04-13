@@ -10,6 +10,7 @@ import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
 import synthesijer.ast.expr.BinaryExpr;
+import synthesijer.ast.expr.CondExpr;
 import synthesijer.ast.expr.FieldAccess;
 import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.Literal;
@@ -159,6 +160,13 @@ public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerEx
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
 		o.getArg().accept(this);
+	}
+
+	@Override
+	public void visitCondExpr(CondExpr o) {
+		o.getCond().accept(this);
+		o.getTruePart().accept(this);
+		o.getFalsePart().accept(this);
 	}
 
 	@Override

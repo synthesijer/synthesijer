@@ -8,6 +8,7 @@ import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
 import synthesijer.ast.expr.BinaryExpr;
+import synthesijer.ast.expr.CondExpr;
 import synthesijer.ast.expr.FieldAccess;
 import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.Literal;
@@ -122,4 +123,13 @@ public class GenerateSynthesisTableItemVisitor implements SynthesijerExprVisitor
 		o.getArg().accept(this);
 	}
 
+	@Override
+	public void visitCondExpr(CondExpr o) {
+		out.println(o);
+		o.getCond().accept(this);
+		o.getTruePart().accept(this);
+		o.getFalsePart().accept(this);
+		entry.op = Op.SELECT;
+	}
+	
 }
