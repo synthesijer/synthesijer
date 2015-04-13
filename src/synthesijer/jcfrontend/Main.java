@@ -93,10 +93,6 @@ public class Main {
 		JCTopVisitor visitor = new JCTopVisitor(module);
 		decl.accept(visitor);
 		
-		if(extending != null && extending.equals("Thread")){ //TODO experimental
-			addThread(module);
-		}
-
 		Manager.INSTANCE.addModule(module, syntheisizeFlag);			
 		/*
 		if(syntheisizeFlag){
@@ -105,27 +101,6 @@ public class Main {
 			Manager.INSTANCE.registUserHDLModule(decl.sym.toString());
 		}
 		*/
-	}
-
-	// TODO experimental
-	private static void addThread(Module m){
-		// start
-		Method start = new Method(m, "start", PrimitiveTypeKind.VOID);
-		m.addMethod(start);
-		MethodInvocation tmp = new MethodInvocation(start);
-		Ident run = new Ident(start);
-		run.setIdent("run");
-		tmp.setMethod(run);
-		start.getBody().addStatement(new ExprStatement(start, tmp));
-		start.setNoWaitFlag(true);
-
-		// join
-		Method join = new Method(m, "join", PrimitiveTypeKind.VOID);
-		m.addMethod(join);
-		join.setWaitWithMethod(start); // "join" must wait for "start".
-		
-		Method yield = new Method(m, "yield", PrimitiveTypeKind.VOID);
-		m.addMethod(yield);
 	}
 	
 }

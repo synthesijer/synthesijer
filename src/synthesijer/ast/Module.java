@@ -3,7 +3,15 @@ package synthesijer.ast;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import javax.management.RuntimeErrorException;
+
+import synthesijer.Manager;
+import synthesijer.SynthesijerUtils;
+import synthesijer.ast.expr.Ident;
+import synthesijer.ast.expr.MethodInvocation;
+import synthesijer.ast.statement.ExprStatement;
 import synthesijer.ast.statement.VariableDecl;
+import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.model.State;
 import synthesijer.model.Statemachine;
 
@@ -34,8 +42,8 @@ public class Module implements Scope, SynthesijerAstTree{
 		this.extending = extending;
 		this.implementing = implementing;
 		scopes.add(this);
-	}	
-	
+	}
+
 	public void addScope(Scope s){
 		scopes.add(s);
 	}
@@ -121,6 +129,52 @@ public class Module implements Scope, SynthesijerAstTree{
 	@Override
 	public void accept(SynthesijerAstVisitor v) {
 		v.visitModule(this);
+	}
+
+	public void resolveExtends(){
+		if(getExtending() == null) return;
+		if(getExtending().equals("Thread")){ //TODO experimental
+			addThread(this);
+		}else{
+			System.out.println("exnteds: " + getExtending());
+			Module ext = Manager.INSTANCE.searchModule(getExtending());
+			if(ext == null){
+				SynthesijerUtils.error("cannot find the extending class:" + getExtending());
+				throw new RuntimeException("cannot find the extending class:" + getExtending());
+			}
+			ext.resolveExtends();
+			for(Method m: ext.getMethods()){
+				if(!methodTable.containsKey(m.getName())){
+					addMethod(m);
+				}
+			}
+			for(VariableDecl v: ext.getVariableDecls()){
+				if(!variableTable.contains(v.getName())){
+					addVariableDecl(v);
+				}
+			}
+		}
+	}
+
+	// TODO experimental
+	private void addThread(Module m){
+		// start
+		Method start = new Method(m, "start", PrimitiveTypeKind.VOID);
+		m.addMethod(start);
+		MethodInvocation tmp = new MethodInvocation(start);
+		Ident run = new Ident(start);
+		run.setIdent("run");
+		tmp.setMethod(run);
+		start.getBody().addStatement(new ExprStatement(start, tmp));
+		start.setNoWaitFlag(true);
+
+		// join
+		Method join = new Method(m, "join", PrimitiveTypeKind.VOID);
+		m.addMethod(join);
+		join.setWaitWithMethod(start); // "join" must wait for "start".
+		
+		Method yield = new Method(m, "yield", PrimitiveTypeKind.VOID);
+		m.addMethod(yield);
 	}
 
 }

@@ -9,7 +9,12 @@ import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import synthesijer.ast.Method;
 import synthesijer.ast.Module;
+import synthesijer.ast.expr.Ident;
+import synthesijer.ast.expr.MethodInvocation;
+import synthesijer.ast.statement.ExprStatement;
+import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.ARITH_RSHIFT32;
 import synthesijer.lib.ARITH_RSHIFT64;
@@ -192,13 +197,13 @@ public enum Manager {
 				e.printStackTrace();
 			}
 	}
-	
+
 	private void doGenSchedulerBoard(){
 		for(SynthesijerModuleInfo info : modules.values()){
 			if(info.sysnthesisFlag == false){
 				// skip
 				continue;
-			}
+			}			
 			String name = info.m.getName();
 			System.out.println("SchdulerBoard init: " + name);
 			IdentifierGenerator i = new IdentifierGenerator();
@@ -210,8 +215,19 @@ public enum Manager {
 		}
 	}
 	
+	private void doResolveExtends(){
+		for(SynthesijerModuleInfo info : modules.values()){
+			if(info.sysnthesisFlag == false){
+				// skip
+				continue;
+			}			
+			info.m.resolveExtends();
+		}
+	}
+	
 	public void preprocess(){
 		genGlobalSymbolTable();
+		doResolveExtends();
 		doGenSchedulerBoard();
 	}
 	
