@@ -23,15 +23,18 @@ public enum Op {
 	GEQ(PrimitiveTypeKind.BOOLEAN),
 	COMPEQ(PrimitiveTypeKind.BOOLEAN),
 	NEQ(PrimitiveTypeKind.BOOLEAN),
-	SIMPLE_LSHIFT,
-	SIMPLE_LOGIC_RSHIFT,
-	SIMPLE_ARITH_RSHIFT,
-	LSHIFT32(1),
-	LOGIC_RSHIFT32(1),
-	ARITH_RSHIFT32(1),
-	LSHIFT64(1),
-	LOGIC_RSHIFT64(1),
-	ARITH_RSHIFT64(1),
+	SIMPLE_LSHIFT32(PrimitiveTypeKind.INT),
+	SIMPLE_LOGIC_RSHIFT32(PrimitiveTypeKind.INT),
+	SIMPLE_ARITH_RSHIFT32(PrimitiveTypeKind.INT),
+	SIMPLE_LSHIFT64(PrimitiveTypeKind.LONG),
+	SIMPLE_LOGIC_RSHIFT64(PrimitiveTypeKind.LONG),
+	SIMPLE_ARITH_RSHIFT64(PrimitiveTypeKind.LONG),
+	LSHIFT32(false, 1, PrimitiveTypeKind.INT),
+	LOGIC_RSHIFT32(false, 1, PrimitiveTypeKind.INT),
+	ARITH_RSHIFT32(false, 1, PrimitiveTypeKind.INT),
+	LSHIFT64(false, 1, PrimitiveTypeKind.LONG),
+	LOGIC_RSHIFT64(false, 1, PrimitiveTypeKind.LONG),
+	ARITH_RSHIFT64(false, 1, PrimitiveTypeKind.LONG),
 	JP(true),
 	JT(true),
 	RETURN(true),
@@ -181,17 +184,35 @@ public enum Op {
 			else return MOD32;
 		}
 		case LSHIFT: {
-			if(rhs instanceof ConstantOperand) return SIMPLE_LSHIFT;
+			if(rhs instanceof ConstantOperand){
+				if(isLong(lhs) || isDouble(lhs)){
+					return SIMPLE_LSHIFT64;
+				}else{
+					return SIMPLE_LSHIFT32;
+				}
+			}
 			if(isLong(lhs)) return LSHIFT64;
 			else return LSHIFT32;
 		}
 		case LOGIC_RSHIFT: {
-			if(rhs instanceof ConstantOperand) return SIMPLE_LOGIC_RSHIFT;
+			if(rhs instanceof ConstantOperand){
+				if(isLong(lhs) || isDouble(lhs)){
+					return SIMPLE_LOGIC_RSHIFT64;
+				}else{
+					return SIMPLE_LOGIC_RSHIFT32;
+				}
+			}
 			if(isLong(lhs)) return LOGIC_RSHIFT64;
 			else return LOGIC_RSHIFT32;
 		}
 		case ARITH_RSHIFT: {
-			if(rhs instanceof ConstantOperand) return SIMPLE_ARITH_RSHIFT;
+			if(rhs instanceof ConstantOperand){
+				if(isLong(lhs) || isDouble(lhs)){
+					return SIMPLE_ARITH_RSHIFT64;
+				}else{
+					return SIMPLE_ARITH_RSHIFT32;
+				}
+			}
 			if(isLong(lhs)) return ARITH_RSHIFT64;
 			else return ARITH_RSHIFT32;
 		}

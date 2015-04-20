@@ -65,7 +65,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 			return item;
 		}
 		int shift = (int)log2(value);
-		item.overwriteOp(Op.SIMPLE_LSHIFT);
+		item.overwriteOp(Op.SIMPLE_LSHIFT32);
 		item.overwriteSrc(0, v);
 		item.overwriteSrc(1, new ConstantOperand(String.valueOf(shift), k.getType()));
 		return item;
@@ -82,7 +82,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 			return item;
 		}
 		int shift = (int)log2(value);
-		item.overwriteOp(Op.SIMPLE_ARITH_RSHIFT);
+		item.overwriteOp(Op.SIMPLE_ARITH_RSHIFT32);
 		item.overwriteSrc(1, new ConstantOperand(String.valueOf(shift), k.getType()));
 		return item;
 	}

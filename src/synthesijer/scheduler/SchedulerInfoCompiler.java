@@ -466,9 +466,12 @@ public class SchedulerInfoCompiler {
 		case GEQ : ret = HDLOp.GEQ;break;
 		case COMPEQ : ret = HDLOp.EQ;break;
 		case NEQ : ret = HDLOp.NEQ;break;
-		case SIMPLE_LSHIFT : ret = HDLOp.LSHIFT;break;
-		case SIMPLE_LOGIC_RSHIFT : ret = HDLOp.LOGIC_RSHIFT;break;
-		case SIMPLE_ARITH_RSHIFT : ret = HDLOp.ARITH_RSHIFT;break;
+		case SIMPLE_LSHIFT32 : ret = HDLOp.LSHIFT32;break;
+		case SIMPLE_LOGIC_RSHIFT32 : ret = HDLOp.LOGIC_RSHIFT32;break;
+		case SIMPLE_ARITH_RSHIFT32 : ret = HDLOp.ARITH_RSHIFT32;break;
+		case SIMPLE_LSHIFT64 : ret = HDLOp.LSHIFT64;break;
+		case SIMPLE_LOGIC_RSHIFT64 : ret = HDLOp.LOGIC_RSHIFT64;break;
+		case SIMPLE_ARITH_RSHIFT64 : ret = HDLOp.ARITH_RSHIFT64;break;
 		case LSHIFT32 : break;
 		case LOGIC_RSHIFT32 : break;
 		case ARITH_RSHIFT32 : break;
