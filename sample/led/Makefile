@@ -1,6 +1,6 @@
 SYNTHESIJER ?= ../../bin
 
-SOURCES = led.java counter.java FireFly.java
+SOURCES = led.java counter.java Firefly.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 OPT = --chaining

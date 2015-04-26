@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.7
-# Date: Tue Nov 25 06:13:32 2014
+# Date: Sat Apr 25 10:33:04 2015
 #
 ##############################################################
 #
@@ -21,19 +21,19 @@ SET addpads = false
 SET asysymbol = true
 SET busformat = BusFormatAngleBracketNotRipped
 SET createndf = false
-SET designentry = Verilog
-SET device = xc6slx25
+SET designentry = VHDL
+SET device = xc6slx4
 SET devicefamily = spartan6
 SET flowvendor = Other
 SET formalverification = false
 SET foundationsym = false
 SET implementationfiletype = Ngc
-SET package = csg324
+SET package = tqg144
 SET removerpms = false
 SET simulationfiles = Behavioral
-SET speedgrade = -3
+SET speedgrade = -2
 SET verilogsim = true
-SET vhdlsim = false
+SET vhdlsim = true
 # END Project Options
 # BEGIN Select
 SELECT Floating-point xilinx.com:ip:floating_point:6.1
@@ -78,4 +78,4 @@ CSET result_tlast_behv=Null
 MISC pkg_timestamp=2013-07-22T10:46:33Z
 # END Extra information
 GENERATE
-# CRC:  f6a2299
+# CRC: 6e491bc4
