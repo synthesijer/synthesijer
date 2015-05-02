@@ -192,7 +192,11 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
 		// reset
-		HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b1) begin", o.getModule().getSysResetName()));
+		if(o.getModule().isNegativeReset()){
+			HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b0) begin", o.getModule().getSysResetName()));
+		}else{
+			HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b1) begin", o.getModule().getSysResetName()));
+		}
 		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getStateKey().getName(), o.getIdleState().getStateId().getVerilogHDL()));
 		HDLUtils.println(dest, offset+4, String.format("%s <= 32'h0;", o.getDelayCounter().getName()));
 		
@@ -259,7 +263,11 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	}
 	
 	private void genSyncProcess(HDLSignal o, int offset){
-		HDLUtils.println(dest, offset, String.format("if(%s == 1'b1) begin", o.getModule().getSysResetName()));
+		if(o.getModule().isNegativeReset()){
+			HDLUtils.println(dest, offset, String.format("if(%s == 1'b0) begin", o.getModule().getSysResetName()));
+		}else{
+			HDLUtils.println(dest, offset, String.format("if(%s == 1'b1) begin", o.getModule().getSysResetName()));
+		}
 		if(o.getResetValue() != null){
 			HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getName(), o.getResetValue().getVerilogHDL()));
 		}

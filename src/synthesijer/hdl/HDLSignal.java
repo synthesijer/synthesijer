@@ -22,7 +22,9 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	private final HDLExpr equivExpr;
 	private final boolean equivFlag;
 	
-	private boolean ignoreFlag = false; 
+	private boolean ignoreFlag = false;
+	
+	private boolean debugFlag = false;
 	
 	public enum ResourceKind{
 		REGISTER("reg"), WIRE("wire");
@@ -340,4 +342,12 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 		return this;
 	}
 	
+	public void setDebugFlag(boolean flag){
+		debugFlag = flag;
+	}
+
+	public boolean isDebugFlag(){
+		return debugFlag;
+	}
+
 }

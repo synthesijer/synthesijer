@@ -170,7 +170,11 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
 		HDLUtils.println(dest, offset, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
 		// reset
- 		HDLUtils.println(dest, offset+2, String.format("if %s = '1' then", o.getModule().getSysResetName()));
+		if(o.getModule().isNegativeReset()){
+			HDLUtils.println(dest, offset+2, String.format("if %s = '0' then", o.getModule().getSysResetName()));
+		}else{
+			HDLUtils.println(dest, offset+2, String.format("if %s = '1' then", o.getModule().getSysResetName()));
+		}
  		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getStateKey().getName(), o.getIdleState().getStateId().getVHDL()));
  		HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getDelayCounter().getName(), o.getDelayCounter().getDefaultValue().getVHDL()));
  		
@@ -243,7 +247,11 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
 	private void genSyncProcess(HDLSignal o, int offset){
 		HDLUtils.println(dest, offset, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
-		HDLUtils.println(dest, offset+2, String.format("if %s = '1' then", o.getModule().getSysResetName()));
+		if(o.getModule().isNegativeReset()){
+			HDLUtils.println(dest, offset+2, String.format("if %s = '0' then", o.getModule().getSysResetName()));
+		}else{
+			HDLUtils.println(dest, offset+2, String.format("if %s = '1' then", o.getModule().getSysResetName()));
+		}
 		if(o.getResetValue() != null){
 			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getResetValue())));
 		}

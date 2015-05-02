@@ -108,6 +108,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		// architecture
 		HDLUtils.println(dest, offset, String.format("architecture RTL of %s is", o.getName()));
 		HDLUtils.nl(dest);
+		HDLUtils.println(dest, offset+2, String.format("attribute mark_debug : string;"));
+		HDLUtils.println(dest, offset+2, String.format("attribute keep : string;"));
+		HDLUtils.nl(dest);
 		
 		Hashtable<String, Boolean> componentFlags = new Hashtable<>();
 		for(HDLInstance i: o.getModuleInstances()){
@@ -156,6 +159,10 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			s = String.format("signal %s : %s;", o.getName(), o.getType().getVHDL());
 		}
 		HDLUtils.println(dest, offset, s);
+		if(o.isDebugFlag()){
+			HDLUtils.println(dest, offset, String.format("attribute mark_debug of %s : signal is \"true\";", o.getName()));
+			HDLUtils.println(dest, offset, String.format("attribute keep of %s : signal is \"true\";", o.getName()));
+		}
 	}
 
 	@Override

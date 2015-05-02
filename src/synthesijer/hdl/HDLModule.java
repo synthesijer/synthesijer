@@ -27,7 +27,9 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	private ArrayList<HDLSignalBinding> bindings = new ArrayList<>();
 	
 	private HDLPort sysClk; 
-	private HDLPort sysReset; 
+	private HDLPort sysReset;
+	
+	private boolean negativeResetFlag = false;
 	
 	public HDLModule(String name, String sysClkName, String sysResetName, boolean syncFlag){
 		this.name = name.replace('.', '_');
@@ -260,5 +262,14 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLModule(this);
 	}
+	
+	public boolean isNegativeReset(){
+		return negativeResetFlag;
+	}
+
+	public void setNegativeReset(boolean flag){
+		negativeResetFlag = flag;
+	}
+
 
 }
