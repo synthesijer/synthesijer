@@ -20,6 +20,10 @@ public class Test002 {
 		a[i]++;
 	}
 
+	public void copy(int i, int j){
+		a[j] = a[i];
+	}
+
 	public void set(int i, int v){
 		a[i] = v;
 	}
