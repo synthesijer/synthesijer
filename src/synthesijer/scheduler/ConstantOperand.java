@@ -1,6 +1,8 @@
 package synthesijer.scheduler;
 
 import synthesijer.ast.Type;
+import synthesijer.ast.type.ArrayRef;
+import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class ConstantOperand implements Operand{
@@ -31,7 +33,17 @@ public class ConstantOperand implements Operand{
 		}else{
 			this.value = value;
 		}
-		this.type = type;
+		this.type = getReferedType(type);
+	}
+	
+	private Type getReferedType(Type t){
+		if(t instanceof ArrayRef){
+			return getReferedType(((ArrayRef)t).getRefType());
+		}else if(t instanceof ArrayType){
+			return getReferedType(((ArrayType)t).getElemType());
+		}else{
+			return t;
+		}
 	}
 	
 	@Override

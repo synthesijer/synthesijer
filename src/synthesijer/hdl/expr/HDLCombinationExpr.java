@@ -41,7 +41,7 @@ public class HDLCombinationExpr implements HDLExpr{
 	
 	private HDLType getPriorType(HDLType t1, HDLType t2){
 		if(t1 == null && t2 != null) return t2;
-		if(t1 != null && t2 == null) return t2;
+		if(t1 != null && t2 == null) return t1;
 		HDLType t = null;
 		if(t1.getKind().hasWdith() && t1.getKind().isPrimitive() && t2.getKind().hasWdith() && t2.getKind().isPrimitive()){
 			boolean signFlag = false;
@@ -185,6 +185,8 @@ public class HDLCombinationExpr implements HDLExpr{
 		boolean arith_shift_mode = false;
 
 		if(op.isInfix()){
+			System.out.println(args[0]);
+			System.out.println(args[1]);
 			String s = String.format("%s %s %s", toSigned(args[0].getResultExpr()), op.getVHDL(), toSigned(args[1].getResultExpr()));
 			if(getResultExpr().getType().isVector()) s = "std_logic_vector(" + s + ")";
 			return s; 

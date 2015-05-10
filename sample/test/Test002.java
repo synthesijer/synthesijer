@@ -12,6 +12,14 @@ public class Test002 {
 		}
 	}
 
+	public void dec(int i){
+		a[i]--;
+	}
+
+	public void inc(int i){
+		a[i]++;
+	}
+
 	public void set(int i, int v){
 		a[i] = v;
 	}
