@@ -259,8 +259,9 @@ public class HDLCombinationExpr implements HDLExpr{
 								String.format("%s(%d)", args[0].getResultExpr().getVHDL(), ta.getWidth()-1)
 							  :	"'0'"; 
 								
-				int msb = t0.getWidth()-shift-1;
-				if(msb > ta.getWidth()-1) msb = ta.getWidth()-1;
+				//int msb = t0.getWidth()-shift-1;
+				int msb = t0.getWidth()-1;
+				//if(msb > ta.getWidth()-1) msb = ta.getWidth()-1;
 				int lsb = shift;
 				if(lsb > ta.getWidth()-1) lsb = 0;
 
@@ -396,8 +397,9 @@ public class HDLCombinationExpr implements HDLExpr{
 				}
 				HDLPrimitiveType ta = (HDLPrimitiveType)(args[0].getResultExpr().getType());
 								
-				int msb = t0.getWidth()-shift-1;
-				if(msb > ta.getWidth()-1) msb = ta.getWidth()-1;
+				//int msb = t0.getWidth()-shift-1;
+				//if(msb > ta.getWidth()-1) msb = ta.getWidth()-1;
+				int msb = t0.getWidth()-1;
 				int lsb = shift;
 				if(lsb > ta.getWidth()-1) lsb = 0;
 				String key = args[0].getResultExpr().getVerilogHDL();
