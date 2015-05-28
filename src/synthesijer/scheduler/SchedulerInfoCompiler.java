@@ -1130,7 +1130,7 @@ public class SchedulerInfoCompiler {
 						call_req = obj.getSignalForPort(item0.name + "_req");
 						call_busy = obj.getSignalForPort(item0.name + "_busy");
 						//flag_name = String.format("%s_ext_call_flag_%04d", obj.getName(), item.getStepId());
-						flag_name = String.format("%s_ext_call_flag_%04d", item0.name, item.getStepId());
+						flag_name = String.format("%s_%s_ext_call_flag_%04d", obj.getName(), item0.name, item.getStepId());
 					}else{
 						call_req = varTable.get(item0.name + "_req_local");
 						call_busy = varTable.get(item0.name + "_busy");
