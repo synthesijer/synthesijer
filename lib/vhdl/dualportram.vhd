@@ -33,6 +33,9 @@ architecture RTL of dualportram is
   type MEM_TYPE is array ( WORDS-1 downto 0 ) of std_logic_vector(WIDTH-1 downto 0);
   shared variable mem : MEM_TYPE := (others => (others => '0'));
 
+  attribute ram_style : string;
+  attribute ram_style of mem : variable is "block";
+
   signal q, q_b : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
   
 begin

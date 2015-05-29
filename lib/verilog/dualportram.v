@@ -21,7 +21,7 @@ module dualportram #(
     output wire [31:0] 	    length
 );
  
-   reg [WIDTH-1:0]     mem [WORDS-1:0];
+   (* ram_style = "block" *) reg [WIDTH-1:0] mem [WORDS-1:0];
    reg [WIDTH-1:0] q, q_b;
 
    assign dout   = q;

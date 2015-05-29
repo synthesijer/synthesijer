@@ -14,7 +14,7 @@ module simple_dualportram #( parameter WIDTH = 32, DEPTH = 10, WORDS =1024 )
     input wire 		    oe_b
     );
 
-   reg [WIDTH-1:0] 	    mem [WORDS-1:0];
+   (* ram_style = "block" *) reg [WIDTH-1:0] 	    mem [WORDS-1:0];
    reg [WIDTH-1:0] 	    dout_r;
    assign dout_b = dout_r;
 

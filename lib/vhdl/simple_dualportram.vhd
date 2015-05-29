@@ -29,6 +29,9 @@ architecture RTL of simple_dualportram is
   type ram_type is array (WORDS-1 downto 0) of std_logic_vector (WIDTH-1 downto 0);
   signal RAM: ram_type := (others => (others => '0'));
 
+  attribute ram_style : string;
+  attribute ram_style of RAM : signal is "block";
+
   signal q : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
 
 begin  -- RTL
