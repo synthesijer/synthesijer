@@ -64,7 +64,10 @@ public class JCTopVisitor extends Visitor{
 		m.setArgs(parseArgs(decl.getParameters(), m));
 		
 		m.setUnsynthesizableFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "unsynthesizable"));
-		m.setAutoFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "auto"));
+		m.setAutoFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "auto") & module.isSynthesijerHDL());
+		if(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "auto") & (!module.isSynthesijerHDL())){
+			SynthesijerUtils.warn("@auto for " + module.getName() + "::" + name + " is skipped, because @synthesijerhdl is not set.");
+		}
 		m.setSynchronizedFlag(JCFrontendUtils.isSynchronized(decl.mods));
 		m.setPrivateFlag(JCFrontendUtils.isPrivate(decl.mods));
 		m.setRawFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "raw"));

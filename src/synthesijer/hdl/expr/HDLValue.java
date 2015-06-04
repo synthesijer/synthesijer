@@ -93,8 +93,7 @@ public class HDLValue implements HDLLiteral{
 	@Override
 	public String getVerilogHDL() {
 		switch(type.getKind()){
-		case VECTOR:
-		case SIGNED:{
+		case VECTOR:{
 			if(type.getWidth()%4 == 0){
 				//String v = String.format("%064x", Long.parseLong(value));
 				String v = String.format("%064x", asLongValue());
@@ -105,6 +104,19 @@ public class HDLValue implements HDLLiteral{
 				//v += Long.toBinaryString(Long.parseLong(value));
 				v += Long.toBinaryString(asLongValue());
 				return String.format("%d'b%s", type.getWidth(), v.substring(v.length()-type.getWidth(), v.length()));
+			}
+		}
+		case SIGNED:{
+			if(type.getWidth()%4 == 0){
+				//String v = String.format("%064x", Long.parseLong(value));
+				String v = String.format("%064x", asLongValue());
+				return String.format("%d'sh%s", type.getWidth(), v.substring(v.length()-type.getWidth()/4, v.length()));
+			}else{
+				String v = "";
+				for(int i = 0; i < 64; i++){ v += "0"; }
+				//v += Long.toBinaryString(Long.parseLong(value));
+				v += Long.toBinaryString(asLongValue());
+				return String.format("%d'sb%s", type.getWidth(), v.substring(v.length()-type.getWidth(), v.length()));
 			}
 		}
 		case BIT:

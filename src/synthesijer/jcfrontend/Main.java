@@ -84,16 +84,18 @@ public class Main {
 			implementing.add(getImplementingIntarfaceName(importTable, i.toString()));
 		}
 		
-		boolean syntheisizeFlag = true;
+		JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "synthesijerhdl");
+		
+		boolean synthesizeFlag = true;
 		if(extending != null && extending.equals("synthesijer.hdl.HDLModule")){
-			syntheisizeFlag = false;
+			synthesizeFlag = false;
 		}
 		
 		Module module = new Module(decl.sym.toString(), importTable, extending, implementing);		
 		JCTopVisitor visitor = new JCTopVisitor(module);
 		decl.accept(visitor);
 		
-		Manager.INSTANCE.addModule(module, syntheisizeFlag);			
+		Manager.INSTANCE.addModule(module, synthesizeFlag);			
 		/*
 		if(syntheisizeFlag){
 			Manager.INSTANCE.addModule(module);			

@@ -3,8 +3,6 @@ package synthesijer.ast;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import javax.management.RuntimeErrorException;
-
 import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.expr.Ident;
@@ -30,6 +28,8 @@ public class Module implements Scope, SynthesijerAstTree{
 	private ArrayList<Scope> scopes = new ArrayList<>();
 	
 	private Statemachine statemachine;
+	
+	private boolean synthesijerHDLFlag = false;
 	
 	public Module(String name, Hashtable<String, String> importTable, String extending, ArrayList<String> implementing){
 		this(null, name, importTable, extending, implementing);
@@ -154,6 +154,14 @@ public class Module implements Scope, SynthesijerAstTree{
 				}
 			}
 		}
+	}
+	
+	public boolean isSynthesijerHDL(){
+		return synthesijerHDLFlag;
+	}
+
+	public void setSynthesijerHDL(boolean flag){
+		flag = synthesijerHDLFlag;
 	}
 
 	// TODO experimental
