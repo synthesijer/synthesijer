@@ -1,4 +1,4 @@
-# synthesijer
+# Synthesijer
 
 ## Build from source code
 ### Requirement
