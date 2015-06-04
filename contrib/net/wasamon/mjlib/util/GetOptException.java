@@ -2,7 +2,7 @@ package net.wasamon.mjlib.util;
 
 
 /**
- * GetOpt¤ÇÈ¯À¸¤·¤¿Îã³°¤ò¥«¥×¥»¥ë²½¤·¤¿Îã³°
+ * GetOptã§ç™ºç”Ÿã—ãŸä¾‹å¤–ã‚’ã‚«ãƒ—ã‚»ãƒ«åŒ–ã—ãŸä¾‹å¤–
  *
  * @version $Id: GetOptException.java,v 1.1.1.1 2003/12/29 11:46:15 miyo Exp $
  * @author Takefumi MIYOSHI

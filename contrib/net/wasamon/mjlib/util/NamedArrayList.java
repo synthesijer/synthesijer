@@ -3,7 +3,7 @@ package net.wasamon.mjlib.util;
 import java.util.ArrayList;
 
 /**
- * Ì¾Á°ÉÕ¤­¤Î¥¢¥ì¥¤¥ê¥¹¥È¥¯¥é¥¹
+ * åå‰ä»˜ãã®ã‚¢ãƒ¬ã‚¤ãƒªã‚¹ãƒˆã‚¯ãƒ©ã‚¹
  *
  * @version $Id: NamedArrayList.java,v 1.1.1.1 2003/12/29 11:46:16 miyo Exp $
  * @author Takefumi MIYOSHI
@@ -12,17 +12,17 @@ import java.util.ArrayList;
 public class NamedArrayList extends ArrayList{
   
   /**
-   * ¥³¥ó¥¹¥È¥é¥¯¥¿
+   * ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
    */
   public NamedArrayList(){
     super();
   }
 
   /**
-   * Ì¾Á°¤ò¥­¡¼¤Ë¤·¤ÆArrayList¤è¤ê¥ª¥Ö¥¸¥§¥¯¥È¤ò¸¡º÷¤·¸«¤Ä¤±¤¿¤â¤Î¤òÊÖ¤¹¡£
-   * @param name ¥­¡¼¤È¤Ê¤ëÌ¾Á°
-   * @return ¤½¤ÎÌ¾Á°¤Î¥ª¥Ö¥¸¥§¥¯¥È
-   * @throws NoSuchException ¤ß¤Ä¤«¤é¤Ê¤«¤Ã¤¿¾ì¹ç¤ËÈ¯À¸¤¹¤ëÎã³°
+   * åå‰ã‚’ã‚­ãƒ¼ã«ã—ã¦ArrayListã‚ˆã‚Šã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ¤œç´¢ã—è¦‹ã¤ã‘ãŸã‚‚ã®ã‚’è¿”ã™ã€‚
+   * @param name ã‚­ãƒ¼ã¨ãªã‚‹åå‰
+   * @return ãã®åå‰ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+   * @throws NoSuchException ã¿ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã«ç™ºç”Ÿã™ã‚‹ä¾‹å¤–
    */
   public NamedObject search(String name) throws NoSuchException{
     NamedObject obj = null;

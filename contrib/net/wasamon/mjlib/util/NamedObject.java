@@ -2,7 +2,7 @@ package net.wasamon.mjlib.util;
 
 
 /**
- * Ì¾Á°¤Ä¤­¥ª¥Ö¥¸¥§¥¯¥È¤Î´ğÄì¥¯¥é¥¹
+ * åå‰ã¤ãã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åŸºåº•ã‚¯ãƒ©ã‚¹
  * 
  * @version $Id: NamedObject.java,v 1.1.1.1 2003/12/29 11:46:16 miyo Exp $
  * @author Takefumi MIYOSHI
@@ -13,15 +13,15 @@ public class NamedObject extends Object{
   private String name;
 
   /**
-   * Ì¾Á°¤òÅĞÏ¿¤·¡¢¥¤¥ó¥¿¥ó¥¹¤òÀ¸À®
-   * @param name ¤³¤Î¥ª¥Ö¥¸¥§¥¯¥È¤Ë¤Ä¤±¤ëÌ¾Á°
+   * åå‰ã‚’ç™»éŒ²ã—ã€ã‚¤ãƒ³ã‚¿ãƒ³ã‚¹ã‚’ç”Ÿæˆ
+   * @param name ã“ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã¤ã‘ã‚‹åå‰
    */
   public NamedObject(String name){
     this.name = name;
   }
 
   /**
-   * ¤³¤Î¥¤¥ó¥¹¥¿¥ó¥¹¤ÎÌ¾Á°¤òÊÖ¤¹
+   * ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®åå‰ã‚’è¿”ã™
    */
   public String getName(){
     return name;
