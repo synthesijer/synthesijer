@@ -95,7 +95,6 @@ public class Main {
 		
 		boolean synthesizeFlag = true;
 		if(isHDLModule(extending, importTable) == true){
-			System.out.println("not sythesize");
 			synthesizeFlag = false;
 		}
 		

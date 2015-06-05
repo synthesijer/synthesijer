@@ -118,10 +118,15 @@ public class Literal extends Expr{
 	}
 
 	public void castType(Type newType){
+		System.out.println("cast");
 		if(newType instanceof PrimitiveTypeKind){
 			switch((PrimitiveTypeKind)newType){
 			case BOOLEAN: valueBoolean = Boolean.valueOf(getValueAsStr()); break;
-			case BYTE:    valueByte    = Integer.valueOf(getValueAsStr()).byteValue(); break;//Byte.valueOf(getValueAsStr()); break;
+			case BYTE:{
+				System.out.print(getValueAsStr());
+				System.out.println(" => " + Integer.valueOf(getValueAsStr()).byteValue());
+				valueByte    = Integer.valueOf(getValueAsStr()).byteValue(); break;//Byte.valueOf(getValueAsStr()); break;
+			}
 			case CHAR:    valueChar    = (char)(Integer.valueOf(getValueAsStr()) & 0x0000FFFF); break;
 			case SHORT:   valueShort   = Short.valueOf(getValueAsStr()); break;
 			case INT:     valueInt     = Integer.valueOf(getValueAsStr()); break;

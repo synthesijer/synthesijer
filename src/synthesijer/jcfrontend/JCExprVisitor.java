@@ -130,7 +130,7 @@ public class JCExprVisitor extends Visitor{
 		if(ltype == rtype) return;
 		//SynthesijerUtils.dump(lhs.getClass());
 		//System.out.printf("JCExprVisitor: RHS is casted into %s from %s\n", ltype, rtype);
-		((Literal)rhs).castType(ltype);
+		//((Literal)rhs).castType(ltype);
 	}
 	
 	public void visitAssign(JCAssign that){
