@@ -133,10 +133,12 @@ public class Module implements Scope, SynthesijerAstTree{
 
 	public void resolveExtends(){
 		if(getExtending() == null) return;
-		if(getExtending().equals("Thread")){ //TODO experimental
+		if(getExtending().equals("HDLModule")){
+			// skip
+		}else if(getExtending().equals("Thread")){ //TODO experimental
 			addThread(this);
 		}else{
-			System.out.println("exnteds: " + getExtending());
+			System.out.println("extends: " + getExtending());
 			Module ext = Manager.INSTANCE.searchModule(getExtending());
 			if(ext == null){
 				SynthesijerUtils.error("cannot find the extending class:" + getExtending());

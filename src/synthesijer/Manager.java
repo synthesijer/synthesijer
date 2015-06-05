@@ -145,6 +145,7 @@ public enum Manager {
 
 	public Module searchModule(String name){
 		SynthesijerModuleInfo info = modules.get(name);
+		if(info == null) return null;
 		return info.m;
 	}
 

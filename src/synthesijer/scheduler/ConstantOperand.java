@@ -37,6 +37,7 @@ public class ConstantOperand implements Operand{
 	}
 	
 	private Type getReferedType(Type t){
+		
 		if(t instanceof ArrayRef){
 			return getReferedType(((ArrayRef)t).getRefType());
 		}else if(t instanceof ArrayType){
@@ -52,7 +53,7 @@ public class ConstantOperand implements Operand{
 	}
 	
 	public void setType(Type t){
-		this.type = t;
+		this.type = getReferedType(t);
 	}
 	
 	public String getValue(){

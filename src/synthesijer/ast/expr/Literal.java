@@ -121,7 +121,7 @@ public class Literal extends Expr{
 		if(newType instanceof PrimitiveTypeKind){
 			switch((PrimitiveTypeKind)newType){
 			case BOOLEAN: valueBoolean = Boolean.valueOf(getValueAsStr()); break;
-			case BYTE:    valueByte    = Byte.valueOf(getValueAsStr()); break;
+			case BYTE:    valueByte    = Integer.valueOf(getValueAsStr()).byteValue(); break;//Byte.valueOf(getValueAsStr()); break;
 			case CHAR:    valueChar    = (char)(Integer.valueOf(getValueAsStr()) & 0x0000FFFF); break;
 			case SHORT:   valueShort   = Short.valueOf(getValueAsStr()); break;
 			case INT:     valueInt     = Integer.valueOf(getValueAsStr()); break;
