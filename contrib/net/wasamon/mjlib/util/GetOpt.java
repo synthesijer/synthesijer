@@ -160,8 +160,8 @@ public class GetOpt {
 	private boolean makeOptList(String sp, String[] lp) {
 		int i = 0;
 		while (i < sp.length()) {
-			if (sp.length() > (i + 1) && sp.charAt(i + 1) == ':') { // もし文字の後に':'が続いていた場合引数を伴う
-				if (sp.length() > (i + 2) && sp.charAt(i + 2) == ':') { // もう一つ続いていたらラスト
+		    if (sp.length() > (i + 1) && sp.charAt(i + 1) == ':') { /* もし文字の後に':'が続いていた場合引数を伴う */
+			if (sp.length() > (i + 2) && sp.charAt(i + 2) == ':') { /* もう一つ続いていたらラスト */
 					opt_with_arg_rest = new NamedObject(sp.substring(i, i + 1));
 					i += 3;
 				} else {
@@ -175,7 +175,7 @@ public class GetOpt {
 		}
 		i = 0;
 		while (i < lp.length) {
-			if (lp[i].charAt(lp[i].length() - 1) == ':') { // 最終の文字が':'なら引数を伴う
+		    if (lp[i].charAt(lp[i].length() - 1) == ':') { /* 最終の文字が':'なら引数を伴う */
 				opt_with_arg.add(new NamedObject(lp[i].substring(0,
 						lp[i].length() - 1)));
 			} else {
@@ -229,7 +229,7 @@ public class GetOpt {
 		if (opt_flag.has(ptn)) {
 			opts.add(new NamedObject(ptn));
 			add = 0;
-		} else if (ptn.matches(".*=.*")) { // hogehoge=*みたいな形
+		} else if (ptn.matches(".*=.*")) { /* hogehoge=*みたいな形 */
 			int index = ptn.indexOf("=");
 			String ptn2 = ptn.substring(0, index);
 			if (opt_with_arg.has(ptn2)) {
