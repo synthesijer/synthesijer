@@ -59,6 +59,13 @@ public class Main {
 		}
 	}
 
+	private static boolean isHDLModule(String extending, Hashtable<String, String> importTable){
+		if(extending == null) return false;
+		if(extending.equals("HDLModule")) return true; // ad-hoc
+		if(extending.equals("synthesijer.hdl.HDLModule")) return true;
+		return false;
+	}
+
 	/**
 	 * starts to parse a new class in order to generate a instance of Module from a given instance of JCClassDecl.
 	 * @param env
@@ -87,7 +94,8 @@ public class Main {
 		JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "synthesijerhdl");
 		
 		boolean synthesizeFlag = true;
-		if(extending != null && extending.equals("synthesijer.hdl.HDLModule")){
+		if(isHDLModule(extending, importTable) == true){
+			System.out.println("not sythesize");
 			synthesizeFlag = false;
 		}
 		
