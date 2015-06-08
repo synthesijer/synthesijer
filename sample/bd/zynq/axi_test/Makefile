@@ -1,10 +1,10 @@
 SYNTHESIJER ?= ../../../../bin
-SYNTHESIJER_APPLICATIONS = ../../../../../synthesijer-applications
+SYNTHESIJER_EXTRA_LIB = ../../../../../synthesijer_extra-libs
 
-CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_APPLICATIONS)/bin:.
+CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_EXTRA_LIB)/bin:.
 
-SOURCES = $(SYNTHESIJER_APPLICATIONS)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
-          $(SYNTHESIJER_APPLICATIONS)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \
+SOURCES = $(SYNTHESIJER_EXTRA_LIB)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
+          $(SYNTHESIJER_EXTRA_LIB)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \
           MemTest.java
 
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
