@@ -1,8 +1,9 @@
 SYNTHESIJER ?= ../../../bin
-CLASSPATH = $(SYNTHESIJER):../../../../synthesijer-applications/bin:.
+SYNTHESIJER_EXTRA_LIB ?= ../../../../synthesijer_extra-libs
+CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_EXTRA_LIB)/bin:.
 
-SOURCES = ../../../../synthesijer-applications/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
-          ../../../../synthesijer-applications/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \
+SOURCES = $(SYNTHESIJER_EXTRA_LIB)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
+          $(SYNTHESIJER_EXTRA_LIB)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \
           TestFrame.java \
           RGBTest.java \
           SinTableRom.java
