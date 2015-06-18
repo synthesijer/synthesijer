@@ -171,7 +171,7 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		return expr;
 	}
 
-	public HDLExpr newExpr(HDLOp op, HDLSignal arg0, int value){
+	public HDLExpr newExpr(HDLOp op, HDLExpr arg0, int value){
 		return newExpr(op, arg0, new HDLValue(String.valueOf(value), HDLPrimitiveType.genIntegerType()));
 	}
 	
@@ -184,7 +184,13 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		submodules.add(obj);
 		return obj;
 	}
-	
+
+	public HDLInstance newModuleInstance(HDLModule m){
+		HDLInstance obj = new HDLInstance(this, String.format("sjr_generate_U_%04d", getExprUniqueId()), m);
+		submodules.add(obj);
+		return obj;
+	}
+
 	public HDLInstance[] getModuleInstances(){
 		return submodules.toArray(new HDLInstance[]{});
 	}

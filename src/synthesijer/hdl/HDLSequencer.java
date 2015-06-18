@@ -33,6 +33,9 @@ public class HDLSequencer implements HDLTree{
 		delayCounter.setIgnore(true);
 	}
 	
+	private int id = 0;
+	private int genUniqId(){ int tmp = id; id++; return tmp; }
+	
 	public void setTransitionTime(int step){
 		this.timestep = step;
 	}
@@ -54,6 +57,11 @@ public class HDLSequencer implements HDLTree{
 	}
 
 	public SequencerState addSequencerState(String id){
+		return addSequencerState(id, true);
+	}
+
+	public SequencerState addSequencerState(){
+		String id = String.format("sjr_tmp_state_%04d", genUniqId());
 		return addSequencerState(id, true);
 	}
 
