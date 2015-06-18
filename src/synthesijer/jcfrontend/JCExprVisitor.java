@@ -158,10 +158,11 @@ public class JCExprVisitor extends Visitor{
 			for(JCExpression expr: that.elems){
 				tmp.addElem(stepIn(expr));
 			}
-			if(that.dims.size() == 0){
+			if(that.dims.size() == 0 && that.elems.size() > 0){
 				Literal d = new Literal(scope);
 				d.setValue(that.elems.size());
 				tmp.addDimExpr(d);
+				SynthesijerUtils.warn("In " + scope.getModule().getName());
 				SynthesijerUtils.warn("Intialization with new expression is not supported.");
 				SynthesijerUtils.warn("Intialization values, " + that + " are not used.");				
 			}
