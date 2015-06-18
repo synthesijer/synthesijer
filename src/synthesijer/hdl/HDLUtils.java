@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.EnumSet;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.hdl.HDLPort.OPTION;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.tools.HDLSequencerToDot;
 import synthesijer.hdl.tools.ResourceUsageTable;
@@ -72,6 +74,42 @@ public class HDLUtils {
 		}catch(IOException e){
 			SynthesijerUtils.error(e.toString());
 		}
+	}
+
+	public static HDLPort genOutputPort(HDLModule m, String name){
+		return m.newPort(name, HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
+	}
+
+	public static HDLPort genOutputPort(HDLModule m, String name, EnumSet<OPTION> opt){
+		return m.newPort(name, HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), opt);
+	}
+
+	public static HDLPort genOutputPort(HDLModule m, String name, int width){
+		return m.newPort(name, HDLPort.DIR.OUT, HDLPrimitiveType.genVectorType(width));
+	}
+	
+	public static HDLPort genOutputPort(HDLModule m, String name, int width, EnumSet<OPTION> opt){
+		return m.newPort(name, HDLPort.DIR.OUT, HDLPrimitiveType.genVectorType(width), opt);
+	}
+
+	public static HDLPort genInputPort(HDLModule m, String name){
+		return m.newPort(name, HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
+	}
+
+	public static HDLPort genInputPort(HDLModule m, String name, EnumSet<OPTION> opt){
+		return m.newPort(name, HDLPort.DIR.IN, HDLPrimitiveType.genBitType(), opt);
+	}
+
+	public static HDLPort genInputPort(HDLModule m, String name, int width){
+		return m.newPort(name, HDLPort.DIR.IN, HDLPrimitiveType.genVectorType(width));
+	}
+
+	public static HDLPort genInputPort(HDLModule m, String name, int width, EnumSet<OPTION> opt){
+		return m.newPort(name, HDLPort.DIR.IN, HDLPrimitiveType.genVectorType(width), opt);
+	}
+	
+	public static HDLValue value(int value, int width){
+		return new HDLValue(String.valueOf(value), HDLPrimitiveType.genSignedType(width));
 	}
 
 }
