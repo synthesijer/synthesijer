@@ -435,8 +435,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		varTable.put(o.getName(), v);
 		varList.add(v);
 		if (o.getInitExpr() != null){
-			//System.out.println(o);
-
+			
 			Operand src = stepIn(o.getInitExpr());
 			
 			if(src.getType() != PrimitiveTypeKind.DECLARED){ // allows to cast
@@ -791,7 +790,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitNewArray(NewArray o) {
 		for (Expr expr : o.getDimExpr()) {
-			expr.accept(this);
+			expr.accept(this); // expected integer literal for array size
 		}
 	}
 

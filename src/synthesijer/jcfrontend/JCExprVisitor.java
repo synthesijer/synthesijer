@@ -154,9 +154,16 @@ public class JCExprVisitor extends Visitor{
 		for(JCExpression dim: that.dims){
 			tmp.addDimExpr(stepIn(dim));
 		}
-		if(that.elems != null){
+		if(that.elems != null){ // ad-hoc: to support array initialization 
 			for(JCExpression expr: that.elems){
 				tmp.addElem(stepIn(expr));
+			}
+			if(that.dims.size() == 0){
+				Literal d = new Literal(scope);
+				d.setValue(that.elems.size());
+				tmp.addDimExpr(d);
+				SynthesijerUtils.warn("Intialization with new expression is not supported.");
+				SynthesijerUtils.warn("Intialization values, " + that + " are not used.");				
 			}
 		}
 		expr = tmp;
