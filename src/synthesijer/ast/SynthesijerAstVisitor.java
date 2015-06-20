@@ -4,6 +4,7 @@ package synthesijer.ast;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
+import synthesijer.ast.statement.DoWhileStatement;
 import synthesijer.ast.statement.ExprStatement;
 import synthesijer.ast.statement.ForStatement;
 import synthesijer.ast.statement.IfStatement;
@@ -44,5 +45,7 @@ public interface SynthesijerAstVisitor extends SynthesijerModuleVisitor, Synthes
 	public void visitVariableDecl(VariableDecl o);
 
 	public void visitWhileStatement(WhileStatement o);
+	
+	public void visitDoWhileStatement(DoWhileStatement o);
 
 }

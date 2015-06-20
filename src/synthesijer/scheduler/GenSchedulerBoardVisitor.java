@@ -31,6 +31,7 @@ import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
+import synthesijer.ast.statement.DoWhileStatement;
 import synthesijer.ast.statement.ExprStatement;
 import synthesijer.ast.statement.ForStatement;
 import synthesijer.ast.statement.IfStatement;
@@ -467,7 +468,22 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
 		join.setBranchId(lastItem.getStepId()+1); // next
 	}
-	
+
+	@Override
+	public void visitDoWhileStatement(DoWhileStatement o) {
+
+		SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		Operand flag = stepIn(o.getCondition());
+		int condId = lastItem.getStepId();
+		SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
+		
+		GenSchedulerBoardVisitor v = stepIn(o.getBody(), condId, join.getStepId(), condId);
+
+		fork.setBranchIds(new int[]{lastItem.getStepId()+1, join.getStepId()}); // fork into loop body or exi
+		join.setBranchId(v.entryId); // next
+
+	}
+
 	public SchedulerItem addSchedulerItem(SchedulerItem item){
 		if(board == null){
 			return item; // skip

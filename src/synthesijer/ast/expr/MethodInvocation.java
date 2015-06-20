@@ -3,6 +3,8 @@ package synthesijer.ast.expr;
 import java.util.ArrayList;
 
 import synthesijer.Manager;
+import synthesijer.SynthesijerUtils;
+import synthesijer.UnknownModuleException;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Scope;
@@ -75,7 +77,12 @@ public class MethodInvocation extends Expr{
 	public Method getTargetMethod(){
 		if(method instanceof FieldAccess){
 			ComponentType type = (ComponentType)(method.getType());
-			return Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+			try{
+				return Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+			}catch(UnknownModuleException e){
+				SynthesijerUtils.error(method + ": cannot find type:" + type.getName());
+				throw new RuntimeException("cannot find class:" + type.getName());
+			}
 		}else{
 			return getScope().getModule().searchMethod(getMethodName());
 		}
@@ -87,7 +94,13 @@ public class MethodInvocation extends Expr{
 			return method.getType();
 		}else{
 			ComponentType type = (ComponentType)(method.getType());
-			Method m = Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+			Method m;
+			try{
+				m = Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
+			}catch(UnknownModuleException e){
+				SynthesijerUtils.error(method + ": cannot find type:" + type.getName());
+				throw new RuntimeException("cannot find class:" + type.getName());
+			}
 			return m.getType();
 		}
 	}

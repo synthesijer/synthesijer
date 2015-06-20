@@ -26,6 +26,7 @@ import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
+import synthesijer.ast.statement.DoWhileStatement;
 import synthesijer.ast.statement.ExprStatement;
 import synthesijer.ast.statement.ForStatement;
 import synthesijer.ast.statement.IfStatement;
@@ -364,6 +365,18 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 	@Override
 	public void visitWhileStatement(WhileStatement o) {
 		dest.printf("<statement type=\"while\">\n");
+		dest.printf("<condition>\n");
+		o.getCondition().accept(this);
+		dest.printf("</condition>\n");
+		dest.printf("<body>\n");
+		o.getBody().accept(this);
+		dest.printf("</body>\n");
+		dest.printf("</statement>\n");
+	}
+
+	@Override
+	public void visitDoWhileStatement(DoWhileStatement o) {
+		dest.printf("<statement type=\"do-while\">\n");
 		dest.printf("<condition>\n");
 		o.getCondition().accept(this);
 		dest.printf("</condition>\n");

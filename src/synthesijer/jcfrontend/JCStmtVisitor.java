@@ -5,6 +5,7 @@ import openjdk.com.sun.tools.javac.tree.JCTree.JCBlock;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCBreak;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCCase;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCContinue;
+import openjdk.com.sun.tools.javac.tree.JCTree.JCDoWhileLoop;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCForLoop;
@@ -27,6 +28,7 @@ import synthesijer.ast.Type;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
+import synthesijer.ast.statement.DoWhileStatement;
 import synthesijer.ast.statement.ExprStatement;
 import synthesijer.ast.statement.ForStatement;
 import synthesijer.ast.statement.IfStatement;
@@ -99,6 +101,13 @@ public class JCStmtVisitor extends Visitor{
 	
 	public void visitWhileLoop(JCWhileLoop that){
 		WhileStatement tmp = new WhileStatement(scope);
+		tmp.setCondition(stepIn(that.cond, scope));
+		tmp.setBody(wrapBlockStatement(stepIn(that.body, scope)));
+		stmt = tmp;
+	}
+	
+	public void visitDoLoop(JCDoWhileLoop that){
+		DoWhileStatement tmp = new DoWhileStatement(scope);
 		tmp.setCondition(stepIn(that.cond, scope));
 		tmp.setBody(wrapBlockStatement(stepIn(that.body, scope)));
 		stmt = tmp;

@@ -21,6 +21,24 @@ public class Test001{
 		return x;
 	}
 	
+	public int acc3(int num, int y){
+		int i = 0;
+		while(i < num){
+			x += y;
+			i++;
+		}
+		return x;
+	}
+
+	public int acc4(int num, int y){
+		int i = 0;
+		do{
+			x += y;
+			i++;
+		}while(i < num);
+		return x;
+	}
+
 	public int switch_test(int x){
 	    int value = 0;
 	    switch(x){

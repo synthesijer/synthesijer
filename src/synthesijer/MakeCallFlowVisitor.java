@@ -24,6 +24,7 @@ import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.BreakStatement;
 import synthesijer.ast.statement.ContinueStatement;
+import synthesijer.ast.statement.DoWhileStatement;
 import synthesijer.ast.statement.ExprStatement;
 import synthesijer.ast.statement.ForStatement;
 import synthesijer.ast.statement.IfStatement;
@@ -253,6 +254,12 @@ public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerEx
 
 	@Override
 	public void visitWhileStatement(WhileStatement o) {
+		o.getCondition().accept(this);
+		o.getBody().accept(this);
+	}
+
+	@Override
+	public void visitDoWhileStatement(DoWhileStatement o) {
 		o.getCondition().accept(this);
 		o.getBody().accept(this);
 	}

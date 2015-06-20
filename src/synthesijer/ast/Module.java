@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
+import synthesijer.UnknownModuleException;
 import synthesijer.ast.expr.Ident;
 import synthesijer.ast.expr.MethodInvocation;
 import synthesijer.ast.statement.ExprStatement;
@@ -139,8 +140,10 @@ public class Module implements Scope, SynthesijerAstTree{
 			addThread(this);
 		}else{
 			System.out.println("extends: " + getExtending());
-			Module ext = Manager.INSTANCE.searchModule(getExtending());
-			if(ext == null){
+			Module ext;
+			try{
+				ext = Manager.INSTANCE.searchModule(getExtending());
+			}catch(UnknownModuleException e){
 				SynthesijerUtils.error("cannot find the extending class:" + getExtending());
 				throw new RuntimeException("cannot find the extending class:" + getExtending());
 			}

@@ -144,9 +144,11 @@ public enum Manager {
 		modules.put(name, new SynthesijerModuleInfo(m, hm, synthesisFlag));
 	}
 
-	public Module searchModule(String name){
+	public Module searchModule(String name) throws UnknownModuleException{
 		SynthesijerModuleInfo info = modules.get(name);
-		if(info == null) return null;
+		if(info == null){
+			throw new UnknownModuleException();
+		}
 		return info.m;
 	}
 
