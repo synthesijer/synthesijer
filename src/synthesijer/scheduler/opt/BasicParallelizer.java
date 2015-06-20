@@ -253,7 +253,6 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 			SchedulerSlot slot = slots[i];
 			Integer d = degrees.get(slot);
 			//if(d == null) d = 0;
-			slot.dump(System.out);
 			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0 || d > 1 || slot.getItems().length > 1 || isExcept(slot.getItems()[0])){
 				if(bb != null && bb.size() > 0){
 					prev = parallelize(ret, bb, id_map);

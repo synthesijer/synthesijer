@@ -21,6 +21,7 @@ ghdl32: $(VHDL_SOURCES)
 	ghdl -e sim006
 	ghdl -e sim011
 	ghdl -e sim013
+	ghdl -e sim001
 
 clean:
 	-rm -f *.class

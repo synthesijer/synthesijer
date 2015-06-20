@@ -6,6 +6,8 @@ public class Test001Sim{
 		int v = obj.add(100, 200);
 		v = obj.acc(v);
 		v = obj.acc2(10, v);
+		v = obj.acc3(10, v);
+		v = obj.acc4(10, v);
 		v = obj.add2(50, 400);
 		int x = obj.switch_test(0);
 		x = obj.switch_test(1);
