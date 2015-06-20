@@ -479,7 +479,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		
 		GenSchedulerBoardVisitor v = stepIn(o.getBody(), condId, join.getStepId(), condId);
 
-		fork.setBranchIds(new int[]{lastItem.getStepId()+1, join.getStepId()}); // fork into loop body or exi
+		fork.setBranchIds(new int[]{join.getStepId(), lastItem.getStepId()+1}); // fork into loop body or exi
 		join.setBranchId(v.entryId); // next
 
 	}

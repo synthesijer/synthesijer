@@ -16,7 +16,7 @@ ghdl64: $(VHDL_SOURCES)
 	ghdl -e -Wa,--32 -Wl,-m32 sim013
 
 ghdl32: $(VHDL_SOURCES)
-	ghdl -a $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/*.vhd
+	ghdl -a $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd sim001.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/*.vhd
 	ghdl -e sim
 	ghdl -e sim006
 	ghdl -e sim011
