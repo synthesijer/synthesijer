@@ -91,14 +91,14 @@ public class Main {
 			implementing.add(getImplementingIntarfaceName(importTable, i.toString()));
 		}
 		
-		JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "synthesijerhdl");
-		
 		boolean synthesizeFlag = true;
 		if(isHDLModule(extending, importTable) == true){
 			synthesizeFlag = false;
 		}
 		
-		Module module = new Module(decl.sym.toString(), importTable, extending, implementing);		
+		Module module = new Module(decl.sym.toString(), importTable, extending, implementing);
+		module.setSynthesijerHDL(    JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "synthesijerhdl"));
+		
 		JCTopVisitor visitor = new JCTopVisitor(module);
 		decl.accept(visitor);
 		

@@ -162,11 +162,11 @@ public class Module implements Scope, SynthesijerAstTree{
 	}
 	
 	public boolean isSynthesijerHDL(){
-		return synthesijerHDLFlag;
+		return this.synthesijerHDLFlag;
 	}
 
 	public void setSynthesijerHDL(boolean flag){
-		flag = synthesijerHDLFlag;
+		this.synthesijerHDLFlag = flag;
 	}
 
 	// TODO experimental
