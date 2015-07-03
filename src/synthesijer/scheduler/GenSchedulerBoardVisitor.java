@@ -870,6 +870,12 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			result = tmp;
 			break;
 		}
+		case NOT:{
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.NOT, new Operand[]{v}, tmp));
+			result = tmp;
+			break;
+		}
 		default:
 			System.out.println("unknown unary expr:" + o.getOp());
 		}
