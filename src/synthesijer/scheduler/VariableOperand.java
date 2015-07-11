@@ -11,7 +11,9 @@ public class VariableOperand implements Operand{
 	
 	private final Type type;
 	
-	private final Expr initExpr;
+	//private final Expr initExpr;
+	
+	private final Operand initSrc;
 	
 	private final boolean publicFlag;
 	
@@ -35,10 +37,12 @@ public class VariableOperand implements Operand{
 		this(name, type, null, false, false, false, name, null, false, false);
 	}
 
-	public VariableOperand(String name, Type type, Expr initExpr, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag, boolean volatileFlag){
+//	public VariableOperand(String name, Type type, Expr initExpr, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag, boolean volatileFlag){
+	public VariableOperand(String name, Type type, Operand initSrc, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag, boolean volatileFlag){
 		this.name = name;
 		this.type = type;
-		this.initExpr = initExpr;
+		//this.initExpr = initExpr;
+		this.initSrc = initSrc;
 		this.publicFlag = publicFlag;
 		this.globalConstantFlag = globalConstantFlag;
 		this.methodParamFlag = methodParamFlag;
@@ -57,8 +61,12 @@ public class VariableOperand implements Operand{
 		return type;
 	}
 	
-	public Expr getInitExpr(){
-		return initExpr;
+//	public Expr getInitExpr(){
+//	return initExpr;
+//}
+
+	public Operand getInitSrc(){
+		return initSrc;
 	}
 	
 	public boolean isPublic(){
@@ -102,10 +110,27 @@ public class VariableOperand implements Operand{
 	public SchedulerItem getPredItem(SchedulerItem ctx){
 		return predItemMap.get(ctx);
 	}
-
+	
 	@Override
 	public String info(){
 		return name + ":" + type;
+	}
+
+	public String dump(){
+		String s = name
+				+ ":" + type
+				+ ", public=" + publicFlag 
+				+ ", globalConstant=" + globalConstantFlag
+				+ ", methodParam=" + methodParamFlag
+				+ ", origName=" + origName
+				+ ", methodName=" + methodName
+				+ ", privateMethod=" + privateMethodFlag
+				+ ", volatile=" + volatileFlag
+				+ ", chaining=" + chaining;
+		if(initSrc != null){
+			s += ", init=" + initSrc.info();
+		}
+		return s;
 	}
 
 }

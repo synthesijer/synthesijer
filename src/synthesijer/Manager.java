@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -54,6 +55,7 @@ import synthesijer.scheduler.GlobalSymbolTable;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
+import synthesijer.scheduler.VariableOperand;
 import synthesijer.scheduler.opt.BasicParallelizer;
 import synthesijer.scheduler.opt.ConvArrayAccessToArrayIndex;
 import synthesijer.scheduler.opt.OperationStrengthReduction;
@@ -188,18 +190,25 @@ public enum Manager {
 	
 	private void dumpSchedulerInfo(SchedulerInfo si, String postfix){
 		try(PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".txt")));
-				PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")))){
-				dot.println("digraph {");
-				for(SchedulerBoard b: si.getBoardsList()){
-					b.dump(txt);
-					b.dumpDot(dot);
+			PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")))){
+			txt.println("Variables:");
+			for(ArrayList<VariableOperand> va: si.getVarTableList()){
+				for(VariableOperand v: va){
+					txt.println(v.dump());
 				}
-				dot.println("}");
-				txt.close();
-				dot.close();
-			}catch(IOException e){
-				e.printStackTrace();
 			}
+			txt.println("");
+			dot.println("digraph {");
+			for(SchedulerBoard b: si.getBoardsList()){
+				b.dump(txt);
+				b.dumpDot(dot);
+			}
+			dot.println("}");
+			txt.close();
+			dot.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 
 	private void doGenSchedulerBoard(){

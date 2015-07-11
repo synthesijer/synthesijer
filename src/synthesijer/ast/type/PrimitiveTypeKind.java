@@ -63,4 +63,12 @@ public enum PrimitiveTypeKind implements Type{
 		return width;
 	}
 	
+	public boolean isCastAllowed(){
+		if(isInteger() || isFloating()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 }

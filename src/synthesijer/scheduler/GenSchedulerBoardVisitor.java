@@ -167,7 +167,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		return v;
 	}
 
-	private Operand stepIn(Expr expr){
+	public Operand stepIn(Expr expr){
 		GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this);
 		expr.accept(v);
 		Operand o = v.getOperand();
@@ -426,12 +426,18 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		String prefix = o.getScope().getMethod() == null ? "class" : o.getScope().getMethod().getName();
 		String vName;
 		vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
+		
 		VariableOperand v;
-		if(vv.getMethod() != null){
-			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile());
-		}else{
-			v = new VariableOperand(vName, t, vv.getInitExpr(), vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile());
+		Operand initSrc = null;
+		if(vv.getInitExpr() != null){
+			initSrc = stepIn(vv.getInitExpr());
 		}
+		if(vv.getMethod() != null){
+			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile());
+		}else{
+			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile());
+		}
+		
 		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
 		varTable.put(o.getName(), v);
 		varList.add(v);
@@ -439,7 +445,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 			
 			Operand src = stepIn(o.getInitExpr());
 			
-			if(src.getType() != PrimitiveTypeKind.DECLARED){ // allows to cast
+			if(src.getType() instanceof PrimitiveTypeKind && ((PrimitiveTypeKind)src.getType()).isCastAllowed()){ // allows to cast
 				if(isCastRequired(v.getType(), src.getType()) == true){
 					if(src instanceof VariableOperand){
 						VariableOperand tmp = addCast(src, v.getType()); // RHS is casted into corresponding to LHS
@@ -597,13 +603,13 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		parent.addVariable(v.getName(), v);
 		return v; 
 	}
-	
+/*	
 	private VariableOperand newVariable(String key, Type t, Expr initExpr){
 		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, initExpr, false, false, false, null, "", false, false);
 		parent.addVariable(v.getName(), v);
 		return v; 
 	}
-
+*/
 	private VariableRefOperand newVariableRef(String key, Type t, VariableOperand ref){
 		VariableRefOperand v = new VariableRefOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, ref);
 		parent.addVariable(v.getName(), v);
@@ -759,7 +765,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(klass, o.getIdent().getSymbol());
 			type = var.var.getType();
 			tmp = newVariable("field_access", type);
-			Operand v = stepIn(var.var.getInitExpr());
+			//Operand v = stepIn(var.var.getInitExpr());
+			Operand v = var.var.getInitSrc();
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, tmp));
 		}
 		
@@ -808,6 +815,15 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		for (Expr expr : o.getDimExpr()) {
 			expr.accept(this); // expected integer literal for array size
 		}
+		if(o.getDimExpr().get(0) instanceof Literal){
+			Literal value = (Literal)(o.getDimExpr().get(0));
+			int words = Integer.valueOf(value.getValueAsStr());
+			int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
+			result = new ArrayRefOperand("", o.getType(), depth, words);
+		}else{
+			SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
+			SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
+		}
 	}
 
 	@Override
@@ -815,7 +831,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		for (Expr expr : o.getParameters()) {
 			expr.accept(this);
 		}
-		result = newVariable("new_class", o.getType());
+		//result = newVariable("new_class", o.getType());
+		result = new InstanceRefOperand("", o.getType(), o.getClassName());
 	}
 
 	@Override
