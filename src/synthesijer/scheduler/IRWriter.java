@@ -1,0 +1,79 @@
+package synthesijer.scheduler;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+
+public class IRWriter {
+	
+	private final String name;
+	
+	public IRWriter(String name){
+		this.name = name;
+	}
+	
+	public void generate(SchedulerInfo info) throws IOException{
+		try(
+			PrintStream ir = new PrintStream(new FileOutputStream(new File(name + ".ir")));
+			){
+			ir.println("(module " + info.getName());
+			gen_variables(ir, info);
+			for(SchedulerBoard b: info.getBoardsList()){
+				genSchedulerBoard(ir, b);
+			}
+			ir.println(")");
+			ir.close();
+		}catch(IOException e){
+			throw new IOException(e);
+		}
+	}
+	
+	private void genSchedulerBoard(PrintStream ir, SchedulerBoard b){
+		ir.println("    (SEQUENCER " + b.getName());
+		for(SchedulerSlot s: b.getSlots()){
+			genSchedulerSlot(ir, s);
+		}
+		ir.println("    )");
+	}
+
+	private void genSchedulerSlot(PrintStream ir, SchedulerSlot slot){
+		ir.println("      (SLOT " + slot.getStepId());
+		for(SchedulerItem i: slot.getItems()){
+			genSchedulerItem(ir, i);
+		}
+		ir.println("      )");
+	}
+
+	private void genSchedulerItem(PrintStream ir, SchedulerItem item){
+		ir.println("        " + item.toSexp());
+	}
+
+	private void gen_variables(PrintStream ir, SchedulerInfo info){
+		ir.println("  (variables ");
+		for(ArrayList<VariableOperand> va: info.getVarTableList()){
+			for(VariableOperand v: va){
+				gen_variable(ir, v);
+			}
+		}
+		ir.println("  )");
+	}
+
+	private void gen_variable(PrintStream ir, VariableOperand v){
+		String s = "    ";
+		s += "(";
+		s += "VAR";
+		s += " " + v.getType();
+		s += " " + v.getName();
+	    s += " :public " + v.isPublic();
+	    s += " :global_constant " + v.isGlobalConstant();
+	    s += " :orginal " + v.getOrigName();
+	    s += " :method " + v.getMethodName();
+	    s += " :private_method " + v.isPrivateMethod();
+	    s += " :volatile " + v.isVolatileFlag();
+	    s += " :init " + v.getInitSrc();
+		s += ")";
+		ir.println(s);
+	}
+}

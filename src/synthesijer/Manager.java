@@ -52,6 +52,7 @@ import synthesijer.lib.OUTPUT8;
 import synthesijer.lib.SimpleBlockRAM;
 import synthesijer.scheduler.GenSchedulerBoardVisitor;
 import synthesijer.scheduler.GlobalSymbolTable;
+import synthesijer.scheduler.IRWriter;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
@@ -189,8 +190,11 @@ public enum Manager {
 	}
 	
 	private void dumpSchedulerInfo(SchedulerInfo si, String postfix){
-		try(PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".txt")));
-			PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")))){
+		try(
+				PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".txt")));
+				PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")));
+				){
+			(new IRWriter(si.getName() + "_scheduler_board_" + postfix)).generate(si);
 			txt.println("Variables:");
 			for(ArrayList<VariableOperand> va: si.getVarTableList()){
 				for(VariableOperand v: va){

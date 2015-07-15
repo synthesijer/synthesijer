@@ -161,7 +161,12 @@ public class SchedulerItem {
 		String s = String.format("%s_%04d: op=%s, src=%s, dest=%s, next=%s", getBoardName(), getStepId(), op, srcInfo(), destInfo(), branchList());
 		return s;
 	}
-	
+
+	public String toSexp(){
+		String s = String.format("(ITEM %s %s (%s) :next %s", op, destInfo(), srcInfo(), branchList());
+		return s;
+	}
+
 }
 
 class MethodEntryItem extends SchedulerItem{
