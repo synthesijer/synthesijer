@@ -15,11 +15,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 
 	@Override
 	public SchedulerInfo opt(SchedulerInfo info){
-		SchedulerInfo result = new SchedulerInfo(info.getName());
-		ArrayList<VariableOperand>[] vars = info.getVarTableList();
-		for(ArrayList<VariableOperand> v: vars){
-			result.addVarTable(v);
-		}
+		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
 			result.addBoard(conv(b));
 		}

@@ -97,7 +97,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	private SchedulerItem lastItem;
 	
 	private final Hashtable<String, VariableOperand> varTable = new Hashtable<>();
-	private final ArrayList<VariableOperand> varList = new ArrayList<>();
+	private final ArrayList<VariableOperand> varList;
 	
 	private SchedulerItem methodExit;
 	
@@ -109,7 +109,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		this.exitId = -1;
 		this.continueId = -1;		
 		this.breakId = -1;
-		info.addVarTable(varList);
+		this.varList = info.getModuleVarList();
 	}
 
 	private GenSchedulerBoardVisitor(GenSchedulerBoardVisitor parent, SchedulerBoard board, int exitId, int breakId, int continueId) {
@@ -122,8 +122,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		this.lastItem = parent.lastItem;
 		this.breakId = breakId;
 		this.continueId = continueId;		
-		info.addVarTable(varList);
-		board.addVarTable(varList);
+		this.varList = board.getVarList();
 	}
 
 	public IdentifierGenerator getIdGen(){

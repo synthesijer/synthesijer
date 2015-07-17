@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 
 public class IRWriter {
 	
@@ -18,8 +17,8 @@ public class IRWriter {
 		try(
 			PrintStream ir = new PrintStream(new FileOutputStream(new File(name + ".ir")));
 			){
-			ir.println("(module " + info.getName());
-			gen_variables(ir, info);
+			ir.println("(MODULE " + info.getName());
+			genVariables(ir, info.getModuleVarList().toArray(new VariableOperand[]{}));
 			for(SchedulerBoard b: info.getBoardsList()){
 				genSchedulerBoard(ir, b);
 			}
@@ -31,6 +30,8 @@ public class IRWriter {
 	}
 	
 	private void genSchedulerBoard(PrintStream ir, SchedulerBoard b){
+		ir.println(" (BOARD " + b.getName());
+		genVariables(ir, b.getVarList().toArray(new VariableOperand[]{}));
 		ir.println("    (SEQUENCER " + b.getName());
 		for(SchedulerSlot s: b.getSlots()){
 			genSchedulerSlot(ir, s);
@@ -50,12 +51,10 @@ public class IRWriter {
 		ir.println("        " + item.toSexp());
 	}
 
-	private void gen_variables(PrintStream ir, SchedulerInfo info){
+	private void genVariables(PrintStream ir, VariableOperand[] vars){
 		ir.println("  (variables ");
-		for(ArrayList<VariableOperand> va: info.getVarTableList()){
-			for(VariableOperand v: va){
-				gen_variable(ir, v);
-			}
+		for(VariableOperand v: vars){
+			gen_variable(ir, v);
 		}
 		ir.println("  )");
 	}

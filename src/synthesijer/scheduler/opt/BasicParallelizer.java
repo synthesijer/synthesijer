@@ -17,11 +17,9 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 	public static final boolean DEBUG = false;
 
 	public SchedulerInfo opt(SchedulerInfo info){
-		SchedulerInfo result = new SchedulerInfo(info.getName());
-		ArrayList<VariableOperand>[] vars = info.getVarTableList();
-		for(ArrayList<VariableOperand> v: vars){
-			result.addVarTable(v);
-		}
+//		SchedulerInfo result = new SchedulerInfo(info.getName());
+//		result.addModuleVarList(info.getModuleVarList());
+		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
 			result.addBoard(conv(b));
 		}

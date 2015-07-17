@@ -1,7 +1,5 @@
 package synthesijer.scheduler.opt;
 
-import java.util.ArrayList;
-
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
@@ -13,11 +11,7 @@ import synthesijer.scheduler.VariableOperand;
 public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 	
 	public SchedulerInfo opt(SchedulerInfo info){
-		SchedulerInfo result = new SchedulerInfo(info.getName());
-		ArrayList<VariableOperand>[] vars = info.getVarTableList();
-		for(ArrayList<VariableOperand> v: vars){
-			result.addVarTable(v);
-		}
+		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
 			result.addBoard(conv(b));
 		}

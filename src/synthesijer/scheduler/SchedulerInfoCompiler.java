@@ -1006,18 +1006,16 @@ public class SchedulerInfoCompiler {
 		
 		if(m.hasCallStack()){
 			HDLInstance call_stack = genStackForRecursiveCall(m.getName() + "_call_stack_memory", m.getCallStackSize(), 16);
-			for(ArrayList<VariableOperand> list: board.getVarTableList()){
-				for(VariableOperand v: list){
-					if(v.getMethodName() == null){
+			for(VariableOperand v: board.getVarList()){
+				if(v.getMethodName() == null){
 						continue; // skip non-user defined variable
-					}
-					HDLVariable hv = varTable.get(v.getName());
-					if(hv.getType() instanceof HDLPrimitiveType){
-						HDLInstance inst = genStackForRecursiveCall(hv.getName() + "_call_stack_memory", m.getCallStackSize(), ((HDLPrimitiveType)hv.getType()).getWidth());
-						callStackMap.put(hv, inst);
-					}else{
-						SynthesijerUtils.warn("cannot preserve non-primitive type variable for recursive call:" + v);
-					}
+				}
+				HDLVariable hv = varTable.get(v.getName());
+				if(hv.getType() instanceof HDLPrimitiveType){
+					HDLInstance inst = genStackForRecursiveCall(hv.getName() + "_call_stack_memory", m.getCallStackSize(), ((HDLPrimitiveType)hv.getType()).getWidth());
+					callStackMap.put(hv, inst);
+				}else{
+					SynthesijerUtils.warn("cannot preserve non-primitive type variable for recursive call:" + v);
 				}
 			}
 		}

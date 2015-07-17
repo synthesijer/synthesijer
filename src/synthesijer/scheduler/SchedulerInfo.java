@@ -6,14 +6,24 @@ public class SchedulerInfo {
 	
 	private ArrayList<SchedulerBoard> boardsList = new ArrayList<>();
 	
-	private ArrayList<ArrayList<VariableOperand>> varTableList = new ArrayList<>();
-	
 	private final String name;
+	
+	private final ArrayList<VariableOperand> varList;
 	
 	public SchedulerInfo(String name){
 		this.name = name;
+		varList = new ArrayList<>();
+	}
+
+	private SchedulerInfo(SchedulerInfo i){
+		this.name = i.name;
+		varList = i.varList;
 	}
 	
+	public SchedulerInfo getSameInfo(){
+		return new SchedulerInfo(this);
+	}
+
 	public String getName(){
 		return name;
 	}
@@ -24,16 +34,30 @@ public class SchedulerInfo {
 
 	@SuppressWarnings("unchecked")
 	public ArrayList<VariableOperand>[] getVarTableList(){
-		return varTableList.toArray(new ArrayList[]{});
+		ArrayList<ArrayList<VariableOperand>> ret = new ArrayList<>();
+		ret.add(varList);
+		for(SchedulerBoard b: boardsList){
+			//for(ArrayList<VariableOperand> va : b.getVarTableList()){
+			//	ret.add(va);
+			//}
+			ret.add(b.getVarList());
+		}
+		return ret.toArray(new ArrayList[]{});
 	}
-	
+
 	public void addBoard(SchedulerBoard b){
 		boardsList.add(b);
 	}
-
-	public void addVarTable(ArrayList<VariableOperand> t){
-		varTableList.add(t);
-	}
+	
+//	public void addModuleVarList(ArrayList<VariableOperand> t){
+//		if(varList != null){
+//			SynthesijerUtils.warn("DUPLICATE addModuleVarTable:" + name);
+//		}
+//		this.varList = t;
+//	}
 		
+	public ArrayList<VariableOperand> getModuleVarList(){
+		return varList;
+	}
 	
 }

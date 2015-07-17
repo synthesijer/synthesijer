@@ -23,18 +23,24 @@ public class SchedulerBoard {
 	 */
 	private ArrayList<SchedulerSlot> slots;
 	
-	private ArrayList<ArrayList<VariableOperand>> varTableList = new ArrayList<>();
+	private final ArrayList<VariableOperand> varList;
 	
 	SchedulerBoard(String name, Method m){
 		this.name = name;
 		this.method = m;
-		this.slots = new ArrayList<SchedulerSlot>();
+		this.slots = new ArrayList<>();
+		varList = new ArrayList<>();
 	}
-	
+
+	private SchedulerBoard(SchedulerBoard b){
+		this.name = b.name;
+		this.method = b.method;
+		this.slots = new ArrayList<SchedulerSlot>();
+		this.varList = b.varList;
+	}
+
 	public SchedulerBoard genSameEnvBoard() {
-		SchedulerBoard b = new SchedulerBoard(name, method);
-		b.varTableList = varTableList;
-		return b;
+		return new SchedulerBoard(this);
 	}
 	
 	public String getName(){
@@ -49,13 +55,8 @@ public class SchedulerBoard {
 		return slots.toArray(new SchedulerSlot[]{});
 	}
 
-	public void addVarTable(ArrayList<VariableOperand> t){
-		varTableList.add(t);
-	}
-
-	@SuppressWarnings("unchecked")
-	public ArrayList<VariableOperand>[] getVarTableList(){
-		return varTableList.toArray(new ArrayList[]{});
+	public ArrayList<VariableOperand> getVarList(){
+		return varList;
 	}
 
 	/**
