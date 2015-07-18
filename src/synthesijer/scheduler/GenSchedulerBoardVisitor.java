@@ -637,10 +637,26 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		return isFloat(t) || isDouble(t);
 	}
 	
-	private Type getPreferableType(Type t0, Type t1){
+	/**
+	 * Select preferable type by comparison with t0 and t1
+	 * "Preferable" means that
+	 *   floating is more preferred than integer.
+	 *   For floating,
+	 *    double is more preferred than float.
+	 *   For integer,
+	 *    the one which has longer size is more preferred than the other.  
+	 * @param t0
+	 * @param t1
+	 * @return
+	 * @throws UnsupportedException
+	 */
+	private Type getPreferableType(Type t0, Type t1) throws UnsupportedException{
 		if(t0 == t1){
 			return t0;
 		}
+		if(t0 instanceof ArrayRef) t0 = ((ArrayRef)t0).getRefType().getElemType();
+		if(t1 instanceof ArrayRef) t1 = ((ArrayRef)t1).getRefType().getElemType();
+				
 		if(isFloating(t0) || isFloating(t1)){
 			if(isDouble(t0) || isDouble(t1)) return PrimitiveTypeKind.DOUBLE;
 			return PrimitiveTypeKind.FLOAT; // t0 and/or t1 is float
@@ -648,8 +664,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		int w0 = getWidth(t0);
 		int w1 = getWidth(t1);
 		if(w0 < 0 || w1 < 0){
-			SynthesijerUtils.warn("cannot convert:" + t0 + " <-> " + t1 + ", then use " + t0);
-			return t0; // skip
+			throw new UnsupportedException("["+parent.getBoard().getName()+"] " + "cannot convert:" + t0 + " <-> " + t1 + ", then use " + t0);
+//			return t0; // skip
 		}
 		return w0 > w1 ? t0 : t1;
 	}
@@ -658,14 +674,16 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	public void visitBinaryExpr(BinaryExpr o) {
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
-		Type type;
 		Op op = Op.get(o.getOp(), lhs, rhs);
+		Type type = lhs.getType();
 		
 		
 		if(isCastRequired(lhs.getType(), rhs.getType()) == true){
-			type = getPreferableType(lhs.getType(), rhs.getType()); // select type
-		}else{
-			type = lhs.getType();
+			try{
+				type = getPreferableType(lhs.getType(), rhs.getType()); // select type
+			}catch(UnsupportedException e){
+				SynthesijerUtils.warn(e.toString() + " " + o);
+			}
 		}
 		
 		if(isCastRequired(lhs.getType(), rhs.getType()) == true && lhs.getType() != type){

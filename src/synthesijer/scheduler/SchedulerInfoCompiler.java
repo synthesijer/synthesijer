@@ -1,6 +1,5 @@
 package synthesijer.scheduler;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Enumeration;
@@ -16,7 +15,6 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Type;
 import synthesijer.ast.expr.Literal;
-import synthesijer.ast.expr.NewArray;
 import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
