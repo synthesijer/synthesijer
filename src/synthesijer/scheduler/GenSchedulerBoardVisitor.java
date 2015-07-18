@@ -651,11 +651,13 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	 * @throws UnsupportedException
 	 */
 	private Type getPreferableType(Type t0, Type t1) throws UnsupportedException{
+		
+		if(t0 instanceof ArrayRef) t0 = ((ArrayRef)t0).getRefType().getElemType();
+		if(t1 instanceof ArrayRef) t1 = ((ArrayRef)t1).getRefType().getElemType();
+		
 		if(t0 == t1){
 			return t0;
 		}
-		if(t0 instanceof ArrayRef) t0 = ((ArrayRef)t0).getRefType().getElemType();
-		if(t1 instanceof ArrayRef) t1 = ((ArrayRef)t1).getRefType().getElemType();
 				
 		if(isFloating(t0) || isFloating(t1)){
 			if(isDouble(t0) || isDouble(t1)) return PrimitiveTypeKind.DOUBLE;
