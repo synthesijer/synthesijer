@@ -19,6 +19,10 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	private boolean assignAlwaysFlag;
 	private HDLExpr assignAlwaysExpr;
 	
+	private boolean assignSignalEvelntFlag;
+	private HDLSignal assignSignalEventSig;
+	private HDLExpr assignSignalEventExpr;
+	
 	private final HDLExpr equivExpr;
 	private final boolean equivFlag;
 	
@@ -44,6 +48,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 		this.kind = kind;
 		defaultValue = null;
 		assignAlwaysFlag = false;
+		assignSignalEvelntFlag = false;
 		this.equivExpr = equivExpr;
 		this.equivFlag = equivFlag;
 	}
@@ -178,7 +183,7 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 	public boolean isAssignAlways(){
 		return assignAlwaysFlag;
 	}
-	
+
 	public HDLExpr getAssignAlwaysExpr(){
 		return assignAlwaysExpr;
 	}
@@ -239,6 +244,24 @@ public class HDLSignal implements HDLTree, HDLExpr, HDLVariable, HDLPortPairItem
 		return list.toArray(new HDLSignal[]{});
 	}
 	
+	public boolean isAssignSignalEvent(){
+		return assignSignalEvelntFlag;
+	}
+
+	public void setAssignForSignalEvent(HDLSignal sig, HDLExpr expr){
+		assignSignalEvelntFlag = true;
+		assignSignalEventSig = sig;
+		assignSignalEventExpr = expr;
+	}
+
+	public HDLSignal getAssignSignalEventSig(){
+		return assignSignalEventSig;
+	}
+
+	public HDLExpr getAssignSignalEventExpr(){
+		return assignSignalEventExpr;
+	}
+
 	public class AssignmentCondition{
 		private final SequencerState s;
 		private final HDLExpr value;

@@ -134,6 +134,11 @@ public class HDLCombinationExpr implements HDLExpr{
 				return HDLPrimitiveType.genSignedType(64);
 			case ID:
 				return args[0].getType();
+			case HDLMUL:{
+				int w0 = ((HDLPrimitiveType)(args[0].getType())).getWidth(); 
+				int w1 = ((HDLPrimitiveType)(args[0].getType())).getWidth();
+				return HDLPrimitiveType.genSignedType(w0 + w1);
+			}
 			default:
 				return HDLPrimitiveType.genUnknowType();
 			}
@@ -324,6 +329,11 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case ID:
 				return args[0].getResultExpr().getVHDL();
+			case HDLMUL:{
+				String s = String.format("%s %s %s", toSigned(args[0].getResultExpr()), op.getVHDL(), toSigned(args[1].getResultExpr()));
+				if(getResultExpr().getType().isVector()) s = "std_logic_vector(" + s + ")";
+				return s; 
+			}
 			default:
 				return "(" + op + " " + getArgsString(args) + ")"; 
 			}
@@ -476,6 +486,8 @@ public class HDLCombinationExpr implements HDLExpr{
 			}
 			case ID:
 				return args[0].getResultExpr().getVerilogHDL();
+			case HDLMUL:
+				return String.format("%s %s %s", args[0].getResultExpr().getVerilogHDL(), op.getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 			default:
 				return "(" + op + " " + getArgsString(args) + ")";
 			}

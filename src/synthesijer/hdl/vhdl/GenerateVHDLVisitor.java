@@ -360,14 +360,22 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	
 	@Override
 	public void visitHDLSignal(HDLSignal o) {
-		if(o.isRegister() && !o.isAssignAlways()){
+		if(o.isRegister() && o.isAssignSignalEvent()){
+			HDLUtils.println(dest, offset, String.format("process(%s)", o.getAssignSignalEventSig().getVHDL()));
+			HDLUtils.println(dest, offset, "begin");
+			HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getAssignSignalEventSig().getVHDL(), o.getAssignSignalEventSig().getVHDL()));
+			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignSignalEventExpr().getResultExpr())));
+			HDLUtils.println(dest, offset+2, "end if;");
+			HDLUtils.println(dest, offset, "end process;");
+			HDLUtils.nl(dest);
+		}else if(o.isRegister() && !o.isAssignAlways()){
 			if(o.isIgnore()) return;
 			if(o.getConditions().length == 0 && o.hasDefaultValue() == false) return;
 //			if(o.getConditions().length == 0) return;
 			genSignalRegisterProcess(o);
 		}else if(o.isAssignAlways()){
 			HDLUtils.println(dest, offset, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignAlwaysExpr().getResultExpr())));
-			HDLUtils.nl(dest);
+			HDLUtils.nl(dest);		
 		}
 	}
 
