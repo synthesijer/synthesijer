@@ -2,7 +2,6 @@ package synthesijer.scheduler;
 
 import java.util.Hashtable;
 
-import synthesijer.ast.Expr;
 import synthesijer.ast.Type;
 
 public class VariableOperand implements Operand{
@@ -10,8 +9,6 @@ public class VariableOperand implements Operand{
 	private final String name;
 	
 	private final Type type;
-	
-	//private final Expr initExpr;
 	
 	private final Operand initSrc;
 	
@@ -30,6 +27,8 @@ public class VariableOperand implements Operand{
 	private final boolean volatileFlag;
 	
 	private boolean chaining = false;
+	
+	private boolean isExport = false;
 	
 	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
 	

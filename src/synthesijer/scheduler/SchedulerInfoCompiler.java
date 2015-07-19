@@ -11,11 +11,7 @@ import synthesijer.IdentifierGenerator;
 import synthesijer.Manager;
 import synthesijer.Manager.SynthesijerModuleInfo;
 import synthesijer.SynthesijerUtils;
-import synthesijer.ast.Expr;
-import synthesijer.ast.Method;
 import synthesijer.ast.Type;
-import synthesijer.ast.expr.Literal;
-import synthesijer.ast.expr.TypeCast;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
@@ -130,24 +126,6 @@ public class SchedulerInfoCompiler {
 		return list;
 	}
 	
-	private Pair getMethodParamPair(String methodName, String v){
-		ArrayList<Pair> list = getMethodParamPairList(methodName);
-		for(Pair p: list){
-			if(p.orig.getOrigName().equals(v)) return p;
-		}
-		return null;
-	}
-	
-	private HDLExpr convExprToHDLExpr(Expr expr, HDLPrimitiveType type){
-		if(expr instanceof Literal){
-			return new HDLValue(((Literal)expr).getValueAsStr(), type);
-		}else if(expr instanceof TypeCast){
-			return convExprToHDLExpr(((TypeCast)expr).getExpr(), type);
-		}else{
-			return null;
-		}
-	}
-
 	private HDLExpr convConstantToHDLExpr(ConstantOperand c){
 		HDLPrimitiveType type = (HDLPrimitiveType)getHDLType(c.getType());
 		//HDLSignal tmp = hm.newSignal(String.format("constant_%04d", constIdGen.id()), type);
@@ -561,7 +539,7 @@ public class SchedulerInfoCompiler {
 				for(Pair pair: paramList){
 					// MUX to select valid siganl from inside/outside arguments
 					HDLExpr arg;
-					if(board.getMethod().isPrivate() == false){
+					if(board.isPrivate() == false){
 						arg = hm.newExpr(HDLOp.IF, varTable.get(board.getName()+"_req"), pair.port.getSignal(), pair.local);
 					}else{
 						arg = pair.local;
@@ -963,24 +941,23 @@ public class SchedulerInfoCompiler {
 	private Hashtable<SchedulerBoard, HDLSignal> returnSigTable = new Hashtable<>();
 
 	private void genMethodCtrlSignals(SchedulerBoard board, Hashtable<HDLVariable, HDLInstance> callStackMap){
-		Method m = board.getMethod();
 	
-		if(m.getType() != PrimitiveTypeKind.VOID){
-			if(board.getMethod().isPrivate() == false){
-				HDLPort return_port = hm.newPort(board.getName() + "_return", HDLPort.DIR.OUT, getHDLType(m.getType()));
+		if(board.getReturnType() != PrimitiveTypeKind.VOID){
+			if(board.isPrivate() == false){
+				HDLPort return_port = hm.newPort(board.getName() + "_return", HDLPort.DIR.OUT, getHDLType(board.getReturnType()));
 				returnSigTable.put(board, return_port.getSignal());
 			}else{
-				HDLSignal return_sig = hm.newSignal(board.getName() + "_return", getHDLType(m.getType()));
+				HDLSignal return_sig = hm.newSignal(board.getName() + "_return", getHDLType(board.getReturnType()));
 				returnSigTable.put(board, return_sig);
 			}
 		}
 
-		if(board.getMethod().isAuto()){
+		if(board.isAuto()){
 			return; 
 		}
 		
 		// generating a busy port signal
-		if(board.getMethod().isPrivate() == false){ // public
+		if(board.isPrivate() == false){ // public
 			HDLPort busy_port = hm.newPort(board.getName() + "_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
 			busy_port.getSignal().setResetValue(HDLPreDefinedConstant.HIGH);
 			varTable.put(busy_port.getName(), busy_port.getSignal());
@@ -991,7 +968,7 @@ public class SchedulerInfoCompiler {
 				
 		HDLSignal req_flag = hm.newSignal(board.getName() + "_req_flag", HDLPrimitiveType.genBitType());
 		HDLSignal req_local = hm.newSignal(board.getName() + "_req_local", HDLPrimitiveType.genBitType());
-		if(board.getMethod().isPrivate() == false){ // public
+		if(board.isPrivate() == false){ // public
 			HDLPort req_port = hm.newPort(board.getName() + "_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 			varTable.put(req_port.getName(), req_port.getSignal());
 			req_flag.setAssign(null, hm.newExpr(HDLOp.OR, req_local, req_port.getSignal()));
@@ -1002,15 +979,15 @@ public class SchedulerInfoCompiler {
 		varTable.put(req_flag.getName(), req_flag);
 		varTable.put(req_local.getName(), req_local);
 		
-		if(m.hasCallStack()){
-			HDLInstance call_stack = genStackForRecursiveCall(m.getName() + "_call_stack_memory", m.getCallStackSize(), 16);
+		if(board.hasCallStack()){
+			HDLInstance call_stack = genStackForRecursiveCall(board.getName() + "_call_stack_memory", board.getCallStackSize(), 16);
 			for(VariableOperand v: board.getVarList()){
 				if(v.getMethodName() == null){
 						continue; // skip non-user defined variable
 				}
 				HDLVariable hv = varTable.get(v.getName());
 				if(hv.getType() instanceof HDLPrimitiveType){
-					HDLInstance inst = genStackForRecursiveCall(hv.getName() + "_call_stack_memory", m.getCallStackSize(), ((HDLPrimitiveType)hv.getType()).getWidth());
+					HDLInstance inst = genStackForRecursiveCall(hv.getName() + "_call_stack_memory", board.getCallStackSize(), ((HDLPrimitiveType)hv.getType()).getWidth());
 					callStackMap.put(hv, inst);
 				}else{
 					SynthesijerUtils.warn("cannot preserve non-primitive type variable for recursive call:" + v);
@@ -1055,12 +1032,11 @@ public class SchedulerInfoCompiler {
 		HDLSequencer seq = hm.newSequencer(board.getName() + "_method");
 		IdGen id = new IdGen("S");
 		Hashtable<Integer, SequencerState> states = new Hashtable<>();
-		Method m = board.getMethod();
 		
 		HDLVariable busy_port_sig = null, req_flag = null, req_flag_d = null, req_flag_edge = null;
 		HDLInstance call_stack = hm.getModuleInstance(board.getName() + "_call_stack_memory");
 
-		if(board.getMethod().isAuto() == false){
+		if(board.isAuto() == false){
 			req_flag = varTable.get(board.getName() + "_req_flag");
 			busy_port_sig = varTable.get(board.getName() + "_busy");
 			
@@ -1091,13 +1067,13 @@ public class SchedulerInfoCompiler {
 					HDLExpr unlock = null;
 					HDLExpr wait_with_unlock = null;
 
-					if(m.getWaitWithMethod() != null){ // must wait for other method, such as join
-						HDLVariable flag = varTable.get(m.getWaitWithMethod().getName() + "_busy");
+					if(board.hasWaitDependsBoard()){ // must wait for other method, such as join
+						HDLVariable flag = varTable.get(board.getWaitDependsBoardName() + "_busy");
 						wait_with_unlock = hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW); // the waiting method has been done.
 						unlock = wait_with_unlock;
 					}
 					
-					if(m.hasCallStack()){
+					if(board.hasCallStack()){
 						HDLExpr stack_bottom = hm.newExpr(HDLOp.EQ, call_stack.getSignalForPort("address_b"), HDLPreDefinedConstant.INTEGER_ZERO);
 						// unlock is updated with this stack bottom condition 
 						unlock = (unlock == null) ? stack_bottom : hm.newExpr(HDLOp.AND, stack_bottom, unlock);
@@ -1109,7 +1085,7 @@ public class SchedulerInfoCompiler {
 						s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 					}
 					
-					if(board.getMethod().isAuto() == false){
+					if(board.isAuto() == false){
 						if(unlock != null){
 							busy_port_sig.setAssign(s, hm.newExpr(HDLOp.IF, unlock, HDLPreDefinedConstant.LOW, HDLPreDefinedConstant.HIGH));
 						}else{
@@ -1121,7 +1097,7 @@ public class SchedulerInfoCompiler {
 					break;
 				}
 				case METHOD_ENTRY:{
-					if(m.isAuto()){
+					if(board.isAuto()){
 						s.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 					}else{
 						s.addStateTransit(hm.newExpr(HDLOp.OR, req_flag, req_flag_d), states.get(item.getSlot().getNextStep()[0]));
@@ -1302,7 +1278,7 @@ public class SchedulerInfoCompiler {
 		}
 		seq.getIdleState().addStateTransit(states.get(0));
 		
-		if(board.getMethod().isAuto() == false){
+		if(board.isAuto() == false){
 			if(methodEntryState != null && methodIdleState != null){
 				HDLSignal sig = methodEntryState.getKey();  
 				sig.setAssignForSequencer(seq,
@@ -1313,11 +1289,11 @@ public class SchedulerInfoCompiler {
 			}
 		}
 
-		if(m.hasCallStack()){
+		if(board.hasCallStack()){
 			HDLExpr unlock = null;
 			
-			if(m.getWaitWithMethod() != null){ // must wait for other method, such as join
-				HDLVariable flag = varTable.get(m.getWaitWithMethod().getName() + "_busy");
+			if(board.hasWaitDependsBoard()){ // must wait for other method, such as join
+				HDLVariable flag = varTable.get(board.getWaitDependsBoardName() + "_busy");
 				unlock = hm.newExpr(HDLOp.EQ, flag, HDLPreDefinedConstant.LOW); // the waiting method has been done.
 			}
 			Enumeration<Integer> i = returnTable.keys();
