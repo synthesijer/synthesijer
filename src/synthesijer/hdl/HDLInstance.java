@@ -124,6 +124,15 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		return null;
 	}
 
+	public void setParameterOverwrite(String name, String value){
+		for(ParamPair pair: params){
+			if(pair.param.getName().equals(name)){
+				pair.value = value;
+				return; 
+			}
+		}
+	}
+
 	public ArrayList<ParamPair> getParameterPairs(){
 		return params;
 	}

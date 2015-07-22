@@ -149,9 +149,9 @@ public class VariableOperand implements Operand{
 	    s += " :method " + getMethodName();
 	    s += " :private_method " + isPrivateMethod();
 	    s += " :volatile " + isVolatileFlag();
-		s += ", chaining=" + chaining;
+		s += " :chaining " + chaining;
 		if(initSrc != null){
-			s += ", init=" + initSrc.info();
+			s += " :init " + initSrc.info();
 		}
 		s += ")";
 
