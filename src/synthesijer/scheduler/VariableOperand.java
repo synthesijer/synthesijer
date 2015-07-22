@@ -136,4 +136,26 @@ public class VariableOperand implements Operand{
 		return s;
 	}
 
+	public String toSexp(){
+		String s = "";
+		s += "(";
+		s += "VAR";
+		s += " " + type;
+		s += " " + name;
+	    s += " :public " + isPublic();
+	    s += " :global_constant " + isGlobalConstant();
+	    s += " :method_param " + methodParamFlag;
+	    s += " :orginal " + getOrigName();
+	    s += " :method " + getMethodName();
+	    s += " :private_method " + isPrivateMethod();
+	    s += " :volatile " + isVolatileFlag();
+		s += ", chaining=" + chaining;
+		if(initSrc != null){
+			s += ", init=" + initSrc.info();
+		}
+		s += ")";
+
+		return s;
+	}
+
 }

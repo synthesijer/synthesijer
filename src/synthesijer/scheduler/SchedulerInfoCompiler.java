@@ -142,16 +142,17 @@ public class SchedulerInfoCompiler {
 		if(type == PrimitiveTypeKind.VOID) return null; // Void variable is not synthesized.
 		HDLSignal sig = hm.newSignal(name, getHDLType(type));
 //		if(v.getInitExpr() != null && v.getInitExpr().isConstant()){
-		if(v.getInitSrc() != null && v.getInitSrc() instanceof ConstantOperand){
-//			HDLExpr e = convExprToHDLExpr(v.getInitExpr(), (HDLPrimitiveType)sig.getType());
-			HDLExpr e = convConstantToHDLExpr((ConstantOperand)(v.getInitSrc()));
-			if(e == null){
-				//SynthesijerUtils.warn("initial value is not allowed:" + v.getVariable().getInitExpr());
+		if(v.getInitSrc() != null){
+			if(v.getInitSrc() instanceof ConstantOperand){
+				HDLExpr e = convConstantToHDLExpr((ConstantOperand)(v.getInitSrc()));
+				if(e == null){
+					SynthesijerUtils.warn("initial value is not allowed:" + v.getInitSrc());
+				}else{
+					sig.setResetValue(e);
+				}
 			}else{
-				sig.setResetValue(e);
+				SynthesijerUtils.warn("only litral for initial value is allowed: " + v.getName() + ":" + v.getInitSrc());
 			}
-		}else{
-			//SynthesijerUtils.warn("only litral for initial value is allowed: " + v.getName() + ":" + v.getVariable().getInitExpr());
 		}
 		if(v.isMethodParam()){
 			if(v.isPrivateMethod()){

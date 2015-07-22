@@ -163,7 +163,16 @@ public class SchedulerItem {
 	}
 
 	public String toSexp(){
-		String s = String.format("(ITEM %s %s (%s) :next %s", op, destInfo(), srcInfo(), branchList());
+		String s = "(ITEM";
+		s += " " + op;
+		if(dest == null){
+			s += " VOID";
+		}else{
+			s += " " + destInfo();
+		}
+		s += " (" + srcInfo() + ")";
+		s += " :next " + branchList();
+		s += ")";
 		return s;
 	}
 

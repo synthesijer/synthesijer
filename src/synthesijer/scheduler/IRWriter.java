@@ -60,19 +60,7 @@ public class IRWriter {
 	}
 
 	private void gen_variable(PrintStream ir, VariableOperand v){
-		String s = "    ";
-		s += "(";
-		s += "VAR";
-		s += " " + v.getType();
-		s += " " + v.getName();
-	    s += " :public " + v.isPublic();
-	    s += " :global_constant " + v.isGlobalConstant();
-	    s += " :orginal " + v.getOrigName();
-	    s += " :method " + v.getMethodName();
-	    s += " :private_method " + v.isPrivateMethod();
-	    s += " :volatile " + v.isVolatileFlag();
-	    s += " :init " + v.getInitSrc();
-		s += ")";
+		String s = "    " + v.toSexp();
 		ir.println(s);
 	}
 }
