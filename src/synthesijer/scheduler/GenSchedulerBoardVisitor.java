@@ -455,7 +455,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 					}
 				}
 			}
-
+			v.setInitSrc(src);
 			addSchedulerItem(new SchedulerItem(board, Op.ASSIGN, new Operand[]{src}, v));
 		}
 	}

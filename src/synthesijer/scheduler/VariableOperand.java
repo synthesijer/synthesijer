@@ -10,7 +10,7 @@ public class VariableOperand implements Operand{
 	
 	private final Type type;
 	
-	private final Operand initSrc;
+	private Operand initSrc;
 	
 	private final boolean publicFlag;
 	
@@ -67,7 +67,11 @@ public class VariableOperand implements Operand{
 	public Operand getInitSrc(){
 		return initSrc;
 	}
-	
+
+	public void setInitSrc(Operand src){
+		initSrc = src;
+	}
+
 	public boolean isPublic(){
 		return publicFlag;
 	}
