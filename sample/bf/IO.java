@@ -7,7 +7,8 @@ public class IO {
 	}
 
 	public byte getchar() {
-		byte b = obj.read();
+		byte b;
+		b = obj.read();
 		return b;
 	}
 

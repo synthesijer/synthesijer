@@ -47,7 +47,8 @@ public class BF {
 	public void print() {
 		boolean flag = true;
 		for (int i = 0; i < CODESIZE; i++) {
-			byte b = prog[i];
+			byte b;
+			b = prog[i];
 			if (b == 0) {
 				break;
 			}
@@ -57,13 +58,15 @@ public class BF {
 	}
 
 	private void put_hex(byte b) {
-		byte h = (byte) ((b >> 4) & 0x0F);
+		byte h;
+		h = (byte) ((b >> 4) & 0x0F);
 		if (0 <= h && h <= 9) {
 			io.putchar((byte) (h + '0'));
 		} else {
 			io.putchar((byte) ((h - 10) + 'A'));
 		}
-		byte l = (byte) ((b >> 0) & 0x0F);
+		byte l;
+		l = (byte) ((b >> 0) & 0x0F);
 		if (0 <= h && l <= 9) {
 			io.putchar((byte) (l + '0'));
 		} else {
@@ -87,7 +90,8 @@ public class BF {
 //System.out.printf("[2]=%02x\n", data[2]);
 //System.out.printf("pc=%02x\n", pc);
 //System.out.printf("ptr=%02x\n", ptr);
-		byte cmd = prog[pc];
+		byte cmd;
+		cmd = prog[pc];
 		byte tmp;
 		int nlvl = 0;
 		switch (cmd) {
