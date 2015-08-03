@@ -25,7 +25,6 @@ public enum GlobalSymbolTable {
 	public void add(Module m){
 		ClassInfo i = new ClassInfo();
 		map.put(m.getName(), i);
-		
 		for(Method method: m.getMethods()){
 			i.methods.put(method.getName(), new MethodInfo(method));
 		}

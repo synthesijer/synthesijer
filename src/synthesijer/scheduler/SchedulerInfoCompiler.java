@@ -151,7 +151,7 @@ public class SchedulerInfoCompiler {
 					sig.setResetValue(e);
 				}
 			}else{
-				SynthesijerUtils.warn("only litral for initial value is allowed: " + v.getName() + ":" + v.getInitSrc());
+				SynthesijerUtils.warn("only litral for initial value is allowed: " + v.getName() + ":" + v.getInitSrc().info());
 			}
 		}
 		if(v.isMethodParam()){
@@ -192,7 +192,7 @@ public class SchedulerInfoCompiler {
 			array.getParameterPair("DEPTH").setValue(String.valueOf(depth));
 		}else{
 			if(initSrc != null){
-				SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + initSrc.info());
+				//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + initSrc.info());
 			}else{
 				SynthesijerUtils.warn("unsupported to array initializing expression.");
 			}

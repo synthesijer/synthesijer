@@ -834,14 +834,14 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		for (Expr expr : o.getDimExpr()) {
 			expr.accept(this); // expected integer literal for array size
 		}
-		if(o.getDimExpr().get(0) instanceof Literal){
+		if(o.getDimExpr().size() > 0 && o.getDimExpr().get(0) instanceof Literal){
 			Literal value = (Literal)(o.getDimExpr().get(0));
 			int words = Integer.valueOf(value.getValueAsStr());
 			int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
 			result = new ArrayRefOperand("", o.getType(), depth, words);
 		}else{
-			SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
-			SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
+			//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
+			//SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
 		}
 	}
 
