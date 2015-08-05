@@ -163,15 +163,36 @@ public class SchedulerItem {
 	}
 
 	public String toSexp(){
-		String s = "(ITEM";
-		s += " " + op;
+		String sep = "";
+		String s = "(" + op;
+		
+		// destination operand
 		if(dest == null){
 			s += " VOID";
 		}else{
-			s += " " + destInfo();
+			//s += " " + destInfo();
+			s += " " + dest.getName();
 		}
-		s += " (" + srcInfo() + ")";
-		s += " :next " + branchList();
+		
+		// source operands
+		//s += " (" + srcInfo() + ")";
+		s += " (";
+		if(src != null){
+			for(Operand o: src){
+				s += sep + o.getName(); sep = " ";
+			}
+			sep = "";
+		}
+		s += ")";
+		
+		// next
+		s += " :next";
+		s += " (";
+		for(int id: getSlot().getNextStep()){
+			s += sep + id; sep = " ";
+		}
+		s += ")";
+		
 		s += ")";
 		return s;
 	}

@@ -18,4 +18,9 @@ public class ComponentType implements Type{
 	public void accept(SynthesijerAstTypeVisitor v){
 		v.visitComponentType(this);
 	}
+	
+	public String toString(){
+		return "ComponentType::" + name;
+	}
+
 }

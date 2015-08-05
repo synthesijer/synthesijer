@@ -56,9 +56,12 @@ public class SchedulerInfoCompiler {
 	private Hashtable<String, HDLVariable> varTable = new Hashtable<>();
 
 	private void genDeclarations(){
-		for(ArrayList<VariableOperand> t: info.getVarTableList()){
-			for(VariableOperand v: t){
-				Optional<HDLVariable> var = Optional.ofNullable(genHDLVariable(v));
+		//for(ArrayList<VariableOperand> t: info.getVarTableList()){
+		for(ArrayList<Operand> t: info.getVarTableList()){
+			//for(VariableOperand v: t){
+			for(Operand v: t){
+				if(!(v instanceof VariableOperand)) continue;
+				Optional<HDLVariable> var = Optional.ofNullable(genHDLVariable((VariableOperand)v));
 				var.ifPresent(x -> varTable.put(v.getName(), x));
 			}
 		}
@@ -1000,8 +1003,10 @@ public class SchedulerInfoCompiler {
 		
 		if(board.hasCallStack()){
 			HDLInstance call_stack = genStackForRecursiveCall(board.getName() + "_call_stack_memory", board.getCallStackSize(), 16);
-			for(VariableOperand v: board.getVarList()){
-				if(v.getMethodName() == null){
+			//for(VariableOperand v: board.getVarList()){
+			for(Operand v: board.getVarList()){
+				if(!(v instanceof VariableOperand)) continue;
+				if(((VariableOperand)v).getMethodName() == null){
 						continue; // skip non-user defined variable
 				}
 				HDLVariable hv = varTable.get(v.getName());

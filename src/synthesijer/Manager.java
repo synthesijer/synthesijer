@@ -53,6 +53,7 @@ import synthesijer.lib.SimpleBlockRAM;
 import synthesijer.scheduler.GenSchedulerBoardVisitor;
 import synthesijer.scheduler.GlobalSymbolTable;
 import synthesijer.scheduler.IRWriter;
+import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
@@ -196,8 +197,10 @@ public enum Manager {
 				){
 			(new IRWriter(si.getName() + "_scheduler_board_" + postfix)).generate(si);
 			txt.println("Variables:");
-			for(ArrayList<VariableOperand> va: si.getVarTableList()){
-				for(VariableOperand v: va){
+			//for(ArrayList<VariableOperand> va: si.getVarTableList()){
+			for(ArrayList<Operand> va: si.getVarTableList()){
+				//for(VariableOperand v: va){
+				for(Operand v: va){
 					txt.println(v.dump());
 				}
 			}

@@ -1,5 +1,6 @@
 package synthesijer.scheduler;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import synthesijer.ast.Type;
@@ -162,10 +163,28 @@ public class VariableOperand implements Operand{
 	    s += " :method " + getMethodName();
 	    s += " :private_method " + isPrivateMethod();
 	    s += " :volatile " + isVolatileFlag();
-		s += " :chaining " + chaining;
+	    if(chaining){
+	    	String sep = "";
+	    	s += " :chaining (";
+	    	Enumeration<SchedulerItem> e = predItemMap.keys();
+	    	while(e.hasMoreElements()){
+	    		SchedulerItem k = e.nextElement();
+	    		s += sep + "(" + k.getStepId() + " " + predItemMap.get(k).getStepId() + ")";
+	    		sep = " ";
+	    	}
+			s += ")";
+		}
 		s += " :member " + isMember();
 		if(initSrc != null){
-			s += " :init " + initSrc.info();
+			//s += " :init " + initSrc.toSexp();
+			s += " :init (REF";
+			if(initSrc instanceof VariableOperand){ s += " VAR "; }
+			else if(initSrc instanceof ArrayRefOperand){ s += " ARRAY "; }
+			else if(initSrc instanceof InstanceRefOperand){ s += " INSTANCE "; }
+			else if(initSrc instanceof ConstantOperand){ s += " CONSTANT "; }
+			else{s += " UNKNOWN "; }
+			s += initSrc.getName();
+			s += ")";
 		}
 		s += ")";
 

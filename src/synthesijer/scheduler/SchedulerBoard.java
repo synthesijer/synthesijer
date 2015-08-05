@@ -25,7 +25,8 @@ public class SchedulerBoard {
 	 */
 	private ArrayList<SchedulerSlot> slots;
 	
-	private final ArrayList<VariableOperand> varList;
+	//private final ArrayList<VariableOperand> varList;
+	private final ArrayList<Operand> varList;
 	
 	private final Type returnType;
 	
@@ -112,7 +113,8 @@ public class SchedulerBoard {
 		return slots.toArray(new SchedulerSlot[]{});
 	}
 
-	public ArrayList<VariableOperand> getVarList(){
+//	public ArrayList<VariableOperand> getVarList(){
+	public ArrayList<Operand> getVarList(){
 		return varList;
 	}
 

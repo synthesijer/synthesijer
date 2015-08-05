@@ -21,6 +21,11 @@ public class ArrayRefOperand implements Operand{
 	}
 	
 	@Override
+	public String getName(){
+		return name;
+	}
+	
+	@Override
 	public Type getType(){
 		return type;
 	}
@@ -34,4 +39,17 @@ public class ArrayRefOperand implements Operand{
 	public String info(){
 		return "ArrayRef<" + getType() + ">(depth=" + depth + ", words=" + words + ")";
 	}
+
+	@Override
+	public String dump(){
+		return toSexp();
+	}	
+	
+	@Override
+	public String toSexp(){
+		String s = "(ARRAY-REF " + getType() + " " + getName();
+		s += " ((depth " + depth + ")" + " (words " + words + ")" + "))";
+		return s;
+	}
+
 }

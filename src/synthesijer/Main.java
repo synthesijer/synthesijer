@@ -61,7 +61,7 @@ public class Main {
 		}
 		
 		if(result.isOK()){
-			dump("dump000.xml");
+			//dump("dump000.xml");
 			Manager.INSTANCE.preprocess();
 			Manager.INSTANCE.generate(options);
 			if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);

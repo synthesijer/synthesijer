@@ -18,7 +18,8 @@ public class IRWriter {
 			PrintStream ir = new PrintStream(new FileOutputStream(new File(name + ".ir")));
 			){
 			ir.println("(MODULE " + info.getName());
-			genVariables(ir, info.getModuleVarList().toArray(new VariableOperand[]{}));
+			//genVariables(ir, info.getModuleVarList().toArray(new VariableOperand[]{}));
+			genVariables(ir, info.getModuleVarList().toArray(new Operand[]{}));
 			for(SchedulerBoard b: info.getBoardsList()){
 				genSchedulerBoard(ir, b);
 			}
@@ -30,8 +31,9 @@ public class IRWriter {
 	}
 	
 	private void genSchedulerBoard(PrintStream ir, SchedulerBoard b){
-		ir.println(" (BOARD " + b.getName());
-		genVariables(ir, b.getVarList().toArray(new VariableOperand[]{}));
+		ir.println(" (BOARD " + b.getReturnType() + " " + b.getName());
+		//genVariables(ir, b.getVarList().toArray(new VariableOperand[]{}));
+		genVariables(ir, b.getVarList().toArray(new Operand[]{}));
 		ir.println("    (SEQUENCER " + b.getName());
 		for(SchedulerSlot s: b.getSlots()){
 			genSchedulerSlot(ir, s);
@@ -51,15 +53,18 @@ public class IRWriter {
 		ir.println("        " + item.toSexp());
 	}
 
-	private void genVariables(PrintStream ir, VariableOperand[] vars){
+	//private void genVariables(PrintStream ir, VariableOperand[] vars){
+	private void genVariables(PrintStream ir, Operand[] vars){
 		ir.println("  (variables ");
-		for(VariableOperand v: vars){
+		//for(VariableOperand v: vars){
+		for(Operand v: vars){
 			gen_variable(ir, v);
 		}
 		ir.println("  )");
 	}
 
-	private void gen_variable(PrintStream ir, VariableOperand v){
+	//private void gen_variable(PrintStream ir, VariableOperand v){
+	private void gen_variable(PrintStream ir, Operand v){
 		String s = "    " + v.toSexp();
 		ir.println(s);
 	}

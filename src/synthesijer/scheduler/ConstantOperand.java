@@ -7,13 +7,16 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class ConstantOperand implements Operand{
 	
+	private final String name;
+	
 	private final String value;
 	
 	private final String origValue;
 	
 	private Type type;
 	
-	public ConstantOperand(String value, Type type){
+	public ConstantOperand(String name, String value, Type type){
+		this.name = name;
 		this.origValue = value;
 		if(type instanceof PrimitiveTypeKind){
 			switch((PrimitiveTypeKind)type){
@@ -46,6 +49,11 @@ public class ConstantOperand implements Operand{
 	}
 	
 	@Override
+	public String getName(){
+		return name;
+	}
+	
+	@Override
 	public Type getType(){
 		return type;
 	}
@@ -72,4 +80,14 @@ public class ConstantOperand implements Operand{
 		return false;
 	}
 
+	@Override
+	public String dump(){
+		return toSexp();
+	}	
+
+	@Override
+	public String toSexp(){
+		return "(CONSTANT " + type + " " +  getName() + " " + value + ")";
+	}
+	
 }

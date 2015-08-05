@@ -8,7 +8,8 @@ public class SchedulerInfo {
 	
 	private final String name;
 	
-	private final ArrayList<VariableOperand> varList;
+	//private final ArrayList<VariableOperand> varList;
+	private final ArrayList<Operand> varList;
 	
 	public SchedulerInfo(String name){
 		this.name = name;
@@ -33,8 +34,10 @@ public class SchedulerInfo {
 	}
 
 	@SuppressWarnings("unchecked")
-	public ArrayList<VariableOperand>[] getVarTableList(){
-		ArrayList<ArrayList<VariableOperand>> ret = new ArrayList<>();
+	//public ArrayList<VariableOperand>[] getVarTableList(){
+	public ArrayList<Operand>[] getVarTableList(){
+		//ArrayList<ArrayList<VariableOperand>> ret = new ArrayList<>();
+		ArrayList<ArrayList<Operand>> ret = new ArrayList<>();
 		ret.add(varList);
 		for(SchedulerBoard b: boardsList){
 			//for(ArrayList<VariableOperand> va : b.getVarTableList()){
@@ -56,7 +59,8 @@ public class SchedulerInfo {
 //		this.varList = t;
 //	}
 		
-	public ArrayList<VariableOperand> getModuleVarList(){
+	//public ArrayList<VariableOperand> getModuleVarList(){
+	public ArrayList<Operand> getModuleVarList(){
 		return varList;
 	}
 	

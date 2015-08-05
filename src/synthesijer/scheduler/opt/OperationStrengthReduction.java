@@ -1,5 +1,6 @@
 package synthesijer.scheduler.opt;
 
+import synthesijer.IdentifierGenerator;
 import synthesijer.scheduler.ConstantOperand;
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
@@ -10,6 +11,8 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class OperationStrengthReduction implements SchedulerInfoOptimizer{
+	
+	private final IdentifierGenerator idGen = new IdentifierGenerator();
 
 	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
@@ -61,7 +64,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		int shift = (int)log2(value);
 		item.overwriteOp(Op.SIMPLE_LSHIFT32);
 		item.overwriteSrc(0, v);
-		item.overwriteSrc(1, new ConstantOperand(String.valueOf(shift), k.getType()));
+		item.overwriteSrc(1, new ConstantOperand(String.format("reduction_constant_%05d", idGen.id()), String.valueOf(shift), k.getType()));
 		return item;
 	}
 	
@@ -77,7 +80,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		}
 		int shift = (int)log2(value);
 		item.overwriteOp(Op.SIMPLE_ARITH_RSHIFT32);
-		item.overwriteSrc(1, new ConstantOperand(String.valueOf(shift), k.getType()));
+		item.overwriteSrc(1, new ConstantOperand(String.format("reduction_constant_%05d", idGen.id()), String.valueOf(shift), k.getType()));
 		return item;
 	}
 	

@@ -41,6 +41,11 @@ public class InstanceRefOperand implements Operand{
 	public boolean isChaining(SchedulerItem ctx) {
 		return false;
 	};
+	
+	@Override
+	public String getName(){
+		return name;
+	}
 		
 	@Override
 	public Type getType(){
@@ -56,6 +61,23 @@ public class InstanceRefOperand implements Operand{
 			sep = ", ";
 		}
 		s += ")";
+		return s;
+	}
+
+	@Override
+	public String dump(){
+		return toSexp();
+	}	
+
+	@Override
+	public String toSexp(){
+		String s = "(INSTANCE-REF " + className + " " + getName() + " (";
+		String sep = "(";
+		for(ParamPair p: parameters){
+			s += sep + "(" + p.key + " " + p.value + ")";
+			sep = " ";
+		}
+		s += "))";
 		return s;
 	}
 

@@ -97,7 +97,8 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	private SchedulerItem lastItem;
 	
 	private final Hashtable<String, VariableOperand> varTable = new Hashtable<>();
-	private final ArrayList<VariableOperand> varList;
+	//private final ArrayList<VariableOperand> varList;
+	private final ArrayList<Operand> varList;
 	
 	private SchedulerItem methodExit;
 	
@@ -153,6 +154,10 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	
 	public void addVariable(String name, VariableOperand v){
 		varTable.put(name, v);
+		varList.add(v);
+	}
+	
+	public void addVariable(Operand v){
 		varList.add(v);
 	}
 	
@@ -451,7 +456,8 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 						if(tmp != null) src = tmp;
 					}else if(src instanceof ConstantOperand){
 						// regenerate constant with appropriate type info.
-						src = new ConstantOperand(((ConstantOperand) src).getOrigValue(), v.getType());
+						src = new ConstantOperand(String.format("constant_%05d", idGen.id()), ((ConstantOperand) src).getOrigValue(), v.getType());
+						addVariable(src);
 					}
 				}
 			}
@@ -799,7 +805,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitLitral(Literal o) {
-		result = new ConstantOperand(o.getValueAsStr(), o.getType());
+		result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), o.getValueAsStr(), o.getType());
+		parent.addVariable(result);
 	}
 
 	@Override
@@ -838,8 +845,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			Literal value = (Literal)(o.getDimExpr().get(0));
 			int words = Integer.valueOf(value.getValueAsStr());
 			int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
-			//result = new ArrayRefOperand("", o.getType(), depth, words);
-			result = new ArrayRefOperand("", o.getType(), depth, words);
+			result = new ArrayRefOperand(String.format("array_%05d", parent.getIdGen().id()), o.getType(), depth, words);
+			parent.addVariable(result);
 		}else{
 			//System.out.println("size = " + o.getDimExpr().size());
 			SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
@@ -850,7 +857,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	@Override
 	public void visitNewClassExpr(NewClassExpr o) {
 		
-		InstanceRefOperand ref = new InstanceRefOperand("", o.getType(), o.getClassName());
+		InstanceRefOperand ref = new InstanceRefOperand(String.format("inst_%05d", parent.getIdGen().id()), o.getType(), o.getClassName());
+		parent.addVariable(ref);
 
 		for (Expr expr : o.getParameters()) {
 			//expr.accept(this);
@@ -881,15 +889,18 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			result = parent.addCast(v, o.getType());
 		}else if(v instanceof ConstantOperand){
 			//System.out.println(((ConstantOperand) v).getValue());
-			result = new ConstantOperand(((ConstantOperand) v).getOrigValue(), o.getType());
+			result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), ((ConstantOperand) v).getOrigValue(), o.getType());
+			parent.addVariable(result);
 		}
 	}
 
 	@Override
 	public void visitUnaryExpr(UnaryExpr o) {
 		Operand v = stepIn(o.getArg());
-		ConstantOperand c1 = new ConstantOperand("1", v.getType());
-		ConstantOperand c0 = new ConstantOperand("0", v.getType());
+		ConstantOperand c1 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "1", v.getType());
+		parent.addVariable(c1);
+		ConstantOperand c0 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "0", v.getType());
+		parent.addVariable(c0);
 		switch(o.getOp()){
 		case INC:{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
