@@ -151,7 +151,9 @@ public class SchedulerInfoCompiler {
 					sig.setResetValue(e);
 				}
 			}else{
-				SynthesijerUtils.warn("only litral for initial value is allowed: " + v.getName() + ":" + v.getInitSrc().info());
+				if(v.isMember()){
+					SynthesijerUtils.warn("only litral for initial value of member is allowed: " + v.getName() + ":" + v.getInitSrc().info());
+				}
 			}
 		}
 		if(v.isMethodParam()){

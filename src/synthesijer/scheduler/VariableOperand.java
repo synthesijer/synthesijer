@@ -1,6 +1,5 @@
 package synthesijer.scheduler;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import synthesijer.ast.Type;
@@ -31,17 +30,29 @@ public class VariableOperand implements Operand{
 	
 	private boolean isExport = false;
 	
+	private final boolean memberFlag;
+	
 	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
 	
-	public VariableOperand(String name, Type type){
-		this(name, type, null, false, false, false, name, null, false, false);
+	public VariableOperand(String name, Type type, boolean memberFlag){
+		this(name, type, null, false, false, false, name, null, false, false, memberFlag);
 	}
 
-//	public VariableOperand(String name, Type type, Expr initExpr, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag, boolean volatileFlag){
-	public VariableOperand(String name, Type type, Operand initSrc, boolean publicFlag, boolean globalConstantFlag, boolean methodParamFlag, String origName, String methodName, boolean privateMethodFlag, boolean volatileFlag){
+	public VariableOperand(
+			String name,
+			Type type,
+			Operand initSrc,
+			boolean publicFlag,
+			boolean globalConstantFlag,
+			boolean methodParamFlag,
+			String origName,
+			String methodName,
+			boolean privateMethodFlag,
+			boolean volatileFlag,
+			boolean memberFlag
+			){
 		this.name = name;
 		this.type = type;
-		//this.initExpr = initExpr;
 		this.initSrc = initSrc;
 		this.publicFlag = publicFlag;
 		this.globalConstantFlag = globalConstantFlag;
@@ -50,6 +61,7 @@ public class VariableOperand implements Operand{
 		this.methodName = methodName;
 		this.privateMethodFlag = privateMethodFlag;
 		this.volatileFlag = volatileFlag;
+		this.memberFlag = memberFlag;
 	}
 
 	public String getName(){
@@ -61,10 +73,6 @@ public class VariableOperand implements Operand{
 		return type;
 	}
 	
-//	public Expr getInitExpr(){
-//	return initExpr;
-//}
-
 	public Operand getInitSrc(){
 		return initSrc;
 	}
@@ -111,6 +119,10 @@ public class VariableOperand implements Operand{
 		return predItemMap.containsKey(ctx);
 	}
 
+	public boolean isMember(){
+		return memberFlag;
+	}
+
 	public SchedulerItem getPredItem(SchedulerItem ctx){
 		return predItemMap.get(ctx);
 	}
@@ -151,6 +163,7 @@ public class VariableOperand implements Operand{
 	    s += " :private_method " + isPrivateMethod();
 	    s += " :volatile " + isVolatileFlag();
 		s += " :chaining " + chaining;
+		s += " :member " + isMember();
 		if(initSrc != null){
 			s += " :init " + initSrc.info();
 		}

@@ -412,7 +412,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	}
 
 	private VariableOperand newVariable(String key, Type t){
-		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, getIdGen().id()), t);
+		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, getIdGen().id()), t, false);
 		addVariable(v.getName(), v);
 		return v; 
 	}
@@ -432,9 +432,9 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 			initSrc = stepIn(vv.getInitExpr());
 		}
 		if(vv.getMethod() != null){
-			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile());
+			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile(), false);
 		}else{
-			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile());
+			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile(), true);
 		}
 		
 		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
@@ -598,7 +598,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	}
 
 	private VariableOperand newVariable(String key, Type t){
-		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t);
+		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, false);
 		parent.addVariable(v.getName(), v);
 		return v; 
 	}
@@ -610,7 +610,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	}
 */
 	private VariableRefOperand newVariableRef(String key, Type t, VariableOperand ref){
-		VariableRefOperand v = new VariableRefOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, ref);
+		VariableRefOperand v = new VariableRefOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, ref, false);
 		parent.addVariable(v.getName(), v);
 		return v; 
 	}
@@ -838,11 +838,12 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			Literal value = (Literal)(o.getDimExpr().get(0));
 			int words = Integer.valueOf(value.getValueAsStr());
 			int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
+			//result = new ArrayRefOperand("", o.getType(), depth, words);
 			result = new ArrayRefOperand("", o.getType(), depth, words);
 		}else{
-			System.out.println("size = " + o.getDimExpr().size());
-			//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
-			//SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
+			//System.out.println("size = " + o.getDimExpr().size());
+			SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
+			SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
 		}
 	}
 
@@ -852,7 +853,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		InstanceRefOperand ref = new InstanceRefOperand("", o.getType(), o.getClassName());
 
 		for (Expr expr : o.getParameters()) {
-			expr.accept(this);
+			//expr.accept(this);
 			if(expr instanceof NewArray){
 				NewArray param = (NewArray)expr;
 				ArrayList<Expr> elem = param.getElems();
