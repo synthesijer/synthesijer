@@ -1,5 +1,6 @@
 package synthesijer.scheduler;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import synthesijer.ast.Type;

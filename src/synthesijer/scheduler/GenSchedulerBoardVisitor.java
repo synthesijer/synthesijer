@@ -840,6 +840,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
 			result = new ArrayRefOperand("", o.getType(), depth, words);
 		}else{
+			System.out.println("size = " + o.getDimExpr().size());
 			//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
 			//SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
 		}
@@ -847,11 +848,24 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
 	@Override
 	public void visitNewClassExpr(NewClassExpr o) {
+		
+		InstanceRefOperand ref = new InstanceRefOperand("", o.getType(), o.getClassName());
+
 		for (Expr expr : o.getParameters()) {
 			expr.accept(this);
+			if(expr instanceof NewArray){
+				NewArray param = (NewArray)expr;
+				ArrayList<Expr> elem = param.getElems();
+				for(int i = 0; i < elem.size()/2; i ++){
+					String key = ((Literal)elem.get(2*i)).getValueAsStr();
+					String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
+					ref.addParameter(key, value);
+				}
+			}else{
+				SynthesijerUtils.warn("Parameters should be array expression");
+			}
 		}
-		//result = newVariable("new_class", o.getType());
-		result = new InstanceRefOperand("", o.getType(), o.getClassName());
+		result = ref;
 	}
 
 	@Override

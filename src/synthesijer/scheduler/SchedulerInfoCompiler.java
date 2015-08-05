@@ -239,21 +239,26 @@ public class SchedulerInfoCompiler {
 			SynthesijerUtils.info("<<< return to compiling " + this.info.getName());
 		}
 		HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
-		/*
-		if(expr.getParameters().size() > 0){
-			NewArray param = (NewArray)(expr.getParameters().get(0));
-			ArrayList<Expr> elem = param.getElems();
-			for(int i = 0; i < elem.size()/2; i ++){
-				String key = ((Literal)elem.get(2*i)).getValueAsStr();
-				String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
-				if(inst.getParameterPair(key) == null){
-					SynthesijerUtils.error(key + " is not defined in " + inst.getSubModule().getName());
-					System.exit(0);
+		
+		if(v.getInitSrc() != null){
+			Operand src = v.getInitSrc();
+			if(src instanceof InstanceRefOperand){
+				InstanceRefOperand o = (InstanceRefOperand)src;
+				for(InstanceRefOperand.ParamPair p: o.getParameters()){
+					String key = p.key;
+					String value = p.value;				
+					if(inst.getParameterPair(key) != null){
+						inst.getParameterPair(key).setValue(value);
+						}else{
+							SynthesijerUtils.warn(key + " is not defined in " + inst.getSubModule().getName());
+							SynthesijerUtils.warn("parameter " + key + " -> " + value + " is not used.");
+						}
 				}
-				inst.getParameterPair(key).setValue(value);
+			}else{
+				SynthesijerUtils.warn("can use only InstanceRefOperand for source operand of instance variable");
 			}
 		}
-		*/
+		
 		Hashtable<HDLSignalBinding, HDLSignalBinding> exportBindingMap = new Hashtable<>();
 		for(HDLPort p: inst.getSubModule().getPorts()){
 			if(p.isSet(HDLPort.OPTION.EXPORT)){
