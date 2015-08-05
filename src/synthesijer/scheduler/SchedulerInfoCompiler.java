@@ -150,10 +150,21 @@ public class SchedulerInfoCompiler {
 				}else{
 					sig.setResetValue(e);
 				}
-			}else{
+			}else if(v.getInitSrc() instanceof VariableOperand){
+				VariableOperand o = (VariableOperand)(v.getInitSrc());
+				if(varTable.containsKey(o.getName())){
+					HDLExpr e = varTable.get(o.getName());
+					sig.setResetValue(e);
+				}else{
+					if(v.isMember()){
+						SynthesijerUtils.warn(v.getInitSrc().info() + " is not defiend at previous using by "+ v.getName());
+					}
+				}
+				/*
 				if(v.isMember()){
 					SynthesijerUtils.warn("only litral for initial value of member is allowed: " + v.getName() + ":" + v.getInitSrc().info());
 				}
+				*/
 			}
 		}
 		if(v.isMethodParam()){
