@@ -161,31 +161,20 @@ public class SchedulerItem {
 		String s = String.format("%s_%04d: op=%s, src=%s, dest=%s, next=%s", getBoardName(), getStepId(), op, srcInfo(), destInfo(), branchList());
 		return s;
 	}
-
-	public String toSexp(){
-		String sep = "";
+	
+	public String toSexp0(){
 		String s = "(" + op;
-		
-		// destination operand
-		if(dest == null){
-			s += " VOID";
-		}else{
-			//s += " " + destInfo();
-			s += " " + dest.getName();
-		}
 		
 		// source operands
 		//s += " (" + srcInfo() + ")";
-		s += " (";
 		if(src != null){
 			for(Operand o: src){
-				s += sep + o.getName(); sep = " ";
+				s += " " + o.getName();
 			}
-			sep = "";
 		}
-		s += ")";
 		
 		// next
+		String sep = "";
 		s += " :next";
 		s += " (";
 		for(int id: getSlot().getNextStep()){
@@ -195,6 +184,19 @@ public class SchedulerItem {
 		
 		s += ")";
 		return s;
+
+	}
+
+	public String toSexp(){
+		
+		// destination operand
+		if(dest == null){
+			return toSexp0();
+		}else{
+			//s += " " + destInfo();
+			return "(SET " + dest.getName() + " " + toSexp0() + ")";
+		}
+		
 	}
 
 }
