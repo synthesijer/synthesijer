@@ -39,6 +39,7 @@ public class IRWriter {
 			genSchedulerSlot(ir, s);
 		}
 		ir.println("    )");
+		ir.println(" )");
 	}
 
 	private void genSchedulerSlot(PrintStream ir, SchedulerSlot slot){
@@ -55,7 +56,7 @@ public class IRWriter {
 
 	//private void genVariables(PrintStream ir, VariableOperand[] vars){
 	private void genVariables(PrintStream ir, Operand[] vars){
-		ir.println("  (variables ");
+		ir.println("  (VARIABLES ");
 		//for(VariableOperand v: vars){
 		for(Operand v: vars){
 			gen_variable(ir, v);

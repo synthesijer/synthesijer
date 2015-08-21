@@ -163,7 +163,7 @@ public class SchedulerItem {
 	}
 	
 	public String toSexp0(){
-		String s = "(" + op;
+		String s = op.toString();
 		
 		// source operands
 		//s += " (" + srcInfo() + ")";
@@ -173,30 +173,47 @@ public class SchedulerItem {
 			}
 		}
 		
+		if(this instanceof MethodInvokeItem){
+			s += ((MethodInvokeItem)this).addInfo();
+		}
+		if(this instanceof SelectItem){
+			s += ((SelectItem)this).addInfo();
+		}
+		if(this instanceof FieldAccessItem){
+			s += ((FieldAccessItem)this).addInfo();
+		}
+		if(this instanceof TypeCastItem){
+			s += ((TypeCastItem)this).addInfo();
+		}
+
+		return s;
+	}
+	
+	public String nextList(){ 
 		// next
+		String s = "";
 		String sep = "";
-		s += " :next";
+		s += ":next";
 		s += " (";
 		for(int id: getSlot().getNextStep()){
 			s += sep + id; sep = " ";
 		}
-		s += ")";
-		
 		s += ")";
 		return s;
 
 	}
 
 	public String toSexp(){
-		
+		String s = "";
 		// destination operand
 		if(dest == null){
-			return toSexp0();
+			s = "(" + toSexp0() + " " + nextList() + ")";
 		}else{
 			//s += " " + destInfo();
-			return "(SET " + dest.getName() + " " + toSexp0() + ")";
+			s = "(SET " + dest.getName() + " (" + toSexp0() + ")" + " " + nextList() + ")";
 		}
 		
+		return s;
 	}
 
 }
@@ -242,10 +259,12 @@ class MethodInvokeItem extends SchedulerItem{
 
 	public String info(){
 		String s = super.info();
+		String argsStr = "";
+		for(String a: args) argsStr += " " + a;
 		if(obj == null){
-			s += " (name=" + name + ")";
+			s += " (name=" + name + ", args=" + argsStr + ")";
 		}else{
-			s += " (obj = " + obj.getName() + ", name=" + name + ")";
+			s += " (obj = " + obj.getName() + ", name=" + name + ", args=" + argsStr + ")";
 		}
 		return s;
 	}
@@ -256,6 +275,21 @@ class MethodInvokeItem extends SchedulerItem{
 	
 	public boolean isNoWait(){
 		return noWaitFlag;
+	}
+	
+	public String addInfo(){
+		String s = "";
+		if(obj != null){
+			s = " :obj " + obj.getName();
+		}
+		s += " :no_wait " + noWaitFlag;
+		s += " :name " + name;
+		s += " :args (";
+		for(int i = 0; i < args.length; i++){
+			s += " " + args[i];
+		}
+		s += ")";
+		return s;
 	}
 	
 }
@@ -278,6 +312,12 @@ class FieldAccessItem extends SchedulerItem{
 		}else{
 			s += " (obj=" + obj.getName() + ", name=" + name + ")";
 		}
+		return s;
+	}
+
+	public String addInfo(){
+		String s = "";
+		s += " :obj " + obj.getName() + " :name " + name;
 		return s;
 	}
 	
@@ -326,6 +366,12 @@ class TypeCastItem extends SchedulerItem{
 		return new TypeCastItem(board, op, src, dest, orig, target);
 	}
 	
+	public String addInfo(){
+		String s = "";
+		s += " :orig " + orig + " :target " + target;
+		return s;
+	}
+	
 }
 
 class SelectItem extends SchedulerItem{
@@ -341,7 +387,24 @@ class SelectItem extends SchedulerItem{
 
 	public String info(){
 		String s = super.info();
-		s += " (" + target + "->" + target + ")";
+		s += " ( target=" + target.info();
+		s += " pat=";
+		String sep = "";
+		for(Operand o: pat){
+			s += sep + o.info();
+			sep = ", ";
+		}
+		return s;
+	}
+	
+	public String addInfo(){
+		String s = "";
+		s += " :target " + target.getName();
+		s += " :patterns (";
+		for(Operand o: pat){
+			s += " " + o.getName();	
+		}
+		s += ")";
 		return s;
 	}
 	

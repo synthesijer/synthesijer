@@ -289,5 +289,90 @@ public enum Op {
 	public Type getType(){
 		return type;
 	}
+	
+	public static Op parseOp(String k) throws Exception{
+		switch(k){
+		case "METHOD_ENTRY": return METHOD_ENTRY;
+		case "METHOD_EXIT" : return METHOD_EXIT;
+		case "ASSIGN" : return ASSIGN;
+		case "NOP" : return NOP;
+		case "ADD" : return ADD;
+		case "SUB" : return SUB;
+		case "MUL32" : return MUL32;
+		case "MUL64" : return MUL64;
+		case "DIV32" : return DIV32;
+		case "DIV64" : return DIV64;
+		case "MOD32" : return MOD32;
+		case "MOD64" : return MOD64;
+		case "LT" : return LT;
+		case "LEQ" : return LEQ;
+		case "GT" : return GT;
+		case "GEQ" : return GEQ;
+		case "COMPEQ" : return COMPEQ;
+		case "NEQ" : return NEQ;
+		case "SIMPLE_LSHIFT32" : return SIMPLE_LSHIFT32;
+		case "SIMPLE_LOGIC_RSHIFT32" : return SIMPLE_LOGIC_RSHIFT32;
+		case "SIMPLE_ARITH_RSHIFT32" : return SIMPLE_ARITH_RSHIFT32;
+		case "SIMPLE_LSHIFT64" : return SIMPLE_LSHIFT64;
+		case "SIMPLE_LOGIC_RSHIFT64" : return SIMPLE_LOGIC_RSHIFT64;
+		case "SIMPLE_ARITH_RSHIFT64" : return SIMPLE_ARITH_RSHIFT64;
+		case "LSHIFT32" : return LSHIFT32;
+		case "LOGIC_RSHIFT32": return LOGIC_RSHIFT32; 
+		case "ARITH_RSHIFT32" : return ARITH_RSHIFT32;
+		case "LSHIFT64" : return LSHIFT64;
+		case "LOGIC_RSHIFT64" : return LOGIC_RSHIFT64;
+		case "ARITH_RSHIFT64" : return ARITH_RSHIFT64;
+		case "JP" : return JP;
+		case "JT" : return JT;
+		case "RETURN" : return RETURN;
+		case "SELECT" : return SELECT;
+		case "AND" : return AND;
+		case "NOT" : return NOT;
+		case "MSB_FLAP":  return MSB_FLAP;
+		case "LAND" : return LAND;
+		case "LOR" : return LOR;
+		case "OR" : return OR;
+		case "XOR" : return XOR;
+		case "LNOT" : return LNOT;
+		case "ARRAY_ACCESS" : return ARRAY_ACCESS;
+		case "ARRAY_INDEX" : return ARRAY_INDEX;
+		case "CALL" : return CALL;
+		case "EXT_CALL" : return EXT_CALL;
+		case "FIELD_ACCESS" : return FIELD_ACCESS;
+		case "BREAK" : return BREAK;
+		case "CONTINUE" : return CONTINUE;
+		case "CAST" : return CAST;
+		case "COND" : return COND;
+		case "FADD32" : return FADD32;
+		case "FSUB32" : return FSUB32;
+		case "FMUL32" : return FMUL32;
+		case "FDIV32" : return FDIV32;
+		case "FADD64" : return FADD64;
+		case "FSUB64" : return FSUB64;
+		case "FMUL64" : return FMUL64;
+		case "FDIV64" : return FDIV64;
+		case "CONV_F2I" : return CONV_F2I;
+		case "CONV_I2F" : return CONV_I2F;
+		case "CONV_D2L" : return CONV_D2L;
+		case "CONV_L2D" : return CONV_L2D;
+		case "CONV_F2D" : return CONV_F2D;
+		case "CONV_D2F" : return CONV_D2F;
+		case "FLT32" : return FLT32;
+		case "FLEQ32" : return FLEQ32;
+		case "FGT32" : return FGT32;
+		case "FGEQ32" : return FGEQ32;
+		case "FCOMPEQ32" : return FCOMPEQ32;
+		case "FNEQ32" : return FNEQ32;
+		case "FLT64" : return FLT64;
+		case "FLEQ64" : return FLEQ64;
+		case "FGT64" : return FGT64;
+		case "FGEQ64" : return FGEQ64;
+		case "FCOMPEQ64" : return FCOMPEQ64;
+		case "FNEQ64" : return FNEQ64;
+		case "UNDEFINED" : return UNDEFINED;
+		default:
+			throw new Exception("Undefined operation : " + k);
+		}
+	}
 
 }

@@ -42,6 +42,27 @@ public class SchedulerBoard {
 	
 	private final String waitDependsBoardName;
 	
+	SchedulerBoard(
+			String name,
+			Type returnType,
+			boolean privateFlag,
+			boolean autoFlag,
+			boolean callStackFlag,
+			int callStackSize,
+			boolean hasWaitWithMethod,
+			String waitMethodName){
+		this.name = name;
+		this.slots = new ArrayList<>();
+		varList = new ArrayList<>();
+		this.returnType = returnType;
+		this.privateFlag = privateFlag;
+		this.autoFlag = autoFlag;
+		this.callStackFlag = callStackFlag;
+		this.callStackSize = callStackSize;
+		this.hasWaitDependsBoardFlag = hasWaitWithMethod; 
+		this.waitDependsBoardName = waitMethodName;
+	}
+	
 	SchedulerBoard(String name, Method m){
 		this.name = name;
 		this.slots = new ArrayList<>();

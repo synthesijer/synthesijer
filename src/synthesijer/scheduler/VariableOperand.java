@@ -29,8 +29,6 @@ public class VariableOperand implements Operand{
 	
 	private boolean chaining = false;
 	
-	private boolean isExport = false;
-	
 	private final boolean memberFlag;
 	
 	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
@@ -168,8 +166,9 @@ public class VariableOperand implements Operand{
 	    	s += " :chaining (";
 	    	Enumeration<SchedulerItem> e = predItemMap.keys();
 	    	while(e.hasMoreElements()){
-	    		SchedulerItem k = e.nextElement();
-	    		s += sep + "(" + k.getStepId() + " " + predItemMap.get(k).getStepId() + ")";
+	    		SchedulerItem ctx = e.nextElement();
+	    		SchedulerItem pred = predItemMap.get(ctx);
+	    		s += sep + "(" + ctx.getBoardName() + " " + ctx.getStepId() + " " + pred.getBoardName()+" "+pred.getStepId() + ")";
 	    		sep = " ";
 	    	}
 			s += ")";

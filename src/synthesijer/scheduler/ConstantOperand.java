@@ -72,7 +72,7 @@ public class ConstantOperand implements Operand{
 
 	@Override
 	public String info(){
-		return value + ":" + type;
+		return value + ":" + type + "("+ name +")";
 	}
 	
 	@Override
@@ -82,7 +82,7 @@ public class ConstantOperand implements Operand{
 
 	@Override
 	public String dump(){
-		return toSexp();
+		return name + ":" + type + ", value = " + value;
 	}	
 
 	@Override

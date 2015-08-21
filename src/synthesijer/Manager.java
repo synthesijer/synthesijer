@@ -52,6 +52,7 @@ import synthesijer.lib.OUTPUT8;
 import synthesijer.lib.SimpleBlockRAM;
 import synthesijer.scheduler.GenSchedulerBoardVisitor;
 import synthesijer.scheduler.GlobalSymbolTable;
+import synthesijer.scheduler.IRReader;
 import synthesijer.scheduler.IRWriter;
 import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
@@ -285,7 +286,8 @@ public enum Manager {
 			info.setHDLModule(loadUserHDLModule(info.m.getName())); 
 		}else{
 			info.state = CompileState.GENERATE_HDL;
-			HDLModule hm = new HDLModule(info.m.getName(), "clk", "reset");
+			//HDLModule hm = new HDLModule(info.m.getName(), "clk", "reset");
+			HDLModule hm = new HDLModule(info.getName(), "clk", "reset");
 			info.setHDLModule(hm); 
 			SchedulerInfoCompiler compiler = new SchedulerInfoCompiler(info.getSchedulerInfo(), hm);			
 			compiler.compile();
@@ -319,10 +321,13 @@ public enum Manager {
 		}
 	}
 	
-	public void generate(Options opt){
+	public void optimize(Options opt){
 		if(opt.optimizing){
 			optimizeAll(opt);
 		}
+	}
+	
+	public void generate(){
 		compileSchedulerInfoAll();
 	}
 
@@ -362,6 +367,14 @@ public enum Manager {
 		dest.printf("</modules>\n");
 	}
 	
+	public void loadIR(String path){
+		IRReader reader = new IRReader(path);
+		String name = reader.result.getName();
+		SynthesijerModuleInfo info = new SynthesijerModuleInfo(null, null, true);
+		info.setSchedulerInfo(reader.result);
+		modules.put(name, info);
+	}
+	
 	public class SynthesijerModuleInfo{
 		/**
 		 * A given module
@@ -397,6 +410,14 @@ public enum Manager {
 				}
 			}else{
 				this.state = CompileState.INITIALIZE;
+			}
+		}
+		
+		public String getName(){
+			if(m != null){
+				return m.getName();
+			}else{
+				return info.getName();
 			}
 		}
 		

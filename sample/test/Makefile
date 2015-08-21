@@ -1,6 +1,6 @@
 SYNTHESIJER ?= ../../bin
 
-SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java
+SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 OPT = --chaining
@@ -28,6 +28,7 @@ clean:
 	-rm -f $(VHDL_SOURCES)
 	-rm -f $(VERILOG_SOURCES)
 	-rm -f *.xml
+	-rm -f *.ir
 	-rm -f *.dot
 	-rm -f *.o
 	-rm -f sim

@@ -42,13 +42,13 @@ public class ArrayRefOperand implements Operand{
 
 	@Override
 	public String dump(){
-		return toSexp();
+		return info();
 	}	
 	
 	@Override
 	public String toSexp(){
 		String s = "(ARRAY-REF " + getType() + " " + getName();
-		s += " ((depth " + depth + ")" + " (words " + words + ")" + "))";
+		s += " :depth " + depth + " :words " + words + ")";
 		return s;
 	}
 

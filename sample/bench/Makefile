@@ -30,6 +30,7 @@ clean:
 	-rm -f *.dot
 	-rm -f *.o
 	-rm -f *.s
+	-rm -f *.ir
 	-rm -f *.vcd
 	-rm -f *~
 	-rm -f work-obj93.cf

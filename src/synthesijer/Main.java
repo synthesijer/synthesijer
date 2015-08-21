@@ -3,6 +3,7 @@ package synthesijer;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import net.wasamon.mjlib.util.GetOpt;
 import net.wasamon.mjlib.util.GetOptException;
@@ -27,9 +28,23 @@ public class Main {
 			System.exit(0);
 		}
 
-		openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
+		ArrayList<String> javaSrc = new ArrayList<>();
+		ArrayList<String> irSrc = new ArrayList<>();
+		for(String a: opt.getArgs()){
+			if(a.endsWith(".java")){
+				javaSrc.add(a);
+			}else if(a.endsWith("ir")){
+				irSrc.add(a);
+			}
+		}
 
-		Result result = compiler.compile(opt.getArgs());
+		if(javaSrc.size() > 0){
+			openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
+			Result result = compiler.compile(javaSrc.toArray(new String[]{}));
+			if(result.isOK() == false){
+				System.exit(result.exitCode);
+			}
+		}
 		
 		boolean vhdlFlag = opt.flag("vhdl");
 		boolean verilogFlag = opt.flag("verilog");
@@ -59,24 +74,29 @@ public class Main {
 		if(vhdlFlag == false && verilogFlag == false){
 			vhdlFlag = true;
 		}
+				
+		//dump("dump000.xml");
+		Manager.INSTANCE.preprocess();
+		Manager.INSTANCE.optimize(options);
 		
-		if(result.isOK()){
-			//dump("dump000.xml");
-			Manager.INSTANCE.preprocess();
-			Manager.INSTANCE.generate(options);
-			if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
-			if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
-			if(packaging){
-				SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(packageTop);
-				if(info == null){
-					SynthesijerUtils.warn("unknown module for ip-exact: " + packageTop);
-				}else{
-					HDLModule m = info.getHDLModule();
-					HDLModuleToComponentXML.conv(m, null, vendor, libname);
-				}
+		for(String f: irSrc){
+			System.out.println(f);
+			Manager.INSTANCE.loadIR(f);
+		}
+		Manager.INSTANCE.generate();
+		
+		if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
+		if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
+		if(packaging){
+			SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(packageTop);
+			if(info == null){
+				SynthesijerUtils.warn("unknown module for ip-exact: " + packageTop);
+			}else{
+				HDLModule m = info.getHDLModule();
+				HDLModuleToComponentXML.conv(m, null, vendor, libname);
 			}
 		}
-		System.exit(result.exitCode);
+
 	}
 	
 	private static void printHelp(){

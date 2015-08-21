@@ -52,6 +52,10 @@ public class SchedulerInfo {
 		boardsList.add(b);
 	}
 	
+	public void addOperand(Operand o){
+		varList.add(o);
+	}
+	
 //	public void addModuleVarList(ArrayList<VariableOperand> t){
 //		if(varList != null){
 //			SynthesijerUtils.warn("DUPLICATE addModuleVarTable:" + name);
