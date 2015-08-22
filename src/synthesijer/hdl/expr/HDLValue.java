@@ -24,7 +24,11 @@ public class HDLValue implements HDLLiteral{
 	public HDLValue(int v){
 		this(String.valueOf(v), HDLPrimitiveType.genIntegerType());
 	}
-	
+
+	public HDLValue(String v){
+		this(v, HDLPrimitiveType.genStringType());
+	}
+
 	public String toString(){
 		return String.format("HDLValue:: value=%s, type=%s, actualType=%s", value, type, actualType);
 	}
