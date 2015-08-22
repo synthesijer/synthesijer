@@ -60,7 +60,7 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLParameter(HDLParameter o) {
-		HDLUtils.print(dest, offset, String.format("parameter %s = %s", o.getName(), o.getDefaultValue()));
+		HDLUtils.print(dest, offset, String.format("parameter %s = %s", o.getName(), o.getDefaultValue().getVerilogHDL()));
 	}
 
 	@Override

@@ -85,7 +85,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			HDLUtils.print(dest, offset+2, String.format("%s : %s := %s",
 					p.getName(),
 					((HDLPrimitiveType)p.getType()).getVHDL(),
-					p.getValue()));
+					p.getDefaultValue().getVHDL()));
 			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
@@ -140,7 +140,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLParameter(HDLParameter o) {
-		HDLUtils.print(dest, offset, String.format("%s : %s := %s", o.getName(), o.getType().getVHDL(), o.getDefaultValue()));
+		HDLUtils.print(dest, offset, String.format("%s : %s := %s", o.getName(), o.getType().getVHDL(), o.getDefaultValue().getVHDL()));
 	}
 
 	@Override

@@ -3,15 +3,16 @@ package synthesijer.lib;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
+import synthesijer.hdl.expr.HDLValue;
 
 public class SimpleBlockRAM extends HDLModule{
 	
 	public SimpleBlockRAM(int width, int depth, int length){
 		super("singleportram", "clk", "reset");
 		
-		newParameter("WIDTH", HDLPrimitiveType.genIntegerType(), String.valueOf(width));
-		newParameter("DEPTH", HDLPrimitiveType.genIntegerType(), String.valueOf(depth));
-		newParameter("WORDS", HDLPrimitiveType.genIntegerType(), String.valueOf(length));
+		newParameter("WIDTH", HDLPrimitiveType.genIntegerType(), new HDLValue(width));
+		newParameter("DEPTH", HDLPrimitiveType.genIntegerType(), new HDLValue(depth));
+		newParameter("WORDS", HDLPrimitiveType.genIntegerType(), new HDLValue(length));
 		
 		newPort("length",  DIR.OUT, HDLPrimitiveType.genSignedType(32));
 		newPort("address_b", DIR.IN,  HDLPrimitiveType.genSignedType(32));

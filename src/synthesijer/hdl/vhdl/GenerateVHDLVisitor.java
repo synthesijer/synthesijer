@@ -44,10 +44,10 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		for(ParamPair pair: o.getParameterPairs()){
 			if(pair.getValue() != null){
 				HDLUtils.print(dest, 0, sep);
-				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.getValue()));
+				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.getValue().getVHDL()));
 			}else{
 				HDLUtils.print(dest, 0, sep);
-				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.param.getValue()));
+				HDLUtils.print(dest, offset+2, String.format("%s => %s", pair.param.getName(), pair.param.getValue().getVHDL()));
 			}
 			sep = "," + Constant.BR;
 		}

@@ -3,6 +3,7 @@ package synthesijer.hdl;
 import java.util.ArrayList;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.sequencer.SequencerState;
 
 public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
@@ -124,7 +125,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		return null;
 	}
 
-	public void setParameterOverwrite(String name, String value){
+	public void setParameterOverwrite(String name, HDLValue value){
 		for(ParamPair pair: params){
 			if(pair.param.getName().equals(name)){
 				pair.value = value;
@@ -160,12 +161,12 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	
 	public class ParamPair{
 		public final HDLParameter param;
-		private String value;
-		ParamPair(HDLParameter param, String value){this.param = param; this.value = value;}
-		public void setValue(String value){
+		private HDLValue value;
+		ParamPair(HDLParameter param, HDLValue value){this.param = param; this.value = value;}
+		public void setValue(HDLValue value){
 			this.value = value;
 		}
-		public String getValue(){
+	public HDLValue getValue(){
 			return value;
 		}
 	}

@@ -1,14 +1,15 @@
 package synthesijer.hdl;
 
+import synthesijer.hdl.expr.HDLValue;
 
 public class HDLParameter implements HDLTree{
 	
 	private final String name;
 	private final HDLPrimitiveType type;
-	private final String defaultValue;
-	private final String value;
+	private final HDLValue defaultValue;
+	private final HDLValue value;
 	
-	public HDLParameter(String name, HDLPrimitiveType type, String defaultValue, String value){
+	public HDLParameter(String name, HDLPrimitiveType type, HDLValue defaultValue, HDLValue value){
 		this.name = name;
 		this.type = type;
 		this.defaultValue = defaultValue;
@@ -23,11 +24,11 @@ public class HDLParameter implements HDLTree{
 		return type;
 	}
 	
-	public String getDefaultValue(){
+	public HDLValue getDefaultValue(){
 		return defaultValue;
 	}
 	
-	public String getValue(){
+	public HDLValue getValue(){
 		return value;
 	}
 

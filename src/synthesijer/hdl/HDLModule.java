@@ -68,7 +68,7 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		return name;
 	}
 		
-	public HDLParameter newParameter(String name, HDLPrimitiveType type, String defaultValue){
+	public HDLParameter newParameter(String name, HDLPrimitiveType type, HDLValue defaultValue){
 		HDLParameter param = new HDLParameter(name, type, defaultValue, defaultValue);
 		parameters.add(param);
 		return param;

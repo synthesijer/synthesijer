@@ -203,9 +203,9 @@ public class SchedulerInfoCompiler {
 		Operand initSrc = v.getInitSrc();
 		if(initSrc != null && initSrc instanceof ArrayRefOperand){
 			ArrayRefOperand o = (ArrayRefOperand)initSrc;
-			array.getParameterPair("WORDS").setValue(String.valueOf(o.words));
+			array.getParameterPair("WORDS").setValue(new HDLValue(o.words));
 			int depth = o.depth;
-			array.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+			array.getParameterPair("DEPTH").setValue(new HDLValue(depth));
 		}else{
 			if(initSrc != null){
 				//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + initSrc.info());
@@ -264,7 +264,7 @@ public class SchedulerInfoCompiler {
 					String key = p.key;
 					String value = p.value;				
 					if(inst.getParameterPair(key) != null){
-						inst.getParameterPair(key).setValue(value);
+						inst.getParameterPair(key).setValue(new HDLValue(Integer.parseInt(value))); // ad-hoc, only to treat integer value paramters
 						}else{
 							SynthesijerUtils.warn(key + " is not defined in " + inst.getSubModule().getName());
 							SynthesijerUtils.warn("parameter " + key + " -> " + value + " is not used.");
@@ -1044,9 +1044,9 @@ public class SchedulerInfoCompiler {
 		}
 		stack.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
 		stack.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
-		stack.getParameterPair("WORDS").setValue(String.valueOf(size));
+		stack.getParameterPair("WORDS").setValue(new HDLValue(size));
 		int depth = (int)Math.ceil(Math.log(size) / Math.log(2.0));
-		stack.getParameterPair("DEPTH").setValue(String.valueOf(depth));
+		stack.getParameterPair("DEPTH").setValue(new HDLValue(depth));
 		stack.getSignalForPort("address_b").setResetValue(HDLPreDefinedConstant.VECTOR_ZERO);
 		stack.getSignalForPort("we_b").setResetValue(HDLPreDefinedConstant.LOW);
 		return stack;
