@@ -37,6 +37,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLInstance(HDLInstance o) {
+		if(o.getSubModule().isComponentDeclRequired() == false) return;
 		HDLUtils.println(dest, offset, String.format("component %s", o.getSubModule().getName()));
 		if(o.getSubModule().getParameters().length > 0){
 			genGenericList(dest, offset+2, o.getSubModule().getParameters());

@@ -67,7 +67,7 @@ public class HDLValue implements HDLLiteral{
 		case SIGNED: {
 			if(type.getWidth()%4 == 0){
 				//String v = String.format("%016x", Long.parseLong(value));
-				String v = String.format("%016x", asLongValue());
+				String v = String.format("%020x", asLongValue());
 				//System.out.printf("%s => %s => %s\n", value, v, v.substring(v.length()-type.getWidth()/4, v.length()));
 				if(v.length()-type.getWidth()/4 < 0){
 					System.out.println(v);
@@ -92,7 +92,7 @@ public class HDLValue implements HDLLiteral{
 		case INTEGER:
 			return String.valueOf(value);
 		case STRING:
-			return value;
+			return "\"" + value + "\"";
 		default:
 			return "UNKNWON(" + value + ")";
 		}
@@ -104,7 +104,7 @@ public class HDLValue implements HDLLiteral{
 		case VECTOR:{
 			if(type.getWidth()%4 == 0){
 				//String v = String.format("%064x", Long.parseLong(value));
-				String v = String.format("%064x", asLongValue());
+				String v = String.format("%080x", asLongValue());
 				return String.format("%d'h%s", type.getWidth(), v.substring(v.length()-type.getWidth()/4, v.length()));
 			}else{
 				String v = "";
@@ -136,6 +136,7 @@ public class HDLValue implements HDLLiteral{
 		case INTEGER:
 			return String.valueOf(value);
 		case STRING:
+//			return "\"" + value + "\"";
 			return value;
 		default:
 			return "UNKNWON(" + value + ")";

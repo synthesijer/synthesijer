@@ -3,6 +3,7 @@ package synthesijer.hdl;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Hashtable;
 
 import synthesijer.SynthesijerComponent;
 import synthesijer.hdl.expr.HDLCombinationExpr;
@@ -25,11 +26,14 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	private ArrayList<HDLExpr> exprs = new ArrayList<>();
 	private ArrayList<HDLParameter> parameters = new ArrayList<>();
 	private ArrayList<HDLSignalBinding> bindings = new ArrayList<>();
+	private final Hashtable<String, LibrariesInfo> libraries = new Hashtable<>();
 	
 	private HDLPort sysClk; 
 	private HDLPort sysReset;
 	
 	private boolean negativeResetFlag = false;
+	
+	private boolean componentDeclRequired = true;
 	
 	public HDLModule(String name, String sysClkName, String sysResetName, boolean syncFlag){
 		this.name = name.replace('.', '_');
@@ -276,6 +280,39 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	public void setNegativeReset(boolean flag){
 		negativeResetFlag = flag;
 	}
+		
+	public void setComponentDeclRequired(boolean f){
+		this.componentDeclRequired = f;
+	}
 
+	public boolean isComponentDeclRequired(){
+		return this.componentDeclRequired;
+	}
 
+	public void addLibraryUse(String key, String use){
+		LibrariesInfo info;
+		if(libraries.containsKey(key)){
+			info = libraries.get(key);
+		}else{
+			info = new LibrariesInfo(key);
+			libraries.put(key, info);
+		}
+		if(info.useName.contains(use) == false){
+			info.useName.add(use);
+		}
+	}
+	
+	public LibrariesInfo[] getLibraries(){
+		return libraries.values().toArray(new LibrariesInfo[]{});
+	}
+	
+	public class LibrariesInfo{
+		public final String libName;
+		public final ArrayList<String> useName = new ArrayList<>();
+		
+		public LibrariesInfo(String libName){
+			this.libName = libName;
+		}
+	}
+	
 }

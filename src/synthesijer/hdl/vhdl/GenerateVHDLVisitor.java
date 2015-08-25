@@ -91,6 +91,15 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, String.format("use IEEE.numeric_std.all;"));
 		HDLUtils.nl(dest);
 		
+		HDLModule.LibrariesInfo[] libraries = o.getLibraries();
+		for(HDLModule.LibrariesInfo lib: libraries){
+			HDLUtils.println(dest, offset, String.format("library " + lib.libName + ";"));
+			for(String s: lib.useName){
+				HDLUtils.println(dest, offset, String.format("use " + s + ";"));
+			}
+			HDLUtils.nl(dest);
+		}
+		
 		// entity
 		o.accept(new GenerateVHDLDefVisitor(dest, offset));
 		
