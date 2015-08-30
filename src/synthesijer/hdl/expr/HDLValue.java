@@ -92,7 +92,8 @@ public class HDLValue implements HDLLiteral{
 		case INTEGER:
 			return String.valueOf(value);
 		case STRING:
-			return "\"" + value + "\"";
+			//return "\"" + value + "\"";
+			return value;
 		default:
 			return "UNKNWON(" + value + ")";
 		}
