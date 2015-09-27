@@ -40,8 +40,12 @@
             <classpath refid="synthesijer.classpath"/>
         </javac>
     </target>
-    <target name="jar" depends="init">
-	<jar basedir="./bin/" jarfile="synthesijer.jar" />
+    <target name="jar" depends="init,build">
+	<jar basedir="./bin/" jarfile="synthesijer.jar" >
+            <manifest>
+                <attribute name="Main-class" value="synthesijer.Main"/>
+            </manifest>
+        </jar>
     </target>
     <target name="jar_with_scala" depends="init">
         <jar jarfile="synthesijer_with_scala.jar">

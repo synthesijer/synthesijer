@@ -8,7 +8,8 @@
 ### Build
     % git clone https://github.com/synthesijer/synthesijer.git
     % cd synthesijer
-    % ant
     % ant jar
 
+### Run
+    % java -jar synthesijer
 
