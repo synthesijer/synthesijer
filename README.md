@@ -11,5 +11,5 @@
     % ant jar
 
 ### Run
-    % java -jar synthesijer
+    % java -jar synthesijer.jar
 
