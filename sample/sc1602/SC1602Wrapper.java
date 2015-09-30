@@ -14,7 +14,7 @@ public class SC1602Wrapper extends HDLModule {
 	public SC1602Wrapper(String... args) {
 		super("sc1602_wrapper", "clk", "reset");
 
-		newParameter("CLKWAIT", HDLPrimitiveType.genIntegerType(), "16");
+		newParameter("CLKWAIT", 16);
 
 		newPort("pLCD_RS", DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.EXPORT));
 		newPort("pLCD_E",  DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.EXPORT));

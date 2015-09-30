@@ -12,8 +12,8 @@ public class RS232C_RX_Wrapper extends HDLModule{
 	
 	public RS232C_RX_Wrapper(String... args){
 		super("rs232c_rx", "clk", "reset");
-		newParameter("sys_clk", HDLPrimitiveType.genIntegerType(), String.valueOf(25000000));
-		newParameter("rate", HDLPrimitiveType.genIntegerType(), String.valueOf(9600));
+		newParameter("sys_clk", 25000000);
+		newParameter("rate", 9600);
 		newPort("din",   DIR.IN, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.EXPORT));
 		newPort("rd", DIR.OUT,  HDLPrimitiveType.genBitType());
 		newPort("dout", DIR.OUT,  HDLPrimitiveType.genVectorType(8));

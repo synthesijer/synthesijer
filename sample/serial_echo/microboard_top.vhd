@@ -13,6 +13,9 @@ end microboard_top;
 
 architecture RTL of microboard_top is
 
+  attribute mark_debug : string;
+  attribute keep : string;
+
   component ToUpper
     port (
       clk : in std_logic;
