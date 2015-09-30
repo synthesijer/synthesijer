@@ -46,7 +46,7 @@
                 <attribute name="Main-class" value="synthesijer.Main"/>
             </manifest>
         </jar>
-     </target>
+    </target>
     <target name="jar_with_scala" depends="init">
         <jar jarfile="synthesijer_with_scala.jar">
             <fileset dir="./bin" />
