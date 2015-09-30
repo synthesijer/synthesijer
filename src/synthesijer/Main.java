@@ -1,9 +1,14 @@
 package synthesijer;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import net.wasamon.mjlib.util.GetOpt;
 import net.wasamon.mjlib.util.GetOptException;
@@ -20,115 +25,154 @@ import synthesijer.tools.xilinx.HDLModuleToComponentXML;
  *
  */
 public class Main {
+
+    public static void main(String... args) throws Exception{
+	GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,ip-exact:,vendor:,libname:", args);
+	if(opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0){
+	    printHelp();
+	    System.exit(0);
+	}
+
+	ArrayList<String> javaSrc = new ArrayList<>();
+	ArrayList<String> irSrc = new ArrayList<>();
 	
-	public static void main(String... args) throws GetOptException{
-		GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,ip-exact:,vendor:,libname:", args);
-		if(opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0){
-			printHelp();
-			System.exit(0);
+	ArrayList<String> classPath = new ArrayList<>();
+	addClassPath(".");
+	
+	for(String a: opt.getArgs()){
+	    if(a.endsWith(".java")){
+		javaSrc.add(a);
+		File f = new File(a);
+		String p = f.getParent();
+		if(p != null && classPath.contains(p) == false){
+		    addClassPath(p);
+		    classPath.add(p);
 		}
+	    }else if(a.endsWith("ir")){
+		irSrc.add(a);
+	    }
+	}
 
-		ArrayList<String> javaSrc = new ArrayList<>();
-		ArrayList<String> irSrc = new ArrayList<>();
-		for(String a: opt.getArgs()){
-			if(a.endsWith(".java")){
-				javaSrc.add(a);
-			}else if(a.endsWith("ir")){
-				irSrc.add(a);
-			}
-		}
-
-		if(javaSrc.size() > 0){
-			openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
-			Result result = compiler.compile(javaSrc.toArray(new String[]{}));
-			if(result.isOK() == false){
-				System.exit(result.exitCode);
-			}
-		}
+	if(javaSrc.size() > 0){
+	    openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
+	    Result result = compiler.compile(javaSrc.toArray(new String[]{}));
+	    if(result.isOK() == false){
+		System.exit(result.exitCode);
+	    }
+	}
 		
-		boolean vhdlFlag = opt.flag("vhdl");
-		boolean verilogFlag = opt.flag("verilog");
-		Options options = new Options();
-		options.optimizing = !opt.flag("no-optimize");
-		options.chaining = opt.flag("chaining");
-		options.operation_strength_reduction = opt.flag("operation_strength_reduction");
-		boolean packaging = false;
-		String packageTop = "";
-		if(opt.flag("ip-exact")){
-			packageTop = opt.getValue("ip-exact");
-			packaging = true;
-		}
-		String vendor = "synthesijer";
-		if(opt.flag("vendor")){
-			vendor = opt.getValue("vendor");
-		}
-		String libname = "user";
-		if(opt.flag("libname")){
-			libname = opt.getValue("user");
-		}
+	boolean vhdlFlag = opt.flag("vhdl");
+	boolean verilogFlag = opt.flag("verilog");
+	Options options = new Options();
+	options.optimizing = !opt.flag("no-optimize");
+	options.chaining = opt.flag("chaining");
+	options.operation_strength_reduction = opt.flag("operation_strength_reduction");
+	boolean packaging = false;
+	String packageTop = "";
+	if(opt.flag("ip-exact")){
+	    packageTop = opt.getValue("ip-exact");
+	    packaging = true;
+	}
+	String vendor = "synthesijer";
+	if(opt.flag("vendor")){
+	    vendor = opt.getValue("vendor");
+	}
+	String libname = "user";
+	if(opt.flag("libname")){
+	    libname = opt.getValue("user");
+	}
 
-		if(opt.flag("config")){
-			System.out.println("config: " + opt.getValue("config"));
-		}
+	if(opt.flag("config")){
+	    System.out.println("config: " + opt.getValue("config"));
+	}
 		
-		if(vhdlFlag == false && verilogFlag == false){
-			vhdlFlag = true;
-		}
+	if(vhdlFlag == false && verilogFlag == false){
+	    vhdlFlag = true;
+	}
 				
-		//dump("dump000.xml");
-		Manager.INSTANCE.preprocess();
-		Manager.INSTANCE.optimize(options);
+	//dump("dump000.xml");
+	Manager.INSTANCE.preprocess();
+	Manager.INSTANCE.optimize(options);
 		
-		for(String f: irSrc){
-			System.out.println(f);
-			Manager.INSTANCE.loadIR(f);
-		}
-		Manager.INSTANCE.generate();
+	for(String f: irSrc){
+	    System.out.println(f);
+	    Manager.INSTANCE.loadIR(f);
+	}
+	Manager.INSTANCE.generate();
 		
-		if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
-		if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
-		if(packaging){
-			SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(packageTop);
-			if(info == null){
-				SynthesijerUtils.warn("unknown module for ip-exact: " + packageTop);
-			}else{
-				HDLModule m = info.getHDLModule();
-				HDLModuleToComponentXML.conv(m, null, vendor, libname);
-			}
-		}
-
-	}
-	
-	private static void printHelp(){
-		System.out.println();
-		System.out.printf("Synthesijer: %d.%d.%d", Constant.majorVersion, Constant.minorVersion, Constant.revVersion);
-		System.out.println();
-		System.out.println();
-		System.out.println("Usage: java [-cp classpath] synthesijer.Main [options] sources");
-		System.out.println();
-		System.out.println("Options:");
-		System.out.println("  -h, --help: print this help");
-		System.out.println("  --vhdl: output VHDL");
-		System.out.println("  --verilog: output Verilog HDL");
-		System.out.println("  (If you specify neither --vhdl nor --verilog, --vhdl is selected.)");
-		System.out.println("  --config=file: thespecified file is used for compiler settings");
-		System.out.println("  --no-optimize: do not apply any optimizations");
-		System.out.println("  --chaining: do opeartion chain in greedy manner");
-		System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
-		System.out.println("  --ip-exact=TOP: generates a IP package template for \"TOP\" module");
-		System.out.println("  --vendor=name: to specify vendor id for generating a IP package");
-		System.out.println("  --libname=name: to specify library name for generating a IP package");
-		System.out.println();
-		System.out.println("Please access to http://synthesijer.sorceforge.net/ for more information.");
-		System.out.println();
-	}
-	
-	public static void dump(String destName){
-		try(PrintWriter dest = new PrintWriter(new FileOutputStream(destName), true)){
-			Manager.INSTANCE.dumpAsXML(dest);
-		}catch(IOException e){
-			e.printStackTrace();
-		}
+	if(vhdlFlag) Manager.INSTANCE.output(OutputFormat.VHDL);
+	if(verilogFlag) Manager.INSTANCE.output(OutputFormat.Verilog);
+	if(packaging){
+	    SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(packageTop);
+	    if(info == null){
+		SynthesijerUtils.warn("unknown module for ip-exact: " + packageTop);
+	    }else{
+		HDLModule m = info.getHDLModule();
+		HDLModuleToComponentXML.conv(m, null, vendor, libname);
+	    }
 	}
 
+    }
+	
+    private static void printHelp(){
+	System.out.println();
+	System.out.printf("Synthesijer: %d.%d.%d", Constant.majorVersion, Constant.minorVersion, Constant.revVersion);
+	System.out.println();
+	System.out.println();
+	System.out.println("Usage: java [-cp classpath] synthesijer.Main [options] sources");
+	System.out.println();
+	System.out.println("Options:");
+	System.out.println("  -h, --help: print this help");
+	System.out.println("  --vhdl: output VHDL");
+	System.out.println("  --verilog: output Verilog HDL");
+	System.out.println("  (If you specify neither --vhdl nor --verilog, --vhdl is selected.)");
+	System.out.println("  --config=file: thespecified file is used for compiler settings");
+	System.out.println("  --no-optimize: do not apply any optimizations");
+	System.out.println("  --chaining: do opeartion chain in greedy manner");
+	System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
+	System.out.println("  --ip-exact=TOP: generates a IP package template for \"TOP\" module");
+	System.out.println("  --vendor=name: to specify vendor id for generating a IP package");
+	System.out.println("  --libname=name: to specify library name for generating a IP package");
+	System.out.println();
+	System.out.println("Please access to http://synthesijer.sorceforge.net/ for more information.");
+	System.out.println();
+    }
+	
+    public static void dump(String destName){
+	try(PrintWriter dest = new PrintWriter(new FileOutputStream(destName), true)){
+	    Manager.INSTANCE.dumpAsXML(dest);
+	}catch(IOException e){
+	    e.printStackTrace();
+	}
+    }
+
+    public static void addClassPath(String classPath) throws IOException {
+        addClassPath(new File(classPath));
+    }
+
+    private static void addClassPath(File classPath) throws IOException {
+	addClassPath(classPath.toURL());
+    }
+
+    private static final Class<?>[] PARAMETERS = new Class<?>[] { URL.class };
+
+    private static void addClassPath(URL classPathUrl) throws IOException {
+	System.out.println("Add classpath: " + classPathUrl);
+
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+
+        Class<?> sysclass = URLClassLoader.class;
+
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", PARAMETERS);
+            method.setAccessible(true);
+            method.invoke(sysloader, new Object[] { classPathUrl });
+        } catch (NoSuchMethodException e) {
+            throw new IOException("could not add " + classPathUrl + " to classpath");
+        } catch (InvocationTargetException e) {
+            throw new IOException("could not add " + classPathUrl + " to classpath");
+        } catch (IllegalAccessException e) {
+            throw new IOException("could not add " + classPathUrl + " to classpath");
+        }
+    }
 }

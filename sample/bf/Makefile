@@ -7,7 +7,7 @@ VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 
 all: $(SOURCES)
-	java -cp $(SYNTHESIJER):../serial_echo:. synthesijer.Main --vhdl --verilog $(OPT) $(SOURCES)
+	java -jar $(SYNTHESIJER) --vhdl --verilog $(OPT) $(SOURCES)
 
 clean:
 	-rm -f $(CLASSES)
