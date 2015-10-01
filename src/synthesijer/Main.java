@@ -4,14 +4,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Properties;
 
 import net.wasamon.mjlib.util.GetOpt;
-import net.wasamon.mjlib.util.GetOptException;
 import openjdk.com.sun.tools.javac.main.Main.Result;
 import synthesijer.Manager.OutputFormat;
 import synthesijer.Manager.SynthesijerModuleInfo;
@@ -27,7 +27,7 @@ import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 public class Main {
 
     public static void main(String... args) throws Exception{
-	GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,ip-exact:,vendor:,libname:", args);
+	GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,ip-exact:,vendor:,libname:,lib-classes:", args);
 	if(opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0){
 	    printHelp();
 	    System.exit(0);
@@ -37,7 +37,23 @@ public class Main {
 	ArrayList<String> irSrc = new ArrayList<>();
 	
 	ArrayList<String> classPath = new ArrayList<>();
+	ArrayList<String> javacPath = new ArrayList<>();
+	
+	classPath.add(".");
+	javacPath.add(".");
 	addClassPath(".");
+
+	if(opt.flag("lib-classes")){
+	    String arg = opt.getValue("lib-classes");
+	    if(arg != null){
+		String[] paths = arg.split(":");
+		for(String path: paths){
+		    addClassPath(path);
+		    classPath.add(path);
+		    javacPath.add(path);
+		}
+	    }
+	}
 	
 	for(String a: opt.getArgs()){
 	    if(a.endsWith(".java")){
@@ -52,8 +68,21 @@ public class Main {
 		irSrc.add(a);
 	    }
 	}
-
+	
+	String osName = System.getProperty("os.name");
+	String pathDelim = ":"; 
+	if(osName.startsWith("Windows")){
+	    pathDelim = ";";
+	}
+	String classPathStr = System.getProperty("java.class.path");
+	for(String s: javacPath){
+	    classPathStr += pathDelim + s;
+	}
+		
 	if(javaSrc.size() > 0){
+	    javaSrc.add(0, classPathStr);
+	    javaSrc.add(0, "-cp");
+	    System.out.println(javaSrc);
 	    openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
 	    Result result = compiler.compile(javaSrc.toArray(new String[]{}));
 	    if(result.isOK() == false){
@@ -126,7 +155,8 @@ public class Main {
 	System.out.println("  --vhdl: output VHDL");
 	System.out.println("  --verilog: output Verilog HDL");
 	System.out.println("  (If you specify neither --vhdl nor --verilog, --vhdl is selected.)");
-	System.out.println("  --config=file: thespecified file is used for compiler settings");
+	System.out.println("  --config=file: the specified file is used for compiler settings");
+	System.out.println("  --lib-classes=path1:path2:...: the specified paths will be added as classpaths for compile time");
 	System.out.println("  --no-optimize: do not apply any optimizations");
 	System.out.println("  --chaining: do opeartion chain in greedy manner");
 	System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
@@ -151,6 +181,16 @@ public class Main {
     }
 
     private static void addClassPath(File classPath) throws IOException {
+	/*
+	  if (classPath.isDirectory()) {
+	  File[] children = classPath.listFiles();
+	  for(File f: children){
+	  addClassPath(f);
+	  }
+	  }else{
+	  addClassPath(classPath.toURL());
+	  }
+	*/	
 	addClassPath(classPath.toURL());
     }
 
