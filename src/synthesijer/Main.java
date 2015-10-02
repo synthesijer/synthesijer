@@ -82,7 +82,7 @@ public class Main {
 	if(javaSrc.size() > 0){
 	    javaSrc.add(0, classPathStr);
 	    javaSrc.add(0, "-cp");
-	    System.out.println(javaSrc);
+	    //System.out.println(javaSrc);
 	    openjdk.com.sun.tools.javac.main.Main compiler = new openjdk.com.sun.tools.javac.main.Main("javac", new PrintWriter(System.err, true));
 	    Result result = compiler.compile(javaSrc.toArray(new String[]{}));
 	    if(result.isOK() == false){
