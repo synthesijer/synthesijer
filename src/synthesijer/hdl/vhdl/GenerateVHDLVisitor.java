@@ -357,6 +357,10 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	    if(dest.getType().isBit()){
 		return String.format("std_logic(%s)", src);
 	    }else if(dest.getType().isVector()){
+		if(dest.getType().getWidth() < expr.getType().getWidth()){
+		    SynthesijerUtils.warn(String.format("Destination(%s) is %dbit, but source(%s) is %dbit. It is forced for destination.", dest.getVHDL(), dest.getType().getWidth(), src, expr.getType().getWidth()));
+		    src = String.format("%s(%d-1 downto %d)", src, dest.getType().getWidth(), 0);
+		}
 		return String.format("std_logic_vector(%s)", src);
 	    }else if(dest.getType().isSigned()){
 		return String.format("signed(%s)", src);
