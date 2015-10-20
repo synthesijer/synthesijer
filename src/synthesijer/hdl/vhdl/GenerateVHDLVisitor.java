@@ -357,12 +357,35 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	    if(dest.getType().isBit()){
 		return String.format("std_logic(%s)", src);
 	    }else if(dest.getType().isVector()){
-		if(dest.getType().getWidth() < expr.getType().getWidth()){
-		    SynthesijerUtils.warn(String.format("Destination(%s) is %dbit, but source(%s) is %dbit. It is forced for destination.", dest.getVHDL(), dest.getType().getWidth(), src, expr.getType().getWidth()));
-		    src = String.format("%s(%d-1 downto %d)", src, dest.getType().getWidth(), 0);
+		if(dest.getType().getWidth() != expr.getType().getWidth()){
+		    SynthesijerUtils.warn(String.format("Destination(%s) is %dbit, but source(%s) is %dbit. It is forced for destination.",
+							dest.getVHDL(), dest.getType().getWidth(), src, expr.getType().getWidth()));
+		    if(dest.getType().getWidth() < expr.getType().getWidth()){
+			src = String.format("%s(%d-1 downto %d)", src, dest.getType().getWidth(), 0);
+		    }else if(dest.getType().getWidth() > expr.getType().getWidth()){
+			String s = "";
+			for(int i = 0; i < dest.getType().getWidth()-expr.getType().getWidth(); i++){
+			    s += src + "(" + (expr.getType().getWidth()-1) + ")" + " & ";
+			}
+			src = s + src;
+		    }
 		}
 		return String.format("std_logic_vector(%s)", src);
 	    }else if(dest.getType().isSigned()){
+
+		if(dest.getType().getWidth() != expr.getType().getWidth()){
+		    SynthesijerUtils.warn(String.format("Destination(%s) is %dbit, but source(%s) is %dbit. It is forced for destination.",
+							dest.getVHDL(), dest.getType().getWidth(), src, expr.getType().getWidth()));
+		    if(dest.getType().getWidth() < expr.getType().getWidth()){
+			src = String.format("%s(%d-1 downto %d)", src, dest.getType().getWidth(), 0);
+		    }else if(dest.getType().getWidth() > expr.getType().getWidth()){
+			String s = "";
+			for(int i = 0; i < dest.getType().getWidth()-expr.getType().getWidth(); i++){
+			    s += src + "(" + (expr.getType().getWidth()-1) + ")" + " & ";
+			}
+			src = s + src;
+		    }
+		}
 		return String.format("signed(%s)", src);
 	    }else{
 		SynthesijerUtils.error("cannot assign:" + dest + " <- " + expr);
