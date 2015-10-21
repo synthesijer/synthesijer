@@ -397,10 +397,18 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
     @Override
     public void visitHDLSignal(HDLSignal o) {
 	if(o.isRegister() && o.isAssignSignalEvent()){
-	    HDLUtils.println(dest, offset, String.format("process(%s)", o.getAssignSignalEventSig().getVHDL()));
+	    HDLUtils.println(dest, offset, String.format("process(%s)", o.getAssignSignalEventSignal().getName()));
 	    HDLUtils.println(dest, offset, "begin");
-	    HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getAssignSignalEventSig().getVHDL(), o.getAssignSignalEventSig().getVHDL()));
+	    HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getAssignSignalEventSignal().getName(), o.getAssignSignalEventSignal().getName()));
 	    HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignSignalEventExpr().getResultExpr())));
+	    HDLUtils.println(dest, offset+2, "end if;");
+	    HDLUtils.println(dest, offset, "end process;");
+	    HDLUtils.nl(dest);
+	}else if(o.isRegister() && o.isAssignPortEvent()){
+	    HDLUtils.println(dest, offset, String.format("process(%s)", o.getAssignPortEventPort().getName()));
+	    HDLUtils.println(dest, offset, "begin");
+	    HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getAssignPortEventPort().getName(), o.getAssignPortEventPort().getName()));
+	    HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignPortEventExpr().getResultExpr())));
 	    HDLUtils.println(dest, offset+2, "end if;");
 	    HDLUtils.println(dest, offset, "end process;");
 	    HDLUtils.nl(dest);
