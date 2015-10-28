@@ -19,10 +19,10 @@ public class SC1602TestKC705 {
 		HDLPort top_lcd_rw = top.newPort("pLCD_RW", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.NO_SIG));
 
 		HDLModule target = new HDLModule("SC1602Test", "clk", "reset");
-		HDLPort lcd_rs = target.newPort("class_obj_0000_pLCD_RS_exp", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.NO_SIG));
-		HDLPort lcd_e  = target.newPort("class_obj_0000_pLCD_E_exp",  HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.NO_SIG));
-		HDLPort lcd_db = target.newPort("class_obj_0000_pLCD_DB_exp", HDLPort.DIR.OUT, HDLPrimitiveType.genVectorType(4), EnumSet.of(HDLPort.OPTION.NO_SIG));
-		HDLPort lcd_rw = target.newPort("class_obj_0000_pLCD_RW_exp", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.NO_SIG));
+		HDLPort lcd_rs = target.newPort("obj_pLCD_RS_exp", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.NO_SIG));
+		HDLPort lcd_e  = target.newPort("obj_pLCD_E_exp",  HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.NO_SIG));
+		HDLPort lcd_db = target.newPort("obj_pLCD_DB_exp", HDLPort.DIR.OUT, HDLPrimitiveType.genVectorType(4), EnumSet.of(HDLPort.OPTION.NO_SIG));
+		HDLPort lcd_rw = target.newPort("obj_pLCD_RW_exp", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType(), EnumSet.of(HDLPort.OPTION.NO_SIG));
 		HDLPort test_req  = target.newPort("test_req", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort test_busy = target.newPort("test_busy", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
 		

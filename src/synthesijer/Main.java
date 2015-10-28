@@ -27,7 +27,7 @@ import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 public class Main {
 
     public static void main(String... args) throws Exception{
-	GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,ip-exact:,vendor:,libname:,lib-classes:", args);
+	GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name", args);
 	if(opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0){
 	    printHelp();
 	    System.exit(0);
@@ -92,10 +92,10 @@ public class Main {
 		
 	boolean vhdlFlag = opt.flag("vhdl");
 	boolean verilogFlag = opt.flag("verilog");
-	Options options = new Options();
-	options.optimizing = !opt.flag("no-optimize");
-	options.chaining = opt.flag("chaining");
-	options.operation_strength_reduction = opt.flag("operation_strength_reduction");
+	Options.INSTANCE.optimizing = !opt.flag("no-optimize");
+	Options.INSTANCE.chaining = !opt.flag("no-chaining");
+	Options.INSTANCE.legacy_instance_variable_name = opt.flag("legacy-instance-variable-name");
+	Options.INSTANCE.operation_strength_reduction = opt.flag("operation_strength_reduction");
 	boolean packaging = false;
 	String packageTop = "";
 	if(opt.flag("ip-exact")){
@@ -121,7 +121,7 @@ public class Main {
 				
 	//dump("dump000.xml");
 	Manager.INSTANCE.preprocess();
-	Manager.INSTANCE.optimize(options);
+	Manager.INSTANCE.optimize(Options.INSTANCE);
 		
 	for(String f: irSrc){
 	    System.out.println(f);

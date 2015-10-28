@@ -3,6 +3,7 @@ package synthesijer.scheduler;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import synthesijer.Options;
 import synthesijer.IdentifierGenerator;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
@@ -431,7 +432,11 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	String vName;
 	if(o.getScope().getMethod() == null){
 	    // class variable
-	    vName = "class_" + o.getName();
+	    if(Options.INSTANCE.legacy_instance_variable_name){
+		vName = String.format("class_%s_%04d", o.getName(), idGen.id());
+	    }else{
+		vName = o.getName();
+	    }
 	}else{
 	    // method variable
 	    String prefix =o.getScope().getMethod().getName();
