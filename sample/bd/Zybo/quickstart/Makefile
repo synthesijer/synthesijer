@@ -1,5 +1,5 @@
 SYNTHESIJER ?= ../../../../bin
-SYNTHESIJER_EXTRA_LIB ?= ../../../../../synthesijer_extra_libs
+SYNTHESIJER_EXTRA_LIB ?= ../../../../../synthesijer_extra-libs
 SYNTHESIJER_LIB ?= ../../../../lib
 
 CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_EXTRA_LIB)/bin:.
