@@ -9,40 +9,40 @@ architecture RTL of RGBTest_sim is
 
   component RGBTest
     port (
-      clk : in std_logic;
-      reset : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_forbid_exp_exp_exp : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARADDR_exp_exp_exp : out std_logic_vector(32-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARLEN_exp_exp_exp : out std_logic_vector(8-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARVALID_exp_exp_exp : out std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARREADY_exp_exp_exp : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARSIZE_exp_exp_exp : out std_logic_vector(3-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARBURST_exp_exp_exp : out std_logic_vector(2-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARCACHE_exp_exp_exp : out std_logic_vector(4-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARPROT_exp_exp_exp : out std_logic_vector(3-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RDATA_exp_exp_exp : in std_logic_vector(32-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RRESP_exp_exp_exp : in std_logic_vector(2-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RLAST_exp_exp_exp : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RVALID_exp_exp_exp : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RREADY_exp_exp_exp : out std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWADDR_exp_exp_exp : out std_logic_vector(32-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWLEN_exp_exp_exp : out std_logic_vector(8-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWVALID_exp_exp_exp : out std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWSIZE_exp_exp_exp : out std_logic_vector(3-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWBURST_exp_exp_exp : out std_logic_vector(2-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWCACHE_exp_exp_exp : out std_logic_vector(4-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWPROT_exp_exp_exp : out std_logic_vector(3-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWREADY_exp_exp_exp : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WDATA_exp_exp_exp : out std_logic_vector(32-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WLAST_exp_exp_exp : out std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WVALID_exp_exp_exp : out std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WREADY_exp_exp_exp : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WSTRB_exp_exp_exp : out std_logic_vector(4-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BRESP_exp_exp_exp : in std_logic_vector(2-1 downto 0);
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BVALID_exp_exp_exp : in std_logic;
-      class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BREADY_exp_exp_exp : out std_logic;
-      run_req : in std_logic;
-      run_busy : out std_logic
+      clk                                : in  std_logic;
+      reset                              : in  std_logic;
+      obj_obj_obj_forbid_exp             : in  std_logic;
+      obj_obj_obj_axi_reader_ARADDR_exp  : out std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_reader_ARLEN_exp   : out std_logic_vector(8-1 downto 0);
+      obj_obj_obj_axi_reader_ARVALID_exp : out std_logic;
+      obj_obj_obj_axi_reader_ARREADY_exp : in  std_logic;
+      obj_obj_obj_axi_reader_ARSIZE_exp  : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_reader_ARBURST_exp : out std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_reader_ARCACHE_exp : out std_logic_vector(4-1 downto 0);
+      obj_obj_obj_axi_reader_ARPROT_exp  : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_reader_RDATA_exp   : in  std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_reader_RRESP_exp   : in  std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_reader_RLAST_exp   : in  std_logic;
+      obj_obj_obj_axi_reader_RVALID_exp  : in  std_logic;
+      obj_obj_obj_axi_reader_RREADY_exp  : out std_logic;
+      obj_obj_obj_axi_writer_AWADDR_exp  : out std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_writer_AWLEN_exp   : out std_logic_vector(8-1 downto 0);
+      obj_obj_obj_axi_writer_AWVALID_exp : out std_logic;
+      obj_obj_obj_axi_writer_AWSIZE_exp  : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_writer_AWBURST_exp : out std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_writer_AWCACHE_exp : out std_logic_vector(4-1 downto 0);
+      obj_obj_obj_axi_writer_AWPROT_exp  : out std_logic_vector(3-1 downto 0);
+      obj_obj_obj_axi_writer_AWREADY_exp : in  std_logic;
+      obj_obj_obj_axi_writer_WDATA_exp   : out std_logic_vector(32-1 downto 0);
+      obj_obj_obj_axi_writer_WLAST_exp   : out std_logic;
+      obj_obj_obj_axi_writer_WVALID_exp  : out std_logic;
+      obj_obj_obj_axi_writer_WREADY_exp  : in  std_logic;
+      obj_obj_obj_axi_writer_WSTRB_exp   : out std_logic_vector(4-1 downto 0);
+      obj_obj_obj_axi_writer_BRESP_exp   : in  std_logic_vector(2-1 downto 0);
+      obj_obj_obj_axi_writer_BVALID_exp  : in  std_logic;
+      obj_obj_obj_axi_writer_BREADY_exp  : out std_logic;
+      run_req                            : in  std_logic;
+      run_busy                           : out std_logic
       );
   end component RGBTest;
 
@@ -67,36 +67,36 @@ U : RGBTest
   port map(
     clk                        => clk,
     reset                      => reset,
-    class_obj_0002_class_obj_0000_class_obj_0000_forbid_exp_exp_exp => '0',
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARADDR_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARLEN_exp_exp_exp   => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARVALID_exp_exp_exp => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARREADY_exp_exp_exp => '1',
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARSIZE_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARBURST_exp_exp_exp => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARCACHE_exp_exp_exp => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_ARPROT_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RDATA_exp_exp_exp   => X"55555555",
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RRESP_exp_exp_exp   => (others => '0'),
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RLAST_exp_exp_exp   => '1',
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RVALID_exp_exp_exp  => '1',
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_reader_RREADY_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWADDR_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWLEN_exp_exp_exp   => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWVALID_exp_exp_exp => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWSIZE_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWBURST_exp_exp_exp => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWCACHE_exp_exp_exp => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWPROT_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_AWREADY_exp_exp_exp => '1',
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WDATA_exp_exp_exp   => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WLAST_exp_exp_exp   => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WVALID_exp_exp_exp  => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WREADY_exp_exp_exp  => '1',
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_WSTRB_exp_exp_exp   => open,
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BRESP_exp_exp_exp   => (others => '0'),
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BVALID_exp_exp_exp  => '0',
-    class_obj_0002_class_obj_0000_class_obj_0000_axi_writer_BREADY_exp_exp_exp  => open,
+    obj_obj_obj_forbid_exp => '0',
+    obj_obj_obj_axi_reader_ARADDR_exp  => open,
+    obj_obj_obj_axi_reader_ARLEN_exp   => open,
+    obj_obj_obj_axi_reader_ARVALID_exp => open,
+    obj_obj_obj_axi_reader_ARREADY_exp => '1',
+    obj_obj_obj_axi_reader_ARSIZE_exp  => open,
+    obj_obj_obj_axi_reader_ARBURST_exp => open,
+    obj_obj_obj_axi_reader_ARCACHE_exp => open,
+    obj_obj_obj_axi_reader_ARPROT_exp  => open,
+    obj_obj_obj_axi_reader_RDATA_exp   => X"55555555",
+    obj_obj_obj_axi_reader_RRESP_exp   => (others => '0'),
+    obj_obj_obj_axi_reader_RLAST_exp   => '1',
+    obj_obj_obj_axi_reader_RVALID_exp  => '1',
+    obj_obj_obj_axi_reader_RREADY_exp  => open,
+    obj_obj_obj_axi_writer_AWADDR_exp  => open,
+    obj_obj_obj_axi_writer_AWLEN_exp   => open,
+    obj_obj_obj_axi_writer_AWVALID_exp => open,
+    obj_obj_obj_axi_writer_AWSIZE_exp  => open,
+    obj_obj_obj_axi_writer_AWBURST_exp => open,
+    obj_obj_obj_axi_writer_AWCACHE_exp => open,
+    obj_obj_obj_axi_writer_AWPROT_exp  => open,
+    obj_obj_obj_axi_writer_AWREADY_exp => '1',
+    obj_obj_obj_axi_writer_WDATA_exp   => open,
+    obj_obj_obj_axi_writer_WLAST_exp   => open,
+    obj_obj_obj_axi_writer_WVALID_exp  => open,
+    obj_obj_obj_axi_writer_WREADY_exp  => '1',
+    obj_obj_obj_axi_writer_WSTRB_exp   => open,
+    obj_obj_obj_axi_writer_BRESP_exp   => (others => '0'),
+    obj_obj_obj_axi_writer_BVALID_exp  => '0',
+    obj_obj_obj_axi_writer_BREADY_exp  => open,
     run_req                   => '1',
     run_busy                  => open
   );

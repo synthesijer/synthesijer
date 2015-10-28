@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../bin
+SYNTHESIJER ?= ../../synthesijer.jar
 SOURCES = BF.java HW.java IO.java ../serial_echo/RS232C_RX_Wrapper.java ../serial_echo/RS232C_TX_Wrapper.java rs232c.java 
 #OPT = --chaining --ip-exact=HW
 OPT = --ip-exact=HW

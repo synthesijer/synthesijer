@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.Optional;
 
 import synthesijer.CompileState;
+import synthesijer.Options;
 import synthesijer.IdentifierGenerator;
 import synthesijer.Manager;
 import synthesijer.Manager.SynthesijerModuleInfo;
@@ -279,7 +280,10 @@ public class SchedulerInfoCompiler {
 		for(HDLPort p: inst.getSubModule().getPorts()){
 			if(p.isSet(HDLPort.OPTION.EXPORT)){
 				String n = inst.getSignalForPort(p.getName()).getName();
-				HDLPort export = hm.newPort(n + "_exp", p.getDir(), p.getType(), EnumSet.of(HDLPort.OPTION.EXPORT));
+				if(p.isSet(HDLPort.OPTION.EXPORT_PATH) == false || Options.INSTANCE.legacy_instance_variable_name){
+				    n += "_exp";
+				}
+				HDLPort export = hm.newPort(n, p.getDir(), p.getType(), EnumSet.of(HDLPort.OPTION.EXPORT, HDLPort.OPTION.EXPORT_PATH));
 				if(p.getDir() == HDLPort.DIR.INOUT || p.isSet(HDLPort.OPTION.NO_SIG)){
 					hm.rmSignal(inst.getSignalForPort(p.getName()));
 					inst.rmPortPair(inst.getPortPair(p));

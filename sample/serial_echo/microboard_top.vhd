@@ -22,8 +22,8 @@ architecture RTL of microboard_top is
       reset : in std_logic;
       run_req : in std_logic;
       run_busy : out std_logic;
-      class_tx_0002_dout_exp : out std_logic;
-      class_rx_0000_din_exp : in std_logic
+      tx_dout_exp : out std_logic;
+      rx_din_exp : in std_logic
     );
   end component ToUpper;
 
@@ -36,8 +36,8 @@ architecture RTL of microboard_top is
   signal U_reset : std_logic;
   signal U_run_req : std_logic;
   signal U_run_busy : std_logic;
-  signal U_class_tx_0002_dout_exp : std_logic;
-  signal U_class_rx_0000_din_exp : std_logic;
+  signal U_tx_dout_exp : std_logic;
+  signal U_rx_din_exp : std_logic;
 
 begin
 
@@ -45,7 +45,7 @@ begin
   USER_RESET_sig <= USER_RESET;
   USB_RS232_RXD_sig <= USB_RS232_RXD;
   USB_RS232_TXD <= USB_RS232_TXD_sig;
-  USB_RS232_TXD_sig <= U_class_tx_0002_dout_exp;
+  USB_RS232_TXD_sig <= U_tx_dout_exp;
 
 
   -- expressions
@@ -58,7 +58,7 @@ begin
 
   U_run_req <= '1';
 
-  U_class_rx_0000_din_exp <= USB_RS232_RXD_sig;
+  U_rx_din_exp <= USB_RS232_RXD_sig;
 
 
   inst_U : ToUpper
@@ -67,8 +67,8 @@ begin
     reset => U_reset,
     run_req => U_run_req,
     run_busy => U_run_busy,
-    class_tx_0002_dout_exp => U_class_tx_0002_dout_exp,
-    class_rx_0000_din_exp => U_class_rx_0000_din_exp
+    tx_dout_exp => U_tx_dout_exp,
+    rx_din_exp => U_rx_din_exp
   );
 
 
