@@ -7,7 +7,7 @@ import synthesijer.hdl.expr.*;
 public class MicroboardTop{
 	
 	public static void main(String... args) throws IOException{
-		HDLModule top = new HDLModule("microboard_top", "CLOCK_Y3", "USER_RESET");
+		HDLModule top = new HDLModule("microboard_top", "CLOCK_Y2", "USER_RESET");
 		HDLPort din = top.newPort("USB_RS232_RXD", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort dout = top.newPort("USB_RS232_TXD", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
 

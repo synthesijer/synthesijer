@@ -4,7 +4,11 @@ microboard_top.vhd: MicroboardTop.java
 	javac -cp $(SYNTHESIJER):. $<
 	java -cp $(SYNTHESIJER):. $(<:.java=)
 
-all: microboard_top.vhd
+microboard_top.v: MicroboardTop.java
+	javac -cp $(SYNTHESIJER):. $<
+	java -cp $(SYNTHESIJER):. $(<:.java=)
+
+ise:
 	mkdir -p xst/projnav.tmp
 	xst -intstyle ise -ifn "microboard_top.xst" -ofn "microboard_top.syr" 
 	ngdbuild -intstyle ise -dd _ngo -nt timestamp -uc microboard.ucf -p xc6slx9-csg324-2 microboard_top.ngc microboard_top.ngd  
@@ -12,6 +16,14 @@ all: microboard_top.vhd
 	par -w -intstyle ise -ol high -mt off microboard_top_map.ncd microboard_top.ncd microboard_top.pcf 
 	trce -intstyle ise -v 3 -s 2 -n 3 -fastpaths -xml microboard_top.twx microboard_top.ncd -o microboard_top.twr microboard_top.pcf 
 	bitgen -intstyle ise -f microboard_top.ut microboard_top.ncd 
+
+all-vhdl: microboard_top.vhd
+	ln -sf microboard_top_vhdl.prj microboard_top.prj
+	$(MAKE) ise
+
+all-verilog: microboard_top.v
+	ln -sf microboard_top_verilog.prj microboard_top.prj
+	$(MAKE) ise
 
 clean:
 	-rm -f MicroboardTop.class
