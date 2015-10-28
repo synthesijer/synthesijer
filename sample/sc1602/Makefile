@@ -3,7 +3,7 @@ SYNTHESIJER ?= ../../bin
 SOURCES = SC1602Test.java SC1602Wrapper.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
-OPT = --chaining --ip-exact=SC1602Test
+OPT = --chaining --ip-exact=SC1602Test --legacy-instance-variable-name
 
 all:
 	java -cp $(SYNTHESIJER):. synthesijer.Main --vhdl --verilog $(OPT) $(SOURCES)

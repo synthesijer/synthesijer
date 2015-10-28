@@ -158,8 +158,9 @@ public class Main {
 	System.out.println("  --config=file: the specified file is used for compiler settings");
 	System.out.println("  --lib-classes=path1:path2:...: the specified paths will be added as classpaths for compile time");
 	System.out.println("  --no-optimize: do not apply any optimizations");
-	System.out.println("  --chaining: do opeartion chain in greedy manner");
+	System.out.println("  --no-chaining: do not apply opeartion chain in greedy manner");
 	System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
+	System.out.println("  --legacy-instance-variable-name: to use legacy variable name for instance variables, such as class_*_0000");
 	System.out.println("  --ip-exact=TOP: generates a IP package template for \"TOP\" module");
 	System.out.println("  --vendor=name: to specify vendor id for generating a IP package");
 	System.out.println("  --libname=name: to specify library name for generating a IP package");
