@@ -123,7 +123,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
     @Override
     public void visitHDLPort(HDLPort o) {
-	if(o.isSet(HDLPort.OPTION.NO_SIG)) return; // nothing to do
+	if(o.isSet(HDLPort.OPTION.NO_SIG) || o.isSet(HDLPort.OPTION.EXPORT_PATH)) return; // nothing to do
 	if(o.getDir() == HDLPort.DIR.INOUT){
 	    return;
 	}else if(o.isOutput()){
