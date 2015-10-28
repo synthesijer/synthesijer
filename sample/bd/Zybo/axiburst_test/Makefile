@@ -20,6 +20,9 @@ all: $(SOURCES)
 	cp $(SYNTHESIJER_LIB)/vhdl/dualportram.vhd AXIHP_MEMCPY2_v1_0/src/
 	cp $(SYNTHESIJER_EXTRA_LIB)/hdl/vhdl/axi_lite_slave_32.vhd AXIHP_MEMCPY2_v1_0/src/
 	cp $(SYNTHESIJER_EXTRA_LIB)/hdl/vhdl/simple_axi_memiface_32.vhd AXIHP_MEMCPY2_v1_0/src/
+	cp $(SYNTHESIJER_EXTRA_LIB)/hdl/vhdl/axi_memiface_32.vhd AXIHP_MEMCPY2_v1_0/src/
+	cp $(SYNTHESIJER_EXTRA_LIB)/hdl_lib/vhdl/simple_fifo_32.vhd AXIHP_MEMCPY2_v1_0/src/
+	cp $(SYNTHESIJER_EXTRA_LIB)/hdl_lib/vhdl/simple_fifo.vhd AXIHP_MEMCPY2_v1_0/src/
 
 clean:
 	-rm -f *.class
@@ -31,6 +34,7 @@ clean:
 	-rm -f *.vcd
 	-rm -f work-obj93.cf
 	-rm -f *.txt
+	-rm -f *.ir
 	-rm -f synthesijer_lib_axi_AXIMemIface32RTLTest.v
 	-rm -f synthesijer_lib_axi_AXIMemIface32RTLTest.vhd
 	-rm -f synthesijer_lib_axi_AXILiteSlave32RTL.vhd
