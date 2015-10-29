@@ -72,11 +72,16 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 		if(o.getType() instanceof HDLUserDefinedType){
 			((HDLUserDefinedType) o.getType()).accept(this);
 		}
-		String s;
+		String s = "";
+		
+		if(o.isDebugFlag()){
+		    s += "(* mark_debug=\"TRUE\", keep=\"TRUE\" *) ";
+		}
+
 		if(o.getResetValue() != null && o.isRegister()){
-			s = String.format("%s %s %s = %s;", o.getKind().toString(), o.getType().getVerilogHDL(), o.getName(), o.getResetValue().getVerilogHDL());
+			s += String.format("%s %s %s = %s;", o.getKind().toString(), o.getType().getVerilogHDL(), o.getName(), o.getResetValue().getVerilogHDL());
 		}else{
-			s = String.format("%s %s %s;", o.getKind().toString(), o.getType().getVerilogHDL(), o.getName());
+			s += String.format("%s %s %s;", o.getKind().toString(), o.getType().getVerilogHDL(), o.getName());
 		}
 		HDLUtils.println(dest, offset, s);
 	}
