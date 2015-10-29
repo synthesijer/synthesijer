@@ -1,5 +1,6 @@
 public class Test001{
 	
+	@synthesijer.rt.Debug
 	private int x = 0;
 	public int acc(int y){
 		x += y; 
