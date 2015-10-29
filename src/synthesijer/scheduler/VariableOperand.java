@@ -30,6 +30,8 @@ public class VariableOperand implements Operand{
 	private boolean chaining = false;
 	
 	private final boolean memberFlag;
+    
+    private boolean debugFlag = false;
 	
 	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
 	
@@ -121,6 +123,14 @@ public class VariableOperand implements Operand{
 	public boolean isMember(){
 		return memberFlag;
 	}
+
+    public void setDebug(boolean flag){
+	debugFlag = flag;
+    }
+
+    public boolean isDebug(){
+	return debugFlag;
+    }
 
 	public SchedulerItem getPredItem(SchedulerItem ctx){
 		return predItemMap.get(ctx);

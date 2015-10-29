@@ -145,6 +145,7 @@ public class SchedulerInfoCompiler {
 	}
 	if(type == PrimitiveTypeKind.VOID) return null; // Void variable is not synthesized.
 	HDLSignal sig = hm.newSignal(name, getHDLType(type));
+	if(v.isDebug()) sig.setDebugFlag(true);
 	//		if(v.getInitExpr() != null && v.getInitExpr().isConstant()){
 	if(v.getInitSrc() != null){
 	    if(v.getInitSrc() instanceof ConstantOperand){

@@ -450,8 +450,10 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 	}
 	if(vv.getMethod() != null){
 	    v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile(), false);
+	    if(vv.isDebug()) v.setDebug(true);
 	}else{
 	    v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile(), true);
+	    if(vv.isDebug()) v.setDebug(true);
 	}
 		
 	//Variable v = new Variable(o.getVariable().getUniqueName(), t);

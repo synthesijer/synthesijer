@@ -1,5 +1,6 @@
 public class Test000{
 
+    @synthesijer.rt.Debug
     int ic;
     long lc;
     int x;
