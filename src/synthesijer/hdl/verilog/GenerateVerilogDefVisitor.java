@@ -75,7 +75,7 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 		String s = "";
 		
 		if(o.isDebugFlag()){
-		    s += "(* mark_debug=\"TRUE\", keep=\"TRUE\" *) ";
+		    s += "(* mark_debug=\"TRUE\", keep=\"TRUE\", S=\"TRUE\" *) ";
 		}
 
 		if(o.getResetValue() != null && o.isRegister()){

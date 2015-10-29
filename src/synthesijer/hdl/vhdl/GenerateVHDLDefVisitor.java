@@ -111,6 +111,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		HDLUtils.nl(dest);
 		HDLUtils.println(dest, offset+2, String.format("attribute mark_debug : string;"));
 		HDLUtils.println(dest, offset+2, String.format("attribute keep : string;"));
+		HDLUtils.println(dest, offset+2, String.format("attribute S : string;"));
 		HDLUtils.nl(dest);
 		
 		Hashtable<String, Boolean> componentFlags = new Hashtable<>();
@@ -163,6 +164,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		if(o.isDebugFlag()){
 			HDLUtils.println(dest, offset, String.format("attribute mark_debug of %s : signal is \"true\";", o.getName()));
 			HDLUtils.println(dest, offset, String.format("attribute keep of %s : signal is \"true\";", o.getName()));
+			HDLUtils.println(dest, offset, String.format("attribute S of %s : signal is \"true\";", o.getName()));
 		}
 	}
 
