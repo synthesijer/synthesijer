@@ -72,7 +72,17 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	pairs.remove(pair);
 	if(pair.item instanceof HDLSignal) module.rmSignal((HDLSignal)pair.item);
     }
-	
+
+    public void replacePortPair(HDLPortPairItem oldItem, HDLPortPairItem newItem){
+	PortPair pair = getPortPairByItem(oldItem);
+	if(pair == null){
+	    SynthesijerUtils.warn("not specified remove pair, nothing to do.");
+	    return;
+	}
+	pairs.remove(pair);
+	pairs.add(new PortPair(newItem, pair.port));
+    }
+
     public void update(){
 	genPortSignals();
     }
@@ -93,6 +103,14 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
     public PortPair getPortPair(HDLPort port){
 	for(PortPair pair: pairs){
 	    if(pair.port.getName().equals(port.getName())) return pair;
+	}
+	return null;
+    }
+
+    private PortPair getPortPairByItem(HDLPortPairItem item){
+	for(PortPair pair: pairs){
+	    //System.out.println(pair.item.getName() + "<->" + item.getName());
+	    if(pair.item.getName().equals(item.getName())) return pair;
 	}
 	return null;
     }

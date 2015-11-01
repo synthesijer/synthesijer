@@ -6,6 +6,7 @@ import synthesijer.Constant;
 import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
+import synthesijer.hdl.HDLInstanceRef;
 import synthesijer.hdl.HDLInstance.ParamPair;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
@@ -435,4 +436,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		
     }
 
+    @Override
+    public void visitHDLInstanceRef(HDLInstanceRef o){
+    }
 }

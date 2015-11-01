@@ -20,6 +20,11 @@ public class HDLTreeVisitorBase implements HDLTreeVisitor{
 		visitHDLTree(o);
 	}
 
+    	@Override
+	public void visitHDLInstanceRef(HDLInstanceRef o) {
+		visitHDLTree(o);
+	}
+
 	@Override
 	public void visitHDLLitral(HDLLiteral o) {
 		visitHDLTree(o);

@@ -22,6 +22,7 @@ import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
+import synthesijer.hdl.HDLInstanceRef;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLOp;
 import synthesijer.hdl.HDLPort;
@@ -67,16 +68,11 @@ public class SchedulerInfoCompiler {
 	    }
 	}
     }
-	
-    private HDLInstance genArrayInstance(String name, ArrayType t, boolean publicFlag){
-	Manager.SynthesijerModuleInfo info = null;
-	Type t0 = t.getElemType();
-	if(t0 instanceof PrimitiveTypeKind == false){
-	    throw new RuntimeException("unsupported type: " + t);
-	}
-	PrimitiveTypeKind pt = (PrimitiveTypeKind)t0;
+
+    private SynthesijerModuleInfo searchArrayModuleInfo(PrimitiveTypeKind t, boolean publicFlag){
+	SynthesijerModuleInfo info = null;
 	if(publicFlag){
-	    switch(pt){
+	    switch(t){
 	    case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM1");  break;
 	    case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM8");  break;
 	    case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM16"); break;
@@ -87,7 +83,7 @@ public class SchedulerInfoCompiler {
 	    default: throw new RuntimeException("unsupported type: " + t);
 	    }
 	}else{
-	    switch(pt){
+	    switch(t){
 	    case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM1");  break;
 	    case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM8");  break;
 	    case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("SimpleBlockRAM16"); break;
@@ -98,12 +94,33 @@ public class SchedulerInfoCompiler {
 	    default: throw new RuntimeException("unsupported type: " + t);
 	    }
 	}
+	return info;
+    }
+	
+    private HDLInstance genArrayInstance(String name, ArrayType t, boolean publicFlag){
+	SynthesijerModuleInfo info = null;
+	Type t0 = t.getElemType();
+	if(t0 instanceof PrimitiveTypeKind == false){
+	    throw new RuntimeException("unsupported type: " + t);
+	}
+	info = searchArrayModuleInfo((PrimitiveTypeKind)t0, publicFlag);
 	HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
 	inst.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
 	inst.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
 	return inst;
     }
-	
+
+    private HDLInstanceRef genArrayInstanceRef(String name, ArrayType t, boolean publicFlag){
+	SynthesijerModuleInfo info = null;
+	Type t0 = t.getElemType();
+	if(t0 instanceof PrimitiveTypeKind == false){
+	    throw new RuntimeException("unsupported type: " + t);
+	}
+	info = searchArrayModuleInfo((PrimitiveTypeKind)t0, publicFlag);
+	HDLInstanceRef ref = new HDLInstanceRef(hm, info.getHDLModule(), name);
+	return ref;
+    }
+
     private class Pair{
 	public final VariableOperand orig; // the VariableOperand in given source
 	public final HDLSignal reg; // the actual signal for the method.
@@ -173,16 +190,13 @@ public class SchedulerInfoCompiler {
 	    }
 	}
 	if(v.isMethodParam()){
+	    String prefix = v.getMethodName();
+	    String n = prefix + "_" + v.getOrigName();
+	    HDLSignal local = hm.newSignal(n + "_local", getHDLType(type));
 	    if(v.isPrivateMethod()){
-		String prefix = v.getMethodName();
-		String n = prefix + "_" + v.getOrigName();
-		HDLSignal local = hm.newSignal(n + "_local", getHDLType(type));
 		getMethodParamPairList(prefix).add(new Pair(v, sig, null, local));
 	    }else{
-		String prefix = v.getMethodName();
-		String n = prefix + "_" + v.getOrigName();
 		HDLPort port = hm.newPort(n, HDLPort.DIR.IN, getHDLType(type));
-		HDLSignal local = hm.newSignal(n + "_local", getHDLType(type));
 		getMethodParamPairList(prefix).add(new Pair(v, sig, port, local));
 	    }
 	}else if(v.isPublic() && (!v.isGlobalConstant())){
@@ -201,13 +215,37 @@ public class SchedulerInfoCompiler {
 	
     private HDLVariable genHDLVariable(VariableOperand v, ArrayType t){
 	String name = v.getName();
-	HDLInstance array = genArrayInstance(name, t, v.isPublic());
 	Operand initSrc = v.getInitSrc();
+	HDLVariable ret = null;
 	if(initSrc != null && initSrc instanceof ArrayRefOperand){
+	    HDLInstance array = genArrayInstance(name, t, v.isPublic());
 	    ArrayRefOperand o = (ArrayRefOperand)initSrc;
 	    array.getParameterPair("WORDS").setValue(new HDLValue(o.words));
 	    int depth = o.depth;
 	    array.getParameterPair("DEPTH").setValue(new HDLValue(depth));
+	    
+	    if(v.isPublic() && (!v.isGlobalConstant())){
+		String n = v.getOrigName();
+		HDLPort addr = hm.newPort(n + "_address", HDLPort.DIR.IN, array.getSignalForPort("address").getType());
+		HDLPort we = hm.newPort(n + "_we", HDLPort.DIR.IN, array.getSignalForPort("we").getType());
+		HDLPort oe = hm.newPort(n + "_oe", HDLPort.DIR.IN, array.getSignalForPort("oe").getType());
+		HDLPort din = hm.newPort(n + "_din", HDLPort.DIR.IN, array.getSignalForPort("din").getType());
+		HDLPort dout = hm.newPort(n + "_dout", HDLPort.DIR.OUT, array.getSignalForPort("dout").getType());
+		HDLPort length = hm.newPort(n + "_length", HDLPort.DIR.OUT, array.getSignalForPort("length").getType());
+		array.getSignalForPort("address").setAssign(null, addr.getSignal());
+		array.getSignalForPort("we").setAssign(null, we.getSignal());
+		array.getSignalForPort("oe").setAssign(null, oe.getSignal());
+		array.getSignalForPort("din").setAssign(null, din.getSignal());
+		dout.getSignal().setAssign(null, array.getSignalForPort("dout"));				
+		length.getSignal().setAssign(null, array.getSignalForPort("length"));				
+	    }
+	    ret = array;
+	}else if(v.isMethodParam()){
+	    String prefix = v.getMethodName();
+	    String n = prefix + "_" + v.getOrigName();
+	    HDLType ht = getHDLType(t.getElemType());
+	    HDLInstanceRef ref = genArrayInstanceRef(n, t, v.isPublic());
+	    ret = ref;
 	}else{
 	    if(initSrc != null){
 		//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + initSrc.info());
@@ -216,22 +254,8 @@ public class SchedulerInfoCompiler {
 	    }
 	    SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
 	}
-	if(v.isPublic() && (!v.isGlobalConstant())){
-	    String n = v.getOrigName();
-	    HDLPort addr = hm.newPort(n + "_address", HDLPort.DIR.IN, array.getSignalForPort("address").getType());
-	    HDLPort we = hm.newPort(n + "_we", HDLPort.DIR.IN, array.getSignalForPort("we").getType());
-	    HDLPort oe = hm.newPort(n + "_oe", HDLPort.DIR.IN, array.getSignalForPort("oe").getType());
-	    HDLPort din = hm.newPort(n + "_din", HDLPort.DIR.IN, array.getSignalForPort("din").getType());
-	    HDLPort dout = hm.newPort(n + "_dout", HDLPort.DIR.OUT, array.getSignalForPort("dout").getType());
-	    HDLPort length = hm.newPort(n + "_length", HDLPort.DIR.OUT, array.getSignalForPort("length").getType());
-	    array.getSignalForPort("address").setAssign(null, addr.getSignal());
-	    array.getSignalForPort("we").setAssign(null, we.getSignal());
-	    array.getSignalForPort("oe").setAssign(null, oe.getSignal());
-	    array.getSignalForPort("din").setAssign(null, din.getSignal());
-	    dout.getSignal().setAssign(null, array.getSignalForPort("dout"));				
-	    length.getSignal().setAssign(null, array.getSignalForPort("length"));				
-	}
-	return array;
+	
+	return ret;
     }
 	
     private HDLVariable genHDLVariable(VariableOperand v, ComponentType t){
@@ -630,6 +654,10 @@ public class SchedulerInfoCompiler {
 		    HDLInstance array = (HDLInstance)var;
 		    we = array.getSignalForPort("we_b");
 		    din = array.getSignalForPort("din_b");
+		}else if(var instanceof HDLInstanceRef){
+		    HDLInstanceRef array = (HDLInstanceRef)var;
+		    we = array.getPortByPostfix("_we_b").get().getSignal();
+		    din = array.getPortByPostfix("_din_b").get().getSignal();
 		}else{
 		    // external memory (through Field Access)
 		    FieldAccessItem fa = fieldAccessChainMap.get(ref.getName());
@@ -637,9 +665,10 @@ public class SchedulerInfoCompiler {
 		    we = obj.getSignalForPort(fa.name + "_we");
 		    din = obj.getSignalForPort(fa.name + "_din");
 		}
-
+		
 		we.setAssign(state, HDLPreDefinedConstant.HIGH);
 		we.setDefaultValue(HDLPreDefinedConstant.LOW);
+		
 		HDLExpr expr = convOperandToHDLExpr(item, src[0]);
 		din.setAssign(state, expr);
 		predExprMap.put(item, expr);
@@ -671,13 +700,18 @@ public class SchedulerInfoCompiler {
 	    Operand src[] = item.getSrcOperand();
 			
 	    HDLSignal addr = null, oe = null, dout = null;
-	    if(varTable.get(((VariableOperand)src[0]).getName()) instanceof HDLInstance){
+	    HDLVariable var = varTable.get(((VariableOperand)src[0]).getName());
+	    if(var instanceof HDLInstance){
 		// local memory
-		HDLInstance array;
-		array = (HDLInstance)(varTable.get(((VariableOperand)src[0]).getName()));
+		HDLInstance array = (HDLInstance)var;
 		addr = array.getSignalForPort("address_b");
 		oe = array.getSignalForPort("oe_b");
 		dout = array.getSignalForPort("dout_b");
+	    }else if(var instanceof HDLInstanceRef){
+		HDLInstanceRef array = (HDLInstanceRef)var;
+		addr = array.getPortByPostfix("_address_b").get().getSignal();
+		oe = array.getPortByPostfix("_oe_b").get().getSignal();
+		dout = array.getPortByPostfix("_dout_b").get().getSignal();
 	    }else{
 		// external memory (through Field Access)
 		FieldAccessItem fa = fieldAccessChainMap.get(((VariableOperand)src[0]).getName());
@@ -688,7 +722,9 @@ public class SchedulerInfoCompiler {
 	    }
 
 	    HDLExpr index = convOperandToHDLExpr(item, src[1]);
-	    addr.setAssign(state, 0, index);
+	    if(addr != null){
+		addr.setAssign(state, 0, index);
+	    }
 	    if(oe != null){
 		oe.setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 		oe.setDefaultValue(HDLPreDefinedConstant.LOW);
@@ -705,21 +741,26 @@ public class SchedulerInfoCompiler {
 	    Operand src[] = item.getSrcOperand();
 			
 	    HDLSignal addr = null;
-	    if(varTable.get(((VariableOperand)src[0]).getName()) instanceof HDLInstance){
+	    HDLVariable var = varTable.get(((VariableOperand)src[0]).getName());
+	    if(var instanceof HDLInstance){
 		// local memory
-		HDLInstance array;
-		array = (HDLInstance)(varTable.get(((VariableOperand)src[0]).getName()));
+		HDLInstance array = (HDLInstance)var;
 		addr = array.getSignalForPort("address_b");
+	    }else if(var instanceof HDLInstanceRef){
+		HDLInstanceRef array = (HDLInstanceRef)var;
+		addr = array.getPortByPostfix("_address_b").get().getSignal();
 	    }else{
 		// external memory (through Field Access)
 		FieldAccessItem fa = fieldAccessChainMap.get(((VariableOperand)src[0]).getName());
+		
 		HDLInstance obj = (HDLInstance)(varTable.get(fa.obj.getName()));
 		addr = obj.getSignalForPort(fa.name + "_address");
 	    }
 			
 	    HDLExpr index = convOperandToHDLExpr(item, src[1]);
-	    addr.setAssign(state, index);
-	
+	    if(addr != null){
+		addr.setAssign(state, index);
+	    }
 	    break;
 	}
 	case CALL :{
@@ -750,9 +791,18 @@ public class SchedulerInfoCompiler {
 	    HDLInstance obj = (HDLInstance)(varTable.get(item0.obj.getName()));
 	    Operand[] params = item0.getSrcOperand();
 	    for(int i = 0; i < item0.args.length; i++){
-		HDLSignal t = obj.getSignalForPort(item0.name + "_" + item0.args[i]);
-		t.setAssign(state.getTransitions().get(0).getDestState(), 0, convOperandToHDLExpr(item, params[i]));  // should set in ***_body
-		//t.setAssign(state, 0, convOperandToHDLExpr(params[i]));
+		Type t = params[i].getType();
+		if(t instanceof ArrayType){
+		    // connect array type parameter
+		    HDLInstance target = (HDLInstance)(varTable.get((params[i]).getName()));
+		    connectArrayTypeParammeter(target, obj, item0.name + "_" + item0.args[i]); // connect obj into target
+		}else{
+		    // for primitive parameters
+		    HDLSignal d = obj.getSignalForPort(item0.name + "_" + item0.args[i]);
+		    // should set in ***_body
+		    d.setAssign(state.getTransitions().get(0).getDestState(), 0, convOperandToHDLExpr(item, params[i]));
+		    //t.setAssign(state, 0, convOperandToHDLExpr(params[i]));
+		}
 	    }
 	    if(item0.getDestOperand().getType() != PrimitiveTypeKind.VOID){ // non-void function
 		HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item0.getDestOperand());
@@ -769,9 +819,17 @@ public class SchedulerInfoCompiler {
 	}
 	case FIELD_ACCESS :{
 	    FieldAccessItem item0 = (FieldAccessItem)item;
-	    HDLInstance obj = (HDLInstance)(varTable.get(item0.obj.getName()));
-	    HDLSignal src = obj.getSignalForPort(item0.name); // only for array.length
-	    if(src == null) src = obj.getSignalForPort(item0.name + "_out"); // normal 
+	    HDLVariable var = varTable.get(item0.obj.getName());
+	    HDLSignal src = null;
+	    if(var != null && var instanceof HDLInstance){
+		HDLInstance obj = (HDLInstance)var;
+		src = obj.getSignalForPort(item0.name);
+		if(src == null){
+		    src = obj.getSignalForPort(item0.name + "_out"); // normal
+		}
+	    }else if(var != null && var instanceof HDLInstanceRef){
+		src = hm.getPort(var.getName() + "_" + item0.name).getSignal();
+	    }
 	    HDLExpr dest = convOperandToHDLExpr(item, item0.getDestOperand());
 	    if(dest instanceof HDLSignal && src != null){
 		HDLSignal d = (HDLSignal)dest;
@@ -957,6 +1015,47 @@ public class SchedulerInfoCompiler {
 	    predExprMap.put(item, expr);
 	}
 	}
+    }
+
+    private void connectArrayTypeParammeter(HDLInstance src, HDLInstance dest, String key){
+
+	HDLExpr mux_key = hm.newExpr(HDLOp.OR, dest.getSignalForPort(key + "_we_b"), dest.getSignalForPort(key + "_oe_b"));
+	
+	// length (dest.length <- src.length)
+	HDLSignal dest_length = dest.getSignalForPort(key + "_length");
+	dest_length.setAssign(null, src.getSignalForPort("length"));
+
+	// dout_b (dest.dout_b <- src.dout_b)
+	HDLSignal dest_dout = dest.getSignalForPort(key + "_dout_b");
+	dest_dout.setAssign(null, src.getSignalForPort("dout_b"));
+
+	// address (src.address_b <- dest.address_b when mux_key else src.address_b)
+	HDLSignal dest_address_b = dest.getSignalForPort(key + "_address_b");
+	HDLSignal src_address_b = src.getSignalForPort("address_b");
+	HDLSignal address_b_mux = hm.newTmpSignal(src_address_b.getType(), HDLSignal.ResourceKind.WIRE);
+	address_b_mux.setAssign(null, hm.newExpr(HDLOp.IF, mux_key, dest_address_b, src_address_b));
+	src.replacePortPair(src_address_b, address_b_mux);
+
+	// din (src.din_b <- dest.din_b when mux_key else src.din_b)
+	HDLSignal dest_din_b = dest.getSignalForPort(key + "_din_b");
+	HDLSignal src_din_b = src.getSignalForPort("din_b");
+	HDLSignal din_b_mux = hm.newTmpSignal(src_din_b.getType(), HDLSignal.ResourceKind.WIRE);
+	din_b_mux.setAssign(null, hm.newExpr(HDLOp.IF, mux_key, dest_din_b, src_din_b));
+	src.replacePortPair(src_din_b, din_b_mux);
+
+	// we (src.we_b <- dest.we_b or src.we_b)
+	HDLSignal dest_we_b = dest.getSignalForPort(key + "_we_b");
+	HDLSignal src_we_b = src.getSignalForPort("we_b");
+	HDLSignal we_b_or = hm.newTmpSignal(src_we_b.getType(), HDLSignal.ResourceKind.WIRE);
+	we_b_or.setAssign(null, hm.newExpr(HDLOp.OR, dest_we_b, src_we_b));
+	src.replacePortPair(src_we_b, we_b_or);
+
+	// oe (src.oe_b <- dest.oe_b or else src.oe_b)
+	HDLSignal dest_oe_b = dest.getSignalForPort(key + "_oe_b");
+	HDLSignal src_oe_b = src.getSignalForPort("oe_b");
+	HDLSignal oe_b_or = hm.newTmpSignal(src_oe_b.getType(), HDLSignal.ResourceKind.WIRE);
+	oe_b_or.setAssign(null, hm.newExpr(HDLOp.OR, dest_oe_b, src_oe_b));
+	src.replacePortPair(src_oe_b, oe_b_or);
     }
 	
     private void genCompUnitExpr(SchedulerItem item, int opcode, SequencerState state, HardwareResource resource, SchedulerBoard board){
