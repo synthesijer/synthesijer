@@ -1,4 +1,3 @@
-/** This has not been worked well, yet */
 public class Test015_A{
     
     public void pack(byte[] s, int[] d){
