@@ -10,19 +10,25 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 	
     private final HDLModule module;
     private final String name;
+    private final String origName;
     private final HDLModule target;
 	
     private ArrayList<PortPair> pairs = new ArrayList<>();
     private ArrayList<ParamPair> params = new ArrayList<>();
 	
-    HDLInstance(HDLModule module, String name, HDLModule target){
+    HDLInstance(HDLModule module, String name, HDLModule target, String origName){
 	this.module = module;
 	this.name = name;
 	this.target = target;
+	this.origName = origName;
 	genPortSignals();
 	for(HDLParameter param: target.getParameters()){
 	    params.add(new ParamPair(param, null));
-	}
+	}	
+    }
+    
+    HDLInstance(HDLModule module, String name, HDLModule target){
+	this(module, name, target, name);
     }
 	
     private String getAbsoluteName(String n){
@@ -51,7 +57,11 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		    if(!p.getType().isEqual(s.getType())) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
 		}
 	    }else{
-		s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
+		if(p.isSet(HDLPort.OPTION.EXPORT)){
+		    s = module.newSignal(origName + "_" + p.getName(), p.getType(), k);
+		}else{
+		    s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
+		}
 		//System.out.println("n=" + p.getName());
 		//System.out.println("s=" + s);
 	    }

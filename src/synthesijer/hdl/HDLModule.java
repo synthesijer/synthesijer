@@ -190,6 +190,12 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	return exprs.toArray(new HDLExpr[]{});
     }
 
+    public HDLInstance newModuleInstance(HDLModule m, String n, String origName){
+	HDLInstance obj = new HDLInstance(this, n, m, origName);
+	submodules.add(obj);
+	return obj;
+    }
+
     public HDLInstance newModuleInstance(HDLModule m, String n){
 	HDLInstance obj = new HDLInstance(this, n, m);
 	submodules.add(obj);

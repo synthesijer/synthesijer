@@ -238,6 +238,7 @@ public class SchedulerInfoCompiler {
 		array.getSignalForPort("din").setAssign(null, din.getSignal());
 		dout.getSignal().setAssign(null, array.getSignalForPort("dout"));				
 		length.getSignal().setAssign(null, array.getSignalForPort("length"));				
+		//System.out.println("len:" + length.getName());
 	    }
 	    ret = array;
 	}else if(v.isMethodParam()){
@@ -280,7 +281,9 @@ public class SchedulerInfoCompiler {
 	    Manager.INSTANCE.compileSchedulerInfo(instName);
 	    SynthesijerUtils.info("<<< return to compiling " + this.info.getName());
 	}
-	HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
+	//System.out.println(v.getName());
+	//System.out.println(v.getOrigName());
+	HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name, v.getOrigName());
 		
 	if(v.getInitSrc() != null){
 	    Operand src = v.getInitSrc();
