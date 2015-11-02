@@ -1,28 +1,6 @@
 public class BubbleSort{
 
-  private final int ar[] = new int[512];
-
-  public synchronized void init(){
-    for(int i = 0; i < ar.length; i++){
-      ar[i] = ar.length - 1 - i;
-    }
-  }
-
-  public synchronized void set(int id, int data){
-    ar[id] = data;
-  }
-
-  public synchronized int get(int id){
-    return ar[id];
-  }
-
-  public void check(){
-	for(int i = 0; i < ar.length; i++){
-		int v = ar[i];
-	}
-  }
-
-  public synchronized void test(){
+  public synchronized void test(int[] ar){
     int tmp;
     int max_i = ar.length - 1;
     for(int i = 0; i <= max_i - 1; i++){
