@@ -93,7 +93,8 @@ public class Main {
 	boolean vhdlFlag = opt.flag("vhdl");
 	boolean verilogFlag = opt.flag("verilog");
 	Options.INSTANCE.optimizing = !opt.flag("no-optimize");
-	Options.INSTANCE.chaining = !opt.flag("no-chaining");
+	//Options.INSTANCE.chaining = !opt.flag("no-chaining");
+	Options.INSTANCE.chaining = opt.flag("chaining");
 	Options.INSTANCE.legacy_instance_variable_name = opt.flag("legacy-instance-variable-name");
 	Options.INSTANCE.operation_strength_reduction = opt.flag("operation_strength_reduction");
 	boolean packaging = false;
@@ -158,7 +159,8 @@ public class Main {
 	System.out.println("  --config=file: the specified file is used for compiler settings");
 	System.out.println("  --lib-classes=path1:path2:...: the specified paths will be added as classpaths for compile time");
 	System.out.println("  --no-optimize: do not apply any optimizations");
-	System.out.println("  --no-chaining: do not apply opeartion chain in greedy manner");
+	//System.out.println("  --no-chaining: do not apply opeartion chain in greedy manner");
+	System.out.println("  --chaining: apply opeartion chain in greedy manner");
 	System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
 	System.out.println("  --legacy-instance-variable-name: to use legacy variable name for instance variables, such as class_*_0000");
 	System.out.println("  --ip-exact=TOP: generates a IP package template for \"TOP\" module");
