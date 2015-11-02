@@ -652,8 +652,10 @@ public class SchedulerInfoCompiler {
 		if(var instanceof HDLInstance){
 		    // local memory
 		    HDLInstance array = (HDLInstance)var;
-		    we = array.getSignalForPort("we_b");
-		    din = array.getSignalForPort("din_b");
+		    //we = array.getSignalForPort("we_b");
+		    //din = array.getSignalForPort("din_b");
+		    we = hm.getSignal(array.getName() + "_we_b");
+		    din = hm.getSignal(array.getName() + "_din_b");
 		}else if(var instanceof HDLInstanceRef){
 		    HDLInstanceRef array = (HDLInstanceRef)var;
 		    we = array.getPortByPostfix("_we_b").get().getSignal();
@@ -704,9 +706,12 @@ public class SchedulerInfoCompiler {
 	    if(var instanceof HDLInstance){
 		// local memory
 		HDLInstance array = (HDLInstance)var;
-		addr = array.getSignalForPort("address_b");
-		oe = array.getSignalForPort("oe_b");
-		dout = array.getSignalForPort("dout_b");
+		//addr = array.getSignalForPort("address_b");
+		//oe = array.getSignalForPort("oe_b");
+		//dout = array.getSignalForPort("dout_b");
+		addr = hm.getSignal(array.getName() + "_address_b");
+		oe = hm.getSignal(array.getName() + "_oe_b");
+		dout = hm.getSignal(array.getName() + "_dout_b");
 	    }else if(var instanceof HDLInstanceRef){
 		HDLInstanceRef array = (HDLInstanceRef)var;
 		addr = array.getPortByPostfix("_address_b").get().getSignal();
@@ -745,7 +750,8 @@ public class SchedulerInfoCompiler {
 	    if(var instanceof HDLInstance){
 		// local memory
 		HDLInstance array = (HDLInstance)var;
-		addr = array.getSignalForPort("address_b");
+		//addr = array.getSignalForPort("address_b");
+		addr = hm.getSignal(array.getName() + "_address_b");
 	    }else if(var instanceof HDLInstanceRef){
 		HDLInstanceRef array = (HDLInstanceRef)var;
 		addr = array.getPortByPostfix("_address_b").get().getSignal();
@@ -758,9 +764,9 @@ public class SchedulerInfoCompiler {
 	    }
 			
 	    HDLExpr index = convOperandToHDLExpr(item, src[1]);
-	    if(addr != null){
-		addr.setAssign(state, index);
-	    }
+	    
+	    addr.setAssign(state, index);
+	    
 	    break;
 	}
 	case CALL :{
@@ -1048,7 +1054,8 @@ public class SchedulerInfoCompiler {
 	HDLSignal dest_address_b = dest.getSignalForPort(key + "_address_b");
 	HDLSignal src_address_b = src.getSignalForPort("address_b");
 	HDLSignal address_b_mux = hm.newTmpSignal(src_address_b.getType(), HDLSignal.ResourceKind.WIRE);
-	address_b_mux.setAssign(null, hm.newExpr(HDLOp.IF, mux_key, dest_address_b, src_address_b));
+	//address_b_mux.setAssign(null, hm.newExpr(HDLOp.IF, hm.newExpr(HDLOp.AND, mux_key, flag), dest_address_b, src_address_b));
+	address_b_mux.setAssign(null, hm.newExpr(HDLOp.IF, flag, dest_address_b, src_address_b));
 	src.replacePortPair(src_address_b, address_b_mux);
 
 	// din (src.din_b <- dest.din_b when mux_key else src.din_b)

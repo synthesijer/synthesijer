@@ -10,4 +10,14 @@ public class Test015_A{
 	    d[i] += (s[ptr + 3] <<  0);
 	}
     }
+
+    public void pack4(byte[] s, int[] d, int i){
+	int ptr = i << 2;
+	d[i] = 0;
+	d[i] += (s[ptr + 0] << 24);
+	d[i] += (s[ptr + 1] << 16);
+	d[i] += (s[ptr + 2] <<  8);
+	d[i] += (s[ptr + 3] <<  0);
+    }
+
 }
