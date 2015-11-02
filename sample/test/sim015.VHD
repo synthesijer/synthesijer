@@ -18,6 +18,9 @@ architecture RTL of sim015 is
       v_in : in signed(32-1 downto 0);
       v_we : in std_logic;
       v_out : out signed(32-1 downto 0);
+      v1_in : in signed(32-1 downto 0);
+      v1_we : in std_logic;
+      v1_out : out signed(32-1 downto 0);
       test_busy : out std_logic;
       test_req : in std_logic
       );
@@ -58,6 +61,9 @@ begin
     v_in      => (others => '0'),
     v_we      => '0',
     v_out     => open,
+    v1_in      => (others => '0'),
+    v1_we      => '0',
+    v1_out     => open,
     test_busy => open,
     test_req  => req
     );

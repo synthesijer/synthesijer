@@ -795,7 +795,12 @@ public class SchedulerInfoCompiler {
 		if(t instanceof ArrayType){
 		    // connect array type parameter
 		    HDLInstance target = (HDLInstance)(varTable.get((params[i]).getName()));
-		    connectArrayTypeParammeter(target, obj, item0.name + "_" + item0.args[i]); // connect obj into target
+		    HDLSignal flag = hm.newTmpSignal(HDLPrimitiveType.genBitType(), HDLSignal.ResourceKind.REGISTER);
+		    flag.setDefaultValue(HDLPreDefinedConstant.LOW);
+		    flag.setAssign(state, HDLPreDefinedConstant.HIGH);
+		    flag.setAssign(state.getTransitions().get(0).getDestState(), HDLPreDefinedConstant.HIGH); // ext_call body
+		    flag.setAssign(state.getTransitions().get(0).getDestState().getTransitions().get(0).getDestState(), HDLPreDefinedConstant.HIGH); // ext_call wait
+		    connectArrayTypeParammeter(flag, target, obj, item0.name + "_" + item0.args[i]); // connect obj into target
 		}else{
 		    // for primitive parameters
 		    HDLSignal d = obj.getSignalForPort(item0.name + "_" + item0.args[i]);
@@ -1017,17 +1022,27 @@ public class SchedulerInfoCompiler {
 	}
     }
 
-    private void connectArrayTypeParammeter(HDLInstance src, HDLInstance dest, String key){
+    private void connectArrayTypeParammeter(HDLExpr flag, HDLInstance src, HDLInstance dest, String key){
 
 	HDLExpr mux_key = hm.newExpr(HDLOp.OR, dest.getSignalForPort(key + "_we_b"), dest.getSignalForPort(key + "_oe_b"));
 	
 	// length (dest.length <- src.length)
 	HDLSignal dest_length = dest.getSignalForPort(key + "_length");
-	dest_length.setAssign(null, src.getSignalForPort("length"));
+	if(dest_length.isAssignAlways() == false){
+	    dest_length.setAssign(null, src.getSignalForPort("length"));
+	}else{
+	    HDLExpr expr = dest_length.getAssignAlwaysExpr();
+	    dest_length.setAssign(null, hm.newExpr(HDLOp.IF, flag, src.getSignalForPort("length"), expr));
+	}
 
 	// dout_b (dest.dout_b <- src.dout_b)
 	HDLSignal dest_dout = dest.getSignalForPort(key + "_dout_b");
-	dest_dout.setAssign(null, src.getSignalForPort("dout_b"));
+	if(dest_dout.isAssignAlways() == false){
+	    dest_dout.setAssign(null, src.getSignalForPort("dout_b"));
+	}else{
+	    HDLExpr expr = dest_dout.getAssignAlwaysExpr();
+	    dest_dout.setAssign(null, hm.newExpr(HDLOp.IF, flag, src.getSignalForPort("dout_b"), expr));
+	}
 
 	// address (src.address_b <- dest.address_b when mux_key else src.address_b)
 	HDLSignal dest_address_b = dest.getSignalForPort(key + "_address_b");
@@ -1047,7 +1062,7 @@ public class SchedulerInfoCompiler {
 	HDLSignal dest_we_b = dest.getSignalForPort(key + "_we_b");
 	HDLSignal src_we_b = src.getSignalForPort("we_b");
 	HDLSignal we_b_or = hm.newTmpSignal(src_we_b.getType(), HDLSignal.ResourceKind.WIRE);
-	we_b_or.setAssign(null, hm.newExpr(HDLOp.OR, dest_we_b, src_we_b));
+	we_b_or.setAssign(null, hm.newExpr(HDLOp.OR, hm.newExpr(HDLOp.AND, flag, dest_we_b), src_we_b));
 	src.replacePortPair(src_we_b, we_b_or);
 
 	// oe (src.oe_b <- dest.oe_b or else src.oe_b)

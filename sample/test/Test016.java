@@ -1,4 +1,4 @@
-
+/* this is not available*/
 public class Test016{
     
     public byte[] a = new byte[]{1,2,3,4,5,6};
