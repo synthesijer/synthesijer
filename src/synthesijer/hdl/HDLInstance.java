@@ -3,6 +3,7 @@ package synthesijer.hdl;
 import java.util.ArrayList;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.Options;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.sequencer.SequencerState;
 
@@ -57,7 +58,7 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
 		    if(!p.getType().isEqual(s.getType())) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
 		}
 	    }else{
-		if(p.isSet(HDLPort.OPTION.EXPORT)){
+		if(p.isSet(HDLPort.OPTION.EXPORT) && Options.INSTANCE.legacy_instance_variable_name == false){
 		    s = module.newSignal(origName + "_" + p.getName(), p.getType(), k);
 		}else{
 		    s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
