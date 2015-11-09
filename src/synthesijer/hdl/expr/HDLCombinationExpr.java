@@ -360,7 +360,7 @@ public class HDLCombinationExpr implements HDLExpr{
 	}else{
 	    switch(op){
 	    case NOT:
-		return String.format("%s%s", op.getVerilogHDL(), args[0].getResultExpr().getVHDL());
+		return String.format("%s%s", op.getVerilogHDL(), args[0].getResultExpr().getVerilogHDL());
 	    case MSB_FLAP: {
 		String v = args[0].getResultExpr().getVerilogHDL();
 		HDLPrimitiveType t = (HDLPrimitiveType)(args[0].getResultExpr().getType());
@@ -371,14 +371,14 @@ public class HDLCombinationExpr implements HDLExpr{
 	    case IF:
 		return String.format("%s == 1'b1 ? %s : %s", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL(), args[2].getResultExpr().getVerilogHDL());
 	    case CONCAT:
-		return String.format("{%s, %s}", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
+		return String.format("{%s, %s}", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
 	    case DROPHEAD:{
 		HDLPrimitiveType t = (HDLPrimitiveType)args[0].getResultExpr().getType();
 		return String.format("%s[%d - %s - 1 : 0]", args[0].getResultExpr().getVerilogHDL(), t.getWidth(), args[1].getResultExpr().getVerilogHDL());
 	    }
 	    case TAKE: {
 		HDLPrimitiveType t = (HDLPrimitiveType)getResultExpr().getType();
-		return String.format("%s[%d - 1 : 0]", args[0].getResultExpr().getVHDL(), t.getWidth());
+		return String.format("%s[%d - 1 : 0]", args[0].getResultExpr().getVerilogHDL(), t.getWidth());
 	    }
 	    case PADDINGHEAD:{
 		HDLPrimitiveType t0 = (HDLPrimitiveType)args[0].getResultExpr().getType();
@@ -407,7 +407,7 @@ public class HDLCombinationExpr implements HDLExpr{
 		    HDLValue tmp = arith_shift_mode ? 
 			new HDLValue(String.valueOf(value >> shift), (HDLPrimitiveType)result.getType())
 			: new HDLValue(String.valueOf(value >>> shift), (HDLPrimitiveType)result.getType());
-		    str = tmp.getVHDL();
+		    str = tmp.getVerilogHDL();
 		}
 		HDLPrimitiveType ta = (HDLPrimitiveType)(args[0].getResultExpr().getType());
 								
