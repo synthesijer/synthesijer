@@ -17,5 +17,6 @@ copy %SYNTHESIJER_LIB%\vhdl\singleportram.vhd                    AXIHP_MEMCPY2_v
 copy %SYNTHESIJER_LIB%\vhdl\dualportram.vhd                      AXIHP_MEMCPY2_v1_0\src\
 copy %SYNTHESIJER_EXTRA_LIB%\hdl\vhdl\axi_lite_slave_32.vhd      AXIHP_MEMCPY2_v1_0\src\
 copy %SYNTHESIJER_EXTRA_LIB%\hdl\vhdl\simple_axi_memiface_32.vhd AXIHP_MEMCPY2_v1_0\src\
+copy %SYNTHESIJER_EXTRA_LIB%\hdl\vhdl\axi_memiface_32.vhd AXIHP_MEMCPY2_v1_0\src\
 copy %SYNTHESIJER_EXTRA_LIB%\hdl_lib\vhdl\simple_fifo_32.vhd AXIHP_MEMCPY2_v1_0\src\
 copy %SYNTHESIJER_EXTRA_LIB%\hdl_lib\vhdl\simple_fifo.vhd AXIHP_MEMCPY2_v1_0\src\
