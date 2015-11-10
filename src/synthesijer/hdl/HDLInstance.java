@@ -31,6 +31,13 @@ public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
     HDLInstance(HDLModule module, String name, HDLModule target){
 	this(module, name, target, name);
     }
+
+    /**
+     * return this module, not the target module to make a insntace
+     */
+    public HDLModule getModule(){
+	return module;
+    }
 	
     private String getAbsoluteName(String n){
 	return this.name + "_" + n;

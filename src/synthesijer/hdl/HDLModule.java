@@ -60,7 +60,15 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	return sysClk;
     }
 
+    public HDLPortPairItem getSysClkPairItem(){
+	return sysClk;
+    }
+
     public HDLPort getSysReset(){
+	return sysReset;
+    }
+
+    public HDLPortPairItem getSysResetPairItem(){
 	return sysReset;
     }
 

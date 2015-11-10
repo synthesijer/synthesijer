@@ -61,7 +61,25 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 	String sep = "";
 	for(HDLInstance.PortPair pair: o.getPairs()){
 	    HDLUtils.print(dest, 0, sep);
-	    HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.port.getName(), pair.item.getName()));
+	    if(o.getSubModule().getSysClkPairItem() != null && pair.port.getName().equals(o.getSubModule().getSysClkPairItem().getName())){
+		// target port to connect is system clock, the port should be connected system clock in this module directly.
+		if(o.getModule().getSysClkPairItem() == null){
+		    SynthesijerUtils.warn(o.getModule().getName() + " does not have system clock, but sub-module requires system clock");
+		    SynthesijerUtils.warn("system clock of sub-module is remained as open, so the sub-module will not work well.");
+		}else{
+		    HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.port.getName(), o.getModule().getSysClkPairItem().getName()));
+		}
+	    }else if(o.getSubModule().getSysResetPairItem() != null && pair.port.getName().equals(o.getSubModule().getSysResetPairItem().getName())){
+		// target port to connect is system reset, the port should be connected system reset in this module directly.
+		if(o.getModule().getSysResetPairItem() == null){
+		    SynthesijerUtils.warn(o.getModule().getName() + " does not have system reset, but sub-module requires system reset");
+		    SynthesijerUtils.warn("system reset of sub-module is remained as open, so the sub-module will not work well.");
+		}else{
+		    HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.port.getName(), o.getModule().getSysResetPairItem().getName()));
+		}
+	    }else{	    
+		HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.port.getName(), pair.item.getName()));
+	    }
 	    sep = "," + Constant.BR;
 	}
 	HDLUtils.println(dest, 0, "");
