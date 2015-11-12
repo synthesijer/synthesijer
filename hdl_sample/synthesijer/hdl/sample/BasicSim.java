@@ -25,6 +25,8 @@ public class BasicSim extends HDLSimModule{
 		HDLSignal clk = newSignal("clk", HDLPrimitiveType.genBitType());
 		HDLSignal reset = newSignal("reset", HDLPrimitiveType.genBitType());
 		counter = newSignal("counter", HDLPrimitiveType.genSignedType(32));
+		setSysClk(clk);
+		setSysReset(reset);
 	
 		HDLSequencer seq = newSequencer("main");
 		seq.setTransitionTime(10);
