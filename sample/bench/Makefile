@@ -32,6 +32,9 @@ clean:
 	-rm -f *.s
 	-rm -f *.ir
 	-rm -f *.vcd
+	-rm -f *.ghw
+	-rm -f *.svg
+	-rm -f *.png
 	-rm -f *~
 	-rm -f work-obj93.cf
 	-rm -f primesim_top 
