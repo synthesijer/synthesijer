@@ -18,6 +18,10 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
     private final EnumSet<OPTION> options;
 	
     private HDLSignalBinding binding = null;
+
+    private String pinId = "<UNDEF>";
+    
+    private String ioAttr = null;
 	
     HDLPort(HDLModule m, String name, DIR dir, HDLType type, EnumSet<OPTION> opt){
 	this(m, name, "", dir, type, opt);
@@ -139,4 +143,19 @@ public class HDLPort implements HDLTree, HDLPortPairItem{
 	v.visitHDLPort(this);
     };
 
+    public void setPinID(String v){
+	this.pinId = v;
+    }
+    
+    public String getPinID(){
+	return this.pinId;
+    }
+    
+    public void setIoAttr(String v){
+	this.ioAttr = v;
+    }
+    
+    public String getIoAttr(){
+	return this.ioAttr;
+    }
 }
