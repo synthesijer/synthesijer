@@ -78,9 +78,23 @@ public class JCExprVisitor extends Visitor{
 	}
 	
 	public void visitUnary(JCUnary that){
+		/*
+		System.out.println("unary:" + that.toString());
+		System.out.println("op:" + that.getOperator().name);
+		if(that.toString().startsWith(that.getOperator().name.toString())){
+			System.out.println("prefix");
+		}else if(that.toString().endsWith(that.getOperator().name.toString())){
+			System.out.println("postfix");
+		}
+		*/
+		boolean postfix = false;
+		if(that.toString().endsWith(that.getOperator().name.toString())){
+			postfix = true;
+		}
 		UnaryExpr tmp = new UnaryExpr(scope);
 		tmp.setOp(Op.getOp(that.operator.name.toString()));
 		tmp.setArg(stepIn(that.arg));
+		tmp.setPostfix(postfix);
 		expr = tmp;
 	}
 	

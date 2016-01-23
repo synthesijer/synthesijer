@@ -922,16 +922,34 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	switch(o.getOp()){
 	case INC:{
 	    VariableOperand tmp = newVariable("unary_expr", v.getType());
+		VariableOperand postfixPreserved = null;
+		if(o.isPostfix()){
+			postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
+		}
 	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ADD, new Operand[]{v, c1}, tmp));
 	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
-	    result = v;
+		if(o.isPostfix()){
+			result = postfixPreserved;
+		}else{		
+			result = v;
+		}
 	    break;
 	}
 	case DEC:{
 	    VariableOperand tmp = newVariable("unary_expr", v.getType());
+		VariableOperand postfixPreserved = null;
+		if(o.isPostfix()){
+			postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
+		}
 	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{v, c1}, tmp));
 	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
-	    result = v;
+		if(o.isPostfix()){
+			result = postfixPreserved;
+		}else{		
+			result = v;
+		}
 	    break;
 	}
 	case MINUS:{

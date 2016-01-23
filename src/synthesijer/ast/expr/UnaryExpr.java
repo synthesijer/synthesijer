@@ -10,6 +10,7 @@ public class UnaryExpr extends Expr{
 	
 	private Op op;
 	private Expr arg;
+	private boolean postfixFlag = false;
 	
 	public UnaryExpr(Scope scope){
 		super(scope);
@@ -22,6 +23,10 @@ public class UnaryExpr extends Expr{
 	public void setOp(Op op){
 		this.op = op;
 	}
+
+	public void setPostfix(boolean f){
+		postfixFlag = f;
+	}
 	
 	public Expr getArg(){
 		return this.arg;
@@ -29,6 +34,10 @@ public class UnaryExpr extends Expr{
 	
 	public Op getOp(){
 		return this.op;
+	}
+
+	public boolean isPostfix(){
+		return postfixFlag;
 	}
 	
 	public void accept(SynthesijerExprVisitor v){
