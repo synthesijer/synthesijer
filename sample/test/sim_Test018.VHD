@@ -16,7 +16,7 @@ architecture RTL of sim_Test018 is
     );
   signal main : Type_main := main_IDLE;
   signal main_delay : signed(32-1 downto 0) := (others => '0');
-  signal tmp_0001 : signed(32-1 downto 0);
+  signal tmp_0001 : signed(32-1 downto 0) := (others => '0');
   signal tmp_0002 : std_logic;
   signal tmp_0003 : std_logic;
   signal tmp_0004 : std_logic;
@@ -38,6 +38,7 @@ architecture RTL of sim_Test018 is
 
   signal flag : std_logic := '0';
   signal finish_flag : std_logic := '0';
+  signal end_of_simulation : std_logic := '0';
 
 begin
 
@@ -56,6 +57,9 @@ begin
     -- state main = main_S0
     main <= main_IDLE;
     wait for 10 ns;
+    if end_of_simulation = '1' then
+      wait;
+    end if;
   end process;
 
 
@@ -100,7 +104,13 @@ begin
   begin
    if clk'event and clk = '1' then
      if finish_flag = '1' then
-       assert (false) report "Simulation End!" severity failure;
+       if(test_return = '1') then
+         report "Test018: TEST SUCCESS";
+       else
+         report "Test018: TEST *** FAILURE ***";
+       end if;
+       end_of_simulation <= '1';
+       --assert (false) report "Simulation End!" severity failure;
      end if;
   end if;
 end process;

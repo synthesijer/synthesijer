@@ -2,10 +2,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity sim_Test017 is
-end sim_Test017;
+entity sim_Test003 is
+end sim_Test003;
 
-architecture RTL of sim_Test017 is
+architecture RTL of sim_Test003 is
 
   signal clk : std_logic := '0';
   signal reset : std_logic := '0';
@@ -22,28 +22,15 @@ architecture RTL of sim_Test017 is
   signal tmp_0004 : std_logic;
   signal tmp_0005 : std_logic;
 
-  component Test017
+  component Test003
     port (
       clk : in std_logic;
       reset : in std_logic;
-      test0_in : in signed(32-1 downto 0);
-      test0_we : in std_logic;
-      test0_out : out signed(32-1 downto 0);
-      test1_in : in signed(32-1 downto 0);
-      test1_we : in std_logic;
-      test1_out : out signed(32-1 downto 0);
-      test2_in : in signed(32-1 downto 0);
-      test2_we : in std_logic;
-      test2_out : out signed(32-1 downto 0);
-      test3_in : in signed(32-1 downto 0);
-      test3_we : in std_logic;
-      test3_out : out signed(32-1 downto 0);
-      test_idx : in signed(32-1 downto 0);
       test_return : out std_logic;
       test_busy : out std_logic;
       test_req : in std_logic
       );
-  end component Test017;
+  end component Test003;
 
   signal run_req, run_busy: std_logic := '0';
   signal test_return : std_logic := '0';
@@ -100,22 +87,10 @@ begin
 
   run_req <= '1' when counter > 100 else '0';
   
-  U: Test017 port map(
-      clk   => clk,
-      reset => reset,
-      test0_in    => (others => '0'),
-      test0_we    => '0',
-      test0_out   => open,
-      test1_in    => (others => '0'),
-      test1_we    => '0',
-      test1_out   => open,
-      test2_in    => (others => '0'),
-      test2_we    => '0',
-      test2_out   => open,
-      test3_in    => (others => '0'),
-      test3_we    => '0',
-      test3_out   => open,
-      test_idx    => (others => '0'),
+  U : Test003
+    port map(
+      clk         => clk,
+      reset       => reset,
       test_return => test_return,
       test_busy   => run_busy,
       test_req    => run_req
@@ -129,9 +104,9 @@ begin
    if clk'event and clk = '1' then
      if finish_flag = '1' then
        if(test_return = '1') then
-         report "Test017: TEST SUCCESS";
+         report "Test003: TEST SUCCESS";
        else
-         report "Test017: TEST *** FAILURE ***";
+         report "Test003: TEST *** FAILURE ***";
        end if;
        end_of_simulation <= '1';
        --assert (false) report "Simulation End!" severity failure;

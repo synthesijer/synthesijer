@@ -1,3 +1,5 @@
+import synthesijer.rt.*;
+
 public class Test001{
 	
 	@synthesijer.rt.Debug
@@ -71,5 +73,66 @@ public class Test001{
 		return value;
 	}
 
+	public boolean test(){
+		int v;
+		v = add(100, 200);
+		if(v != 300) return false;
+		v = acc(v);
+		if(v != 300) return false;
+		v = acc2(10, v);
+		if(v != 3300) return false;
+		v = acc3(10, v);
+		if(v != 36300) return false;
+		v = acc4(10, v);
+		if(v != 399300) return false;
+		v = add2(50, 400);
+		if(v != 450) return false;
+		int x;
+		x = switch_test(0);
+		if(x != 10) return false;
+		x = switch_test(1);
+		if(x != 7) return false;
+		x = switch_test(2);
+		if(x != 700) return false;
+		x = switch_test(3);
+		if(x != 100) return false;
+		x = switch_test(4);
+		if(x != 200) return false;
+		x = switch_test(5);
+		if(x != 200) return false;
+		return true;
+	}
+
+	@unsynthesizable
+	public static void main(String[] args){
+		Test001 obj = new Test001();
+		System.out.println(obj.test());
+		int v;
+		v = obj.add(100, 200);
+		System.out.println(v);
+		v = obj.acc(v);
+		System.out.println(v);
+		v = obj.acc2(10, v);
+		System.out.println(v);
+		v = obj.acc3(10, v);
+		System.out.println(v);
+		v = obj.acc4(10, v);
+		System.out.println(v);
+		v = obj.add2(50, 400);
+		System.out.println(v);
+		int x;
+		x = obj.switch_test(0);
+		System.out.println(x);
+		x = obj.switch_test(1);
+		System.out.println(x);
+		x = obj.switch_test(2);
+		System.out.println(x);
+		x = obj.switch_test(3);
+		System.out.println(x);
+		x = obj.switch_test(4);
+		System.out.println(x);
+		x = obj.switch_test(5);
+		System.out.println(x);
+	}
 	
 }

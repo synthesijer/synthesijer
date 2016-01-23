@@ -3,27 +3,43 @@ SYNTHESIJER ?= ../../bin
 SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java Test017.java Test018.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test017.VHD sim_Test018.VHD
+
 OPT = --chaining
 
-all: $(SOURCES)
+.PHONY: all synthesis ghdl64 ghdl test clean
+
+all: synthesis
+
+synthesis: $(SOURCES)
 	java -cp $(SYNTHESIJER) synthesijer.Main --verilog --vhdl $(OPT) $(SOURCES)
 
-ghdl64: $(VHDL_SOURCES)
-	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) sim.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/singleportram.vhd ../../lib/vhdl/dualportram.vhd sim_Test017.VHD sim_Test018.VHD
+ghdl64: synthesis
+	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) sim.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/singleportram.vhd ../../lib/vhdl/dualportram.vhd $(SIM_SOURCES)
 	ghdl -e -Wa,--32 -Wl,-m32 sim
 	ghdl -e -Wa,--32 -Wl,-m32 sim006
 	ghdl -e -Wa,--32 -Wl,-m32 sim011
 	ghdl -e -Wa,--32 -Wl,-m32 sim013
 
-ghdl32: $(VHDL_SOURCES)
-	ghdl -a $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd sim001.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/*.vhd sim_Test017.VHD sim_Test018.VHD
+ghdl: synthesis
+	ghdl -a $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd sim001.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/*.vhd $(SIM_SOURCES)
 	ghdl -e sim
 	ghdl -e sim006
 	ghdl -e sim011
 	ghdl -e sim013
 	ghdl -e sim001
+	ghdl -e sim_test001
+	ghdl -e sim_test002
+	ghdl -e sim_test003
 	ghdl -e sim_test017
 	ghdl -e sim_test018
+
+test: ghdl
+	./sim_test001
+	./sim_test002
+	./sim_test003
+	./sim_test017
+	./sim_test018
 
 clean:
 	-rm -f *.class
@@ -37,3 +53,4 @@ clean:
 	-rm -f *.vcd
 	-rm -f work-obj93.cf
 	-rm -f *.txt
+	-rm -f *~
