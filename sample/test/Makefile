@@ -7,7 +7,7 @@ SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test017.VHD si
 
 OPT = --chaining
 
-.PHONY: all synthesis ghdl64 ghdl test clean
+.PHONY: all synthesis ghdl64 ghdl test clean test_vhdl test_verilog iverilog
 
 all: synthesis
 
@@ -34,12 +34,24 @@ ghdl: synthesis
 	ghdl -e sim_test017
 	ghdl -e sim_test018
 
-test: ghdl
+test_vhdl: ghdl
 	./sim_test001
 	./sim_test002
 	./sim_test003
 	./sim_test017
 	./sim_test018
+
+iverilog: synthesis
+	iverilog -o sim_verilog_Test001 sim_Test001.v Test001.v
+	iverilog -o sim_verilog_Test002 sim_Test002.v Test002.v ../../lib/verilog/dualportram.v
+	iverilog -o sim_verilog_Test003 sim_Test003.v Test002.v Test003.v ../../lib/verilog/dualportram.v
+
+test_verilog: iverilog
+	./sim_verilog_Test001
+	./sim_verilog_Test002
+	./sim_verilog_Test003
+
+test: test_vhdl test_verilog
 
 clean:
 	-rm -f *.class
@@ -51,6 +63,10 @@ clean:
 	-rm -f *.o
 	-rm -f sim
 	-rm -f *.vcd
+	-rm -f *.ghw
 	-rm -f work-obj93.cf
 	-rm -f *.txt
 	-rm -f *~
+	-rm -f sim???
+	-rm -f sim_test???
+	-rm -f sim_verilog_Test???

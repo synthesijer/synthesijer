@@ -44,6 +44,7 @@ architecture RTL of sim is
   port (
     clk : in std_logic;
     reset : in std_logic;
+    test_return : out std_logic;
     test_req : in std_logic;
     test_busy : out std_logic
   );
@@ -156,6 +157,7 @@ begin
   port map(
     clk => clk,
     reset => reset,
+    test_return => open,
     test_req => req_001,
     test_busy => open
   );
