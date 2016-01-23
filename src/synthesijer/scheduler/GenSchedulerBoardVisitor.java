@@ -104,199 +104,199 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
     private SchedulerItem methodExit;
 	
     public GenSchedulerBoardVisitor(SchedulerInfo info, IdentifierGenerator idGen) {
-	this.info = info;
-	this.parent = null;
-	this.board = null;
-	this.idGen = idGen;
-	this.exitId = -1;
-	this.continueId = -1;		
-	this.breakId = -1;
-	this.varList = info.getModuleVarList();
+		this.info = info;
+		this.parent = null;
+		this.board = null;
+		this.idGen = idGen;
+		this.exitId = -1;
+		this.continueId = -1;		
+		this.breakId = -1;
+		this.varList = info.getModuleVarList();
     }
 
     private GenSchedulerBoardVisitor(GenSchedulerBoardVisitor parent, SchedulerBoard board, int exitId, int breakId, int continueId) {
-	this.parent = parent;
-	this.info = parent.info;
-	this.board = board;
-	this.idGen = parent.idGen;
-	this.exitId = exitId;
-	this.methodExit = parent.methodExit;
-	this.lastItem = parent.lastItem;
-	this.breakId = breakId;
-	this.continueId = continueId;		
-	this.varList = board.getVarList();
+		this.parent = parent;
+		this.info = parent.info;
+		this.board = board;
+		this.idGen = parent.idGen;
+		this.exitId = exitId;
+		this.methodExit = parent.methodExit;
+		this.lastItem = parent.lastItem;
+		this.breakId = breakId;
+		this.continueId = continueId;		
+		this.varList = board.getVarList();
     }
 
     public IdentifierGenerator getIdGen(){
-	return idGen;
+		return idGen;
     }
 	
     public SchedulerBoard getBoard(){
-	return board;
+		return board;
     }
 	
     public int getEntryId(){
-	return entryId;
+		return entryId;
     }
 	
     public void setEntryId(int id){
-	entryId = id;
+		entryId = id;
     }
 	
     public VariableOperand search(String key){
-	if(varTable.containsKey(key)){
-	    return varTable.get(key);
-	}else if(parent != null){
-	    return parent.search(key);
-	}else{
-	    return null;
-	}
+		if(varTable.containsKey(key)){
+			return varTable.get(key);
+		}else if(parent != null){
+			return parent.search(key);
+		}else{
+			return null;
+		}
     }
 	
     public void addVariable(String name, VariableOperand v){
-	varTable.put(name, v);
-	varList.add(v);
+		varTable.put(name, v);
+		varList.add(v);
     }
 	
     public void addVariable(Operand v){
-	varList.add(v);
+		varList.add(v);
     }
 	
     private GenSchedulerBoardVisitor stepIn(Statement stmt, int exitId, int breakId, int continueId){
-	GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, board, exitId, breakId, continueId);
-	stmt.accept(v);
-	SchedulerItem ret = v.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // exit from this block
-	ret.setBranchId(exitId);
-	lastItem = v.lastItem; // update last item
-	if(entryId < 0) entryId = v.entryId;
-	return v;
+		GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, board, exitId, breakId, continueId);
+		stmt.accept(v);
+		SchedulerItem ret = v.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // exit from this block
+		ret.setBranchId(exitId);
+		lastItem = v.lastItem; // update last item
+		if(entryId < 0) entryId = v.entryId;
+		return v;
     }
 
     public Operand stepIn(Expr expr){
-	GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this);
-	expr.accept(v);
-	Operand o = v.getOperand();
-	return o;
+		GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this);
+		expr.accept(v);
+		Operand o = v.getOperand();
+		return o;
     }
 	
     //	private SchedulerItem entry, exit;
 
     @Override
     public void visitModule(Module o) {
-	for(VariableDecl v : o.getVariableDecls()) {
-	    v.accept(this);
-	}
-	for (Method m : o.getMethods()) {
-	    if(m.isConstructor()) continue; // skip 
-	    if(m.isUnsynthesizable()) continue; // skip
-	    SchedulerBoard b = new SchedulerBoard(m.getName(), m);
-	    info.addBoard(b);
-	    this.methodExit = b.addItemInNewSlot(new SchedulerItem(b, Op.METHOD_EXIT, null, null));
-	    this.methodExit.setBranchId(methodExit.getStepId()+1);
-	    // breakId and continueId will not be defined for method
-	    GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this, b, methodExit.getStepId(), -1, -1);
-	    m.accept(child);
-	}
+		for(VariableDecl v : o.getVariableDecls()) {
+			v.accept(this);
+		}
+		for (Method m : o.getMethods()) {
+			if(m.isConstructor()) continue; // skip 
+			if(m.isUnsynthesizable()) continue; // skip
+			SchedulerBoard b = new SchedulerBoard(m.getName(), m);
+			info.addBoard(b);
+			this.methodExit = b.addItemInNewSlot(new SchedulerItem(b, Op.METHOD_EXIT, null, null));
+			this.methodExit.setBranchId(methodExit.getStepId()+1);
+			// breakId and continueId will not be defined for method
+			GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this, b, methodExit.getStepId(), -1, -1);
+			m.accept(child);
+		}
     }
 
     @Override
     public void visitMethod(Method o) {
 		
-	SchedulerItem entry = board.addItemInNewSlot(new MethodEntryItem(board, o.getName()));
-	lastItem = entry;
+		SchedulerItem entry = board.addItemInNewSlot(new MethodEntryItem(board, o.getName()));
+		lastItem = entry;
 
-	for(VariableDecl v: o.getArgs()){
-	    v.accept(this);
-	}
+		for(VariableDecl v: o.getArgs()){
+			v.accept(this);
+		}
 
-	// breakId and continueId will not be defined for method
-	GenSchedulerBoardVisitor v = stepIn(o.getBody(), exitId, -1, -1);
-	entry.setBranchId(v.entryId);
+		// breakId and continueId will not be defined for method
+		GenSchedulerBoardVisitor v = stepIn(o.getBody(), exitId, -1, -1);
+		entry.setBranchId(v.entryId);
     }
 
     @Override
     public void visitBlockStatement(BlockStatement o) {
-	for (Statement s : o.getStatements()) {
-	    s.accept(this);
-	}
+		for (Statement s : o.getStatements()) {
+			s.accept(this);
+		}
     }
 
     @Override
     public void visitBreakStatement(BreakStatement o) {
-	SchedulerItem br = addSchedulerItem(new SchedulerItem(board, Op.BREAK, null, null));
-	br.setBranchId(breakId);
+		SchedulerItem br = addSchedulerItem(new SchedulerItem(board, Op.BREAK, null, null));
+		br.setBranchId(breakId);
     }
 
     @Override
     public void visitContinueStatement(ContinueStatement o) {
-	SchedulerItem br = addSchedulerItem(new SchedulerItem(board, Op.CONTINUE, null, null));
-	br.setBranchId(continueId);
+		SchedulerItem br = addSchedulerItem(new SchedulerItem(board, Op.CONTINUE, null, null));
+		br.setBranchId(continueId);
     }
 
     @Override
     public void visitExprStatement(ExprStatement o) {
-	stepIn(o.getExpr());
+		stepIn(o.getExpr());
     }
 
     @Override
     public void visitForStatement(ForStatement o) {
-	GenSchedulerBoardVisitor forVisitor = new GenSchedulerBoardVisitor(this, board, exitId, breakId, continueId);
-	//GenSchedulerBoardVisitor forVisitor = this;
-	if(entryId > 0) forVisitor.entryId = entryId; // copy entryID when entryId is already settled.
-	for (Statement s : o.getInitializations()) {
-	    s.accept(forVisitor);
-	}
-	int afterInitId = forVisitor.lastItem.getStepId(); // return point for "for loop"
-	if(entryId == -1) entryId = forVisitor.entryId; // copy entryID when entryId is not settled yet.
+		GenSchedulerBoardVisitor forVisitor = new GenSchedulerBoardVisitor(this, board, exitId, breakId, continueId);
+		//GenSchedulerBoardVisitor forVisitor = this;
+		if(entryId > 0) forVisitor.entryId = entryId; // copy entryID when entryId is already settled.
+		for (Statement s : o.getInitializations()) {
+			s.accept(forVisitor);
+		}
+		int afterInitId = forVisitor.lastItem.getStepId(); // return point for "for loop"
+		if(entryId == -1) entryId = forVisitor.entryId; // copy entryID when entryId is not settled yet.
 		
-	Operand flag = forVisitor.stepIn(o.getCondition());
-	SchedulerItem fork = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
-	SchedulerItem join = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		Operand flag = forVisitor.stepIn(o.getCondition());
+		SchedulerItem fork = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		
-	int beforeUpdateId = forVisitor.lastItem.getStepId(); // entry point for update statements
-	for (Statement s : o.getUpdates()){
-	    s.accept(forVisitor);
-	}
-	SchedulerItem loop_back = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
-	loop_back.setBranchId(afterInitId+1); // after loop body and update, back to condition checking
+		int beforeUpdateId = forVisitor.lastItem.getStepId(); // entry point for update statements
+		for (Statement s : o.getUpdates()){
+			s.accept(forVisitor);
+		}
+		SchedulerItem loop_back = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		loop_back.setBranchId(afterInitId+1); // after loop body and update, back to condition checking
 		
-	GenSchedulerBoardVisitor v = forVisitor.stepIn(o.getBody(), beforeUpdateId+1, join.getStepId(), beforeUpdateId);
-	fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
-	join.setBranchId(forVisitor.lastItem.getStepId()+1); // next
-	//lastItem = forVisitor.lastItem;
-	//varTable = preservVarTable;
-	//		forVisitor.entryId = entryTmp;
-	lastItem = forVisitor.lastItem; // write-back
+		GenSchedulerBoardVisitor v = forVisitor.stepIn(o.getBody(), beforeUpdateId+1, join.getStepId(), beforeUpdateId);
+		fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
+		join.setBranchId(forVisitor.lastItem.getStepId()+1); // next
+		//lastItem = forVisitor.lastItem;
+		//varTable = preservVarTable;
+		//		forVisitor.entryId = entryTmp;
+		lastItem = forVisitor.lastItem; // write-back
     }
 
     @Override
     public void visitIfStatement(IfStatement o) {
-	Operand flag = stepIn(o.getCondition());
-	SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
-	SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		Operand flag = stepIn(o.getCondition());
+		SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		
-	GenSchedulerBoardVisitor v0, v1;
-	v0 = stepIn(o.getThenPart(), join.getStepId(), breakId, continueId);
-	if (o.getElsePart() == null) {
-	    fork.setBranchIds(new int[]{v0.getEntryId(), join.getStepId()});
-	    join.setBranchId(v0.lastItem.getStepId() + 1);
-	}else{
-	    v1 = stepIn(o.getElsePart(), join.getStepId(), breakId, continueId);
-	    fork.setBranchIds(new int[]{v0.getEntryId(), v1.getEntryId()});
-	    join.setBranchId(v1.lastItem.getStepId() + 1);
-	}
+		GenSchedulerBoardVisitor v0, v1;
+		v0 = stepIn(o.getThenPart(), join.getStepId(), breakId, continueId);
+		if (o.getElsePart() == null) {
+			fork.setBranchIds(new int[]{v0.getEntryId(), join.getStepId()});
+			join.setBranchId(v0.lastItem.getStepId() + 1);
+		}else{
+			v1 = stepIn(o.getElsePart(), join.getStepId(), breakId, continueId);
+			fork.setBranchIds(new int[]{v0.getEntryId(), v1.getEntryId()});
+			join.setBranchId(v1.lastItem.getStepId() + 1);
+		}
     }
 
     @Override
     public void visitReturnStatement(ReturnStatement o) {
-	SchedulerItem ret;
-	if (o.getExpr() != null){
-	    Operand v = stepIn(o.getExpr());
-	    ret = addSchedulerItem(new SchedulerItem(board, Op.RETURN, new Operand[]{v}, null));
-	}else{
-	    ret = addSchedulerItem(new SchedulerItem(board, Op.RETURN, null, null));
-	}
-	ret.setBranchId(methodExit.getStepId());
+		SchedulerItem ret;
+		if (o.getExpr() != null){
+			Operand v = stepIn(o.getExpr());
+			ret = addSchedulerItem(new SchedulerItem(board, Op.RETURN, new Operand[]{v}, null));
+		}else{
+			ret = addSchedulerItem(new SchedulerItem(board, Op.RETURN, null, null));
+		}
+		ret.setBranchId(methodExit.getStepId());
     }
 
     @Override
@@ -305,219 +305,219 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 
     @Override
     public void visitSwitchStatement(SwitchStatement o) {
-	ArrayList<SwitchStatement.Elem> elements = o.getElements();
-	int[] branchIDs = new int[elements.size() + 1]; // #. patterns and default
+		ArrayList<SwitchStatement.Elem> elements = o.getElements();
+		int[] branchIDs = new int[elements.size() + 1]; // #. patterns and default
 		
-	Operand selector_target = stepIn(o.getSelector()); // target operand
+		Operand selector_target = stepIn(o.getSelector()); // target operand
 
-	Operand[] selector_pat = new Operand[elements.size()];
+		Operand[] selector_pat = new Operand[elements.size()];
 				
-	// gather selector operand
-	for(int i = 0; i < elements.size(); i++){
-	    SwitchStatement.Elem elem = elements.get(i);
-	    selector_pat[i] = stepIn(elem.getPattern());
-	}
+		// gather selector operand
+		for(int i = 0; i < elements.size(); i++){
+			SwitchStatement.Elem elem = elements.get(i);
+			selector_pat[i] = stepIn(elem.getPattern());
+		}
 
-	SchedulerItem fork = addSchedulerItem(new SelectItem(board, selector_target, selector_pat));
-	SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		SchedulerItem fork = addSchedulerItem(new SelectItem(board, selector_target, selector_pat));
+		SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		
-	int nextCaseId;
-	{ // for default
-	    int idx = elements.size();
-	    branchIDs[idx] = lastItem.getStepId() + 1; // currentID + 1
-	    SwitchStatement.Elem elem = o.getDefaultElement();
-	    GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, board, join.getStepId(), join.getStepId(), continueId);
-	    elem.accept(v);
-	    lastItem = v.lastItem;
-	    SchedulerItem ret = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // exit from this block
-	    ret.setBranchId(join.getStepId());
-	    nextCaseId = branchIDs[idx];
-	}
+		int nextCaseId;
+		{ // for default
+			int idx = elements.size();
+			branchIDs[idx] = lastItem.getStepId() + 1; // currentID + 1
+			SwitchStatement.Elem elem = o.getDefaultElement();
+			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, board, join.getStepId(), join.getStepId(), continueId);
+			elem.accept(v);
+			lastItem = v.lastItem;
+			SchedulerItem ret = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // exit from this block
+			ret.setBranchId(join.getStepId());
+			nextCaseId = branchIDs[idx];
+		}
 		
         // switch body (access in manner of reverse order)
-	for(int i = 0; i < elements.size(); i++){
-	    int idx = elements.size() - i - 1;
-	    branchIDs[idx] = lastItem.getStepId() + 1; // currentID
-	    SwitchStatement.Elem elem = elements.get(idx);
-	    GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, board, nextCaseId, join.getStepId(), continueId);
-	    elem.accept(v);
-	    lastItem = v.lastItem;
-	    SchedulerItem ret = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // exit from this block
-	    ret.setBranchId(nextCaseId);
-	    nextCaseId = branchIDs[idx];
-	}
+		for(int i = 0; i < elements.size(); i++){
+			int idx = elements.size() - i - 1;
+			branchIDs[idx] = lastItem.getStepId() + 1; // currentID
+			SwitchStatement.Elem elem = elements.get(idx);
+			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(this, board, nextCaseId, join.getStepId(), continueId);
+			elem.accept(v);
+			lastItem = v.lastItem;
+			SchedulerItem ret = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // exit from this block
+			ret.setBranchId(nextCaseId);
+			nextCaseId = branchIDs[idx];
+		}
 
-	fork.setBranchIds(branchIDs);
-	join.setBranchId(lastItem.getStepId() + 1);
+		fork.setBranchIds(branchIDs);
+		join.setBranchId(lastItem.getStepId() + 1);
     }
 
     public void visitSwitchCaseElement(SwitchStatement.Elem o) {
-	for (Statement s : o.getStatements()){
-	    s.accept(this);
-	}
+		for (Statement s : o.getStatements()){
+			s.accept(this);
+		}
     }
 
     @Override
     public void visitSynchronizedBlock(SynchronizedBlock o) {
-	visitBlockStatement(o);
+		visitBlockStatement(o);
     }
 
     @Override
     public void visitTryStatement(TryStatement o) {
-	o.getBody().accept(this);
+		o.getBody().accept(this);
     }
 	
     private boolean isCastRequired(Type t0, Type t1){
-	if(t0 == t1) return false;
-	Type pt0 = t0, pt1 = t1;
-	if(pt0 instanceof ArrayRef){
-	    pt0 = ((ArrayRef) pt0).getRefType().getElemType(); 
-	}
-	if(pt1 instanceof ArrayRef){
-	    pt1 = ((ArrayRef) pt1).getRefType().getElemType(); 
-	}
-	if(pt0 == pt1) return false;
-	return true;
+		if(t0 == t1) return false;
+		Type pt0 = t0, pt1 = t1;
+		if(pt0 instanceof ArrayRef){
+			pt0 = ((ArrayRef) pt0).getRefType().getElemType(); 
+		}
+		if(pt1 instanceof ArrayRef){
+			pt1 = ((ArrayRef) pt1).getRefType().getElemType(); 
+		}
+		if(pt0 == pt1) return false;
+		return true;
     }
 
     private boolean isFloat(Type t){
-	return t == PrimitiveTypeKind.FLOAT;
+		return t == PrimitiveTypeKind.FLOAT;
     }
 	
     private boolean isDouble(Type t){
-	return t == PrimitiveTypeKind.DOUBLE;
+		return t == PrimitiveTypeKind.DOUBLE;
     }
 	
     public VariableOperand addCast(Operand v, Type target){
-	Operand src = v;
-	VariableOperand tmp = newVariable("cast_expr", target);
-	if(isDouble(target)){
-	    // only long->double or float->double are allowed 
-	    if(v.getType() != PrimitiveTypeKind.LONG && v.getType() != PrimitiveTypeKind.FLOAT){
-		src = addCast(src, PrimitiveTypeKind.LONG);
-	    }
-	}else if(isFloat(target)){
-	    // only int->float or double->float are allowed 
-	    if(v.getType() != PrimitiveTypeKind.INT && v.getType() != PrimitiveTypeKind.DOUBLE){
-		src = addCast(src, PrimitiveTypeKind.INT);
-	    }
-	}else if(isDouble(v.getType())){
-	    // only double->long or double->float are allowed 
-	    if(target != PrimitiveTypeKind.LONG && target != PrimitiveTypeKind.FLOAT){
-		src = addCast(src, PrimitiveTypeKind.LONG);
-	    }
-	}else if(isFloat(v.getType())){
-	    // only float->int or float->double are allowed 
-	    if(target != PrimitiveTypeKind.INT && target != PrimitiveTypeKind.DOUBLE){
-		src = addCast(src, PrimitiveTypeKind.INT);
-	    }
-	}
+		Operand src = v;
+		VariableOperand tmp = newVariable("cast_expr", target);
+		if(isDouble(target)){
+			// only long->double or float->double are allowed 
+			if(v.getType() != PrimitiveTypeKind.LONG && v.getType() != PrimitiveTypeKind.FLOAT){
+				src = addCast(src, PrimitiveTypeKind.LONG);
+			}
+		}else if(isFloat(target)){
+			// only int->float or double->float are allowed 
+			if(v.getType() != PrimitiveTypeKind.INT && v.getType() != PrimitiveTypeKind.DOUBLE){
+				src = addCast(src, PrimitiveTypeKind.INT);
+			}
+		}else if(isDouble(v.getType())){
+			// only double->long or double->float are allowed 
+			if(target != PrimitiveTypeKind.LONG && target != PrimitiveTypeKind.FLOAT){
+				src = addCast(src, PrimitiveTypeKind.LONG);
+			}
+		}else if(isFloat(v.getType())){
+			// only float->int or float->double are allowed 
+			if(target != PrimitiveTypeKind.INT && target != PrimitiveTypeKind.DOUBLE){
+				src = addCast(src, PrimitiveTypeKind.INT);
+			}
+		}
 		
-	addSchedulerItem(TypeCastItem.newCastItem(getBoard(), src, tmp, src.getType(), target)); // src -> tmp::target
-	return tmp;
+		addSchedulerItem(TypeCastItem.newCastItem(getBoard(), src, tmp, src.getType(), target)); // src -> tmp::target
+		return tmp;
     }
 
     private VariableOperand newVariable(String key, Type t){
-	VariableOperand v = new VariableOperand(String.format("%s_%05d", key, getIdGen().id()), t, false);
-	addVariable(v.getName(), v);
-	return v; 
+		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, getIdGen().id()), t, false);
+		addVariable(v.getName(), v);
+		return v; 
     }
 	
     @Override
     public void visitVariableDecl(VariableDecl o) {
-	//Type t = stepIn(o.getVariable().getType());
-	Variable vv = o.getVariable();
-	Type t = vv.getType();
-	//String prefix = o.getScope().getMethod() == null ? "class" : o.getScope().getMethod().getName();
-	String vName;
-	if(o.getScope().getMethod() == null){
-	    // class variable
-	    //	    if(Options.INSTANCE.legacy_instance_variable_name){
-	    //		vName = String.format("class_%s_%04d", o.getName(), idGen.id());
-	    //	    }else{
-	    //		vName = o.getName();
-	    //	    }
-	    vName = String.format("class_%s_%04d", o.getName(), idGen.id());
-	}else{
-	    // method variable
-	    String prefix =o.getScope().getMethod().getName();
-	    vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
-	}
-		
-	VariableOperand v;
-	Operand initSrc = null;
-	if(vv.getInitExpr() != null){
-	    initSrc = stepIn(vv.getInitExpr());
-	}
-	if(vv.getMethod() != null){
-	    v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile(), false);
-	    if(vv.isDebug()) v.setDebug(true);
-	}else{
-	    v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile(), true);
-	    if(vv.isDebug()) v.setDebug(true);
-	}
-		
-	//Variable v = new Variable(o.getVariable().getUniqueName(), t);
-	varTable.put(o.getName(), v);
-	varList.add(v);
-	if (o.getInitExpr() != null){
-			
-	    Operand src = stepIn(o.getInitExpr());
-			
-	    if(src.getType() instanceof PrimitiveTypeKind && ((PrimitiveTypeKind)src.getType()).isCastAllowed()){ // allows to cast
-		if(isCastRequired(v.getType(), src.getType()) == true){
-		    if(src instanceof VariableOperand){
-			VariableOperand tmp = addCast(src, v.getType()); // RHS is casted into corresponding to LHS
-			if(tmp != null) src = tmp;
-		    }else if(src instanceof ConstantOperand){
-			// regenerate constant with appropriate type info.
-			src = new ConstantOperand(String.format("constant_%05d", idGen.id()), ((ConstantOperand) src).getOrigValue(), v.getType());
-			addVariable(src);
-		    }
+		//Type t = stepIn(o.getVariable().getType());
+		Variable vv = o.getVariable();
+		Type t = vv.getType();
+		//String prefix = o.getScope().getMethod() == null ? "class" : o.getScope().getMethod().getName();
+		String vName;
+		if(o.getScope().getMethod() == null){
+			// class variable
+			//	    if(Options.INSTANCE.legacy_instance_variable_name){
+			//		vName = String.format("class_%s_%04d", o.getName(), idGen.id());
+			//	    }else{
+			//		vName = o.getName();
+			//	    }
+			vName = String.format("class_%s_%04d", o.getName(), idGen.id());
+		}else{
+			// method variable
+			String prefix =o.getScope().getMethod().getName();
+			vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
 		}
-	    }
-	    v.setInitSrc(src);
-	    addSchedulerItem(new SchedulerItem(board, Op.ASSIGN, new Operand[]{src}, v));
-	}
+		
+		VariableOperand v;
+		Operand initSrc = null;
+		if(vv.getInitExpr() != null){
+			initSrc = stepIn(vv.getInitExpr());
+		}
+		if(vv.getMethod() != null){
+			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), vv.getMethod().getName(), vv.getMethod().isPrivate(), vv.isVolatile(), false);
+			if(vv.isDebug()) v.setDebug(true);
+		}else{
+			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile(), true);
+			if(vv.isDebug()) v.setDebug(true);
+		}
+		
+		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
+		varTable.put(o.getName(), v);
+		varList.add(v);
+		if (o.getInitExpr() != null){
+			
+			Operand src = stepIn(o.getInitExpr());
+			
+			if(src.getType() instanceof PrimitiveTypeKind && ((PrimitiveTypeKind)src.getType()).isCastAllowed()){ // allows to cast
+				if(isCastRequired(v.getType(), src.getType()) == true){
+					if(src instanceof VariableOperand){
+						VariableOperand tmp = addCast(src, v.getType()); // RHS is casted into corresponding to LHS
+						if(tmp != null) src = tmp;
+					}else if(src instanceof ConstantOperand){
+						// regenerate constant with appropriate type info.
+						src = new ConstantOperand(String.format("constant_%05d", idGen.id()), ((ConstantOperand) src).getOrigValue(), v.getType());
+						addVariable(src);
+					}
+				}
+			}
+			v.setInitSrc(src);
+			addSchedulerItem(new SchedulerItem(board, Op.ASSIGN, new Operand[]{src}, v));
+		}
     }
 
     @Override
     public void visitWhileStatement(WhileStatement o) {
-	int loopEntryId = lastItem.getStepId(); // return point for "for loop"
+		int loopEntryId = lastItem.getStepId(); // return point for "for loop"
 
-	Operand flag = stepIn(o.getCondition());
-	SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
-	SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		Operand flag = stepIn(o.getCondition());
+		SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		
-	GenSchedulerBoardVisitor v = stepIn(o.getBody(), loopEntryId+1, join.getStepId(), loopEntryId+1);
+		GenSchedulerBoardVisitor v = stepIn(o.getBody(), loopEntryId+1, join.getStepId(), loopEntryId+1);
 
-	fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
-	join.setBranchId(lastItem.getStepId()+1); // next
+		fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
+		join.setBranchId(lastItem.getStepId()+1); // next
     }
 
     @Override
     public void visitDoWhileStatement(DoWhileStatement o) {
 
-	SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
-	Operand flag = stepIn(o.getCondition());
-	int condId = lastItem.getStepId();
-	SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
+		SchedulerItem join = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		Operand flag = stepIn(o.getCondition());
+		int condId = lastItem.getStepId();
+		SchedulerItem fork = addSchedulerItem(new SchedulerItem(board, Op.JT, new Operand[]{flag}, null)); // jump on condition
 		
-	GenSchedulerBoardVisitor v = stepIn(o.getBody(), condId, join.getStepId(), condId);
+		GenSchedulerBoardVisitor v = stepIn(o.getBody(), condId, join.getStepId(), condId);
 
-	fork.setBranchIds(new int[]{join.getStepId(), lastItem.getStepId()+1}); // fork into loop body or exi
-	join.setBranchId(v.entryId); // next
+		fork.setBranchIds(new int[]{join.getStepId(), lastItem.getStepId()+1}); // fork into loop body or exi
+		join.setBranchId(v.entryId); // next
 
     }
 
     public SchedulerItem addSchedulerItem(SchedulerItem item){
-	if(board == null){
-	    return item; // skip
-	}
-	board.addItemInNewSlot(item);
-	if(entryId == -1) entryId = item.getStepId();
-	lastItem = item;
-	return item;
+		if(board == null){
+			return item; // skip
+		}
+		board.addItemInNewSlot(item);
+		if(entryId == -1) entryId = item.getStepId();
+		lastItem = item;
+		return item;
     }
 
 }
@@ -529,7 +529,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
     private final GenSchedulerBoardVisitor parent;
 	
     public GenSchedulerBoardExprVisitor(GenSchedulerBoardVisitor parent) {
-	this.parent = parent;
+		this.parent = parent;
     }
 	
     /**
@@ -537,13 +537,13 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
      * @return
      */
     public Operand getOperand(){
-	return result;
+		return result;
     }
 	
     private Operand stepIn(Expr expr){
-	GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this.parent);
-	expr.accept(v);
-	return v.getOperand();
+		GenSchedulerBoardExprVisitor v = new GenSchedulerBoardExprVisitor(this.parent);
+		expr.accept(v);
+		return v.getOperand();
     }
 
     /*
@@ -556,106 +556,106 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 	
     @Override
     public void visitArrayAccess(ArrayAccess o) {
-	VariableOperand indexed = (VariableOperand)(stepIn(o.getIndexed()));
-	Operand index = stepIn(o.getIndex());
-	//		System.out.println("visitArrayAccess:index: " + indexed.getName());
-	//		System.out.println("visitArrayAccess:indexType: " + indexed.getType());
+		VariableOperand indexed = (VariableOperand)(stepIn(o.getIndexed()));
+		Operand index = stepIn(o.getIndex());
+		//		System.out.println("visitArrayAccess:index: " + indexed.getName());
+		//		System.out.println("visitArrayAccess:indexType: " + indexed.getType());
 		
-	ArrayRef type;
-	if(indexed.getType() instanceof ArrayRef){
-	    type = (ArrayRef)indexed.getType();
-	}else if(indexed.getType() instanceof ComponentRef){
-	    ComponentRef ref = (ComponentRef)indexed.getType();
-	    type = new ArrayRef((ArrayType)ref.getRefType());
-	}else{
-	    type = new ArrayRef((ArrayType)indexed.getType());
-	}
+		ArrayRef type;
+		if(indexed.getType() instanceof ArrayRef){
+			type = (ArrayRef)indexed.getType();
+		}else if(indexed.getType() instanceof ComponentRef){
+			ComponentRef ref = (ComponentRef)indexed.getType();
+			type = new ArrayRef((ArrayType)ref.getRefType());
+		}else{
+			type = new ArrayRef((ArrayType)indexed.getType());
+		}
 		
-	//ArrayRef type = new ArrayRef((ArrayType)indexed.getType());
-	VariableOperand tmp = newVariableRef("array_access", type, indexed);
-	parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ARRAY_ACCESS, new Operand[]{indexed, index}, tmp));
-	result = tmp;
+		//ArrayRef type = new ArrayRef((ArrayType)indexed.getType());
+		VariableOperand tmp = newVariableRef("array_access", type, indexed, index);
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ARRAY_ACCESS, new Operand[]{indexed, index}, tmp));
+		result = tmp;
     }
 	
     private boolean isCastRequired(Type t0, Type t1){
-	if(t0 == t1) return false;
-	Type pt0 = t0, pt1 = t1;
-	if(pt0 instanceof ArrayRef){
-	    pt0 = ((ArrayRef) pt0).getRefType().getElemType(); 
-	}
-	if(pt1 instanceof ArrayRef){
-	    pt1 = ((ArrayRef) pt1).getRefType().getElemType(); 
-	}
-	if(pt0 == pt1) return false;
-	return true;
+		if(t0 == t1) return false;
+		Type pt0 = t0, pt1 = t1;
+		if(pt0 instanceof ArrayRef){
+			pt0 = ((ArrayRef) pt0).getRefType().getElemType(); 
+		}
+		if(pt1 instanceof ArrayRef){
+			pt1 = ((ArrayRef) pt1).getRefType().getElemType(); 
+		}
+		if(pt0 == pt1) return false;
+		return true;
     }
 		
     @Override
     public void visitAssignExpr(AssignExpr o) {
-	Operand lhs = stepIn(o.getLhs());
-	Operand rhs = stepIn(o.getRhs());
-	if(isCastRequired(lhs.getType(), rhs.getType()) == true){
-	    if(rhs instanceof VariableOperand){
-		VariableOperand tmp = parent.addCast(rhs, lhs.getType()); // RHS is casted into corresponding to LHS
-		if(tmp != null) rhs = tmp;
-	    }else if(rhs instanceof ConstantOperand){
-		((ConstantOperand) rhs).setType(lhs.getType());
-	    }
-	}
-	parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{rhs}, (VariableOperand)lhs));
+		Operand lhs = stepIn(o.getLhs());
+		Operand rhs = stepIn(o.getRhs());
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true){
+			if(rhs instanceof VariableOperand){
+				VariableOperand tmp = parent.addCast(rhs, lhs.getType()); // RHS is casted into corresponding to LHS
+				if(tmp != null) rhs = tmp;
+			}else if(rhs instanceof ConstantOperand){
+				((ConstantOperand) rhs).setType(lhs.getType());
+			}
+		}
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{rhs}, (VariableOperand)lhs));
     }
 
     @Override
     public void visitAssignOp(AssignOp o) {
-	Operand lhs = stepIn(o.getLhs());
-	Operand rhs = stepIn(o.getRhs());
-	//VariableOperand tmp = newVariable("binary_expr", stepIn(lhs.getType()));
-	VariableOperand tmp = newVariable("binary_expr", lhs.getType());
-	Op op = Op.get(o.getOp(), lhs, rhs);
-	//parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.get(o.getOp()), new Operand[]{lhs,rhs}, tmp));
-	parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, tmp));
-	parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)lhs));
-	result = lhs;
+		Operand lhs = stepIn(o.getLhs());
+		Operand rhs = stepIn(o.getRhs());
+		//VariableOperand tmp = newVariable("binary_expr", stepIn(lhs.getType()));
+		VariableOperand tmp = newVariable("binary_expr", lhs.getType());
+		Op op = Op.get(o.getOp(), lhs, rhs);
+		//parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.get(o.getOp()), new Operand[]{lhs,rhs}, tmp));
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, tmp));
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)lhs));
+		result = lhs;
     }
 
     private VariableOperand newVariable(String key, Type t){
-	VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, false);
-	parent.addVariable(v.getName(), v);
-	return v; 
+		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, false);
+		parent.addVariable(v.getName(), v);
+		return v; 
     }
     /*	
-	private VariableOperand newVariable(String key, Type t, Expr initExpr){
-	VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, initExpr, false, false, false, null, "", false, false);
-	parent.addVariable(v.getName(), v);
-	return v; 
-	}
+		private VariableOperand newVariable(String key, Type t, Expr initExpr){
+		VariableOperand v = new VariableOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, initExpr, false, false, false, null, "", false, false);
+		parent.addVariable(v.getName(), v);
+		return v; 
+		}
     */
-    private VariableRefOperand newVariableRef(String key, Type t, VariableOperand ref){
-	VariableRefOperand v = new VariableRefOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, ref, false);
-	parent.addVariable(v.getName(), v);
-	return v; 
+    private VariableRefOperand newVariableRef(String key, Type t, VariableOperand ref, Operand ptr){
+		VariableRefOperand v = new VariableRefOperand(String.format("%s_%05d", key, parent.getIdGen().id()), t, ref, ptr, false);
+		parent.addVariable(v.getName(), v);
+		return v; 
     }
 
     private int getWidth(Type t){
-	if(t instanceof PrimitiveTypeKind){
-	    return ((PrimitiveTypeKind) t).getWidth();
-	}else if(t instanceof BitVector){
-	    return ((BitVector) t).getWidth();
-	}else{
-	    return -1;
-	}
+		if(t instanceof PrimitiveTypeKind){
+			return ((PrimitiveTypeKind) t).getWidth();
+		}else if(t instanceof BitVector){
+			return ((BitVector) t).getWidth();
+		}else{
+			return -1;
+		}
     }
 	
     private boolean isFloat(Type t){
-	return t == PrimitiveTypeKind.FLOAT;
+		return t == PrimitiveTypeKind.FLOAT;
     }
 	
     private boolean isDouble(Type t){
-	return t == PrimitiveTypeKind.DOUBLE;
+		return t == PrimitiveTypeKind.DOUBLE;
     }
 	
     private boolean isFloating(Type t){
-	return isFloat(t) || isDouble(t);
+		return isFloat(t) || isDouble(t);
     }
 	
     /**
@@ -673,320 +673,320 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
      */
     private Type getPreferableType(Type t0, Type t1) throws UnsupportedException{
 		
-	if(t0 instanceof ArrayRef) t0 = ((ArrayRef)t0).getRefType().getElemType();
-	if(t1 instanceof ArrayRef) t1 = ((ArrayRef)t1).getRefType().getElemType();
+		if(t0 instanceof ArrayRef) t0 = ((ArrayRef)t0).getRefType().getElemType();
+		if(t1 instanceof ArrayRef) t1 = ((ArrayRef)t1).getRefType().getElemType();
 		
-	if(t0 == t1){
-	    return t0;
-	}
+		if(t0 == t1){
+			return t0;
+		}
 				
-	if(isFloating(t0) || isFloating(t1)){
-	    if(isDouble(t0) || isDouble(t1)) return PrimitiveTypeKind.DOUBLE;
-	    return PrimitiveTypeKind.FLOAT; // t0 and/or t1 is float
-	}
-	int w0 = getWidth(t0);
-	int w1 = getWidth(t1);
-	if(w0 < 0 || w1 < 0){
-	    throw new UnsupportedException("["+parent.getBoard().getName()+"] " + "cannot convert:" + t0 + " <-> " + t1 + ", then use " + t0);
-	    //			return t0; // skip
-	}
-	return w0 > w1 ? t0 : t1;
+		if(isFloating(t0) || isFloating(t1)){
+			if(isDouble(t0) || isDouble(t1)) return PrimitiveTypeKind.DOUBLE;
+			return PrimitiveTypeKind.FLOAT; // t0 and/or t1 is float
+		}
+		int w0 = getWidth(t0);
+		int w1 = getWidth(t1);
+		if(w0 < 0 || w1 < 0){
+			throw new UnsupportedException("["+parent.getBoard().getName()+"] " + "cannot convert:" + t0 + " <-> " + t1 + ", then use " + t0);
+			//			return t0; // skip
+		}
+		return w0 > w1 ? t0 : t1;
     }
 	
     @Override
     public void visitBinaryExpr(BinaryExpr o) {
-	Operand lhs = stepIn(o.getLhs());
-	Operand rhs = stepIn(o.getRhs());
-	Op op = Op.get(o.getOp(), lhs, rhs);
-	Type type = lhs.getType();
+		Operand lhs = stepIn(o.getLhs());
+		Operand rhs = stepIn(o.getRhs());
+		Op op = Op.get(o.getOp(), lhs, rhs);
+		Type type = lhs.getType();
 		
 		
-	if(isCastRequired(lhs.getType(), rhs.getType()) == true){
-	    try{
-		type = getPreferableType(lhs.getType(), rhs.getType()); // select type
-	    }catch(UnsupportedException e){
-		SynthesijerUtils.warn(e.toString() + " " + o);
-	    }
-	}
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true){
+			try{
+				type = getPreferableType(lhs.getType(), rhs.getType()); // select type
+			}catch(UnsupportedException e){
+				SynthesijerUtils.warn(e.toString() + " " + o);
+			}
+		}
 		
-	if(isCastRequired(lhs.getType(), rhs.getType()) == true && lhs.getType() != type){
-	    if(lhs instanceof VariableOperand){
-		VariableOperand tmp = parent.addCast(lhs, type);
-		if(tmp != null) lhs = tmp;
-	    }else if(lhs instanceof ConstantOperand){ // ConstantOperand
-		((ConstantOperand) lhs).setType(type);
-	    }
-	}
-	if(isCastRequired(lhs.getType(), rhs.getType()) == true && rhs.getType() != type){
-	    if(rhs instanceof VariableOperand){
-		VariableOperand tmp = parent.addCast(rhs, type);
-		if(tmp != null) rhs = tmp;
-	    }else if(rhs instanceof ConstantOperand){ // ConstantOperand
-		((ConstantOperand) rhs).setType(type);
-	    }
-	}
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true && lhs.getType() != type){
+			if(lhs instanceof VariableOperand){
+				VariableOperand tmp = parent.addCast(lhs, type);
+				if(tmp != null) lhs = tmp;
+			}else if(lhs instanceof ConstantOperand){ // ConstantOperand
+				((ConstantOperand) lhs).setType(type);
+			}
+		}
+		if(isCastRequired(lhs.getType(), rhs.getType()) == true && rhs.getType() != type){
+			if(rhs instanceof VariableOperand){
+				VariableOperand tmp = parent.addCast(rhs, type);
+				if(tmp != null) rhs = tmp;
+			}else if(rhs instanceof ConstantOperand){ // ConstantOperand
+				((ConstantOperand) rhs).setType(type);
+			}
+		}
 		
-	if(op.isForcedType()){
-	    type = op.getType();
-	}
+		if(op.isForcedType()){
+			type = op.getType();
+		}
 
-	result = newVariable("binary_expr", type);
-	parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, (VariableOperand)result));
+		result = newVariable("binary_expr", type);
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, (VariableOperand)result));
     }
 	
 	
     private Type convType(HDLType type){
-	if(type instanceof HDLPrimitiveType == false){
-	    SynthesijerUtils.error("unsupported non-HDLPrimitiveType in user written HDLModule");
-	    throw new RuntimeException("unsupported non-HDLPrimitiveType in user written HDLModule");
-	}
-	HDLPrimitiveType t0 = (HDLPrimitiveType)type;
+		if(type instanceof HDLPrimitiveType == false){
+			SynthesijerUtils.error("unsupported non-HDLPrimitiveType in user written HDLModule");
+			throw new RuntimeException("unsupported non-HDLPrimitiveType in user written HDLModule");
+		}
+		HDLPrimitiveType t0 = (HDLPrimitiveType)type;
 		
-	switch(t0.getKind()){
-	case BIT:
-	    return PrimitiveTypeKind.BOOLEAN;
-	case VECTOR:
-	    return new BitVector(t0.getWidth());
-	case SIGNED:
-	    switch(t0.getWidth()){
-	    case  8: return PrimitiveTypeKind.BYTE;
-	    case 16: return PrimitiveTypeKind.SHORT;
-	    case 32: return PrimitiveTypeKind.INT;
-	    case 64: return PrimitiveTypeKind.LONG;
-	    default:
-		SynthesijerUtils.error("supported only 8-, 16-, 32-, and 64- signed type in user written HDLModule");
-		throw new RuntimeException("supported only 8-, 16-, 32-, and 64- signed type in user written HDLModule");
-	    }
-	default:
-	    SynthesijerUtils.error("unsupported non-HDLPrimitiveType in user written HDLModule");
-	    throw new RuntimeException("unsupported non-HDLPrimitiveType in user written HDLModule");
-	}
+		switch(t0.getKind()){
+		case BIT:
+			return PrimitiveTypeKind.BOOLEAN;
+		case VECTOR:
+			return new BitVector(t0.getWidth());
+		case SIGNED:
+			switch(t0.getWidth()){
+			case  8: return PrimitiveTypeKind.BYTE;
+			case 16: return PrimitiveTypeKind.SHORT;
+			case 32: return PrimitiveTypeKind.INT;
+			case 64: return PrimitiveTypeKind.LONG;
+			default:
+				SynthesijerUtils.error("supported only 8-, 16-, 32-, and 64- signed type in user written HDLModule");
+				throw new RuntimeException("supported only 8-, 16-, 32-, and 64- signed type in user written HDLModule");
+			}
+		default:
+			SynthesijerUtils.error("unsupported non-HDLPrimitiveType in user written HDLModule");
+			throw new RuntimeException("unsupported non-HDLPrimitiveType in user written HDLModule");
+		}
     }
 	
 
     @Override
     public void visitFieldAccess(FieldAccess o) {
-	VariableOperand tmp;
-	Type type = PrimitiveTypeKind.UNDEFIEND;
-	//		System.out.println("visitFieldAccess:Type: " + o.getType());
-	if(o.getType() instanceof ArrayType && o.getIdent().getSymbol().equals("length")){
-	    type = PrimitiveTypeKind.INT;
-	    tmp = newVariable("field_access", type);
-	    Operand v = stepIn(o.getSelected());
-	    parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
-	}else if(o.getType() instanceof ComponentType){
-	    ComponentType ct = (ComponentType)o.getType();
-	    //			System.out.println(" component:" + ct.getName());
-	    //			System.out.println(" field:" + o.getIdent());
-	    VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(ct.getName(), o.getIdent().getSymbol());
-	    //			System.out.println(var);
-	    if(var == null){
-		SynthesijerUtils.error("visitFieldAccess:" + ct.getName() + ":" + o.getIdent().getSymbol());
-	    }
-	    if(var.var == null && var.port != null){
-		type = convType(var.port.getType());
-	    }else{
-		type = var.var.getType();
-	    }
+		VariableOperand tmp;
+		Type type = PrimitiveTypeKind.UNDEFIEND;
+		//		System.out.println("visitFieldAccess:Type: " + o.getType());
+		if(o.getType() instanceof ArrayType && o.getIdent().getSymbol().equals("length")){
+			type = PrimitiveTypeKind.INT;
+			tmp = newVariable("field_access", type);
+			Operand v = stepIn(o.getSelected());
+			parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
+		}else if(o.getType() instanceof ComponentType){
+			ComponentType ct = (ComponentType)o.getType();
+			//			System.out.println(" component:" + ct.getName());
+			//			System.out.println(" field:" + o.getIdent());
+			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(ct.getName(), o.getIdent().getSymbol());
+			//			System.out.println(var);
+			if(var == null){
+				SynthesijerUtils.error("visitFieldAccess:" + ct.getName() + ":" + o.getIdent().getSymbol());
+			}
+			if(var.var == null && var.port != null){
+				type = convType(var.port.getType());
+			}else{
+				type = var.var.getType();
+			}
 
-	    if(type instanceof ArrayType){
-		tmp = newVariable("field_access", new ArrayRef((ArrayType)type));
-	    }else{
-		tmp = newVariable("field_access", type);
-	    }
+			if(type instanceof ArrayType){
+				tmp = newVariable("field_access", new ArrayRef((ArrayType)type));
+			}else{
+				tmp = newVariable("field_access", type);
+			}
 
-	    //tmp = newVariable("field_access", new ComponentRef(ct, type));
-	    Operand v = stepIn(o.getSelected());
-	    parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
-	    //System.out.println("visitFiledAccess: " + tmp.getName() + "::" + tmp.getType());
-	}else{
-	    // "public static final" is only allowed. 
-	    String klass = ((Ident)o.getSelected()).getSymbol();
-	    VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(klass, o.getIdent().getSymbol());
-	    type = var.var.getType();
-	    tmp = newVariable("field_access", type);
-	    //Operand v = stepIn(var.var.getInitExpr());
-	    Operand v = var.var.getInitSrc();
-	    Operand replica = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), ((ConstantOperand)v).getValue(), v.getType());
-	    parent.addVariable(replica);
-	    //parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, tmp));
-	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{replica}, tmp));
-	}
+			//tmp = newVariable("field_access", new ComponentRef(ct, type));
+			Operand v = stepIn(o.getSelected());
+			parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
+			//System.out.println("visitFiledAccess: " + tmp.getName() + "::" + tmp.getType());
+		}else{
+			// "public static final" is only allowed. 
+			String klass = ((Ident)o.getSelected()).getSymbol();
+			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(klass, o.getIdent().getSymbol());
+			type = var.var.getType();
+			tmp = newVariable("field_access", type);
+			//Operand v = stepIn(var.var.getInitExpr());
+			Operand v = var.var.getInitSrc();
+			Operand replica = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), ((ConstantOperand)v).getValue(), v.getType());
+			parent.addVariable(replica);
+			//parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, tmp));
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{replica}, tmp));
+		}
 		
-	result = tmp;
+		result = tmp;
     }
 
     @Override
     public void visitIdent(Ident o) {
-	result = parent.search(o.getSymbol());
+		result = parent.search(o.getSymbol());
     }
 
     @Override
     public void visitLitral(Literal o) {
-	result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), o.getValueAsStr(), o.getType());
-	parent.addVariable(result);
+		result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), o.getValueAsStr(), o.getType());
+		parent.addVariable(result);
     }
 
     @Override
     public void visitMethodInvocation(MethodInvocation o) {
-	Expr method = o.getMethod();
-	VariableOperand tmp = newVariable("method_result", o.getType());
-	ArrayList<Expr> params = o.getParameters();
-	Operand[] list = new Operand[params.size()];
-	for(int i = 0; i < params.size(); i++){
-	    list[i] = stepIn(params.get(i));
-	}
-	MethodInvokeItem item;
-	VariableDecl[] vars = o.getTargetMethod().getArgs();
-	String[] callee_args = new String[o.getTargetMethod().getArgs().length];
-	for(int i = 0; i < callee_args.length; i++){
-	    callee_args[i] = vars[i].getName();
-	}
-	if (method instanceof FieldAccess) { // calling other instance method
-	    FieldAccess fa = (FieldAccess)method;
-	    item = new MethodInvokeItem(parent.getBoard(), (VariableOperand)stepIn(fa.getSelected()), o.getMethodName(), list, tmp, callee_args);
-	}else{ // calling this instance method
-	    item = new MethodInvokeItem(parent.getBoard(), o.getMethodName(), list, tmp, callee_args);
-	}
-	parent.addSchedulerItem(item);
-	item.setBranchId(item.getStepId() + 1);
-	item.setNoWait(o.getTargetMethod().isNoWait());
-	result = tmp;
+		Expr method = o.getMethod();
+		VariableOperand tmp = newVariable("method_result", o.getType());
+		ArrayList<Expr> params = o.getParameters();
+		Operand[] list = new Operand[params.size()];
+		for(int i = 0; i < params.size(); i++){
+			list[i] = stepIn(params.get(i));
+		}
+		MethodInvokeItem item;
+		VariableDecl[] vars = o.getTargetMethod().getArgs();
+		String[] callee_args = new String[o.getTargetMethod().getArgs().length];
+		for(int i = 0; i < callee_args.length; i++){
+			callee_args[i] = vars[i].getName();
+		}
+		if (method instanceof FieldAccess) { // calling other instance method
+			FieldAccess fa = (FieldAccess)method;
+			item = new MethodInvokeItem(parent.getBoard(), (VariableOperand)stepIn(fa.getSelected()), o.getMethodName(), list, tmp, callee_args);
+		}else{ // calling this instance method
+			item = new MethodInvokeItem(parent.getBoard(), o.getMethodName(), list, tmp, callee_args);
+		}
+		parent.addSchedulerItem(item);
+		item.setBranchId(item.getStepId() + 1);
+		item.setNoWait(o.getTargetMethod().isNoWait());
+		result = tmp;
     }
 
     @Override
     public void visitNewArray(NewArray o) {
-	for (Expr expr : o.getDimExpr()) {
-	    expr.accept(this); // expected integer literal for array size
-	}
-	if(o.getDimExpr().size() > 0 && o.getDimExpr().get(0) instanceof Literal){
-	    Literal value = (Literal)(o.getDimExpr().get(0));
-	    int words = Integer.valueOf(value.getValueAsStr());
-	    int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
-	    result = new ArrayRefOperand(String.format("array_%05d", parent.getIdGen().id()), o.getType(), depth, words);
-	    parent.addVariable(result);
-	}else{
-	    //System.out.println("size = " + o.getDimExpr().size());
-	    SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
-	    SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
-	}
+		for (Expr expr : o.getDimExpr()) {
+			expr.accept(this); // expected integer literal for array size
+		}
+		if(o.getDimExpr().size() > 0 && o.getDimExpr().get(0) instanceof Literal){
+			Literal value = (Literal)(o.getDimExpr().get(0));
+			int words = Integer.valueOf(value.getValueAsStr());
+			int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
+			result = new ArrayRefOperand(String.format("array_%05d", parent.getIdGen().id()), o.getType(), depth, words);
+			parent.addVariable(result);
+		}else{
+			//System.out.println("size = " + o.getDimExpr().size());
+			SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
+			SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
+		}
     }
 
     @Override
     public void visitNewClassExpr(NewClassExpr o) {
 		
-	InstanceRefOperand ref = new InstanceRefOperand(String.format("inst_%05d", parent.getIdGen().id()), o.getType(), o.getClassName());
-	parent.addVariable(ref);
+		InstanceRefOperand ref = new InstanceRefOperand(String.format("inst_%05d", parent.getIdGen().id()), o.getType(), o.getClassName());
+		parent.addVariable(ref);
 
-	for (Expr expr : o.getParameters()) {
-	    //expr.accept(this);
-	    if(expr instanceof NewArray){
-		NewArray param = (NewArray)expr;
-		ArrayList<Expr> elem = param.getElems();
-		for(int i = 0; i < elem.size()/2; i ++){
-		    String key = ((Literal)elem.get(2*i)).getValueAsStr();
-		    String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
-		    ref.addParameter(key, value);
+		for (Expr expr : o.getParameters()) {
+			//expr.accept(this);
+			if(expr instanceof NewArray){
+				NewArray param = (NewArray)expr;
+				ArrayList<Expr> elem = param.getElems();
+				for(int i = 0; i < elem.size()/2; i ++){
+					String key = ((Literal)elem.get(2*i)).getValueAsStr();
+					String value = ((Literal)elem.get(2*i+1)).getValueAsStr();
+					ref.addParameter(key, value);
+				}
+			}else{
+				SynthesijerUtils.warn("Parameters should be array expression");
+			}
 		}
-	    }else{
-		SynthesijerUtils.warn("Parameters should be array expression");
-	    }
-	}
-	result = ref;
+		result = ref;
     }
 
     @Override
     public void visitParenExpr(ParenExpr o) {
-	o.getExpr().accept(this);
+		o.getExpr().accept(this);
     }
 
     @Override
     public void visitTypeCast(TypeCast o) {
-	Operand v = stepIn(o.getExpr());
-	if(v instanceof VariableOperand){
-	    result = parent.addCast(v, o.getType());
-	}else if(v instanceof ConstantOperand){
-	    //System.out.println(((ConstantOperand) v).getValue());
-	    result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), ((ConstantOperand) v).getOrigValue(), o.getType());
-	    parent.addVariable(result);
-	}
+		Operand v = stepIn(o.getExpr());
+		if(v instanceof VariableOperand){
+			result = parent.addCast(v, o.getType());
+		}else if(v instanceof ConstantOperand){
+			//System.out.println(((ConstantOperand) v).getValue());
+			result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), ((ConstantOperand) v).getOrigValue(), o.getType());
+			parent.addVariable(result);
+		}
     }
 
     @Override
     public void visitUnaryExpr(UnaryExpr o) {
-	Operand v = stepIn(o.getArg());
-	ConstantOperand c1 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "1", v.getType());
-	parent.addVariable(c1);
-	ConstantOperand c0 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "0", v.getType());
-	parent.addVariable(c0);
-	switch(o.getOp()){
-	case INC:{
-	    VariableOperand tmp = newVariable("unary_expr", v.getType());
-		VariableOperand postfixPreserved = null;
-		if(o.isPostfix()){
-			postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
-			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
+		Operand v = stepIn(o.getArg());
+		ConstantOperand c1 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "1", v.getType());
+		parent.addVariable(c1);
+		ConstantOperand c0 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "0", v.getType());
+		parent.addVariable(c0);
+		switch(o.getOp()){
+		case INC:{
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
+			VariableOperand postfixPreserved = null;
+			if(o.isPostfix()){
+				postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
+				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
+			}
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ADD, new Operand[]{v, c1}, tmp));
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
+			if(o.isPostfix()){
+				result = postfixPreserved;
+			}else{		
+				result = v;
+			}
+			break;
 		}
-	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ADD, new Operand[]{v, c1}, tmp));
-	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
-		if(o.isPostfix()){
-			result = postfixPreserved;
-		}else{		
-			result = v;
+		case DEC:{
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
+			VariableOperand postfixPreserved = null;
+			if(o.isPostfix()){
+				postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
+				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
+			}
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{v, c1}, tmp));
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
+			if(o.isPostfix()){
+				result = postfixPreserved;
+			}else{		
+				result = v;
+			}
+			break;
 		}
-	    break;
-	}
-	case DEC:{
-	    VariableOperand tmp = newVariable("unary_expr", v.getType());
-		VariableOperand postfixPreserved = null;
-		if(o.isPostfix()){
-			postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
-			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
+		case MINUS:{
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
+			if(isFloating(tmp.getType())){
+				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.MSB_FLAP, new Operand[]{v}, tmp));
+			}else{
+				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{c0, v}, tmp));
+			}
+			result = tmp;
+			break;
 		}
-	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{v, c1}, tmp));
-	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
-		if(o.isPostfix()){
-			result = postfixPreserved;
-		}else{		
-			result = v;
+		case LNOT:{
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.NOT, new Operand[]{v}, tmp));
+			result = tmp;
+			break;
 		}
-	    break;
-	}
-	case MINUS:{
-	    VariableOperand tmp = newVariable("unary_expr", v.getType());
-	    if(isFloating(tmp.getType())){
-		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.MSB_FLAP, new Operand[]{v}, tmp));
-	    }else{
-		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{c0, v}, tmp));
-	    }
-	    result = tmp;
-	    break;
-	}
-	case LNOT:{
-	    VariableOperand tmp = newVariable("unary_expr", v.getType());
-	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.NOT, new Operand[]{v}, tmp));
-	    result = tmp;
-	    break;
-	}
-	case NOT:{
-	    VariableOperand tmp = newVariable("unary_expr", v.getType());
-	    parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.NOT, new Operand[]{v}, tmp));
-	    result = tmp;
-	    break;
-	}
-	default:
-	    System.out.println("unknown unary expr:" + o.getOp());
-	}
+		case NOT:{
+			VariableOperand tmp = newVariable("unary_expr", v.getType());
+			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.NOT, new Operand[]{v}, tmp));
+			result = tmp;
+			break;
+		}
+		default:
+			System.out.println("unknown unary expr:" + o.getOp());
+		}
     }
 	
     @Override
     public void visitCondExpr(CondExpr o) {
-	Operand cond = stepIn(o.getCond());
-	Operand t = stepIn(o.getTruePart());
-	Operand f = stepIn(o.getFalsePart());
-	VariableOperand tmp = newVariable("cond_expr", t.getType());
-	parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.COND, new Operand[]{cond, t, f}, tmp));
-	result = tmp; 
+		Operand cond = stepIn(o.getCond());
+		Operand t = stepIn(o.getTruePart());
+		Operand f = stepIn(o.getFalsePart());
+		VariableOperand tmp = newVariable("cond_expr", t.getType());
+		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.COND, new Operand[]{cond, t, f}, tmp));
+		result = tmp; 
     }
 }
 
@@ -995,43 +995,43 @@ class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {
     private Type type;
 
     public GenSchedulerBoardTypeVisitor(GenSchedulerBoardVisitor parent) {
-	// TODO Auto-generated constructor stub
+		// TODO Auto-generated constructor stub
     }
 	
     public Type getType(){
-	return type;
+		return type;
     }
 
     @Override
     public void visitArrayType(ArrayType o) {
-	o.getElemType().accept(this);
+		o.getElemType().accept(this);
     }
 	
     @Override
     public void visitArrayRef(ArrayRef o){
-	//o.getElemType().accept(this);
-	this.type = o;
+		//o.getElemType().accept(this);
+		this.type = o;
     }
 
     @Override
     public void visitComponentType(ComponentType o) {
-	this.type = o;
+		this.type = o;
     }
 
     @Override
     public void visitComponentRef(ComponentRef o){
-	//o.getElemType().accept(this);
-	this.type = o;
+		//o.getElemType().accept(this);
+		this.type = o;
     }
 
     @Override
     public void visitMySelfType(MySelfType o) {
-	this.type = o;
+		this.type = o;
     }
 
     @Override
     public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
-	this.type = o;
+		this.type = o;
     }
 
 }
