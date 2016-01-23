@@ -676,7 +676,11 @@ public class SchedulerInfoCompiler {
 		
 				HDLExpr expr = convOperandToHDLExpr(item, src[0]);
 				din.setAssign(state, expr);
-				addr.setAssign(state, convOperandToHDLExpr(item, d.getPtr()));
+				if(addr == null){
+					// indirect memory access. in this case, destination address is already asserted...
+				}else{
+					addr.setAssign(state, convOperandToHDLExpr(item, d.getPtr()));
+				}
 				predExprMap.put(item, expr);
 			}else{
 				SynthesijerUtils.warn("Unsupported ASSIGN: " + item.info());

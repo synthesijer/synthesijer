@@ -924,7 +924,9 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
 			VariableOperand postfixPreserved = null;
 			if(o.isPostfix()){
-				postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
+				Type t = v.getType();
+				while(t instanceof ArrayRef){ t = ((ArrayRef)t).getRefType().getElemType(); }
+				postfixPreserved = newVariable("unary_expr_postfix_preserved", t);
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
 			}
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ADD, new Operand[]{v, c1}, tmp));
@@ -940,7 +942,9 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
 			VariableOperand postfixPreserved = null;
 			if(o.isPostfix()){
-				postfixPreserved = newVariable("unary_expr_postfix_preserved", v.getType());
+				Type t = v.getType();
+				while(t instanceof ArrayRef){ t = ((ArrayRef)t).getRefType().getElemType(); }
+				postfixPreserved = newVariable("unary_expr_postfix_preserved", t);
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
 			}
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{v, c1}, tmp));
