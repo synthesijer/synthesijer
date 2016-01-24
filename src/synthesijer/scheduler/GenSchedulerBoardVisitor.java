@@ -260,7 +260,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 		SchedulerItem loop_back = forVisitor.addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
 		loop_back.setBranchId(afterInitId+1); // after loop body and update, back to condition checking
 		
-		GenSchedulerBoardVisitor v = forVisitor.stepIn(o.getBody(), beforeUpdateId+1, join.getStepId(), beforeUpdateId);
+		GenSchedulerBoardVisitor v = forVisitor.stepIn(o.getBody(), beforeUpdateId+1, join.getStepId(), beforeUpdateId+1);
 		fork.setBranchIds(new int[]{v.getEntryId(), join.getStepId()}); // fork into loop body or exit
 		join.setBranchId(forVisitor.lastItem.getStepId()+1); // next
 		//lastItem = forVisitor.lastItem;
@@ -456,13 +456,14 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 			v = new VariableOperand(vName, t, initSrc, vv.isPublic(), vv.isGlobalConstant(), vv.isMethodParam(), vv.getName(), null, false, vv.isVolatile(), true);
 			if(vv.isDebug()) v.setDebug(true);
 		}
-		
+		//System.out.println("vv.getInitExpr() == o.getInitExpr():" + (vv.getInitExpr() == o.getInitExpr()));
 		//Variable v = new Variable(o.getVariable().getUniqueName(), t);
 		varTable.put(o.getName(), v);
 		varList.add(v);
 		if (o.getInitExpr() != null){
 			
-			Operand src = stepIn(o.getInitExpr());
+			//Operand src = stepIn(o.getInitExpr());
+			Operand src = initSrc;
 			
 			if(src.getType() instanceof PrimitiveTypeKind && ((PrimitiveTypeKind)src.getType()).isCastAllowed()){ // allows to cast
 				if(isCastRequired(v.getType(), src.getType()) == true){
