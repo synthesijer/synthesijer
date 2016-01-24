@@ -3,7 +3,7 @@ SYNTHESIJER ?= ../../bin
 SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java Test017.java Test018.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
-SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test017.VHD sim_Test018.VHD
+SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test004.VHD sim_Test017.VHD sim_Test018.VHD
 
 OPT = --chaining
 
@@ -31,6 +31,7 @@ ghdl: synthesis
 	ghdl -e sim_test001
 	ghdl -e sim_test002
 	ghdl -e sim_test003
+	ghdl -e sim_test004
 	ghdl -e sim_test017
 	ghdl -e sim_test018
 
@@ -38,6 +39,7 @@ test_vhdl: ghdl
 	./sim_test001
 	./sim_test002
 	./sim_test003
+	./sim_test004
 	./sim_test017
 	./sim_test018
 
@@ -45,11 +47,13 @@ iverilog: synthesis
 	iverilog -o sim_verilog_Test001 sim_Test001.v Test001.v
 	iverilog -o sim_verilog_Test002 sim_Test002.v Test002.v ../../lib/verilog/dualportram.v
 	iverilog -o sim_verilog_Test003 sim_Test003.v Test002.v Test003.v ../../lib/verilog/dualportram.v
+	iverilog -o sim_verilog_Test004 sim_Test004.v Test004.v
 
 test_verilog: iverilog
 	./sim_verilog_Test001
 	./sim_verilog_Test002
 	./sim_verilog_Test003
+	./sim_verilog_Test004
 
 test: test_vhdl test_verilog
 

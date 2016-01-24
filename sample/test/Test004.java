@@ -19,11 +19,30 @@ public class Test004 extends Thread{
 		}
 	}
 
-	public void continue_test(){
+	// todo something wrong
+	public int continue_test(){
 		i = 0;
-		while(true){
+		int j = 0;
+		for(j = 0; j < 20; j++){
 		  if(i == 10) continue;
 		  i++;
 		}
+		return j;
 	}
+
+	public boolean test(){
+		break_test();
+		if(i != 10) return false;
+		int v = continue_test();
+		if(i != 10) return false;
+		if(v != 20) return false;
+		return true;
+	}
+
+	@synthesijer.rt.unsynthesizable
+	public static void main(String... args){
+		Test004 o = new Test004();
+		System.out.println(o.test());
+	}
+	
 }

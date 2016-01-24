@@ -2,10 +2,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity sim_Test018 is
-end sim_Test018;
+entity sim_Test004 is
+end sim_Test004;
 
-architecture RTL of sim_Test018 is
+architecture RTL of sim_Test004 is
 
   signal clk : std_logic := '0';
   signal reset : std_logic := '0';
@@ -17,21 +17,33 @@ architecture RTL of sim_Test018 is
   signal main : Type_main := main_IDLE;
   signal main_delay : signed(32-1 downto 0) := (others => '0');
   signal tmp_0001 : signed(32-1 downto 0) := (others => '0');
-  signal tmp_0002 : std_logic;
-  signal tmp_0003 : std_logic;
-  signal tmp_0004 : std_logic;
-  signal tmp_0005 : std_logic;
+  signal tmp_0002 : std_logic := '0';
+  signal tmp_0003 : std_logic := '0';
+  signal tmp_0004 : std_logic := '0';
+  signal tmp_0005 : std_logic := '0';
 
-  component Test018
+  component Test004
     port (
-      clk : in std_logic;
-      reset : in std_logic;
-      test_idx : in signed(32-1 downto 0);
-      test_return : out std_logic;
-      test_busy : out std_logic;
-      test_req : in std_logic
+      clk                  : in  std_logic;
+      reset                : in  std_logic;
+      run_busy             : out std_logic;
+      run_req              : in  std_logic;
+      break_test_busy      : out std_logic;
+      break_test_req       : in  std_logic;
+      continue_test_return : out signed(32-1 downto 0);
+      continue_test_busy   : out std_logic;
+      continue_test_req    : in  std_logic;
+      test_return          : out std_logic;
+      test_busy            : out std_logic;
+      test_req             : in  std_logic;
+      start_busy           : out std_logic;
+      start_req            : in  std_logic;
+      join_busy            : out std_logic;
+      join_req             : in  std_logic;
+      yield_busy           : out std_logic;
+      yield_req            : in  std_logic
       );
-  end component Test018;
+  end component Test004;
 
   signal run_req, run_busy: std_logic := '0';
   signal test_return : std_logic := '0';
@@ -87,14 +99,26 @@ begin
   end process;
 
   run_req <= '1' when counter > 100 else '0';
-  
-  U: Test018 port map(
-      clk   => clk,
-      reset => reset,
-      test_idx    => (others => '0'),
-      test_return => test_return,
-      test_busy   => run_busy,
-      test_req    => run_req
+  U: Test004
+    port map(
+      clk                  => clk,
+      reset                => reset,
+      run_busy             => open,
+      run_req              => '0',
+      break_test_busy      => open,
+      break_test_req       => '0',
+      continue_test_return => open,
+      continue_test_busy   => open,
+      continue_test_req    => '0',
+      test_return          => test_return,
+      test_busy            => run_busy,
+      test_req             => run_req,
+      start_busy           => open,
+      start_req            => '0',
+      join_busy            => open,
+      join_req             => '0',
+      yield_busy           => open,
+      yield_req            => '0'
       );
 
   finish_flag <= '1' when counter > 1000000 else
@@ -105,9 +129,9 @@ begin
    if clk'event and clk = '1' then
      if finish_flag = '1' then
        if(test_return = '1') then
-         report "Test018: TEST SUCCESS";
+         report "Test004: TEST SUCCESS";
        else
-         report "Test018: TEST *** FAILURE ***";
+         report "Test004: TEST *** FAILURE ***";
        end if;
        end_of_simulation <= '1';
        --assert (false) report "Simulation End!" severity failure;

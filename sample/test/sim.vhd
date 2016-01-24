@@ -78,6 +78,10 @@ architecture RTL of sim is
     break_test_busy : out std_logic;
     continue_test_req : in std_logic;
     continue_test_busy : out std_logic;
+    continue_test_return : out signed(32-1 downto 0);
+    test_return : out std_logic;
+    test_busy : out std_logic;
+    test_req : in std_logic;
     start_req : in std_logic;
     start_busy : out std_logic;
     join_req : in std_logic;
@@ -188,6 +192,10 @@ begin
     break_test_busy => open,
     continue_test_req => '1',
     continue_test_busy => open,
+    continue_test_return => open,
+    test_return => open,
+    test_busy => open,
+    test_req => '0',
     start_req => '1',
     start_busy => open,
     join_req => '0',
