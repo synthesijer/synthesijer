@@ -2,10 +2,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity sim_Test005 is
-end sim_Test005;
+entity sim_Test007 is
+end sim_Test007;
 
-architecture RTL of sim_Test005 is
+architecture RTL of sim_Test007 is
 
   signal clk : std_logic := '0';
   signal reset : std_logic := '0';
@@ -22,17 +22,26 @@ architecture RTL of sim_Test005 is
   signal tmp_0004 : std_logic := '0';
   signal tmp_0005 : std_logic := '0';
 
-  component Test005
+  component Test007
     port (
-      clk         : in  std_logic;
-      reset       : in  std_logic;
-      run_busy    : out std_logic;
-      run_req     : in  std_logic;
-      test_return : out std_logic;
-      test_busy   : out std_logic;
-      test_req    : in  std_logic
+      clk            : in  std_logic;
+      reset          : in  std_logic;
+      in_din_exp     : in  std_logic;
+      out_dout_exp   : out std_logic;
+      in16_din_exp   : in  std_logic_vector(16-1 downto 0);
+      out16_dout_exp : out std_logic_vector(16-1 downto 0);
+      in32_din_exp   : in  std_logic_vector(32-1 downto 0);
+      out32_dout_exp : out std_logic_vector(32-1 downto 0);
+      test_t1        : in  std_logic;
+      test_t2        : in  signed(32-1 downto 0);
+      test_t3        : in  signed(32-1 downto 0);
+      run_busy       : out std_logic;
+      run_req        : in  std_logic;
+      test_return    : out std_logic;
+      test_busy      : out std_logic;
+      test_req       : in  std_logic
       );
-  end component Test005;
+  end component Test007;
 
   signal run_req, run_busy: std_logic := '0';
   signal test_return : std_logic := '0';
@@ -88,15 +97,24 @@ begin
   end process;
 
   run_req <= '1' when counter > 100 else '0';
-  U: Test005
+  U: Test007
     port map(
-      clk         => clk,
-      reset       => reset,
-      run_busy    => open,
-      run_req     => '0',
-      test_return => test_return,
-      test_busy   => run_busy,
-      test_req    => run_req
+      clk            => clk,
+      reset          => reset,
+      in_din_exp     => '1',
+      out_dout_exp   => open,
+      in16_din_exp   => std_logic_vector(to_signed(100, 16)),
+      out16_dout_exp => open,
+      in32_din_exp   => std_logic_vector(to_signed(200, 32)),
+      out32_dout_exp => open,
+      test_t1        => '1',
+      test_t2        => to_signed(100, 32),
+      test_t3        => to_signed(200, 32),
+      run_busy       => open,
+      run_req        => '0',
+      test_return    => test_return,
+      test_busy      => run_busy,
+      test_req       => run_req
       );
 
   finish_flag <= '1' when counter > 1000000 else
@@ -107,9 +125,9 @@ begin
    if clk'event and clk = '1' then
      if finish_flag = '1' then
        if(test_return = '1') then
-         report "Test005: TEST SUCCESS";
+         report "Test007: TEST SUCCESS";
        else
-         report "Test005: TEST *** FAILURE ***";
+         report "Test007: TEST *** FAILURE ***";
        end if;
        end_of_simulation <= '1';
        --assert (false) report "Simulation End!" severity failure;

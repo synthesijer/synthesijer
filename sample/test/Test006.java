@@ -4,7 +4,7 @@ public class Test006{
 		return (c == 10+20+40+50+70+80+100+110) ? true : false;
 	}
 
-	public void test(){
+	public boolean test(){
 		boolean success = false;
 		int a = 10;
 		int b = 20;
@@ -27,5 +27,13 @@ public class Test006{
 		c = c + l;
 		if(c == 10+20+40+50+70+80+100+110) success = true;
 		boolean success2 = check(c);
+		return success2;
 	}
+
+	@synthesijer.rt.unsynthesizable
+	public static void main(String... args){
+		Test006 o = new Test006();
+		System.out.println(o.test());
+	}
+	
 }

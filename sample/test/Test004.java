@@ -1,5 +1,5 @@
 public class Test004 extends Thread{
-	private int i;
+	public int i;
 	public void run(){
 		run_body();
 	}

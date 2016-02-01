@@ -26,6 +26,9 @@ architecture RTL of sim_Test004 is
     port (
       clk                  : in  std_logic;
       reset                : in  std_logic;
+      i_in : in signed(32-1 downto 0);
+      i_we : in std_logic;
+      i_out : out signed(32-1 downto 0);
       run_busy             : out std_logic;
       run_req              : in  std_logic;
       break_test_busy      : out std_logic;
@@ -99,10 +102,13 @@ begin
   end process;
 
   run_req <= '1' when counter > 100 else '0';
-  U: Test004
+  U : Test004
     port map(
       clk                  => clk,
       reset                => reset,
+      i_in                 => (others => '0'),
+      i_we                 => '0',
+      i_out                => open,
       run_busy             => open,
       run_req              => '0',
       break_test_busy      => open,

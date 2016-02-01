@@ -1,6 +1,6 @@
 `default_nettype none
   
-module sim_Test004;
+module sim_Test007;
    
    reg clk   = 1'b0;
    reg reset = 1'b0;
@@ -10,28 +10,23 @@ module sim_Test004;
    wire test_return;
    wire run_busy;
    
-   Test004 u(
+   Test007 u(
 	     .clk(clk),
 	     .reset(reset),
+	     .in_din_exp(1'b1),
+	     .out_dout_exp(),
+	     .in16_din_exp(16'd100),
+	     .out16_dout_exp(),
+	     .in32_din_exp(32'd200),
+	     .out32_dout_exp(),
+	     .test_t1(1'b1),
+	     .test_t2(100),
+	     .test_t3(200),
 	     .run_busy(),
 	     .run_req(1'b0),
-	     .i_in(32'h0),
-	     .i_we(1'b0),
-	     .i_out(),
-	     .break_test_busy(),
-	     .break_test_req(1'b0),
-	     .continue_test_return(),
-	     .continue_test_busy(),
-	     .continue_test_req(1'b0),
 	     .test_return(test_return),
 	     .test_busy(run_busy),
-	     .test_req(run_req),
-	     .start_busy(),
-	     .start_req(1'b0),
-	     .join_busy(),
-	     .join_req(1'b0),
-	     .yield_busy(),
-	     .yield_req(1'b0)
+	     .test_req(run_req)
 	     );
    
    initial begin
@@ -55,13 +50,13 @@ module sim_Test004;
 	run_req <= 1'b1;
       if(counter > 100000 || (run_busy == 0 && counter > 105)) begin
 	 if(test_return == 1) begin
-            $display("Test004: TEST SUCCESS");
+            $display("Test007: TEST SUCCESS");
 	 end else begin
-            $display("Test004: TEST *** FAILURE ***");
+            $display("Test007: TEST *** FAILURE ***");
 	 end
 	 $finish;
       end
    end
    
-endmodule // sim_Test004
+endmodule // sim_Test007
 `default_nettype wire

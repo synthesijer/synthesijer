@@ -27,7 +27,10 @@ architecture RTL of sim is
     clk : in std_logic;
     reset : in std_logic;
     run_req : in std_logic;
-    run_busy : out std_logic
+    run_busy : out std_logic;
+    test_req : in std_logic;
+    test_busy : out std_logic;
+    test_return : out std_logic
   );
  end component Test005;
 
@@ -54,6 +57,7 @@ architecture RTL of sim is
   port (
     clk : in std_logic;
     reset : in std_logic;
+    test_return : out std_logic;
     test_req : in std_logic;
     test_busy : out std_logic
   );
@@ -70,24 +74,27 @@ architecture RTL of sim is
 
  component Test004
   port (
-    clk : in std_logic;
-    reset : in std_logic;
-    run_req : in std_logic;
-    run_busy : out std_logic;
-    break_test_req : in std_logic;
-    break_test_busy : out std_logic;
-    continue_test_req : in std_logic;
-    continue_test_busy : out std_logic;
+    clk                  : in  std_logic;
+    reset                : in  std_logic;
+    i_in                 : in  signed(31 downto 0);
+    i_we                 : in  std_logic;
+    i_out                : out signed(31 downto 0);
+    run_req              : in  std_logic;
+    run_busy             : out std_logic;
+    break_test_req       : in  std_logic;
+    break_test_busy      : out std_logic;
+    continue_test_req    : in  std_logic;
+    continue_test_busy   : out std_logic;
     continue_test_return : out signed(32-1 downto 0);
-    test_return : out std_logic;
-    test_busy : out std_logic;
-    test_req : in std_logic;
-    start_req : in std_logic;
-    start_busy : out std_logic;
-    join_req : in std_logic;
-    join_busy : out std_logic;
-    yield_req : in std_logic;
-    yield_busy : out std_logic
+    test_return          : out std_logic;
+    test_busy            : out std_logic;
+    test_req             : in  std_logic;
+    start_req            : in  std_logic;
+    start_busy           : out std_logic;
+    join_req             : in  std_logic;
+    join_busy            : out std_logic;
+    yield_req            : in  std_logic;
+    yield_busy           : out std_logic
   );
  end component Test004;
 
@@ -143,8 +150,11 @@ begin
   port map(
     clk => clk,
     reset => reset,
-    run_req => run_req,
-    run_busy => run_busy
+    run_req => '0',
+    run_busy => open,
+    test_req => run_req,
+    test_busy => run_busy,
+    test_return => open
   );
 
  req_001 <= '1' when counter > 50 else '0';
@@ -170,6 +180,7 @@ begin
   port map(
     clk => clk,
     reset => reset,
+    test_return => open,
     test_req => req_001,
     test_busy => open
   );
@@ -182,26 +193,29 @@ begin
 --    test_busy => open
 --  );
 
- U004: Test004
+ U004 : Test004
   port map(
-    clk => clk,
-    reset => reset,
-    run_req => '0',
-    run_busy => open,
-    break_test_req => '1',
-    break_test_busy => open,
-    continue_test_req => '1',
-    continue_test_busy => open,
+    clk                  => clk,
+    reset                => reset,
+    run_req              => '0',
+    run_busy             => open,
+    i_in                 => (others => '0'),
+    i_we                 => '0',
+    i_out                => open,
+    break_test_req       => '1',
+    break_test_busy      => open,
+    continue_test_req    => '1',
+    continue_test_busy   => open,
     continue_test_return => open,
-    test_return => open,
-    test_busy => open,
-    test_req => '0',
-    start_req => '1',
-    start_busy => open,
-    join_req => '0',
-    join_busy => open,
-    yield_req => '0',
-    yield_busy => open
+    test_return          => open,
+    test_busy            => open,
+    test_req             => '0',
+    start_req            => '1',
+    start_busy           => open,
+    join_req             => '0',
+    join_busy            => open,
+    yield_req            => '0',
+    yield_busy           => open
   );
 
 end RTL;

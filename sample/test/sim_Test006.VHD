@@ -2,10 +2,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity sim_Test005 is
-end sim_Test005;
+entity sim_Test006 is
+end sim_Test006;
 
-architecture RTL of sim_Test005 is
+architecture RTL of sim_Test006 is
 
   signal clk : std_logic := '0';
   signal reset : std_logic := '0';
@@ -22,17 +22,15 @@ architecture RTL of sim_Test005 is
   signal tmp_0004 : std_logic := '0';
   signal tmp_0005 : std_logic := '0';
 
-  component Test005
+  component Test006
     port (
-      clk         : in  std_logic;
-      reset       : in  std_logic;
-      run_busy    : out std_logic;
-      run_req     : in  std_logic;
+      clk : in std_logic;
+      reset : in std_logic;
       test_return : out std_logic;
-      test_busy   : out std_logic;
-      test_req    : in  std_logic
+      test_busy : out std_logic;
+      test_req : in std_logic
       );
-  end component Test005;
+  end component Test006;
 
   signal run_req, run_busy: std_logic := '0';
   signal test_return : std_logic := '0';
@@ -88,15 +86,13 @@ begin
   end process;
 
   run_req <= '1' when counter > 100 else '0';
-  U: Test005
+  U: Test006
     port map(
-      clk         => clk,
-      reset       => reset,
-      run_busy    => open,
-      run_req     => '0',
+      clk => clk,
+      reset => reset,
       test_return => test_return,
-      test_busy   => run_busy,
-      test_req    => run_req
+      test_busy => run_busy,
+      test_req => run_req
       );
 
   finish_flag <= '1' when counter > 1000000 else
@@ -107,9 +103,9 @@ begin
    if clk'event and clk = '1' then
      if finish_flag = '1' then
        if(test_return = '1') then
-         report "Test005: TEST SUCCESS";
+         report "Test006: TEST SUCCESS";
        else
-         report "Test005: TEST *** FAILURE ***";
+         report "Test006: TEST *** FAILURE ***";
        end if;
        end_of_simulation <= '1';
        --assert (false) report "Simulation End!" severity failure;
