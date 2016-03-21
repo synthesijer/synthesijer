@@ -9,7 +9,6 @@ public class Test010{
 		c = a & b;
 		c = a | b;
 		c = a ^ b;
-
 	}
 
 }

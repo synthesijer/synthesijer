@@ -2,14 +2,15 @@ import synthesijer.lib.*;
 
 public class Test008{
 
+	private byte byte_value = 100;
+	private char char_value = 100;
+	private short short_value = 100;
+	private int int_value = 100;
+	private long long_value = 100;
+	private double double_value = 100;
+	private float float_value = 100;
+
     public void run(){
-		byte byte_value = 100;
-		char char_value = 100;
-		short short_value = 100;
-		int int_value = 100;
-		long long_value = 100;
-		double double_value = 100;
-		float float_value = 100;
 
 		int_value = byte_value;
 		byte_value = (byte)int_value;
@@ -48,5 +49,30 @@ public class Test008{
 		int_value = byte_value + int_value;
 		int_value = int_value + byte_value;
     }
+
+	public boolean test(){
+		if(byte_value != 100) return false;
+		if(char_value != 'd') return false;
+		if(short_value != 100) return false;
+		if(int_value != 400) return false;
+		if(long_value != 100) return false;
+		if(double_value != 100.0d) return false;
+		if(float_value != 100.0f) return false;
+		return true;
+	}
+
+	@synthesijer.rt.unsynthesizable
+	public static void main(String... args){
+		Test008 t = new Test008();
+		t.run();
+		System.out.println(t.byte_value);
+		System.out.println(t.char_value);
+		System.out.println(t.short_value);
+		System.out.println(t.int_value);
+		System.out.println(t.long_value);
+		System.out.println(t.double_value);
+		System.out.println(t.float_value);
+		System.out.println(t.test());
+	}
     
 }

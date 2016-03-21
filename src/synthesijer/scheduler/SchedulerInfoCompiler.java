@@ -1341,8 +1341,8 @@ public class SchedulerInfoCompiler {
 							//						call_wait.setStateExitFlag(flag);
 						}
 						//					call_body.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
-					
-						if(call_stack != null){
+						if(call_stack != null && board.getName().equals(item0.name)){
+							System.out.println("treating recursive call.");
 							HDLSignal addr = call_stack.getSignalForPort("address_b");
 							HDLSignal we = call_stack.getSignalForPort("we_b");
 							HDLSignal wdata = call_stack.getSignalForPort("din_b");

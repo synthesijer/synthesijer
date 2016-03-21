@@ -6,25 +6,25 @@ public class HDLSimModule extends HDLModule{
     private HDLSignal sysReset;
 
     public HDLSimModule(String name){
-	super(name);
+		super(name);
     }
     
     public void setSysClk(HDLSignal s){
-	sysClk = s;
+		sysClk = s;
     }
     
     public void setSysReset(HDLSignal s){
-	sysReset = s;
+		sysReset = s;
     }
 
     @Override
     public HDLPortPairItem getSysClkPairItem(){
-	return sysClk;
+		return sysClk;
     }
     
     @Override
     public HDLPortPairItem getSysResetPairItem(){
-	return sysReset;
+		return sysReset;
     }
 
 }

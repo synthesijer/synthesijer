@@ -63,6 +63,10 @@ public class JCTopVisitor extends Visitor{
 		
 		m.setArgs(parseArgs(decl.getParameters(), m));
 		
+		if(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "unsynthesizable")){
+			return;
+		}
+		
 		m.setUnsynthesizableFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "unsynthesizable"));
 		/*
 		m.setAutoFlag(JCFrontendUtils.isAnnotatedBy(decl.mods.annotations, "auto") & module.isSynthesijerHDL());
