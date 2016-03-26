@@ -33,6 +33,9 @@ architecture RTL of bubblesortsim_top is
       finish_flag_we : in std_logic;
       run_req : in std_logic;
       run_busy : out std_logic;
+      test_return : out std_logic;
+      test_busy : out std_logic;
+      test_req : in std_logic;
       start_req : in std_logic;
       start_busy : out std_logic;
       join_req : in std_logic;
@@ -54,6 +57,9 @@ begin
     finish_flag_we => '0',
     run_req => '1',
     run_busy => open,
+    test_return => open,
+    test_busy => open,
+    test_req => '0',
     start_req => '0',
     start_busy => open,
     join_req => '0',

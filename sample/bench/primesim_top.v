@@ -56,26 +56,30 @@ module primesim_top
   end
 
   wire finish_flag;
+  wire [31:0] result_out;
 
   PrimeSim U(
     .clk(clk),
     .reset(reset),
     .finish_flag_out(finish_flag),
-    .finish_flag_in(0),
-    .finish_flag_we(0),
-    .run_req(1),
+    .finish_flag_in(1'b0),
+    .finish_flag_we(1'b0),
+    .run_req(1'b1),
     .run_busy(),
-    .start_req(0),
+    .start_req(1'b0),
     .start_busy(),
-    .join_req(0),
+    .join_req(1'b0),
     .join_busy(),
-    .yield_req(0),
-    .yield_busy()
+    .yield_req(1'b0),
+    .yield_busy(),
+    .result_we(1'b0),
+    .result_in(32'h0),
+    .result_out(result_out)
     );
 
   always @(posedge clk) begin
     if (finish_flag == 1'b1) begin
-      $write("end\n");
+      $display("%d\n", result_out);
       $finish;
     end
   end

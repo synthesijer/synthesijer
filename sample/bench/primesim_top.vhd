@@ -31,6 +31,9 @@ architecture RTL of primesim_top is
       finish_flag_out : out std_logic;
       finish_flag_in : in std_logic;
       finish_flag_we : in std_logic;
+      result_in : in signed(32-1 downto 0);
+      result_we : in std_logic;
+      result_out : out signed(32-1 downto 0);
       run_req : in std_logic;
       run_busy : out std_logic;
       start_req : in std_logic;
@@ -52,6 +55,9 @@ begin
     finish_flag_out => finish_flag,
     finish_flag_in => '0',
     finish_flag_we => '0',
+    result_in => (others => '0'),
+    result_we => '0',
+    result_out => open,
     run_req => '1',
     run_busy => open,
     start_req => '0',

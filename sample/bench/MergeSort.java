@@ -18,11 +18,13 @@ public class MergeSort {
 		return ar[id];
 	}
 
-	public void check() {
-		for (int i = 0; i < ar.length; i++) {
-			int v0 = ar[i];
-//			int v1 = tmp[i];
+	public boolean check() {
+		int v = ar[0];
+		for (int i = 1; i < ar.length; i++) {
+			if(v > ar[i]) return false;
+			v = ar[i];
 		}
+		return true;
 	}
 
 	private int min(int a, int b){

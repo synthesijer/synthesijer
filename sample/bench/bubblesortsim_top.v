@@ -56,26 +56,33 @@ module bubblesim_top
   end
 
   wire finish_flag;
+  wire test_return;
+   
+  wire test_busy;
 
   BubbleSortSim U(
     .clk(clk),
     .reset(reset),
-    .field_finish_flag_output(finish_flag),
-    .field_finish_flag_input(0),
-    .field_finish_flag_input_we(0),
-    .run_req(1),
+    .finish_flag_out(finish_flag),
+    .finish_flag_in(1'b0),
+    .finish_flag_we(1'b0),
+    .run_req(1'b0),
     .run_busy(),
-    .start_req(0),
+    .start_req(1'b0),
     .start_busy(),
-    .join_req(0),
+    .join_req(1'b0),
     .join_busy(),
-    .yield_req(0),
-    .yield_busy()
+    .yield_req(1'b0),
+    .yield_busy(),
+    .test_req(1'b1),
+    .test_busy(test_busy),
+    .test_return(test_return)
     );
 
   always @(posedge clk) begin
-    if (finish_flag == 1'b1) begin
+    if ((counter >= 100) && (test_busy == 1'b0)) begin
       $write("end\n");
+      $display("%d", test_return);
       $finish;
     end
   end
