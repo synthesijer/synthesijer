@@ -1,7 +1,16 @@
 (MODULE Min001
   (TABLE 1
     (REGISTERS 
-      (REGISTER 1 binary_expr_00002
+      (REGISTER 1 add_req_wire
+        WIRE 1 ()
+      )
+      (REGISTER 2 add_busy_wire
+        WIRE 1 ()
+      )
+      (REGISTER 3 add_ret_wire
+        WIRE 32 ()
+      )
+      (REGISTER 4 binary_expr_00002
         REG 32 ()
       )
     )
@@ -35,23 +44,7 @@
         ((input add_y_0001)
          (width 32))
       )
-      (RESOURCE 7 METHOD_EXIT
-        (32 32) (32)
-        ()
-      )
-      (RESOURCE 8 METHOD_ENTRY
-        (32 32) (32)
-        ()
-      )
       (RESOURCE 9 ADD
-        (32 32) (32)
-        ()
-      )
-      (RESOURCE 10 RETURN
-        (32 32) (32)
-        ()
-      )
-      (RESOURCE 11 JP
         (32 32) (32)
         ()
       )
@@ -61,19 +54,19 @@
       (INSN 1 (METHOD_EXIT :next (1))
     )
     (STATE 1
-      (INSN 2 tr 1 () (2) () ())
-      (INSN 3 (METHOD_ENTRY :next (2))
+      (INSN 1 tr 1 () (2) () ())
+      (INSN 2 (METHOD_ENTRY :next (2))
     )
     (STATE 2
-      (INSN 4 (SET binary_expr_00002 (ADD add_x_0000 add_y_0001) :next (3))
+      (INSN 1 (SET binary_expr_00002 (ADD add_x_0000 add_y_0001) :next (3))
     )
     (STATE 3
-      (INSN 5 tr 1 () (0) () ())
-      (INSN 6 (RETURN binary_expr_00002 :next (0))
+      (INSN 1 tr 1 () (0) () ())
+      (INSN 2 (RETURN binary_expr_00002 :next (0))
     )
     (STATE 4
-      (INSN 7 tr 1 () (0) () ())
-      (INSN 8 (JP :next (0))
+      (INSN 1 tr 1 () (0) () ())
+      (INSN 2 (JP :next (0))
     )
   )
 )
