@@ -54,6 +54,7 @@ import synthesijer.scheduler.GenSchedulerBoardVisitor;
 import synthesijer.scheduler.GlobalSymbolTable;
 import synthesijer.scheduler.IRReader;
 import synthesijer.scheduler.IRWriter;
+import synthesijer.scheduler.IrohaWriter;
 import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
@@ -219,6 +220,14 @@ public enum Manager {
 		}
 	}
 
+	private void outIroha(SchedulerInfo si){
+		try{
+			(new IrohaWriter(si.getName())).generate(si);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+
 	private void doGenSchedulerBoard(){
 		for(SynthesijerModuleInfo info : modules.values()){
 			if(info.sysnthesisFlag == false){
@@ -297,6 +306,7 @@ public enum Manager {
 	private void optimize(SchedulerInfoOptimizer obj, SynthesijerModuleInfo info){
 		info.setSchedulerInfo(obj.opt(info.getSchedulerInfo()));
 		dumpSchedulerInfo(info.getSchedulerInfo(), obj.getKey());
+		outIroha(info.getSchedulerInfo());
 	}
 	
 	private void optimize(SynthesijerModuleInfo info, Options opt){
