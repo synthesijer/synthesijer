@@ -4,13 +4,16 @@
       (REGISTER 1 add_req_wire
         WIRE 1 ()
       )
-      (REGISTER 2 add_x_0000
+      (REGISTER 2 SJR_CONST_ZERO
+        REG 1 0
+      )
+      (REGISTER 3 add_x_0000
         REG 32 ()
       )
-      (REGISTER 3 add_y_0001
+      (REGISTER 4 add_y_0001
         REG 32 ()
       )
-      (REGISTER 4 binary_expr_00002
+      (REGISTER 5 binary_expr_00002
         REG 32 ()
       )
     )
@@ -52,24 +55,25 @@
     (INITIAL 1)
     (STATE 1
       (INSN 1 tr 1 () (2) () ())
+      (INSN 2 ext_output 3 () () (2) ())
     )
     (STATE 2
-      (INSN 2 ext_input 2 () () () (1))
-      (INSN 3 tr 1 () (2 3) (1) ())
-      (INSN 4 ext_output 3 () () (1) ())
-      (INSN 5 ext_input 5 () () () (2))
-      (INSN 6 ext_input 6 () () () (3))
+      (INSN 3 ext_input 2 () () () (1))
+      (INSN 4 tr 1 () (2 3) (1) ())
+      (INSN 5 ext_output 3 () () (1) ())
+      (INSN 6 ext_input 5 () () () (3))
+      (INSN 7 ext_input 6 () () () (4))
     )
     (STATE 3
-      (INSN 7 tr 1 () (4) () ())
-      (INSN 8 add 9 () () (2 3) (4))
+      (INSN 8 tr 1 () (4) () ())
+      (INSN 9 add 9 () () (3 4) (5))
     )
     (STATE 4
-      (INSN 9 ext_output 4 () () (4) ())
-      (INSN 10 tr 1 () (1) () ())
+      (INSN 10 ext_output 4 () () (5) ())
+      (INSN 11 tr 1 () (1) () ())
     )
     (STATE 5
-      (INSN 11 tr 1 () (1) () ())
+      (INSN 12 tr 1 () (1) () ())
     )
   )
 )
