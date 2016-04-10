@@ -55,7 +55,7 @@
     )
     (STATE 2
       (INSN 2 ext_input 2 () () () (1))
-      (INSN 3 tr 1 () (2 1) (1) ())
+      (INSN 3 tr 1 () (2 3) (1) ())
       (INSN 4 ext_output 3 () () (1) ())
       (INSN 5 ext_input 5 () () () (2))
       (INSN 6 ext_input 6 () () () (3))
