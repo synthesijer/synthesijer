@@ -44,12 +44,7 @@
         ((input add_y)
          (width 32))
       )
-      (RESOURCE 7 ext_input
-        () ()
-        ((input null_binary_expr_00002)
-         (width 32))
-      )
-      (RESOURCE 10 ADD
+      (RESOURCE 9 add
         (32 32) (32)
         ()
       )
@@ -60,22 +55,21 @@
     )
     (STATE 2
       (INSN 2 ext_input 2 () () () (1))
-      (INSN 3 tr 1 (1) (2 1) () ())
+      (INSN 3 tr 1 () (2 1) (1) ())
       (INSN 4 ext_output 3 () () (1) ())
       (INSN 5 ext_input 5 () () () (2))
       (INSN 6 ext_input 6 () () () (3))
-      (INSN 7 ext_input 7 () () () (4))
     )
     (STATE 3
-      (INSN 8 tr 1 () (4) () ())
-      (INSN 9 add 10 () () (2 3) (4))
+      (INSN 7 tr 1 () (4) () ())
+      (INSN 8 add 9 () () (2 3) (4))
     )
     (STATE 4
-      (INSN 10 ext_output 3 () () (4) ())
-      (INSN 11 tr 1 () (1) () ())
+      (INSN 9 ext_output 4 () () (4) ())
+      (INSN 10 tr 1 () (1) () ())
     )
     (STATE 5
-      (INSN 12 tr 1 () (1) () ())
+      (INSN 11 tr 1 () (1) () ())
     )
   )
 )
