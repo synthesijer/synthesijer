@@ -242,6 +242,7 @@ public enum Manager {
 			info.m.accept(v);
 			info.setSchedulerInfo(si);
 			dumpSchedulerInfo(si, "init");
+			outIroha(info.getSchedulerInfo());
 		}
 	}
 	
@@ -306,7 +307,6 @@ public enum Manager {
 	private void optimize(SchedulerInfoOptimizer obj, SynthesijerModuleInfo info){
 		info.setSchedulerInfo(obj.opt(info.getSchedulerInfo()));
 		dumpSchedulerInfo(info.getSchedulerInfo(), obj.getKey());
-		outIroha(info.getSchedulerInfo());
 	}
 	
 	private void optimize(SynthesijerModuleInfo info, Options opt){
