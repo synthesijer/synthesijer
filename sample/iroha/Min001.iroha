@@ -2,19 +2,19 @@
   (TABLE 1
     (REGISTERS 
       (REGISTER 1 add_req_wire
-        WIRE 1 ()
+        WIRE UINT 0 ()
       )
       (REGISTER 2 SJR_CONST_ZERO
-        REG 1 0
+        REG UINT 0 0
       )
       (REGISTER 3 add_x_0000
-        REG 32 ()
+        REG INT 32 ()
       )
       (REGISTER 4 add_y_0001
-        REG 32 ()
+        REG INT 32 ()
       )
       (REGISTER 5 binary_expr_00002
-        REG 32 ()
+        REG INT 32 ()
       )
     )
     (RESOURCES
@@ -25,12 +25,12 @@
       (RESOURCE 2 ext_input
         () ()
         ((input add_req)
-         (width 1))
+         (width 0))
       )
       (RESOURCE 3 ext_output
         () ()
         ((output add_busy)
-         (width 1))
+         (width 0))
       )
       (RESOURCE 4 ext_output
         () ()
