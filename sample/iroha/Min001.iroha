@@ -1,4 +1,5 @@
 (MODULE Min001
+  (ATTRS (RESET-POLARITY true) (RESET-NAME reset))
   (TABLE 1
     (REGISTERS 
       (REGISTER 1 add_req_wire
@@ -20,36 +21,36 @@
     (RESOURCES
       (RESOURCE 1 tr
         () ()
-        ()
+        (PARAMS)
       )
       (RESOURCE 2 ext_input
         () ()
-        ((input add_req)
-         (width 0))
+        (PARAMS (INPUT add_req)
+         (WIDTH 0))
       )
       (RESOURCE 3 ext_output
         () ()
-        ((output add_busy)
-         (width 0))
+        (PARAMS (OUTPUT add_busy)
+         (WIDTH 0))
       )
       (RESOURCE 4 ext_output
         () ()
-        ((output add_return)
-         (width 32))
+        (PARAMS (OUTPUT add_return)
+         (WIDTH 32))
       )
       (RESOURCE 5 ext_input
         () ()
-        ((input add_x)
-         (width 32))
+        (PARAMS (INPUT add_x)
+         (WIDTH 32))
       )
       (RESOURCE 6 ext_input
         () ()
-        ((input add_y)
-         (width 32))
+        (PARAMS (INPUT add_y)
+         (WIDTH 32))
       )
       (RESOURCE 9 add
-        (32 32) (32)
-        ()
+        (UINT 32 UINT 32) (UINT 32)
+        (PARAMS )
       )
     )
     (INITIAL 1)
