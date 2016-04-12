@@ -1,5 +1,5 @@
 (MODULE Min001
-  (ATTRS (RESET-POLARITY true) (RESET-NAME reset))
+(ATTRS (RESET-POLARITY true) (RESET-NAME reset))
   (TABLE 1
     (REGISTERS 
       (REGISTER 1 add_req_wire
@@ -50,7 +50,7 @@
       )
       (RESOURCE 9 add
         (UINT 32 UINT 32) (UINT 32)
-        (PARAMS )
+        (PARAMS)
       )
     )
     (INITIAL 1)
