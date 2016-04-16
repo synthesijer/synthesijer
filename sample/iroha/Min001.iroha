@@ -1,12 +1,12 @@
 (MODULE Min001
-(ATTRS (RESET-POLARITY true) (RESET-NAME reset))
+(PARAMS (RESET-POLARITY true) (RESET-NAME reset))
   (TABLE 1
     (REGISTERS 
       (REGISTER 1 add_req_wire
         WIRE UINT 0 ()
       )
       (REGISTER 2 SJR_CONST_ZERO
-        REG UINT 0 0
+        CONST UINT 0 0
       )
       (REGISTER 3 add_x_0000
         REG INT 32 ()
