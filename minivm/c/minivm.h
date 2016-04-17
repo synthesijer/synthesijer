@@ -1,0 +1,104 @@
+#ifndef __MINIVM_H__
+#define __MINIVM_H__
+
+enum OPCODE {
+  METHOD_ENTRY,
+  METHOD_EXIT,
+  ASSIGN,
+  NOP,
+  ADD,
+  SUB,
+  MUL32,
+  MUL64,
+  DIV32,
+  DIV64,
+  MOD32,
+  MOD64,
+  LT,
+  LEQ,
+  GT,
+  GEQ,
+  COMPEQ,
+  NEQ,
+  SIMPLE_LSHIFT32,
+  SIMPLE_LOGIC_RSHIFT32,
+  SIMPLE_ARITH_RSHIFT32,
+  SIMPLE_LSHIFT64,
+  SIMPLE_LOGIC_RSHIFT64,
+  SIMPLE_ARITH_RSHIFT64,
+  LSHIFT32,
+  LOGIC_RSHIFT32,
+  ARITH_RSHIFT32,
+  LSHIFT64,
+  LOGIC_RSHIFT64,
+  ARITH_RSHIFT64,
+  JP,
+  JT,
+  RETURN,
+  SELECT,
+  AND,
+  NOT,
+  MSB_FLAP,
+  LAND,
+  LOR,
+  OR,
+  XOR,
+  LNOT,
+  ARRAY_ACCESS,
+  ARRAY_INDEX,
+  CALL,
+  EXT_CALL,
+  FIELD_ACCESS,
+  BREAK,
+  CONTINUE,
+  CAST,
+  COND,
+  FADD32,
+  FSUB32,
+  FMUL32,
+  FDIV32,
+  FADD64,
+  FSUB64,
+  FMUL64,
+  FDIV64,
+  CONV_F2I,
+  CONV_I2F,
+  CONV_D2L,
+  CONV_L2D,
+  CONV_F2D,
+  CONV_D2F,
+  FLT32,
+  FLEQ32,
+  FGT32,
+  FGEQ32,
+  FCOMPEQ32,
+  FNEQ32,
+  FLT64,
+  FLEQ64,
+  FGT64,
+  FGEQ64,
+  FCOMPEQ64,
+  FNEQ64,
+  UNDEFINED
+};
+
+enum OPERAND_FIELD{
+  MODULE_RESOURCE,
+  LOCAL_STACK
+};
+
+struct operand{
+  enum OPERAND_FIELD field;
+  int width;
+  int ptr;
+};
+
+struct instruction_code{
+  enum OPCODE op;
+  struct operand src0;
+  struct operand src1;
+  struct operand dest;
+  int next_pc;
+};
+
+#endif /* __MINIVM_H__ */
