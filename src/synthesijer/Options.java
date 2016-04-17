@@ -12,4 +12,6 @@ public enum Options {
     
     public boolean legacy_instance_variable_name;
 
+    public boolean iroha;
+
 }

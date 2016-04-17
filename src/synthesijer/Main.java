@@ -27,7 +27,7 @@ import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 public class Main {
 
     public static void main(String... args) throws Exception{
-	GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name", args);
+	GetOpt opt = new GetOpt("h", "no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha", args);
 	if(opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0){
 	    printHelp();
 	    System.exit(0);
@@ -97,6 +97,7 @@ public class Main {
 	Options.INSTANCE.chaining = opt.flag("chaining");
 	Options.INSTANCE.legacy_instance_variable_name = opt.flag("legacy-instance-variable-name");
 	Options.INSTANCE.operation_strength_reduction = opt.flag("operation_strength_reduction");
+	Options.INSTANCE.iroha = opt.flag("iroha");
 	boolean packaging = false;
 	String packageTop = "";
 	if(opt.flag("ip-exact")){

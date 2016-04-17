@@ -242,7 +242,9 @@ public enum Manager {
 			info.m.accept(v);
 			info.setSchedulerInfo(si);
 			dumpSchedulerInfo(si, "init");
-			outIroha(info.getSchedulerInfo());
+			if(Options.INSTANCE.iroha){
+			    outIroha(info.getSchedulerInfo());
+			}
 		}
 	}
 	
