@@ -156,6 +156,7 @@ public class Main {
 	System.out.println("  -h, --help: print this help");
 	System.out.println("  --vhdl: output VHDL");
 	System.out.println("  --verilog: output Verilog HDL");
+	System.out.println("  --iroha: output IROHA source code");
 	System.out.println("  (If you specify neither --vhdl nor --verilog, --vhdl is selected.)");
 	System.out.println("  --config=file: the specified file is used for compiler settings");
 	System.out.println("  --lib-classes=path1:path2:...: the specified paths will be added as classpaths for compile time");
