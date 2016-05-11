@@ -1,23 +1,28 @@
 package synthesijer.scheduler;
 
 import java.util.ArrayList;
+import synthesijer.ast.Module;
 
 public class SchedulerInfo {
 	
 	private ArrayList<SchedulerBoard> boardsList = new ArrayList<>();
 	
 	private final String name;
+
+	private final Module module;
 	
 	//private final ArrayList<VariableOperand> varList;
 	private final ArrayList<Operand> varList;
 	
-	public SchedulerInfo(String name){
+	public SchedulerInfo(String name, Module module){
 		this.name = name;
+		this.module = module;
 		varList = new ArrayList<>();
 	}
 
 	private SchedulerInfo(SchedulerInfo i){
 		this.name = i.name;
+		this.module = i.module;
 		varList = i.varList;
 	}
 	
@@ -27,6 +32,10 @@ public class SchedulerInfo {
 
 	public String getName(){
 		return name;
+	}
+
+	public Module getModule(){
+		return module;
 	}
 	
 	public SchedulerBoard[] getBoardsList(){

@@ -414,7 +414,7 @@ public class SchedulerInfoCompiler {
 
 
     private HDLPrimitiveType getHDLType(MySelfType t){
-		System.err.println("unsupported type: " + t);
+		//System.err.println("unsupported type: " + t);
 		return null;
     }
 	
@@ -1104,8 +1104,8 @@ public class SchedulerInfoCompiler {
     private Hashtable<SchedulerBoard, HDLSignal> returnSigTable = new Hashtable<>();
 
     private void genMethodCtrlSignals(SchedulerBoard board, Hashtable<HDLVariable, HDLInstance> callStackMap){
-	
-		if(board.getReturnType() != PrimitiveTypeKind.VOID){
+		if(board.getReturnType() != PrimitiveTypeKind.VOID &&
+		   !(board.getReturnType() instanceof synthesijer.ast.type.MySelfType)){
 			if(board.isPrivate() == false){
 				HDLPort return_port = hm.newPort(board.getName() + "_return", HDLPort.DIR.OUT, getHDLType(board.getReturnType()));
 				returnSigTable.put(board, return_port.getSignal());

@@ -89,5 +89,5 @@ public class ConstantOperand implements Operand{
 	public String toSexp(){
 		return "(CONSTANT " + type + " " +  getName() + " " + value + ")";
 	}
-	
+
 }

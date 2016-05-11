@@ -31,6 +31,8 @@ public class Module implements Scope, SynthesijerAstTree{
 	private Statemachine statemachine;
 	
 	private boolean synthesijerHDLFlag = false;
+
+	private final Method moduleInitMethod;
 	
 	public Module(String name, Hashtable<String, String> importTable, String extending, ArrayList<String> implementing){
 		this(null, name, importTable, extending, implementing);
@@ -43,6 +45,9 @@ public class Module implements Scope, SynthesijerAstTree{
 		this.extending = extending;
 		this.implementing = implementing;
 		scopes.add(this);
+		//this.moduleInitMethod = new Method(this, "synthesijer_class_init_" + name, PrimitiveTypeKind.VOID);
+		//this.moduleInitMethod.setPrivateFlag(true);
+		this.moduleInitMethod = null;
 	}
 
 	public void addScope(Scope s){
@@ -79,7 +84,7 @@ public class Module implements Scope, SynthesijerAstTree{
 	}
 	
 	public Method getMethod(){
-		return null;
+		return moduleInitMethod;
 	}
 
 	public void addMethod(Method m){

@@ -3,13 +3,14 @@ package synthesijer.scheduler;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import synthesijer.Options;
 import synthesijer.IdentifierGenerator;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
+import synthesijer.ast.SimpleEvalulator;
 import synthesijer.ast.Statement;
+import synthesijer.ast.SynthesijerAstException;
 import synthesijer.ast.SynthesijerAstTypeVisitor;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
@@ -102,12 +103,22 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
     private final ArrayList<Operand> varList;
 	
     private SchedulerItem methodExit;
+    
+    boolean constantPropMode = false;
 	
     public GenSchedulerBoardVisitor(SchedulerInfo info, IdentifierGenerator idGen) {
 		this.info = info;
 		this.parent = null;
+		//this.board = null;
+		
+		//Method initMethod = info.getModule().getMethod();
+		//this.board = new SchedulerBoard(initMethod.getName(), initMethod);
+		//this.methodExit = this.board.addItemInNewSlot(new SchedulerItem(this.board, Op.METHOD_EXIT, null, null));
+		//this.methodExit.setBranchId(methodExit.getStepId()+1);
 		this.board = null;
+
 		this.idGen = idGen;
+		//this.exitId = methodExit.getStepId();
 		this.exitId = -1;
 		this.continueId = -1;		
 		this.breakId = -1;
@@ -183,12 +194,18 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 
     @Override
     public void visitModule(Module o) {
+        constantPropMode = true;
 		for(VariableDecl v : o.getVariableDecls()) {
 			v.accept(this);
 		}
+        constantPropMode = false;
 		for (Method m : o.getMethods()) {
-			if(m.isConstructor()) continue; // skip 
 			if(m.isUnsynthesizable()) continue; // skip
+			if(m.isConstructor()){
+				//System.out.println("constructor");
+				//System.out.println("constructor:" + m.getName());
+				continue; // skip
+			}
 			SchedulerBoard b = new SchedulerBoard(m.getName(), m);
 			info.addBoard(b);
 			this.methodExit = b.addItemInNewSlot(new SchedulerItem(b, Op.METHOD_EXIT, null, null));
@@ -197,6 +214,11 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 			GenSchedulerBoardVisitor child = new GenSchedulerBoardVisitor(this, b, methodExit.getStepId(), -1, -1);
 			m.accept(child);
 		}
+		//{ // initializer
+		//	info.addBoard(this.board);
+		//	SchedulerItem i = addSchedulerItem(new SchedulerItem(board, Op.JP, null, null)); // join point to go to branch following
+		//	i.setBranchId(i.getStepId());
+		//}
     }
 
     @Override
@@ -731,11 +753,41 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			type = op.getType();
 		}
 
+		if(parent.constantPropMode && isConstant(lhs) && isConstant(rhs)){
+			//System.out.println("both lhs and rhs are constant: " + o);
+			ConstantOperand l = getConstant(lhs);
+			ConstantOperand r = getConstant(rhs);
+			try{
+			    Literal literal = SimpleEvalulator.eval(o.getOp(), l.getType(), l.getOrigValue(), r.getType(), r.getOrigValue());
+                result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), literal.getValueAsStr(), type);
+                parent.addVariable(result);
+                return;
+            }catch(SynthesijerAstException e){
+                SynthesijerUtils.warn("unsupported expression in this scope: " + o);
+            }
+		}
 		result = newVariable("binary_expr", type);
 		parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), op, new Operand[]{lhs,rhs}, (VariableOperand)result));
     }
-	
-	
+    
+    private boolean isConstant(Operand o){
+    	if(o instanceof ConstantOperand) return true;
+    	if(o instanceof VariableOperand){
+    		VariableOperand va = (VariableOperand)o;
+    		if(va.getInitSrc() instanceof ConstantOperand) return true;
+    	}
+    	return false;
+    }
+    
+    private ConstantOperand getConstant(Operand o){
+    	if(o instanceof ConstantOperand) return (ConstantOperand)o;
+    	if(o instanceof VariableOperand){
+    		VariableOperand va = (VariableOperand)o;
+    		if(va.getInitSrc() instanceof ConstantOperand) return (ConstantOperand)(va.getInitSrc());
+    	}
+    	return null;
+    }
+
     private Type convType(HDLType type){
 		if(type instanceof HDLPrimitiveType == false){
 			SynthesijerUtils.error("unsupported non-HDLPrimitiveType in user written HDLModule");
@@ -824,12 +876,18 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
     @Override
     public void visitLitral(Literal o) {
-		result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), o.getValueAsStr(), o.getType());
+    	result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), o.getValueAsStr(), o.getType());
 		parent.addVariable(result);
     }
 
     @Override
     public void visitMethodInvocation(MethodInvocation o) {
+		Method target = o.getTargetMethod();
+		if(target == null){
+			System.out.println("[visitMethodInvocation] missing: " + o.getMethodName());
+			return;
+		}
+
 		Expr method = o.getMethod();
 		VariableOperand tmp = newVariable("method_result", o.getType());
 		ArrayList<Expr> params = o.getParameters();
@@ -860,12 +918,17 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		for (Expr expr : o.getDimExpr()) {
 			expr.accept(this); // expected integer literal for array size
 		}
-		if(o.getDimExpr().size() > 0 && o.getDimExpr().get(0) instanceof Literal){
-			Literal value = (Literal)(o.getDimExpr().get(0));
-			int words = Integer.valueOf(value.getValueAsStr());
-			int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
-			result = new ArrayRefOperand(String.format("array_%05d", parent.getIdGen().id()), o.getType(), depth, words);
-			parent.addVariable(result);
+        if(o.getDimExpr().size() > 0 && o.getDimExpr().get(0) instanceof Literal){
+            Literal value = (Literal)(o.getDimExpr().get(0));
+            int words = Integer.valueOf(value.getValueAsStr());
+            int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
+            result = new ArrayRefOperand(String.format("array_%05d", parent.getIdGen().id()), o.getType(), depth, words);
+            parent.addVariable(result);
+        }else if(o.getDimExpr().size() > 0 && result instanceof ConstantOperand){
+            int words = Integer.valueOf(((ConstantOperand)result).getOrigValue());
+            int depth = (int)Math.ceil(Math.log(words) / Math.log(2.0));
+            result = new ArrayRefOperand(String.format("array_%05d", parent.getIdGen().id()), o.getType(), depth, words);
+            parent.addVariable(result);
 		}else{
 			//System.out.println("size = " + o.getDimExpr().size());
 			SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + o.getDimExpr());
@@ -916,10 +979,23 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
     @Override
     public void visitUnaryExpr(UnaryExpr o) {
 		Operand v = stepIn(o.getArg());
-		ConstantOperand c1 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "1", v.getType());
-		parent.addVariable(c1);
-		ConstantOperand c0 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "0", v.getType());
-		parent.addVariable(c0);
+
+		// TODO
+		/*
+		if(parent.constantPropMode && isConstant(v)){
+		    ConstantOperand c = getConstant(v);
+		    Literal literal;
+		    try{
+		        literal = SimpleEvalulator.eval(o.getOp(), c.getType(), c.getOrigValue());
+                result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), literal.getValueAsStr(), v.getType());
+                parent.addVariable(result);
+                return;
+            }catch(SynthesijerAstException e){
+                SynthesijerUtils.warn("unsupported expression in this scope: " + o);
+            }
+		}
+		*/
+		
 		switch(o.getOp()){
 		case INC:{
 			VariableOperand tmp = newVariable("unary_expr", v.getType());
@@ -930,6 +1006,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 				postfixPreserved = newVariable("unary_expr_postfix_preserved", t);
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
 			}
+	        ConstantOperand c1 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "1", v.getType());
+	        parent.addVariable(c1);
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ADD, new Operand[]{v, c1}, tmp));
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
 			if(o.isPostfix()){
@@ -948,6 +1026,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 				postfixPreserved = newVariable("unary_expr_postfix_preserved", t);
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, postfixPreserved));
 			}
+	        ConstantOperand c1 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "1", v.getType());
+	        parent.addVariable(c1);
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{v, c1}, tmp));
 			parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{tmp}, (VariableOperand)v));
 			if(o.isPostfix()){
@@ -962,6 +1042,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			if(isFloating(tmp.getType())){
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.MSB_FLAP, new Operand[]{v}, tmp));
 			}else{
+		        ConstantOperand c0 = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), "0", v.getType());
+		        parent.addVariable(c0);
 				parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.SUB, new Operand[]{c0, v}, tmp));
 			}
 			result = tmp;

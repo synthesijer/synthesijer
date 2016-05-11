@@ -44,6 +44,7 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		Hashtable<Integer, SchedulerSlot> map = new Hashtable<>();
 		for(SchedulerSlot s: slots){
 			map.put(s.getStepId(), s);
+			degrees.put(s, 0);
 		}
 		for(SchedulerSlot s: slots){
 			int[] ids = s.getNextStep();
@@ -250,8 +251,15 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 		for(int i = 0; i < slots.length; i++){
 			SchedulerSlot slot = slots[i];
 			Integer d = degrees.get(slot);
-			//if(d == null) d = 0;
-			if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0 || d > 1 || slot.getItems().length > 1 || isExcept(slot.getItems()[0])){
+			if(d == null){
+				System.out.println("d==null: " + slot.getItems()[0].toSexp() + "@" + slot);
+			}
+			if(slot.hasBranchOp()
+					|| slot.getNextStep().length > 1
+					|| slot.getLatency() > 0
+					|| d > 1
+					|| slot.getItems().length > 1
+					|| isExcept(slot.getItems()[0])){
 				if(bb != null && bb.size() > 0){
 					prev = parallelize(ret, bb, id_map);
 				}

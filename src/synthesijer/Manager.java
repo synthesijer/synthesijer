@@ -237,7 +237,7 @@ public enum Manager {
 			String name = info.m.getName();
 			System.out.println("SchdulerBoard init: " + name);
 			IdentifierGenerator i = new IdentifierGenerator();
-			SchedulerInfo si = new SchedulerInfo(name);
+			SchedulerInfo si = new SchedulerInfo(name, info.m);
 			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(si, i);
 			info.m.accept(v);
 			info.setSchedulerInfo(si);

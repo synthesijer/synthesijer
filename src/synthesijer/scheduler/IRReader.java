@@ -1,8 +1,10 @@
 package synthesijer.scheduler;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.ast.Module;
 import synthesijer.ast.Type;
 import synthesijer.ast.type.TypeGen;
 
@@ -28,7 +30,8 @@ public class IRReader {
 		SchedulerInfo info;
 		ArrayList<ChainingInfo> chainingVars = new ArrayList<>();
 		if(sexp.size() > 1 && sexp.get(0).equals("MODULE")){
-			info = new SchedulerInfo(sexp.get(1).toString());
+			Module m = new Module(sexp.get(1).toString(), new Hashtable<String, String>(), "", new ArrayList<String>());
+			info = new SchedulerInfo(sexp.get(1).toString(), m);
 		}else{
 			throw new IRReaderException("Illegal format");
 		}		

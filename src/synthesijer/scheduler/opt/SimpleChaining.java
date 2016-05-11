@@ -41,6 +41,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		Hashtable<Integer, SchedulerSlot> map = new Hashtable<>();
 		for(SchedulerSlot s: slots){
 			map.put(s.getStepId(), s);
+			degrees.put(s, 0);
 		}
 		for(SchedulerSlot s: slots){
 			int[] ids = s.getNextStep();

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import synthesijer.IdentifierGenerator;
-import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Variable;
@@ -17,12 +16,17 @@ public enum GlobalSymbolTable {
 	
 	Hashtable<String, ClassInfo> map = new Hashtable<>();
 	
-	private SchedulerInfo si = new SchedulerInfo("synthesijer_global_symbol_table");
-	private IdentifierGenerator i = new IdentifierGenerator();
-	private GenSchedulerBoardVisitor board = new GenSchedulerBoardVisitor(si, i);
+	//private SchedulerInfo si = new SchedulerInfo("synthesijer_global_symbol_table", null);
+	//private IdentifierGenerator i = new IdentifierGenerator();
+	//private GenSchedulerBoardVisitor board = new GenSchedulerBoardVisitor(si, i);
 
 	
 	public void add(Module m){
+		SchedulerInfo si = new SchedulerInfo(m.getName(), m);
+		IdentifierGenerator idGen = new IdentifierGenerator();
+		GenSchedulerBoardVisitor board = new GenSchedulerBoardVisitor(si, idGen);
+		board.constantPropMode = true;
+		
 		ClassInfo i = new ClassInfo();
 		map.put(m.getName(), i);
 		for(Method method: m.getMethods()){
@@ -77,15 +81,20 @@ class VariableInfo{
 	public VariableInfo(GenSchedulerBoardVisitor board, Variable v){
 		Operand o = null;
 		if(v.getInitExpr() != null){
-			 o = board.stepIn(v.getInitExpr());
+			o = board.stepIn(v.getInitExpr());
 		}
 		if(v.getMethod() != null){
 			//var = new VariableOperand(v.getName(), v.getType(), v.getInitExpr(), v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), v.getMethod().isPrivate(), v.isVolatile());
-			var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), v.getMethod().isPrivate(), v.isVolatile(), true);
+			//var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), v.getMethod().isPrivate(), v.isVolatile(), true);
+			var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), "", v.getMethod().isPrivate(), v.isVolatile(), true);
+			System.out.println(var.getName());
+			System.out.println(var.isPrivateMethod());
 		}else{
 			//var = new VariableOperand(v.getName(), v.getType(), v.getInitExpr(), v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), null, false, v.isVolatile());
-			var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), null, false, v.isVolatile(), false);
+			//var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), false, v.isVolatile(), false);
+			var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), "", false, v.isVolatile(), false);
 		}
+		board.addVariable(v.getName(), var);
 	}
 
 	public VariableInfo(HDLPort p){

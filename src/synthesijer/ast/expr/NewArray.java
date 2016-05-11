@@ -20,10 +20,12 @@ public class NewArray extends Expr{
 	public void addDimExpr(Expr expr){
 		if(expr instanceof Literal){
 			dimExpr.add(expr);
-		}else{
+		}else if(expr instanceof Ident){
 			String sym = ((Ident)expr).getSymbol();
 			Variable var = getScope().search(sym);
-			dimExpr.add(var.getInitExpr());
+            dimExpr.add(var.getInitExpr());
+		}else{
+		    dimExpr.add(expr);
 		}
 	}
 
