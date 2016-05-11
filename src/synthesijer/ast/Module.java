@@ -2,6 +2,7 @@ package synthesijer.ast;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
@@ -22,8 +23,8 @@ public class Module implements Scope, SynthesijerAstTree{
 	private final String extending;
 	private final ArrayList<String> implementing;
 	
-	private Hashtable<String, Method> methodTable = new Hashtable<>();
-	private Hashtable<String, Variable> variableTable = new Hashtable<>();
+	private LinkedHashMap<String, Method> methodTable = new LinkedHashMap<>();
+	private LinkedHashMap<String, Variable> variableTable = new LinkedHashMap<>();
 	private ArrayList<Method> methods = new ArrayList<>();
 	private ArrayList<VariableDecl> variables = new ArrayList<>();
 	private ArrayList<Scope> scopes = new ArrayList<>();
@@ -159,7 +160,7 @@ public class Module implements Scope, SynthesijerAstTree{
 				}
 			}
 			for(VariableDecl v: ext.getVariableDecls()){
-				if(!variableTable.contains(v.getName())){
+				if(!variableTable.containsKey(v.getName())){
 					addVariableDecl(v);
 				}
 			}

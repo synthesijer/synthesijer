@@ -174,7 +174,7 @@ public enum Op {
 			else return MUL32;
 		}
 		case DIV: {
-			if(isDouble(lhs) || isDouble(rhs)) return FDIV64;
+		    if(isDouble(lhs) || isDouble(rhs)) return FDIV64;
 			if(isFloat(lhs) || isFloat(rhs)) return FDIV32;
 			if(isLong(lhs) || isLong(rhs)) return DIV64;
 			else return DIV32;

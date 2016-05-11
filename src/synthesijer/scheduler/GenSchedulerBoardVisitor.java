@@ -720,6 +720,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
     public void visitBinaryExpr(BinaryExpr o) {
 		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
+
 		Op op = Op.get(o.getOp(), lhs, rhs);
 		Type type = lhs.getType();
 		

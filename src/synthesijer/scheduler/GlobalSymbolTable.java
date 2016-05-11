@@ -87,8 +87,6 @@ class VariableInfo{
 			//var = new VariableOperand(v.getName(), v.getType(), v.getInitExpr(), v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), v.getMethod().isPrivate(), v.isVolatile());
 			//var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), v.getMethod().isPrivate(), v.isVolatile(), true);
 			var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), "", v.getMethod().isPrivate(), v.isVolatile(), true);
-			System.out.println(var.getName());
-			System.out.println(var.isPrivateMethod());
 		}else{
 			//var = new VariableOperand(v.getName(), v.getType(), v.getInitExpr(), v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), null, false, v.isVolatile());
 			//var = new VariableOperand(v.getName(), v.getType(), o, v.isPublic(), v.isGlobalConstant(), v.isMethodParam(), v.getName(), v.getMethod().getName(), false, v.isVolatile(), false);

@@ -22,6 +22,7 @@ public class Test020{
 	private int[] mem0 = new int[a];
 	private int[] mem1 = new int[d];
 	public int[] mem2 = new int[10*30];
+	private int[] mem3 = new int[100/2];
 
 	public boolean test(){
 		if(a != 100) return false;
@@ -31,7 +32,8 @@ public class Test020{
 		if(e != 1) return false;
 		if(mem0.length != a) return false;
 		if(mem1.length != d) return false;
-		if(mem2.length != 10*30) return false;
+		if(mem2.length != 300) return false;
+		if(mem3.length != 50) return false;
 		d = b * a;
 		if(d != 20100) return false;
 		a = 40;

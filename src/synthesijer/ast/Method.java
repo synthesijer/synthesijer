@@ -1,6 +1,6 @@
 package synthesijer.ast;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.VariableDecl;
@@ -30,7 +30,7 @@ public class Method implements Scope, SynthesijerAstTree{
 	private VariableDecl[] args;
 	private final BlockStatement body;
 	
-	private Hashtable<String, Variable> varTable = new Hashtable<>();
+	private LinkedHashMap<String, Variable> varTable = new LinkedHashMap<>();
 	
 	private int uniq_id;
 	
