@@ -10,13 +10,14 @@ public class Test020{
 	int c = b * a;
 	int d = b / a;
 	int e = b % a;
+	int f = b * a / a + 1;
 
 	// unary operations such as the followings have not been supported yet
-	// private int f = a++;
-	// private int g = a--;
-	// private int h = ++a;
-	// private int i = --a;
-	// private int j = ~a;
+	// private int g = a++;
+	// private int h = a--;
+	// private int i = ++a;
+	// private int j = --a;
+	// private int k = ~a;
 
 	// variables and binary expressons are allowed to define memories
 	private int[] mem0 = new int[a];
@@ -30,6 +31,7 @@ public class Test020{
 		if(c != 20100) return false;
 		if(d != 2) return false;
 		if(e != 1) return false;
+		if(f != 202) return false;
 		if(mem0.length != a) return false;
 		if(mem1.length != d) return false;
 		if(mem2.length != 300) return false;

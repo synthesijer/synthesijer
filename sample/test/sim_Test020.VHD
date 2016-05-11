@@ -41,6 +41,9 @@ architecture RTL of sim_Test020 is
       e_in : in signed(32-1 downto 0);
       e_we : in std_logic;
       e_out : out signed(32-1 downto 0);
+      f_in : in signed(32-1 downto 0);
+      f_we : in std_logic;
+      f_out : out signed(32-1 downto 0);
       mem2_address : in signed(32-1 downto 0);
       mem2_we : in std_logic;
       mem2_oe : in std_logic;
@@ -127,6 +130,9 @@ begin
       e_in        => (others => '0'),
       e_we        => '0',
       e_out       => open,
+      f_in        => (others => '0'),
+      f_we        => '0',
+      f_out       => open,
       mem2_address => (others => '0'),
       mem2_we      => '0',
       mem2_oe      => '1',
