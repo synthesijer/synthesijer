@@ -11,12 +11,7 @@ import openjdk.com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
 import synthesijer.Manager;
 import synthesijer.SynthesijerUtils;
-import synthesijer.ast.Method;
 import synthesijer.ast.Module;
-import synthesijer.ast.expr.Ident;
-import synthesijer.ast.expr.MethodInvocation;
-import synthesijer.ast.statement.ExprStatement;
-import synthesijer.ast.type.PrimitiveTypeKind;
 
 
 /**

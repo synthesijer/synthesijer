@@ -11,7 +11,7 @@ public class ArrayAccess extends Expr{
 	
 	private Expr indexed, index;
 	
-	public ArrayAccess(Scope scope){
+    public ArrayAccess(Scope scope){
 		super(scope);
 	}
 	

@@ -164,20 +164,20 @@ public class JCStmtVisitor extends Visitor{
     }
 	
     public void visitSwitch(JCSwitch that){
-		SwitchStatement tmp = new SwitchStatement(scope);
-		tmp.setSelector(stepIn(that.selector, scope));
-		for(JCCase c: that.cases){
-			SwitchStatement.Elem elem;
-			if(c.pat != null){
-				elem = tmp.newElement(stepIn(c.pat, scope));
-			}else{
-				elem = tmp.getDefaultElement();
-			}
-			for(JCStatement s: c.stats){
-				elem.addStatement(stepIn(s, scope));
-			}
-		}
-		stmt = tmp;
+        SwitchStatement tmp = new SwitchStatement(scope);
+        tmp.setSelector(stepIn(that.selector, scope));
+        for(JCCase c: that.cases){
+            SwitchStatement.Elem elem;
+            if(c.pat != null){
+                elem = tmp.newElement(stepIn(c.pat, scope));
+            }else{
+                elem = tmp.getDefaultElement();
+            }
+            for(JCStatement s: c.stats){
+                elem.addStatement(stepIn(s, scope));
+            }
+        }
+        stmt = tmp;
     }
 	
     public void visitVarDef(JCVariableDecl that) {

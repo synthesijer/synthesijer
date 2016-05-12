@@ -8,18 +8,19 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.ast.type.StringType;
 
 public class Literal extends Expr{
+    
+    private boolean valueBoolean;
+    private byte valueByte;
+    private char valueChar;
+    private short valueShort;
+    private int valueInt;
+    private long valueLong;
+    private double valueDouble;
+    private float valueFloat;
+    private String valueStr;
+        
+    private Type type = PrimitiveTypeKind.UNDEFIEND;
 	
-	private boolean valueBoolean;
-	private byte valueByte;
-	private char valueChar;
-	private short valueShort;
-	private int valueInt;
-	private long valueLong;
-	private double valueDouble;
-	private float valueFloat;
-	private String valueStr;
-		
-	private Type type = PrimitiveTypeKind.UNDEFIEND;
 	private int width;
 	
 	public Literal(Scope scope){

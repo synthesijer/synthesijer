@@ -10,18 +10,17 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
-import synthesijer.model.State;
-import synthesijer.model.Statemachine;
 
 public class ForStatement extends Statement implements Scope {
 
-	private Scope parent;
+    private final Scope parent;
 	
 	private ArrayList<Statement> initializations = new ArrayList<>();
 	private Expr condition;
 	private ArrayList<Statement> updates = new ArrayList<>();
 	private BlockStatement body;
-	
+
+	private ArrayList<VariableDecl> variableDecls = new ArrayList<>();
 	private Hashtable<String, Variable> varTable = new Hashtable<>();
 
 	public ForStatement(Scope scope) {
@@ -78,38 +77,23 @@ public class ForStatement extends Statement implements Scope {
 		this.body = s;
 	}
 	
-	public Statement getBody(){
+	public BlockStatement getBody(){
 		return body;
 	}
 
 	public void addVariableDecl(VariableDecl v){
+	    variableDecls.add(v);
 		varTable.put(v.getVariable().getName(), v.getVariable());
 	}
 	
-	public Variable[] getVariables(){
-		return varTable.values().toArray(new Variable[]{});
+	public VariableDecl[] getVariableDecls(){
+		return variableDecls.toArray(new VariableDecl[]{});
 	}
 
 	public Variable search(String s){
 		Variable v = varTable.get(s);
 		if(v != null) return v;
 		return parent.search(s);
-	}
-	
-	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
-		State d = dest;
-		State c = m.newState("for_cond");
-		for(int i = updates.size(); i > 0; i--){
-			d = updates.get(i-1).genStateMachine(m, c, terminal, dest, c);
-		}
-		d = body.genStateMachine(m, d, terminal, dest, c);
-		c.addTransition(dest, condition, false); // exit from this loop
-		c.addTransition(d, condition, true); // repeat this loop
-		d = c;
-		for(int i = initializations.size(); i > 0; i--){
-			d = initializations.get(i-1).genStateMachine(m, d, terminal, dest, c);
-		}
-		return d;
 	}
 	
 	public void accept(SynthesijerAstVisitor v){

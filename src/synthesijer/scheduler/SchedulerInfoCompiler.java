@@ -772,7 +772,7 @@ public class SchedulerInfoCompiler {
 			}
 			
 			HDLExpr index = convOperandToHDLExpr(item, src[1]);
-	    
+
 			addr.setAssign(state, index);
 	    
 			break;

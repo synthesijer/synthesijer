@@ -5,8 +5,6 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
-import synthesijer.model.State;
-import synthesijer.model.Statemachine;
 
 public class VariableDecl extends ExprContainStatement{
 	
@@ -90,33 +88,7 @@ public class VariableDecl extends ExprContainStatement{
     public Expr getInitExpr(){
 		return init;
     }
-	
-    private State state;
-	
-    public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
-		if(hasInitExpr() && init.isConstant()){
-			State s = m.newState("var_init");
-			s.addBody(this);
-			s.addTransition(dest);
-			state = s;
-		}else{
-			State s = m.newState("var_decl");
-			s.addBody(this);
-			s.addTransition(dest);
-			state = s;
-		}
-		return state;
-    }
-	
-    public void setState(State s){
-		this.state = s;
-		s.addBody(this);
-    }
-
-    public State getState(){
-		return state;
-    }
-	
+		
     public void accept(SynthesijerAstVisitor v){
 		v.visitVariableDecl(this);
     }

@@ -1,11 +1,10 @@
 package synthesijer.ast;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import synthesijer.ast.statement.BlockStatement;
 import synthesijer.ast.statement.VariableDecl;
-import synthesijer.model.State;
-import synthesijer.model.Statemachine;
 
 public class Method implements Scope, SynthesijerAstTree{
 	
@@ -13,29 +12,28 @@ public class Method implements Scope, SynthesijerAstTree{
 	private final String name;
 	private final Type type;
 	
-	private boolean unsynthesizableFlag;
-	private boolean autoFlag;
-	private boolean synchronizedFlag;
-	private boolean privateFlag;
-	private boolean rawFlag;
-	private boolean combinationFlag;
-	private boolean parallelFlag;
-	private boolean noWaitFlag;
-	private boolean constructorFlag;
-	private boolean callStackFlag;
-	private int callStackSize;
-	
-	private Statemachine stateMachine;
-	
-	private VariableDecl[] args;
-	private final BlockStatement body;
-	
-	private LinkedHashMap<String, Variable> varTable = new LinkedHashMap<>();
-	
-	private int uniq_id;
-	
-	// A method, for which this method must wait. 
-	private Method waitWith;
+    private boolean unsynthesizableFlag;
+    private boolean autoFlag;
+    private boolean synchronizedFlag;
+    private boolean privateFlag;
+    private boolean rawFlag;
+    private boolean combinationFlag;
+    private boolean parallelFlag;
+    private boolean noWaitFlag;
+    private boolean constructorFlag;
+    private boolean callStackFlag;
+    private int callStackSize;
+    
+    private VariableDecl[] args;
+    private final BlockStatement body;
+    
+    private ArrayList<VariableDecl> variableDecls = new ArrayList<>();
+    private LinkedHashMap<String, Variable> varTable = new LinkedHashMap<>();
+    
+    private int uniq_id;
+    
+    // A method, for which this method must wait. 
+    private Method waitWith;
 	
 	public Method(Scope parent, String name, Type type){
 		this.parent = parent;
@@ -169,11 +167,12 @@ public class Method implements Scope, SynthesijerAstTree{
 	}
 		
 	public void addVariableDecl(VariableDecl v){
+	    variableDecls.add(v);
 		varTable.put(v.getVariable().getName(), v.getVariable());
 	}
 	
-	public Variable[] getVariables(){
-		return varTable.values().toArray(new Variable[]{});
+	public VariableDecl[] getVariableDecls(){
+	    return variableDecls.toArray(new VariableDecl[]{});
 	}
 	
 	public Variable search(String name){
@@ -181,18 +180,7 @@ public class Method implements Scope, SynthesijerAstTree{
 		if(v != null) return v;
 		return parent.search(name);
 	}
-	
-	public void genStateMachine(){
-		stateMachine = new Statemachine(getUniqueName());
-		State terminal = stateMachine.newState("function_exit", true);
-		State s = body.genStateMachine(stateMachine, terminal, terminal, null, null);
-		stateMachine.setEntryState(s);
-	}
-	
-	public Statemachine getStateMachine(){
-		return stateMachine;
-	}
-	
+		
 	@Override
 	public void accept(SynthesijerAstVisitor v){
 		v.visitMethod(this);

@@ -4,8 +4,6 @@ import synthesijer.ast.Expr;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
-import synthesijer.model.State;
-import synthesijer.model.Statemachine;
 
 public class WhileStatement extends Statement{
 	
@@ -28,16 +26,8 @@ public class WhileStatement extends Statement{
 		this.body = body;
 	}
 	
-	public Statement getBody(){
+	public BlockStatement getBody(){
 		return body;
-	}
-
-	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
-		State s = m.newState("while_cond");
-		State d = body.genStateMachine(m, s, terminal, dest, s);
-		s.addTransition(d, condition, true);
-		s.addTransition(dest, condition, false); // exit from this loop
-		return s;
 	}
 
 	public void accept(SynthesijerAstVisitor v){

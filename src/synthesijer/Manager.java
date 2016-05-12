@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import synthesijer.ast.Module;
+import synthesijer.ast.opt.NullOptimizer;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.ARITH_RSHIFT32;
 import synthesijer.lib.ARITH_RSHIFT64;
@@ -59,7 +60,6 @@ import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
-import synthesijer.scheduler.VariableOperand;
 import synthesijer.scheduler.opt.BasicParallelizer;
 import synthesijer.scheduler.opt.ConvArrayAccessToArrayIndex;
 import synthesijer.scheduler.opt.OperationStrengthReduction;
@@ -143,7 +143,9 @@ public enum Manager {
 	
 	public void addModule(Module m, boolean synthesisFlag){
 		if(hasModule(m.getName())) return;
-		addHDLModule(m.getName(), m, null, synthesisFlag);
+		Module optM = (new NullOptimizer()).conv(m);
+		m = null; // clean for check whether the original is used or not
+		addHDLModule(optM.getName(), optM, null, synthesisFlag);
 	}
 
 	private void addHDLModule(String name, Module m, HDLModule hm, boolean synthesisFlag){

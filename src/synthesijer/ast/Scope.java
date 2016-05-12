@@ -17,6 +17,6 @@ public interface Scope extends SynthesijerAstTree{
 	
 	public void addScope(Scope s);
 	
-	public Variable[] getVariables();
+	public VariableDecl[] getVariableDecls();
 
 }

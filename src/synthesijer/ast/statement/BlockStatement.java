@@ -1,7 +1,7 @@
 package synthesijer.ast.statement;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
@@ -9,16 +9,16 @@ import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
-import synthesijer.model.State;
-import synthesijer.model.Statemachine;
 
 public class BlockStatement extends Statement implements Scope{
 	
-	private ArrayList<Statement> statements = new ArrayList<>();
-	
-	private final Scope parent;
-	
-	private Hashtable<String, Variable> varTable = new Hashtable<>();
+    private final Scope parent;
+
+    private ArrayList<Statement> statements = new ArrayList<>();
+    
+    private ArrayList<VariableDecl> variableDecls = new ArrayList<>();
+    
+    private LinkedHashMap<String, Variable> varTable = new LinkedHashMap<>();
 	
 	public BlockStatement(Scope scope){
 		super(scope);
@@ -57,21 +57,13 @@ public class BlockStatement extends Statement implements Scope{
 		return statements;
 	}
 	
-	public State genStateMachine(Statemachine m, State dest, State terminal, State loopout, State loopCont){
-		State d = dest;
-		for(int i = statements.size(); i > 0; i--){
-			Statement stmt = statements.get(i-1);
-			d = stmt.genStateMachine(m, d, terminal, loopout, loopCont);
-		}
-		return d;
-	}
-	
-	public void addVariableDecl(VariableDecl v){
-		varTable.put(v.getVariable().getName(), v.getVariable());
-	}
-	
-	public Variable[] getVariables(){
-		return varTable.values().toArray(new Variable[]{});
+    public void addVariableDecl(VariableDecl v){
+        variableDecls.add(v);
+        varTable.put(v.getVariable().getName(), v.getVariable());
+    }
+
+	public VariableDecl[] getVariableDecls(){
+		return variableDecls.toArray(new VariableDecl[]{});
 	}
 
 	public Variable search(String s){
