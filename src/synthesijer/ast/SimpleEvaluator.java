@@ -3,7 +3,7 @@ package synthesijer.ast;
 import synthesijer.ast.expr.Literal;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
-public class SimpleEvalulator {
+public class SimpleEvaluator {
 	
     interface MathBiFunction<E>{
         E operation(E a, E b);

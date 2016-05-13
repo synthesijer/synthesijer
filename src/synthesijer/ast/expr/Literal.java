@@ -20,15 +20,35 @@ public class Literal extends Expr{
     private String valueStr;
         
     private Type type = PrimitiveTypeKind.UNDEFIEND;
-	
-	private int width;
+    
+    private int width;
 	
 	public Literal(Scope scope){
 		super(scope);
 	}
 	
+	public Literal copy(Scope scope){
+	    Literal newL = new Literal(scope);
+	    newL.valueBoolean = this.valueBoolean;
+	    newL.valueByte = this.valueByte;
+	    newL.valueChar = this.valueChar;
+	    newL.valueShort = this.valueShort;
+	    newL.valueInt = this.valueInt;
+	    newL.valueLong = this.valueLong;
+	    newL.valueDouble = this.valueDouble;
+	    newL.valueFloat = this.valueFloat;
+	    newL.valueStr = this.valueStr;
+	    newL.type = this.type;
+	    newL.width = this.width;
+	    return newL;
+	}
+	
 	public Type getType(){
 		return type;
+	}
+	
+	public boolean isBoolean(){
+	    return (getType()) == PrimitiveTypeKind.BOOLEAN;
 	}
 	
 	public void setValue(boolean value){
@@ -118,7 +138,7 @@ public class Literal extends Expr{
 		}
 	}
 
-	public void castType(Type newType){
+	public Literal castType(Type newType){
 		System.out.println("cast");
 		if(newType instanceof PrimitiveTypeKind){
 			switch((PrimitiveTypeKind)newType){
@@ -143,6 +163,7 @@ public class Literal extends Expr{
 			throw new RuntimeException(String.format("cannot cast from %s into %s", type, newType));
 		}
 		type = newType;
+		return this;
 	}
 
 	public void accept(SynthesijerExprVisitor v){

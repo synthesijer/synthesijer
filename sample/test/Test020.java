@@ -12,18 +12,19 @@ public class Test020{
 	int e = b % a;
 	int f = b * a / a + 1;
 
-	// unary operations such as the followings have not been supported yet
-	// private int g = a++;
-	// private int h = a--;
-	// private int i = ++a;
-	// private int j = --a;
-	// private int k = ~a;
-
 	// variables and binary expressons are allowed to define memories
 	private int[] mem0 = new int[a];
 	private int[] mem1 = new int[d];
 	public int[] mem2 = new int[10*30];
 	private int[] mem3 = new int[100/2];
+
+	// It is also allowed to use unary operations.
+	// Be carefule, "a" is updated same as software behavior
+	private int g = a++;
+	private int h = a--;
+	private int i = ++a;
+	private int j = --a;
+	private int k = ~a;
 
 	public boolean test(){
 		if(a != 100) return false;
@@ -32,7 +33,12 @@ public class Test020{
 		if(d != 2) return false;
 		if(e != 1) return false;
 		if(f != 202) return false;
-		if(mem0.length != a) return false;
+		if(g != 100) return false;
+		if(h != 101) return false;
+		if(i != 101) return false;
+		if(j != 100) return false;
+		if(k != -101) return false;
+		if(mem0.length != 100) return false; // the length should be equald with original "a"
 		if(mem1.length != d) return false;
 		if(mem2.length != 300) return false;
 		if(mem3.length != 50) return false;

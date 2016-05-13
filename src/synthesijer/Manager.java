@@ -12,6 +12,7 @@ import java.util.Hashtable;
 
 import synthesijer.ast.Module;
 import synthesijer.ast.opt.NullOptimizer;
+import synthesijer.ast.opt.StaticEvaluator;
 import synthesijer.hdl.HDLModule;
 import synthesijer.lib.ARITH_RSHIFT32;
 import synthesijer.lib.ARITH_RSHIFT64;
@@ -143,8 +144,8 @@ public enum Manager {
 	
 	public void addModule(Module m, boolean synthesisFlag){
 		if(hasModule(m.getName())) return;
-		Module optM = (new NullOptimizer()).conv(m);
-		m = null; // clean for check whether the original is used or not
+        Module optM = (new NullOptimizer()).conv(m);
+        optM = (new StaticEvaluator()).conv(m);
 		addHDLModule(optM.getName(), optM, null, synthesisFlag);
 	}
 

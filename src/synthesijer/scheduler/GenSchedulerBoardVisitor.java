@@ -8,7 +8,7 @@ import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
-import synthesijer.ast.SimpleEvalulator;
+import synthesijer.ast.SimpleEvaluator;
 import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstException;
 import synthesijer.ast.SynthesijerAstTypeVisitor;
@@ -759,7 +759,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			ConstantOperand l = getConstant(lhs);
 			ConstantOperand r = getConstant(rhs);
 			try{
-			    Literal literal = SimpleEvalulator.eval(o.getOp(), l.getType(), l.getOrigValue(), r.getType(), r.getOrigValue());
+			    Literal literal = SimpleEvaluator.eval(o.getOp(), l.getType(), l.getOrigValue(), r.getType(), r.getOrigValue());
                 result = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), literal.getValueAsStr(), type);
                 parent.addVariable(result);
                 return;

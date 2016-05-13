@@ -344,33 +344,7 @@ public class NullOptimizer {
     }
 
     private Expr conv(Scope scope, Literal expr){
-        Type t = expr.getType();
-        Literal newE = new Literal(scope);
-        if(t == PrimitiveTypeKind.UNDEFIEND){
-            // nothing to do 
-        }else if(t == PrimitiveTypeKind.BOOLEAN){
-            newE.setValue(Boolean.parseBoolean(expr.getValueAsStr()));
-        }else if(t == PrimitiveTypeKind.BYTE){
-            newE.setValue(Byte.parseByte(expr.getValueAsStr()));
-        }else if(t == PrimitiveTypeKind.CHAR){
-            newE.setValue((char)(Integer.parseInt(expr.getValueAsStr())));
-        }else if(t == PrimitiveTypeKind.SHORT){
-            newE.setValue(Short.parseShort(expr.getValueAsStr()));
-        }else if(t == PrimitiveTypeKind.INT){
-            newE.setValue(Integer.parseInt(expr.getValueAsStr()));
-        }else if(t == PrimitiveTypeKind.LONG){
-            newE.setValue(Long.parseLong(expr.getValueAsStr()));
-        }else if(t == PrimitiveTypeKind.DOUBLE){
-            newE.setValue(Double.parseDouble(expr.getValueAsStr()));
-        }else if(t == PrimitiveTypeKind.FLOAT){
-            newE.setValue(Float.parseFloat(expr.getValueAsStr()));
-        }else if(t == PrimitiveTypeKind.NULL){
-            newE.setNull();
-        }else if(t instanceof StringType){
-            newE.setValue(expr.getValueAsStr());
-        }else{
-            SynthesijerUtils.warn("unsupported type for Literal: " + t);
-        }
+        Literal newE = expr.copy(scope);
         return newE;
     }
 
