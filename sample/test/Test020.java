@@ -25,9 +25,11 @@ public class Test020{
 	private int i = ++a;
 	private int j = --a;
 	private int k = ~a;
+	private int l = -a;
+	private int m = a++;
 
 	public boolean test(){
-		if(a != 100) return false;
+		if(a != 101) return false; // "a" has been updated by INC and DEC
 		if(b != 201) return false;
 		if(c != 20100) return false;
 		if(d != 2) return false;
@@ -38,12 +40,14 @@ public class Test020{
 		if(i != 101) return false;
 		if(j != 100) return false;
 		if(k != -101) return false;
+		if(l != -100) return false;
+		if(m != 100) return false;
 		if(mem0.length != 100) return false; // the length should be equald with original "a"
 		if(mem1.length != d) return false;
 		if(mem2.length != 300) return false;
 		if(mem3.length != 50) return false;
 		d = b * a;
-		if(d != 20100) return false;
+		if(d != 20301) return false;
 		a = 40;
 		b = 10;
 		c = b * a;

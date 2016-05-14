@@ -6,10 +6,10 @@ import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
+import synthesijer.ast.Op;
 import synthesijer.ast.Scope;
 import synthesijer.ast.SimpleEvaluator;
 import synthesijer.ast.Type;
-import synthesijer.ast.Variable;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
@@ -30,6 +30,8 @@ import synthesijer.ast.type.StringType;
 
 public class StaticEvaluator {
 
+    private Hashtable<String, Expr> identTable = new Hashtable<>();
+    
     public Module conv(Module m){
         Module newM = new Module(m.getParentScope(), m.getName(), m.getImportTable(), m.getExtending(), m.getImplementingList());
         newM.setSynthesijerHDL(m.isSynthesijerHDL());
@@ -37,15 +39,22 @@ public class StaticEvaluator {
             VariableDecl newV = conv(newM, v);
             newM.addVariableDecl(newV);
         }
+
+        // update
+        for(VariableDecl v: newM.getVariableDecls()){
+            if(identTable.containsKey(v.getVariable().getName())){
+                Expr e = identTable.get(v.getVariable().getName());
+                v.setInitExpr(e);
+            }
+        }
+        
         // methods are copied as is
         for(Method method: m.getMethods()){
             newM.addMethod(method);
         }
         return newM;
     }
-    
-    private Hashtable<String, Expr> identTable = new Hashtable<>();
-    
+        
     private VariableDecl conv(Scope parent, VariableDecl v){
         Expr newInitExpr = conv(parent, v.getInitExpr());
         VariableDecl newV = new VariableDecl(parent, v.getName(), v.getType(), newInitExpr);
@@ -303,7 +312,9 @@ public class StaticEvaluator {
             Literal l = getLiteral(arg);
             try{
                 Literal newL = SimpleEvaluator.eval(expr.getOp(), l.getType(), l.getValueAsStr());
-                identTable.put(((Ident)arg).getSymbol(), newL); // update
+                if(expr.getOp() == Op.INC || expr.getOp() == Op.DEC){
+                    identTable.put(((Ident)arg).getSymbol(), newL); // update
+                }
                 if(expr.isPostfix()){
                     return l.copy(scope); // as is
                 }else{

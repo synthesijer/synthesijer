@@ -859,8 +859,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(klass, o.getIdent().getSymbol());
 			type = var.var.getType();
 			tmp = newVariable("field_access", type);
-			//Operand v = stepIn(var.var.getInitExpr());
-			Operand v = var.var.getInitSrc();
+			Operand v = stepIn(var.var.getInitExpr());
+			//Operand v = var.var.getInitSrc();
 			Operand replica = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), ((ConstantOperand)v).getValue(), v.getType());
 			parent.addVariable(replica);
 			//parent.addSchedulerItem(new SchedulerItem(parent.getBoard(), Op.ASSIGN, new Operand[]{v}, tmp));

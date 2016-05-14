@@ -9,7 +9,7 @@ import synthesijer.ast.Variable;
 public class VariableDecl extends ExprContainStatement{
 	
     private Variable var;
-    private final Expr init;
+    private Expr init;
     private boolean flagGlobalConstant = false;
     private boolean flagPublic = false;
     private boolean flagVolatile = false;
@@ -86,9 +86,14 @@ public class VariableDecl extends ExprContainStatement{
     }
 	
     public Expr getInitExpr(){
-		return init;
+        return init;
     }
-		
+
+    public void setInitExpr(Expr e) {
+        init = e;
+        var.setInitExpr(e);
+    }
+
     public void accept(SynthesijerAstVisitor v){
 		v.visitVariableDecl(this);
     }

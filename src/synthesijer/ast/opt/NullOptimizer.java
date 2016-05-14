@@ -1,12 +1,10 @@
 package synthesijer.ast.opt;
 
-import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Scope;
 import synthesijer.ast.Statement;
-import synthesijer.ast.Type;
 import synthesijer.ast.expr.ArrayAccess;
 import synthesijer.ast.expr.AssignExpr;
 import synthesijer.ast.expr.AssignOp;
@@ -35,8 +33,6 @@ import synthesijer.ast.statement.SynchronizedBlock;
 import synthesijer.ast.statement.TryStatement;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
-import synthesijer.ast.type.PrimitiveTypeKind;
-import synthesijer.ast.type.StringType;
 
 public class NullOptimizer {
     

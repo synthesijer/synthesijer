@@ -29,6 +29,7 @@ public class SimpleEvaluator {
             intFunc = (a) -> a;
             boolFunc = (a) -> a;
             break;
+        case MINUS:
         case MMMINUS:
             floatFunc = (a) -> -a;
             intFunc = (a) -> -a;
