@@ -22,9 +22,10 @@ public class RemoveUnreachableSlot implements SchedulerInfoOptimizer{
 		return "remove_unreachable_slot";
 	}
 	
-	Hashtable<Integer, Boolean> usedFlag = new Hashtable<>(); 
+	Hashtable<Integer, Boolean> usedFlag;
 	
 	public SchedulerBoard conv(SchedulerBoard src){
+		usedFlag = new Hashtable<>(); 
 		for(SchedulerSlot slot: src.getSlots()){
 			for(int id: slot.getNextStep()){
 				usedFlag.put(id, true);

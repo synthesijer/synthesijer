@@ -33,6 +33,7 @@ public class PackArrayWriteAccess implements SchedulerInfoOptimizer{
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
 		int i = 0;
+		// search the sequence of Op.ARRAY_INDEX and Op.ASSIGN to pack them int a slot
 		while(i < slots.length){
 			SchedulerSlot slot = slots[i];
 			i++;
@@ -48,6 +49,10 @@ public class PackArrayWriteAccess implements SchedulerInfoOptimizer{
 			if(items[0].getDestOperand() != candidate_items[0].getDestOperand()){ continue; /* skip */ }
 			newSlot.addItem(candidate_items[0]);
 			candidate_items[0].setSlot(newSlot);
+			// to force next state is after Op.ASSIGN item
+			for(SchedulerItem item: newSlot.getItems()){
+				item.setBranchIds(candidate_items[0].getBranchId());
+			}
 			i++;
 		}
 		return ret;

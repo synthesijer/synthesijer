@@ -3,6 +3,7 @@ package synthesijer.scheduler;
 import java.io.PrintStream;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import synthesijer.ast.Method;
 import synthesijer.ast.Type;
@@ -165,6 +166,29 @@ public class SchedulerBoard {
 			if(s.getStepId() == id) return s;
 		}
 		return null;
+	}
+
+	public Hashtable<SchedulerSlot, Integer> getEntryDegrees(){
+		Hashtable<SchedulerSlot, Integer> degrees = new Hashtable<>();
+		Hashtable<Integer, SchedulerSlot> map = new Hashtable<>();
+		for(SchedulerSlot s: slots){
+			map.put(s.getStepId(), s);
+			degrees.put(s, 0);
+		}
+		for(SchedulerSlot s: slots){
+			int[] ids = s.getNextStep();
+			for(int id: ids){
+				SchedulerSlot target = map.get(id);
+				//SchedulerSlot target = map.get(s.getStepId());
+				Integer v = degrees.get(target);
+				if(v == null){
+					degrees.put(target, 1);
+				}else{
+					degrees.put(target, v+1);
+				}
+			}
+		}
+		return degrees;
 	}
 
 	public void dump(PrintStream out){

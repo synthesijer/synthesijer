@@ -22,11 +22,10 @@ public class Test003 {
 		if(v != 0x20) return false;
 		v = t.a[100];
 		if(v != 50) return false;
-		
 		for(int i = 0; i < 5; i++){
 			v = t.switch_test(i);
 		}
-		if(v != 150) return false;
+		if(v != 150) return false; // should be a[3] (= 150)
 		
 		t.x = 100;
 		t.y = 200;

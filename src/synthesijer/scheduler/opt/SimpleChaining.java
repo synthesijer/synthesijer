@@ -35,30 +35,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		}
 		return newSlot;
 	}
-	
-	private Hashtable<SchedulerSlot, Integer> getEntryDegrees(SchedulerSlot[] slots){
-		Hashtable<SchedulerSlot, Integer> degrees = new Hashtable<>();
-		Hashtable<Integer, SchedulerSlot> map = new Hashtable<>();
-		for(SchedulerSlot s: slots){
-			map.put(s.getStepId(), s);
-			degrees.put(s, 0);
-		}
-		for(SchedulerSlot s: slots){
-			int[] ids = s.getNextStep();
-			for(int id: ids){
-				SchedulerSlot target = map.get(id);
-				//SchedulerSlot target = map.get(s.getStepId());
-				Integer v = degrees.get(target);
-				if(v == null){
-					degrees.put(target, 1);
-				}else{
-					degrees.put(target, v+1);
-				}
-			}
-		}
-		return degrees;
-	}
-	
+		
 	private SchedulerSlot chaining(ArrayList<SchedulerSlot> bb){
 
 		Hashtable<Operand, SchedulerItem> predItem = new Hashtable<>();
@@ -160,22 +137,30 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		}
 		return false;
 	}
+
+	private boolean isChained(int degree, ArrayList<SchedulerSlot> bb, SchedulerSlot slot){
+		if(slot.hasBranchOp()) return false;
+		if(slot.getNextStep().length > 1) return false;
+		if(degree > 1) return false;
+		
+		if(slot.getLatency() > 0) return false; // just simple
+		if(isExcept(slot.getItems()[0])) return false; // just simple
+		if(hasVolatile(slot)) return false; // jsut simple
+
+		if(bb == null) return true; // the first one except the above is a top of chained slots
+		int last = bb.get(bb.size()-1).getNextStep()[0];
+		return last == slot.getStepId(); // true when chained
+	}
 	
 	public SchedulerBoard conv(SchedulerBoard src){
+		Hashtable<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
-		Hashtable<SchedulerSlot, Integer> degrees = getEntryDegrees(slots);
 		ArrayList<SchedulerSlot> bb = null;
 		for(int i = 0; i < slots.length; i++){
 			SchedulerSlot slot = slots[i];
-			Integer d = degrees.get(slot);
-			if(slot.hasBranchOp() ||
-			   slot.getNextStep().length > 1 ||
-			   slot.getLatency() > 0 ||
-			   d > 1 ||
-			   isExcept(slot.getItems()[0]) ||
-			   hasVolatile(slot)
-			   ){
+			int d = degrees.get(slot);
+			if(isChained(d, bb, slot) == false){
 				if(bb != null && bb.size() > 0){
 					ret.addSlot(chaining(bb));
 				}

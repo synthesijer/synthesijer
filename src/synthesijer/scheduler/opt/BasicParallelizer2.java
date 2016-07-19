@@ -39,28 +39,6 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		return newSlot;
 	}
 	
-	private Hashtable<SchedulerSlot, Integer> getEntryDegrees(SchedulerSlot[] slots){
-		Hashtable<SchedulerSlot, Integer> degrees = new Hashtable<>();
-		Hashtable<Integer, SchedulerSlot> map = new Hashtable<>();
-		for(SchedulerSlot s: slots){
-			map.put(s.getStepId(), s);
-			degrees.put(s, 0);
-		}
-		for(SchedulerSlot s: slots){
-			int[] ids = s.getNextStep();
-			for(int id: ids){
-				SchedulerSlot target = map.get(id);
-				//SchedulerSlot target = map.get(s.getStepId());
-				Integer v = degrees.get(target);
-				if(v == null){
-					degrees.put(target, 1);
-				}else{
-					degrees.put(target, v+1);
-				}
-			}
-		}
-		return degrees;
-	}
 	
 	private Hashtable<SchedulerSlot, ArrayList<SchedulerSlot>> analyze(ArrayList<SchedulerSlot> bb){
 		Hashtable<Operand, ArrayList<SchedulerSlot>> writing = new Hashtable<>();
@@ -275,7 +253,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
-		Hashtable<SchedulerSlot, Integer> degrees = getEntryDegrees(slots);
+		Hashtable<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
 		if(DEBUG){
 			dumpDegree(src.getName(), degrees);
 		}
