@@ -62,9 +62,12 @@ import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
 import synthesijer.scheduler.opt.BasicParallelizer;
+import synthesijer.scheduler.opt.BasicParallelizer2;
 import synthesijer.scheduler.opt.ConvArrayAccessToArrayIndex;
 import synthesijer.scheduler.opt.OperationStrengthReduction;
 import synthesijer.scheduler.opt.PackArrayWriteAccess;
+import synthesijer.scheduler.opt.ReduceRedundantJump;
+import synthesijer.scheduler.opt.RemoveUnreachableSlot;
 import synthesijer.scheduler.opt.SchedulerInfoOptimizer;
 import synthesijer.scheduler.opt.SimpleChaining;
 
@@ -323,11 +326,17 @@ public enum Manager {
 			optimize(new OperationStrengthReduction(), info);
 		}
 		optimize(new ConvArrayAccessToArrayIndex(), info); 
-		optimize(new PackArrayWriteAccess(), info); 
-		optimize(new BasicParallelizer(), info);
+		optimize(new PackArrayWriteAccess(), info);
+		if(opt.bb2){
+			optimize(new BasicParallelizer2(), info);
+		}else{
+			optimize(new BasicParallelizer(), info);
+		}
 		if(opt.chaining){
 			optimize(new SimpleChaining(), info);
 		}
+		optimize(new ReduceRedundantJump(), info);
+		optimize(new RemoveUnreachableSlot(), info);
 	}
 	
 	private void optimizeAll(Options opt){

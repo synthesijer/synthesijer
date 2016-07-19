@@ -5,7 +5,7 @@ VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test004.VHD sim_Test005.VHD sim_Test006.VHD sim_Test007.VHD sim_Test017.VHD sim_Test018.VHD sim_Test020.VHD
 
-OPT = --chaining
+OPT = --chaining --bb2
 
 .PHONY: all synthesis ghdl64 ghdl test clean test_vhdl test_verilog iverilog
 

@@ -1427,9 +1427,12 @@ public class SchedulerInfoCompiler {
 					break;
 				}
 				default:
+					/*
 					if(slot.hasBranchOp() || slot.getNextStep().length > 1 || slot.getLatency() > 0){
 						SynthesijerUtils.warn("Undefined state transition: " + item.getOp());
 					}
+					*/
+					states.get(slot.getStepId()).addStateTransit(states.get(slot.getNextStep()[0]));
 					/*
 					  if(item.isBranchOp()){
 					  }else{

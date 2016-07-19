@@ -159,6 +159,13 @@ public class SchedulerBoard {
 	public void addSlot(SchedulerSlot slot){
 		slots.add(slot);
 	}
+	
+	public SchedulerSlot getSlot(int id){
+		for(SchedulerSlot s: slots){
+			if(s.getStepId() == id) return s;
+		}
+		return null;
+	}
 
 	public void dump(PrintStream out){
 		for(SchedulerSlot s: slots){
