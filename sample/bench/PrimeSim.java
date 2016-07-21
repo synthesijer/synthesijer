@@ -11,4 +11,13 @@ public class PrimeSim extends Thread{
 		finish_flag = true;
 	}
 
+	public boolean test(){
+		run();
+		if(result == 65521){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 }

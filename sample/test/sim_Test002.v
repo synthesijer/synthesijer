@@ -34,6 +34,13 @@ module sim_Test002;
 	     .test_busy(run_busy),
 	     .test_req(run_req)
 	     );
+   
+   initial begin
+      `ifdef DUMP_ENABLE
+      $dumpfile("sim_Test002.vcd");
+      $dumpvars();
+      `endif
+   end
 
    always #5
      clk <= !clk;

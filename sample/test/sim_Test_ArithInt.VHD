@@ -2,79 +2,51 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity primesim_top is
-end primesim_top;
+entity sim_Test_ArithInt is
+end sim_Test_ArithInt;
 
-architecture RTL of primesim_top is
+architecture RTL of sim_Test_ArithInt is
 
   signal clk : std_logic := '0';
   signal reset : std_logic := '0';
-  signal counter : unsigned(32-1 downto 0) := (others => '0');
+  signal counter : signed(32-1 downto 0) := (others => '0');
   type Type_main is (
     main_IDLE,
     main_S0  
-  );
+    );
   signal main : Type_main := main_IDLE;
   signal main_delay : signed(32-1 downto 0) := (others => '0');
-  signal tmp_0001 : unsigned(32-1 downto 0) := (others => '0');
+  signal tmp_0001 : signed(32-1 downto 0) := (others => '0');
   signal tmp_0002 : std_logic;
   signal tmp_0003 : std_logic;
   signal tmp_0004 : std_logic;
   signal tmp_0005 : std_logic;
 
-  component PrimeSim
+  component Test_ArithInt
     port (
-      clk : in std_logic;
-      reset : in std_logic;
-      finish_flag_in : in std_logic;
-      finish_flag_we : in std_logic;
-      finish_flag_out : out std_logic;
-      result_in : in signed(32-1 downto 0);
-      result_we : in std_logic;
-      result_out : out signed(32-1 downto 0);
-      run_req : in std_logic;
-      run_busy : out std_logic;
+      clk         : in  std_logic;
+      reset       : in  std_logic;
+      ic_in       : in  signed(32-1 downto 0);
+      ic_we       : in  std_logic;
+      ic_out      : out signed(32-1 downto 0);
+      lc_in       : in  signed(64-1 downto 0);
+      lc_we       : in  std_logic;
+      lc_out      : out signed(64-1 downto 0);
       test_return : out std_logic;
-      test_busy : out std_logic;
-      test_req : in std_logic;
-      start_req : in std_logic;
-      start_busy : out std_logic;
-      join_req : in std_logic;
-      join_busy : out std_logic;
-      yield_req : in std_logic;
-      yield_busy : out std_logic
+      test_busy   : out std_logic;
+      test_req    : in  std_logic
       );
-  end component PrimeSim;
+  end component Test_ArithInt;
 
-  signal finish_flag       : std_logic := '0';
-  signal test_return       : std_logic := '0';
-  signal run_busy          : std_logic := '0';
-  signal run_req           : std_logic := '0';
+  signal run_req, run_busy: std_logic := '0';
+  signal test_return : std_logic := '0';
+
+  signal flag : std_logic := '0';
+  signal finish_flag : std_logic := '0';
   signal end_of_simulation : std_logic := '0';
 
 begin
 
-  U: PrimeSim port map(
-    clk => clk,
-    reset => reset,
-    finish_flag_in => '0',
-    finish_flag_we => '0',
-    finish_flag_out => open,
-    result_in => (others => '0'),
-    result_we => '0',
-    result_out => open,
-    run_req => '0',
-    run_busy => open,
-    test_return => test_return,
-    test_busy => run_busy,
-    test_req => run_req,
-    start_req => '0',
-    start_busy => open,
-    join_req => '0',
-    join_busy => open,
-    yield_req => '0',
-    yield_busy => open
-  );
 
   tmp_0001 <= counter + 1;
   tmp_0002 <= '1' when counter > 3 else '0';
@@ -94,6 +66,7 @@ begin
       wait;
     end if;
   end process;
+
 
   process(main)
   begin
@@ -119,8 +92,22 @@ begin
   end process;
 
   run_req <= '1' when counter > 100 else '0';
+  
+  U : Test_ArithInt port map(
+      clk         => clk,
+      reset       => reset,
+      ic_in       => (others => '0'),
+      ic_we       => '0',
+      ic_out      => open,
+      lc_in       => (others => '0'),
+      lc_we       => '0',
+      lc_out      => open,
+      test_return => test_return,
+      test_busy   => run_busy,
+      test_req    => run_req
+      );
 
-  finish_flag <= '1' when counter > 200000000 else
+  finish_flag <= '1' when counter > 1000000 else
                  '1' when run_busy = '0' and counter > 105 else
                  '0';
   process(clk)
@@ -128,9 +115,9 @@ begin
    if clk'event and clk = '1' then
      if finish_flag = '1' then
        if(test_return = '1') then
-         report "PrimeSim: TEST SUCCESS";
+         report "Test_ArithInt: TEST SUCCESS";
        else
-         report "PrimeSim: TEST *** FAILURE ***";
+         report "Test_ArithInt: TEST *** FAILURE ***";
        end if;
        end_of_simulation <= '1';
        --assert (false) report "Simulation End!" severity failure;

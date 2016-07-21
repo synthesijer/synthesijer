@@ -35,10 +35,11 @@ module sim_Test004;
 	     );
    
    initial begin
-      //$dumpfile("sim_Test004.vcd");
-      //$dumpvars();
+      `ifdef DUMP_ENABLE
+      $dumpfile("sim_Test004.vcd");
+      $dumpvars();
+      `endif
    end
-
    
    always #5
      clk <= !clk;

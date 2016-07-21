@@ -52,8 +52,10 @@ module sim_Test001;
 	     );
 
    initial begin
-      //$dumpfile("sim_Test001.vcd");
-      //$dumpvars();
+      `ifdef DUMP_ENABLE
+      $dumpfile("sim_Test001.vcd");
+      $dumpvars();
+      `endif
    end
    
    always #5
