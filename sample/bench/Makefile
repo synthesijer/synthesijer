@@ -22,6 +22,11 @@ ghdl32: build primesim_top.vhd bubblesortsim_top.vhd mergesortsim_top.vhd
 	ghdl -e bubblesortsim_top
 	ghdl -e mergesortsim_top
 
+iverilog : build primesim_top.v bubblesortsim_top.v mergesortsim_top.v
+	iverilog -o primesim_top primesim_top.v PrimeSim.v Prime.v ../../lib/verilog/dualportram.v ../../lib/verilog/singleportram.v
+	iverilog -o bubblesortsim_top bubblesortsim_top.v BubbleSortSim.v BubbleSort.v ../../lib/verilog/dualportram.v ../../lib/verilog/singleportram.v
+	iverilog -o mergesortsim_top mergesortsim_top.v MergeSortSim.v MergeSort.v ../../lib/verilog/dualportram.v ../../lib/verilog/singleportram.v
+
 clean:
 	-rm -f *.class
 	-rm -f $(VHDL_SOURCES)
