@@ -12,7 +12,7 @@ module bubblesortsim_top;
    
    BubbleSortSim U(.clk(clk),
 		   .reset(reset),
-		   .finish_flag_out(finish_flag),
+		   .finish_flag_out(),
 		   .finish_flag_in(1'b0),
 		   .finish_flag_we(1'b0),
 		   .run_req(1'b0),
