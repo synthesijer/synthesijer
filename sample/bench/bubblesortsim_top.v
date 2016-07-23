@@ -25,10 +25,7 @@ module bubblesortsim_top;
 		   .join_req(1'b0),
 		   .join_busy(),
 		   .yield_req(1'b0),
-		   .yield_busy(),
-		   .test_req(1'b1),
-		   .test_busy(test_busy),
-		   .test_return(test_return)
+		   .yield_busy()
 		   );
    
    initial begin
