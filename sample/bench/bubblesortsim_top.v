@@ -12,7 +12,7 @@ module bubblesortsim_top;
    
    BubbleSortSim U(.clk(clk),
 		   .reset(reset),
-		   .finish_flag_out(finish_flag),
+		   .finish_flag_out(),
 		   .finish_flag_in(1'b0),
 		   .finish_flag_we(1'b0),
 		   .run_req(1'b0),
@@ -25,10 +25,7 @@ module bubblesortsim_top;
 		   .join_req(1'b0),
 		   .join_busy(),
 		   .yield_req(1'b0),
-		   .yield_busy(),
-		   .test_req(1'b1),
-		   .test_busy(test_busy),
-		   .test_return(test_return)
+		   .yield_busy()
 		   );
    
    initial begin
