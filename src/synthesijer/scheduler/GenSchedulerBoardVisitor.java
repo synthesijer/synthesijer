@@ -615,8 +615,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		
     @Override
     public void visitAssignExpr(AssignExpr o) {
-		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
+		Operand lhs = stepIn(o.getLhs());
 		if(isCastRequired(lhs.getType(), rhs.getType()) == true){
 			if(rhs instanceof VariableOperand){
 				VariableOperand tmp = parent.addCast(rhs, lhs.getType()); // RHS is casted into corresponding to LHS
@@ -630,8 +630,8 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
     @Override
     public void visitAssignOp(AssignOp o) {
-		Operand lhs = stepIn(o.getLhs());
 		Operand rhs = stepIn(o.getRhs());
+		Operand lhs = stepIn(o.getLhs());
 		//VariableOperand tmp = newVariable("binary_expr", stepIn(lhs.getType()));
 		VariableOperand tmp = newVariable("binary_expr", lhs.getType());
 		Op op = Op.get(o.getOp(), lhs, rhs);

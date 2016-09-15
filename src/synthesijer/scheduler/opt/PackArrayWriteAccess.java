@@ -58,4 +58,19 @@ public class PackArrayWriteAccess implements SchedulerInfoOptimizer{
 		return ret;
 	}
 
+	// private SchedulerSlot[] searchCorrespondingAssignSlot(SchedulerItem item, SchedulerSlot[] slots, int index){
+	// 	int i = index;
+	// 	SechulerSlot ret = null;
+	// 	while(i < slots.length){
+	// 		SchedulerSlot candidate = slots[i];
+	// 		i++;
+	// 		SchedulerItem[] candidate_items = candidate.getItems();
+	// 		if(candidate_items.length > 1){ continue; /* skip */ }
+	// 		if(candidate_items[0].getOp() != Op.ASSIGN){ continue; /* skip */ }
+	// 		if(item.getDestOperand() != candidate_items[0].getDestOperand()){ continue; /* skip */ }
+	// 		return ret;
+	// 	}
+	// 	return null; // not found
+	// }
+	
 }
