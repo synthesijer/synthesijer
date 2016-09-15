@@ -6,7 +6,7 @@ public class Test022 {
 		for(int i = 1; i < a.length; i++){
 			a[i-1] = a[i];
 		}
-		a[a.length] = x;
+		a[a.length-1] = x;
 	}
 
 	@unsynthesizable
