@@ -19,7 +19,7 @@ module sim_Test_ArithInt;
 	      .ic_in(0),
 	      .ic_we(1'b0),
 	      .ic_out(ic),
-	      .lc_in(0),
+	      .lc_in(64'd0),
 	      .lc_we(1'b0),
 	      .lc_out(lc),
 	      .test_return(test_return),
