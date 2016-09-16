@@ -224,6 +224,8 @@ public class SchedulerItem {
 	private boolean isArrayAccess(){
 		switch(op){
 		case ARRAY_ACCESS:
+		case ARRAY_ACCESS_WAIT:
+		case ARRAY_ACCESS0:
 		case ARRAY_INDEX:
 			return true;
 		default:

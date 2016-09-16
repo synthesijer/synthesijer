@@ -41,6 +41,7 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 		}
 		VariableOperand dest = item.getDestOperand();
 		if(isUsedAsSrc(board, dest)){
+			/*
 			SchedulerItem item0 = new SchedulerItem(board, Op.ARRAY_ACCESS_WAIT, item.getSrcOperand(), item.getDestOperand());
 			board.addItemInNewSlot(item0);
 			SchedulerItem item1 = new SchedulerItem(board, Op.ARRAY_ACCESS0, item.getSrcOperand(), item.getDestOperand());
@@ -52,6 +53,7 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 			item1.setBranchId(origBranchId);
 			ret.addSlot(item0.getSlot());
 			ret.addSlot(item1.getSlot());
+			*/
 			return item;
 		}else{
 			item.overwriteOp(Op.ARRAY_INDEX);

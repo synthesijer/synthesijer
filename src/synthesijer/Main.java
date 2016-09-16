@@ -28,7 +28,7 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		GetOpt opt = new GetOpt("h",
-				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2",
+				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl",
 				args);
 		if (opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0) {
 			printHelp();
@@ -102,6 +102,7 @@ public class Main {
 		Options.INSTANCE.legacy_instance_variable_name = opt.flag("legacy-instance-variable-name");
 		Options.INSTANCE.operation_strength_reduction = opt.flag("operation_strength_reduction");
 		Options.INSTANCE.iroha = opt.flag("iroha");
+		Options.INSTANCE.opencl = opt.flag("opencl");
 		boolean packaging = false;
 		String packageTop = "";
 		if (opt.flag("ip-exact")) {

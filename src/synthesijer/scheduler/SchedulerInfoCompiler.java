@@ -708,9 +708,11 @@ public class SchedulerInfoCompiler {
 		case ARRAY_ACCESS_WAIT :{
 			break;
 		}
+		case ARRAY_ACCESS0:
 		case ARRAY_ACCESS :{
-
-			state.setMaxConstantDelay(2);
+			if(item.getOp() == Op.ARRAY_ACCESS){
+				state.setMaxConstantDelay(2);
+			}
 			HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
 			Operand src[] = item.getSrcOperand();
 			
@@ -740,7 +742,7 @@ public class SchedulerInfoCompiler {
 			}
 
 			HDLExpr index = convOperandToHDLExpr(item, src[1]);
-			if(addr != null){
+			if((addr != null) && (item.getOp() == Op.ARRAY_ACCESS)){
 				addr.setAssign(state, 0, index);
 			}
 			if(oe != null){
@@ -748,7 +750,11 @@ public class SchedulerInfoCompiler {
 				oe.setDefaultValue(HDLPreDefinedConstant.LOW);
 			}
 			if(dout != null){
-				dest.setAssign(state, 2, dout);
+				if(item.getOp() == Op.ARRAY_ACCESS){
+					dest.setAssign(state, 2, dout);
+				}else{
+					dest.setAssign(state, dout);
+				}
 				predExprMap.put(item, dout);
 			}
 			
