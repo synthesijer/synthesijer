@@ -48,6 +48,8 @@ public enum Op {
 	XOR,
 	LNOT,
 	ARRAY_ACCESS(1),
+	ARRAY_ACCESS_WAIT,
+	ARRAY_ACCESS0,
 	ARRAY_INDEX,
 	CALL(true),
 	EXT_CALL(true),

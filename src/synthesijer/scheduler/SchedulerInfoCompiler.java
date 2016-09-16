@@ -565,6 +565,8 @@ public class SchedulerInfoCompiler {
 		case XOR : ret = HDLOp.XOR;break;
 		case LNOT : ret = HDLOp.NOT;break;
 		case ARRAY_ACCESS : break;
+		case ARRAY_ACCESS_WAIT : break;
+		case ARRAY_ACCESS0 : break;
 		case ARRAY_INDEX : break;
 		case CALL : break;
 		case EXT_CALL : break;
@@ -701,6 +703,9 @@ public class SchedulerInfoCompiler {
 			return_sig.setAssign(state, convOperandToHDLExpr(item, src[0]));
 		}
 		case SELECT :{
+			break;
+		}
+		case ARRAY_ACCESS_WAIT :{
 			break;
 		}
 		case ARRAY_ACCESS :{

@@ -27,20 +27,31 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 		for(SchedulerSlot slot: src.getSlots()){
 			SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 			for(SchedulerItem item: slot.getItems()){
-				newSlot.addItem(conv(src, item));
+				newSlot.addItem(conv(src, item, ret));
 			}
 			ret.addSlot(newSlot);
 		}
 		return ret;
 	}
 	
-	public SchedulerItem conv(SchedulerBoard board, SchedulerItem item){
+	public SchedulerItem conv(SchedulerBoard board, SchedulerItem item, SchedulerBoard ret){
 		if(item.getOp() != Op.ARRAY_ACCESS){
 			// nothing to do
 			return item;
 		}
 		VariableOperand dest = item.getDestOperand();
 		if(isUsedAsSrc(board, dest)){
+			SchedulerItem item0 = new SchedulerItem(board, Op.ARRAY_ACCESS_WAIT, item.getSrcOperand(), item.getDestOperand());
+			board.addItemInNewSlot(item0);
+			SchedulerItem item1 = new SchedulerItem(board, Op.ARRAY_ACCESS0, item.getSrcOperand(), item.getDestOperand());
+			board.addItemInNewSlot(item1);
+			item.overwriteOp(Op.ARRAY_INDEX);
+			int origBranchId = item.getBranchId()[0];
+			item.setBranchId(item0.getStepId());
+			item0.setBranchId(item1.getStepId());
+			item1.setBranchId(origBranchId);
+			ret.addSlot(item0.getSlot());
+			ret.addSlot(item1.getSlot());
 			return item;
 		}else{
 			item.overwriteOp(Op.ARRAY_INDEX);
