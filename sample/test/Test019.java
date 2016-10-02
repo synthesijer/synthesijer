@@ -8,7 +8,7 @@ public class Test019{
 
 	public int f(int n){
 		if(n == 0) return 0;
-		f(g(n-1));
+		return f(g(n-1));
 	}
 	
 

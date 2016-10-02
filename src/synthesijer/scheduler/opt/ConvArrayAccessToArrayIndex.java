@@ -27,9 +27,11 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 		for(SchedulerSlot slot: src.getSlots()){
 			SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 			for(SchedulerItem item: slot.getItems()){
-				newSlot.addItem(conv(src, item, ret));
+				SchedulerItem i = conv(src, item, ret);
+				if(i != null) newSlot.addItem(i);
 			}
-			ret.addSlot(newSlot);
+			if(newSlot.getItems().length > 0)
+				ret.addSlot(newSlot);
 		}
 		return ret;
 	}
@@ -41,7 +43,6 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 		}
 		VariableOperand dest = item.getDestOperand();
 		if(isUsedAsSrc(board, dest)){
-			/*
 			SchedulerItem item0 = new SchedulerItem(board, Op.ARRAY_ACCESS_WAIT, item.getSrcOperand(), item.getDestOperand());
 			board.addItemInNewSlot(item0);
 			SchedulerItem item1 = new SchedulerItem(board, Op.ARRAY_ACCESS0, item.getSrcOperand(), item.getDestOperand());
@@ -51,10 +52,11 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 			item.setBranchId(item0.getStepId());
 			item0.setBranchId(item1.getStepId());
 			item1.setBranchId(origBranchId);
+			ret.addSlot(item.getSlot());
 			ret.addSlot(item0.getSlot());
 			ret.addSlot(item1.getSlot());
-			*/
-			return item;
+			return null;
+			//return item;
 		}else{
 			item.overwriteOp(Op.ARRAY_INDEX);
 			return item;
