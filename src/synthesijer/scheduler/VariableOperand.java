@@ -167,7 +167,7 @@ public class VariableOperand implements Operand{
 	    s += " :public " + isPublic();
 	    s += " :global_constant " + isGlobalConstant();
 	    s += " :method_param " + methodParamFlag;
-	    s += " :orginal " + getOrigName();
+	    s += " :original " + getOrigName();
 	    s += " :method " + getMethodName();
 	    s += " :private_method " + isPrivateMethod();
 	    s += " :volatile " + isVolatileFlag();

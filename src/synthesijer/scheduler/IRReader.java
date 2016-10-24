@@ -184,7 +184,7 @@ public class IRReader {
 			case ":public": publicFlag = Boolean.parseBoolean(v.toString()); break;
 			case ":global_constant": globalConstantFlag = Boolean.parseBoolean(v.toString()); break;
 			case ":method_param": methodParamFlag = Boolean.parseBoolean(v.toString()); break;
-			case ":orginal": origName = v.toString(); break;
+			case ":original": origName = v.toString(); break;
 			case ":method": methodName = v.toString(); break;
 			case ":private_method": privateMethodFlag = Boolean.parseBoolean(v.toString()); break;
 			case ":volatile": volatileFlag = Boolean.parseBoolean(v.toString()); break;
