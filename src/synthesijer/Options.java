@@ -17,5 +17,7 @@ public enum Options {
     public boolean iroha;
 	
     public boolean opencl = false;
+	
+    public boolean with_ssa = false;
 
 }

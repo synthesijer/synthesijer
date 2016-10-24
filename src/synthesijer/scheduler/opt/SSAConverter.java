@@ -12,20 +12,31 @@ import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
-public class NullOptimizer implements SchedulerInfoOptimizer{
-	
-    public static final boolean DEBUG = false;
+public class SSAConverter implements SchedulerInfoOptimizer{
 
-    public SchedulerInfo opt(SchedulerInfo info){
+	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
-			result.addBoard(b);
+			result.addBoard(conv(b));
 		}
 		return result;
-    }
-	
-    public String getKey(){
-		return "null_optimizer";
-    }
+	}
+
+	public String getKey(){
+		return "ssa_converter";
+	}
+
+	public SchedulerBoard conv(SchedulerBoard src){
+		ControlFlowGraph g = new ControlFlowGraph(src);
+		g.getBasicBlocks();
+		SchedulerBoard ret = src.genSameEnvBoard();
+		SchedulerSlot[] slots = src.getSlots();
+
+		for(SchedulerSlot s: slots){
+			ret.addSlot(s);
+		}
+
+		return ret;
+	}
 	
 }
