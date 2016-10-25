@@ -99,6 +99,7 @@ public class SExp {
 	public static SExp load(String path) throws Exception{
 		Path src = Paths.get(path); 
 		String str = new String(Files.readAllBytes(src));
+		str = str.replaceAll("\n", " ");
 		SExp s = new SExp();
 		int index = s.parse(str);
 		return s;

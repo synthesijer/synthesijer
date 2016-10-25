@@ -400,6 +400,8 @@ public enum Manager {
 		String name = reader.result.getName();
 		SynthesijerModuleInfo info = new SynthesijerModuleInfo(null, null, true);
 		info.setSchedulerInfo(reader.result);
+		optimize(new ReduceRedundantJump(), info);
+		optimize(new RemoveUnreachableSlot(), info);
 		modules.put(name, info);
 	}
 	
