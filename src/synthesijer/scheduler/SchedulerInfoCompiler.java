@@ -18,6 +18,7 @@ import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
+import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLExpr;
@@ -393,6 +394,8 @@ public class SchedulerInfoCompiler {
 			return getHDLType((ComponentType)type);
 		}else if(type instanceof MySelfType){
 			return getHDLType((MySelfType)type);
+		}else if(type instanceof MultipleType){
+			return getHDLType((MultipleType)type);
 		}else{
 			return null;
 		}
@@ -427,7 +430,11 @@ public class SchedulerInfoCompiler {
 		System.err.println("unsupported type: " + t);
 		return null;
     }
-	
+
+    private HDLType getHDLType(MultipleType t){
+    	return getHDLType(t.get(0));
+    }
+
     private Hashtable<SchedulerItem, HDLExpr> predExprMap;
     private void genStatemachines(){
 		Hashtable<SchedulerBoard, Hashtable<HDLVariable, HDLInstance>> callStackMaps = new Hashtable<>();
@@ -700,6 +707,14 @@ public class SchedulerInfoCompiler {
 		case RETURN : {
 			if(return_sig == null) break;
 			Operand[] src = item.getSrcOperand();
+			return_sig.setAssign(state, convOperandToHDLExpr(item, src[0]));
+		}
+		case MULTI_RETURN : {
+			// TODO
+			if(return_sig == null) break;
+			System.out.println("MULTI_RETURN = "+return_sig);
+			Operand[] src = item.getSrcOperand();
+			System.out.println("MULTI_RETURN : " + return_sig + " < "  + src[0].getName());
 			return_sig.setAssign(state, convOperandToHDLExpr(item, src[0]));
 		}
 		case SELECT :{
@@ -1434,6 +1449,11 @@ public class SchedulerInfoCompiler {
 					break;
 				}
 				case RETURN:{
+					states.get(slot.getStepId()).addStateTransit(states.get(slot.getNextStep()[0]));
+					break;
+				}
+				case MULTI_RETURN:{
+					// TODO
 					states.get(slot.getStepId()).addStateTransit(states.get(slot.getNextStep()[0]));
 					break;
 				}

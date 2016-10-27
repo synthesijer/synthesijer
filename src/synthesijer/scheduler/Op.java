@@ -38,6 +38,7 @@ public enum Op {
 	JP(true),
 	JT(true),
 	RETURN(true),
+	MULTI_RETURN(true),
 	SELECT(true), // switch selector
 	AND,
 	NOT,
@@ -327,6 +328,7 @@ public enum Op {
 		case "JP" : return JP;
 		case "JT" : return JT;
 		case "RETURN" : return RETURN;
+		case "MULTI_RETURN" : return MULTI_RETURN;
 		case "SELECT" : return SELECT;
 		case "AND" : return AND;
 		case "NOT" : return NOT;

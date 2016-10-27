@@ -6,6 +6,7 @@ import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.ast.type.MultipleType;
 
 public interface SynthesijerAstTypeVisitor {
 
@@ -20,5 +21,7 @@ public interface SynthesijerAstTypeVisitor {
 	public void visitMySelfType(MySelfType o);
 
 	public void visitPrimitiveTypeKind(PrimitiveTypeKind o);
+
+	public void visitMultipleType(MultipleType o);
 
 }

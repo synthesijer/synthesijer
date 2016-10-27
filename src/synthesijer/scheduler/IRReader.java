@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Module;
 import synthesijer.ast.Type;
+import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.TypeGen;
 
 public class IRReader {
@@ -163,7 +164,29 @@ public class IRReader {
 	private VariableOperand genVariableOperand(SExp node, SchedulerInfo info, ArrayList<Operand> table, ArrayList<ChainingInfo> chainingVars) throws Exception{
 	
 		String name = node.get(2).toString();
-		Type type = TypeGen.get(node.get(1).toString());
+		Type type;
+		if(node.get(1) instanceof String){
+			type = TypeGen.get(node.get(1).toString());
+		}else if(sexp.get(1) instanceof SExp){
+			// too AD-HOC
+			SExp t = (SExp)(sexp.get(1));
+			if(t.get(0) instanceof String && t.get(0).toString().equals("MULTI")){
+				ArrayList<Type> types = new ArrayList<Type>(); 
+				for(int i = 1; i < t.size(); i++){
+					System.out.println(t.get(i));
+					types.add(TypeGen.get(t.get(i).toString()));
+				}
+				type = new MultipleType(types);
+			}else{
+				SynthesijerUtils.warn("unknown type: " + t);
+				SynthesijerUtils.warn("This type is handled as UNKNOWN");
+				type = TypeGen.get("UNKNOWN");
+			}
+		}else{
+			SynthesijerUtils.warn("unknown type: " + node.get(1));
+			SynthesijerUtils.warn("This type is handled as UNKNOWN");
+			type = TypeGen.get("UNKNOWN");
+		}
 		Operand initSrc = null;
 		boolean publicFlag = false;
 		boolean globalConstantFlag = false;
@@ -250,7 +273,29 @@ public class IRReader {
 
 	private void parseBoard(SExp sexp, SchedulerInfo info, ArrayList<ChainingInfo> chainingVars) throws Exception{
 		String name = sexp.get(2).toString();
-		Type returnType = TypeGen.get(sexp.get(1).toString());
+		Type returnType;
+		if(sexp.get(1) instanceof String){
+			returnType = TypeGen.get(sexp.get(1).toString());
+		}else if(sexp.get(1) instanceof SExp){
+			// too AD-HOC
+			SExp t = (SExp)(sexp.get(1));
+			if(t.get(0) instanceof String && t.get(0).toString().equals("MULTI")){
+				ArrayList<Type> types = new ArrayList<Type>(); 
+				for(int i = 1; i < t.size(); i++){
+					System.out.println(t.get(i));
+					types.add(TypeGen.get(t.get(i).toString()));
+				}
+				returnType = new MultipleType(types);
+			}else{
+				SynthesijerUtils.warn("unknown type: " + t);
+				SynthesijerUtils.warn("This type is handled as UNKNOWN");
+				returnType = TypeGen.get("UNKNOWN");
+			}
+		}else{
+			SynthesijerUtils.warn("unknown type: " + sexp.get(1));
+			SynthesijerUtils.warn("This type is handled as UNKNOWN");
+			returnType = TypeGen.get("UNKNOWN");
+		}
 		boolean privateFlag = false;
 		boolean autoFlag = false;
 		boolean callStackFlag = false;

@@ -49,6 +49,7 @@ import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
+import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLPrimitiveType;
@@ -311,7 +312,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 
     @Override
     public void visitReturnStatement(ReturnStatement o) {
-		SchedulerItem ret;
+    	SchedulerItem ret;
 		if (o.getExpr() != null){
 			Operand v = stepIn(o.getExpr());
 			ret = addSchedulerItem(new SchedulerItem(board, Op.RETURN, new Operand[]{v}, null));
@@ -1119,6 +1120,11 @@ class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {
 
     @Override
     public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
+		this.type = o;
+    }
+
+    @Override
+	public void visitMultipleType(MultipleType o){
 		this.type = o;
     }
 
