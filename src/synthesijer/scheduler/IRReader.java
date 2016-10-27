@@ -173,7 +173,6 @@ public class IRReader {
 			if(t.get(0) instanceof String && t.get(0).toString().equals("MULTI")){
 				ArrayList<Type> types = new ArrayList<Type>(); 
 				for(int i = 1; i < t.size(); i++){
-					System.out.println(t.get(i));
 					types.add(TypeGen.get(t.get(i).toString()));
 				}
 				type = new MultipleType(types);
@@ -282,7 +281,6 @@ public class IRReader {
 			if(t.get(0) instanceof String && t.get(0).toString().equals("MULTI")){
 				ArrayList<Type> types = new ArrayList<Type>(); 
 				for(int i = 1; i < t.size(); i++){
-					System.out.println(t.get(i));
 					types.add(TypeGen.get(t.get(i).toString()));
 				}
 				returnType = new MultipleType(types);

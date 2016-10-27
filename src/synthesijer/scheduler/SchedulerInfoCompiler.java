@@ -711,11 +711,10 @@ public class SchedulerInfoCompiler {
 		}
 		case MULTI_RETURN : {
 			// TODO
-			if(return_sig == null) break;
-			System.out.println("MULTI_RETURN = "+return_sig);
 			Operand[] src = item.getSrcOperand();
-			System.out.println("MULTI_RETURN : " + return_sig + " < "  + src[0].getName());
-			return_sig.setAssign(state, convOperandToHDLExpr(item, src[0]));
+			HDLSignal s = returnMultiSigTable.get(board)[Integer.parseInt(src[0].getName())];
+			//return_sig.setAssign(state, convOperandToHDLExpr(item, src[1]));
+			s.setAssign(state, convOperandToHDLExpr(item, src[1]));
 		}
 		case SELECT :{
 			break;
@@ -1128,10 +1127,13 @@ public class SchedulerInfoCompiler {
     }
 	
     private Hashtable<SchedulerBoard, HDLSignal> returnSigTable = new Hashtable<>();
+    private Hashtable<SchedulerBoard, HDLSignal[]> returnMultiSigTable = new Hashtable<>();
 
     private void genMethodCtrlSignals(SchedulerBoard board, Hashtable<HDLVariable, HDLInstance> callStackMap){
 		if(board.getReturnType() != PrimitiveTypeKind.VOID &&
-		   !(board.getReturnType() instanceof synthesijer.ast.type.MySelfType)){
+		   !(board.getReturnType() instanceof synthesijer.ast.type.MySelfType) &&
+		   !(board.getReturnType() instanceof synthesijer.ast.type.MultipleType)
+		  ){
 			if(board.isPrivate() == false){
 				HDLPort return_port = hm.newPort(board.getName() + "_return", HDLPort.DIR.OUT, getHDLType(board.getReturnType()));
 				returnSigTable.put(board, return_port.getSignal());
@@ -1139,6 +1141,21 @@ public class SchedulerInfoCompiler {
 				HDLSignal return_sig = hm.newSignal(board.getName() + "_return", getHDLType(board.getReturnType()));
 				returnSigTable.put(board, return_sig);
 			}
+		}
+		
+		if(board.getReturnType() instanceof synthesijer.ast.type.MultipleType){
+			MultipleType t = (MultipleType)(board.getReturnType());
+			ArrayList<HDLSignal> list = new ArrayList<HDLSignal>();
+			for(int i = 0; i < t.size(); i++){
+				if(board.isPrivate() == false){
+					HDLPort return_port = hm.newPort(board.getName() + "_return_" + i, HDLPort.DIR.OUT, getHDLType(board.getReturnType()));
+					list.add(return_port.getSignal());
+				}else{
+					HDLSignal return_sig = hm.newSignal(board.getName() + "_return_" + i, getHDLType(board.getReturnType()));
+					list.add(return_sig);
+				}
+			}
+			returnMultiSigTable.put(board, list.toArray(new HDLSignal[]{}));
 		}
 
 		if(board.isAuto()){
