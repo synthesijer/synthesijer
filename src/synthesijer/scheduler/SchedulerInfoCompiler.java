@@ -252,7 +252,7 @@ public class SchedulerInfoCompiler {
 			if(initSrc != null){
 				//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + initSrc.info());
 			}else{
-				SynthesijerUtils.warn("unsupported to array initializing expression.");
+				SynthesijerUtils.warn("unsupported to array initializing expression: " + v.toSexp());
 			}
 			SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
 		}

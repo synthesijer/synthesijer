@@ -132,6 +132,9 @@ public class IRReader {
 				case "INSTANCE-REF":
 					table.add(genInstanceRefOperand(child));
 					break;
+				case "VAR-REF":
+					table.add(genVarRefOperand(child, table));
+					break;
 				default:
 					throw new IRReaderException("Illegal format: expected VAR or CONSTANT, but " + o);
 				}
@@ -205,7 +208,7 @@ public class IRReader {
 			switch(k){
 			case ":public": publicFlag = Boolean.parseBoolean(v.toString()); break;
 			case ":global_constant": globalConstantFlag = Boolean.parseBoolean(v.toString()); break;
-			case ":method_param": methodParamFlag = Boolean.parseBoolean(v.toString()); break;
+			case ":method_param":methodParamFlag = Boolean.parseBoolean(v.toString()); break;
 			case ":original": origName = v.toString(); break;
 			case ":method": methodName = v.toString(); break;
 			case ":private_method": privateMethodFlag = Boolean.parseBoolean(v.toString()); break;
@@ -270,6 +273,27 @@ public class IRReader {
 		return o;
 	}
 
+	private VariableRefOperand genVarRefOperand(SExp node, ArrayList<Operand> table) throws Exception{
+		String name = node.get(2).toString();
+		Type type = TypeGen.get(node.get(1).toString());
+		VariableOperand ref = null;
+		Operand ptr = null;
+		boolean memberFlag = false;
+		for(int i = 3; i < node.size(); i = i + 2){
+			String k = node.get(i).toString();
+			Object v = node.get(i+1);
+			switch(k){
+			case ":ref": ref = (VariableOperand)(search(table, v.toString())); break;
+			case ":ptr": ptr = search(table, v.toString()); break;
+			case ":member": memberFlag = Boolean.parseBoolean(v.toString()); break;
+			default:
+				SynthesijerUtils.warn("skip option:" + k);
+			}
+		}
+		VariableRefOperand o = new VariableRefOperand(name, type, ref, ptr, memberFlag);
+		return o;
+	}
+	
 	private void parseBoard(SExp sexp, SchedulerInfo info, ArrayList<ChainingInfo> chainingVars) throws Exception{
 		String name = sexp.get(2).toString();
 		Type returnType;

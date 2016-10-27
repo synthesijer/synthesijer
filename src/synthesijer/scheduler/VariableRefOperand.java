@@ -22,4 +22,16 @@ public class VariableRefOperand extends VariableOperand{
 		return ptr;
 	}
 	
+	public String toSexp(){
+		String v = "";
+		v += "(VAR-REF";
+		v += " " + getType();
+		v += " " + getName();
+		v += " :ref " + ref.getName();
+		v += " :ptr " + ptr.getName();
+		v += " :member " + isMember();
+		v += ")";
+		return v;
+	}
+	
 }

@@ -12,7 +12,7 @@ public class TypeGen {
 		if(key.startsWith(ARRAY_TYPE)){
 			return new ArrayType(get(key.substring(ARRAY_TYPE.length())));
 		}else if(key.startsWith(ARRAY_REF_TYPE)){
-			return new ArrayType((ArrayType)(get(key.substring(ARRAY_REF_TYPE.length()))));
+			return new ArrayRef((ArrayType)(get(key.substring(ARRAY_REF_TYPE.length()))));
 		}else if(key.startsWith(COMPONENT_TYPE)){
 			return new ComponentType(key.substring(COMPONENT_TYPE.length()));
 		}
