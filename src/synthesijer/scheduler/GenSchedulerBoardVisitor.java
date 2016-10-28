@@ -47,6 +47,7 @@ import synthesijer.ast.statement.WhileStatement;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
+import synthesijer.ast.type.ChannelType;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MultipleType;
@@ -1126,6 +1127,11 @@ class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {
     @Override
 	public void visitMultipleType(MultipleType o){
 		this.type = o;
+    }
+
+    @Override
+    public void visitChannelType(ChannelType o) {
+    	o.getElemType().accept(this);
     }
 
 }
