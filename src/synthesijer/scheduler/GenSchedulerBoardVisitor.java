@@ -822,7 +822,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
     @Override
     public void visitFieldAccess(FieldAccess o) {
 		VariableOperand tmp;
-		Type type = PrimitiveTypeKind.UNDEFIEND;
+		Type type = PrimitiveTypeKind.UNDEFINED;
 		//		System.out.println("visitFieldAccess:Type: " + o.getType());
 		if(o.getType() instanceof ArrayType && o.getIdent().getSymbol().equals("length")){
 			type = PrimitiveTypeKind.INT;

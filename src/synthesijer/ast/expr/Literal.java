@@ -19,7 +19,7 @@ public class Literal extends Expr{
     private float valueFloat;
     private String valueStr;
         
-    private Type type = PrimitiveTypeKind.UNDEFIEND;
+    private Type type = PrimitiveTypeKind.UNDEFINED;
     
     private int width;
 	
@@ -112,7 +112,7 @@ public class Literal extends Expr{
 	}
 	
 	public void setUndefined(){
-		this.type = PrimitiveTypeKind.UNDEFIEND;
+		this.type = PrimitiveTypeKind.UNDEFINED;
 		this.valueStr = null;
 		this.width = 0;
 	}

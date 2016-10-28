@@ -24,7 +24,7 @@ public enum PrimitiveTypeKind implements Type{
 	PACKAGE,
 	TYPEVAR,
 	WILDCARD,
-	UNDEFIEND;
+	UNDEFINED;
 
 	private final int width;
 	

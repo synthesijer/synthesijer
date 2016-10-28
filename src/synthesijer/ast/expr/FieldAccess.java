@@ -59,7 +59,7 @@ public class FieldAccess extends Expr{
 			if(v != null){
 				return v.getType();
 			}else{
-				return PrimitiveTypeKind.UNDEFIEND;
+				return PrimitiveTypeKind.UNDEFINED;
 			}
 		}else{
 			throw new RuntimeException("Unsupported multi- field access");

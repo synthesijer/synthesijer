@@ -36,7 +36,7 @@ public class TypeGen {
 		case "PACKAGE" : return PrimitiveTypeKind.PACKAGE;
 		case "TYPEVAR" : return PrimitiveTypeKind.TYPEVAR;
 		case "WILDCARD" : return PrimitiveTypeKind.WILDCARD;
-		case "UNDEFIEND" : return PrimitiveTypeKind.UNDEFIEND;
+		case "UNDEFINED" : return PrimitiveTypeKind.UNDEFINED;
 		
 		default:
 			throw new Exception("Unknown keyword: " + key);

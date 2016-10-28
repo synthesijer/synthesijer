@@ -224,7 +224,7 @@ public class StaticEvaluator {
     private Expr conv(Scope scope, Literal expr){
         Type t = expr.getType();
         Literal newE = new Literal(scope);
-        if(t == PrimitiveTypeKind.UNDEFIEND){
+        if(t == PrimitiveTypeKind.UNDEFINED){
             // nothing to do 
         }else if(t == PrimitiveTypeKind.BOOLEAN){
             newE.setValue(Boolean.parseBoolean(expr.getValueAsStr()));

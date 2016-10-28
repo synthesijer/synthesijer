@@ -181,13 +181,13 @@ public class IRReader {
 				type = new MultipleType(types);
 			}else{
 				SynthesijerUtils.warn("unknown type: " + t);
-				SynthesijerUtils.warn("This type is handled as UNKNOWN");
-				type = TypeGen.get("UNKNOWN");
+				SynthesijerUtils.warn("This type is handled as UNDEFINED");
+				type = TypeGen.get("UNDEFINED");
 			}
 		}else{
 			SynthesijerUtils.warn("unknown type: " + node.get(1));
-			SynthesijerUtils.warn("This type is handled as UNKNOWN");
-			type = TypeGen.get("UNKNOWN");
+			SynthesijerUtils.warn("This type is handled as UNDEFINED");
+			type = TypeGen.get("UNDEFINED");
 		}
 		Operand initSrc = null;
 		boolean publicFlag = false;
@@ -310,13 +310,13 @@ public class IRReader {
 				returnType = new MultipleType(types);
 			}else{
 				SynthesijerUtils.warn("unknown type: " + t);
-				SynthesijerUtils.warn("This type is handled as UNKNOWN");
-				returnType = TypeGen.get("UNKNOWN");
+				SynthesijerUtils.warn("This type is handled as UNDEFINED");
+				returnType = TypeGen.get("UNDEFINED");
 			}
 		}else{
 			SynthesijerUtils.warn("unknown type: " + sexp.get(1));
-			SynthesijerUtils.warn("This type is handled as UNKNOWN");
-			returnType = TypeGen.get("UNKNOWN");
+			SynthesijerUtils.warn("This type is handled as UNDEFINED");
+			returnType = TypeGen.get("UNDEFINED");
 		}
 		boolean privateFlag = false;
 		boolean autoFlag = false;

@@ -108,7 +108,7 @@ public enum Op {
 	 * @param latency fixed clock latency  
 	 */
 	private Op(int latency){
-		this(false, latency, PrimitiveTypeKind.UNDEFIEND);
+		this(false, latency, PrimitiveTypeKind.UNDEFINED);
 	}
 
 	/**
@@ -116,7 +116,7 @@ public enum Op {
 	 * @param flag branch instruction or not  
 	 */
 	private Op(boolean flag){
-		this(flag, 0, PrimitiveTypeKind.UNDEFIEND);
+		this(flag, 0, PrimitiveTypeKind.UNDEFINED);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public enum Op {
 	 * Default constructor: not branch, latency=0, type=UNDEFINED
 	 */
 	private Op(){
-		this(false, 0, PrimitiveTypeKind.UNDEFIEND);
+		this(false, 0, PrimitiveTypeKind.UNDEFINED);
 	}
 	
 	private static boolean isFloat(Operand operand){
@@ -286,7 +286,7 @@ public enum Op {
 	}
 	
 	public boolean isForcedType(){
-		return (type != PrimitiveTypeKind.UNDEFIEND);
+		return (type != PrimitiveTypeKind.UNDEFINED);
 	}
 
 	public Type getType(){
