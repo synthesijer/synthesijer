@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Module;
 import synthesijer.ast.Type;
+import synthesijer.ast.type.ChannelType;
 import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.TypeGen;
 
@@ -170,15 +171,17 @@ public class IRReader {
 		Type type;
 		if(node.get(1) instanceof String){
 			type = TypeGen.get(node.get(1).toString());
-		}else if(sexp.get(1) instanceof SExp){
+		}else if(node.get(1) instanceof SExp){
 			// too AD-HOC
-			SExp t = (SExp)(sexp.get(1));
-			if(t.get(0) instanceof String && t.get(0).toString().equals("MULTI")){
+			SExp t = (SExp)(node.get(1));
+			if(t.get(0) instanceof String && t.get(0).toString().equals(MultipleType.KEY)){
 				ArrayList<Type> types = new ArrayList<Type>(); 
 				for(int i = 1; i < t.size(); i++){
 					types.add(TypeGen.get(t.get(i).toString()));
 				}
 				type = new MultipleType(types);
+			}else if(t.get(0) instanceof String && t.get(0).toString().equals(ChannelType.KEY)){
+				type = new ChannelType(TypeGen.get(t.get(1).toString()));
 			}else{
 				SynthesijerUtils.warn("unknown type: " + t);
 				SynthesijerUtils.warn("This type is handled as UNDEFINED");
@@ -302,12 +305,14 @@ public class IRReader {
 		}else if(sexp.get(1) instanceof SExp){
 			// too AD-HOC
 			SExp t = (SExp)(sexp.get(1));
-			if(t.get(0) instanceof String && t.get(0).toString().equals("MULTI")){
+			if(t.get(0) instanceof String && t.get(0).toString().equals(MultipleType.KEY)){
 				ArrayList<Type> types = new ArrayList<Type>(); 
 				for(int i = 1; i < t.size(); i++){
 					types.add(TypeGen.get(t.get(i).toString()));
 				}
 				returnType = new MultipleType(types);
+			}else if(t.get(0) instanceof String && t.get(0).toString().equals(ChannelType.KEY)){
+				returnType = new ChannelType(TypeGen.get(t.get(1).toString()));
 			}else{
 				SynthesijerUtils.warn("unknown type: " + t);
 				SynthesijerUtils.warn("This type is handled as UNDEFINED");
