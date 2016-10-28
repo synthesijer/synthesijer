@@ -708,6 +708,7 @@ public class SchedulerInfoCompiler {
 			if(return_sig == null) break;
 			Operand[] src = item.getSrcOperand();
 			return_sig.setAssign(state, convOperandToHDLExpr(item, src[0]));
+			break;
 		}
 		case MULTI_RETURN : {
 			// TODO
@@ -715,6 +716,7 @@ public class SchedulerInfoCompiler {
 			HDLSignal s = returnMultiSigTable.get(board)[Integer.parseInt(src[0].getName())];
 			//return_sig.setAssign(state, convOperandToHDLExpr(item, src[1]));
 			s.setAssign(state, convOperandToHDLExpr(item, src[1]));
+			break;
 		}
 		case SELECT :{
 			break;
