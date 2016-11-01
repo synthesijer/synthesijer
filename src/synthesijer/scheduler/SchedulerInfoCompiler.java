@@ -7,15 +7,16 @@ import java.util.Hashtable;
 import java.util.Optional;
 
 import synthesijer.CompileState;
-import synthesijer.Options;
 import synthesijer.IdentifierGenerator;
 import synthesijer.Manager;
 import synthesijer.Manager.SynthesijerModuleInfo;
+import synthesijer.Options;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Type;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
+import synthesijer.ast.type.ChannelType;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
 import synthesijer.ast.type.MultipleType;
@@ -97,7 +98,35 @@ public class SchedulerInfoCompiler {
 		}
 		return info;
     }
-	
+
+    private SynthesijerModuleInfo searchChannelModuleInfo(PrimitiveTypeKind t, boolean publicFlag){
+		SynthesijerModuleInfo info = null;
+		if(publicFlag){
+			switch(t){
+			case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("FIFO1");  break;
+			case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("FIFO8");  break;
+			case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("FIFO16"); break;
+			case INT:     info = Manager.INSTANCE.searchHDLModuleInfo("FIFO32"); break;
+			case LONG:    info = Manager.INSTANCE.searchHDLModuleInfo("FIFO64"); break;
+			case FLOAT:   info = Manager.INSTANCE.searchHDLModuleInfo("FIFO32"); break;
+			case DOUBLE:  info = Manager.INSTANCE.searchHDLModuleInfo("FIFO64"); break;
+			default: throw new RuntimeException("unsupported type: " + t);
+			}
+		}else{
+			switch(t){
+			case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("FIFO1");  break;
+			case BYTE:    info = Manager.INSTANCE.searchHDLModuleInfo("FIFO8");  break;
+			case SHORT:   info = Manager.INSTANCE.searchHDLModuleInfo("FIFO16"); break;
+			case INT:     info = Manager.INSTANCE.searchHDLModuleInfo("FIFO32"); break;
+			case LONG:    info = Manager.INSTANCE.searchHDLModuleInfo("FIFO64"); break;
+			case FLOAT:   info = Manager.INSTANCE.searchHDLModuleInfo("FIFO32"); break;
+			case DOUBLE:  info = Manager.INSTANCE.searchHDLModuleInfo("FIFO64"); break;
+			default: throw new RuntimeException("unsupported type: " + t);
+			}
+		}
+		return info;
+    }
+
     private HDLInstance genArrayInstance(String name, ArrayType t, boolean publicFlag){
 		SynthesijerModuleInfo info = null;
 		Type t0 = t.getElemType();
@@ -118,6 +147,30 @@ public class SchedulerInfoCompiler {
 			throw new RuntimeException("unsupported type: " + t);
 		}
 		info = searchArrayModuleInfo((PrimitiveTypeKind)t0, publicFlag);
+		HDLInstanceRef ref = new HDLInstanceRef(hm, info.getHDLModule(), name);
+		return ref;
+    }
+
+    private HDLInstance genChannelInstance(String name, ChannelType t, boolean publicFlag){
+		SynthesijerModuleInfo info = null;
+		Type t0 = t.getElemType();
+		if(t0 instanceof PrimitiveTypeKind == false){
+			throw new RuntimeException("unsupported type: " + t);
+		}
+		info = searchChannelModuleInfo((PrimitiveTypeKind)t0, publicFlag);
+		HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
+		inst.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
+		inst.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
+		return inst;
+    }
+
+    private HDLInstanceRef genChannelInstanceRef(String name, ChannelType t, boolean publicFlag){
+		SynthesijerModuleInfo info = null;
+		Type t0 = t.getElemType();
+		if(t0 instanceof PrimitiveTypeKind == false){
+			throw new RuntimeException("unsupported type: " + t);
+		}
+		info = searchChannelModuleInfo((PrimitiveTypeKind)t0, publicFlag);
 		HDLInstanceRef ref = new HDLInstanceRef(hm, info.getHDLModule(), name);
 		return ref;
     }
@@ -259,7 +312,53 @@ public class SchedulerInfoCompiler {
 	
 		return ret;
     }
+
+    private HDLVariable genHDLVariable(VariableOperand v, ChannelType t){
+		String name = v.getName();
+		Operand initSrc = v.getInitSrc();
+		HDLVariable ret = null;
+		if(initSrc != null && initSrc instanceof ArrayRefOperand){
+			HDLInstance array = genChannelInstance(name, t, v.isPublic());
+			ArrayRefOperand o = (ArrayRefOperand)initSrc;
+			array.getParameterPair("WORDS").setValue(new HDLValue(o.words));
+			int depth = o.depth;
+			array.getParameterPair("DEPTH").setValue(new HDLValue(depth));
+	    
+			if(v.isPublic() && (!v.isGlobalConstant())){
+				String n = v.getOrigName();
+				HDLPort addr = hm.newPort(n + "_address", HDLPort.DIR.IN, array.getSignalForPort("address").getType());
+				HDLPort we = hm.newPort(n + "_we", HDLPort.DIR.IN, array.getSignalForPort("we").getType());
+				HDLPort oe = hm.newPort(n + "_oe", HDLPort.DIR.IN, array.getSignalForPort("oe").getType());
+				HDLPort din = hm.newPort(n + "_din", HDLPort.DIR.IN, array.getSignalForPort("din").getType());
+				HDLPort dout = hm.newPort(n + "_dout", HDLPort.DIR.OUT, array.getSignalForPort("dout").getType());
+				HDLPort length = hm.newPort(n + "_length", HDLPort.DIR.OUT, array.getSignalForPort("length").getType());
+				array.getSignalForPort("address").setAssign(null, addr.getSignal());
+				array.getSignalForPort("we").setAssign(null, we.getSignal());
+				array.getSignalForPort("oe").setAssign(null, oe.getSignal());
+				array.getSignalForPort("din").setAssign(null, din.getSignal());
+				dout.getSignal().setAssign(null, array.getSignalForPort("dout"));				
+				length.getSignal().setAssign(null, array.getSignalForPort("length"));				
+				//System.out.println("len:" + length.getName());
+			}
+			ret = array;
+		}else if(v.isMethodParam()){
+			String prefix = v.getMethodName();
+			String n = prefix + "_" + v.getOrigName();
+			HDLType ht = getHDLType(t.getElemType());
+			HDLInstanceRef ref = genChannelInstanceRef(n, t, v.isPublic());
+			ret = ref;
+		}else{
+			if(initSrc != null){
+				//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + initSrc.info());
+			}else{
+				SynthesijerUtils.warn("unsupported to array initializing expression: " + v.toSexp());
+			}
+			SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
+		}
 	
+		return ret;
+    }
+
     private HDLVariable genHDLVariable(VariableOperand v, ComponentType t){
 		String name = v.getName();
 		//NewClassExpr expr = (NewClassExpr)v.getInitExpr();
@@ -379,6 +478,8 @@ public class SchedulerInfoCompiler {
 			String name = v.getName();
 			HDLSignal sig = hm.newSignal(name, HDLPrimitiveType.genVectorType(((BitVector) type).getWidth()));
 			return sig;
+		}else if(type instanceof ChannelType){
+			return genHDLVariable(v, (ChannelType)type);
 		}else{
 			String name = v.getName();
 			throw new RuntimeException("unsupported type: " + type + " of " + name);
@@ -396,6 +497,8 @@ public class SchedulerInfoCompiler {
 			return getHDLType((MySelfType)type);
 		}else if(type instanceof MultipleType){
 			return getHDLType((MultipleType)type);
+		}else if(type instanceof ChannelType){
+			return getHDLType((ChannelType)type);
 		}else{
 			return null;
 		}
@@ -433,6 +536,11 @@ public class SchedulerInfoCompiler {
 
     private HDLType getHDLType(MultipleType t){
     	return getHDLType(t.get(0));
+    }
+
+    private HDLPrimitiveType getHDLType(ChannelType t){
+		System.err.println("unsupported type: " + t);
+		return null;
     }
 
     private Hashtable<SchedulerItem, HDLExpr> predExprMap;
@@ -575,6 +683,7 @@ public class SchedulerInfoCompiler {
 		case ARRAY_ACCESS_WAIT : break;
 		case ARRAY_ACCESS0 : break;
 		case ARRAY_INDEX : break;
+		case FIFO_WRITE : break;
 		case CALL : break;
 		case EXT_CALL : break;
 		case FIELD_ACCESS : break;
@@ -691,6 +800,17 @@ public class SchedulerInfoCompiler {
 					addr.setAssign(state, convOperandToHDLExpr(item, d.getPtr()));
 				}
 				predExprMap.put(item, expr);
+			}else if(dest.getType() instanceof ChannelType){
+
+				HDLInstanceRef chan = (HDLInstanceRef)convOperandToHDLExpr(item, dest);
+				HDLSignal we = hm.getPort(chan.getName() + "_" + "we").getSignal();
+				HDLSignal din = hm.getPort(chan.getName() + "_" + "din").getSignal();
+				HDLExpr srcExpr = (HDLExpr)convOperandToHDLExpr(item, src[0]);
+				we.setAssign(state, HDLPreDefinedConstant.HIGH);
+				we.setDefaultValue(HDLPreDefinedConstant.LOW);
+				din.setAssign(state, srcExpr);
+				
+				//System.out.println("dout,we <= " + srcExpr.getVHDL() + ",HIGH");
 			}else{
 				SynthesijerUtils.warn("Unsupported ASSIGN: " + item.info());
 			}
@@ -802,6 +922,9 @@ public class SchedulerInfoCompiler {
 
 			addr.setAssign(state, index);
 	    
+			break;
+		}
+		case FIFO_WRITE :{
 			break;
 		}
 		case CALL :{
@@ -1107,7 +1230,7 @@ public class SchedulerInfoCompiler {
 		we_b_or.setAssign(null, hm.newExpr(HDLOp.OR, hm.newExpr(HDLOp.AND, flag, dest_we_b), src_we_b));
 		src.replacePortPair(src_we_b, we_b_or);
 
-		// oe (src.oe_b <- dest.oe_b or else src.oe_b)
+		// oe (src.)oe_b <- dest.oe_b or else src.oe_b)
 		HDLSignal dest_oe_b = dest.getSignalForPort(key + "_oe_b");
 		HDLSignal src_oe_b = src.getSignalForPort("oe_b");
 		HDLSignal oe_b_or = hm.newTmpSignal(src_oe_b.getType(), HDLSignal.ResourceKind.WIRE);

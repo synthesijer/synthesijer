@@ -472,6 +472,7 @@ public class IRReader {
 			item = new SelectItem(board, target, pat);
 		}
 		break;
+		case "FIFO_WRITE":
 		case "SET":{
 			// with destination
 			Operand dest = search(info, board, node.get(1).toString());
@@ -510,6 +511,7 @@ public class IRReader {
 			}
 			break;
 			default:{
+				//System.out.println(dest.toSexp());
 				item = new SchedulerItem(board, op, src, (VariableOperand)dest);
 			}
 			}

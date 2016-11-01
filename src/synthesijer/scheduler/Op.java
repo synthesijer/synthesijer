@@ -52,6 +52,7 @@ public enum Op {
 	ARRAY_ACCESS_WAIT,
 	ARRAY_ACCESS0,
 	ARRAY_INDEX,
+	FIFO_WRITE,
 	CALL(true),
 	EXT_CALL(true),
 	FIELD_ACCESS,
@@ -373,6 +374,7 @@ public enum Op {
 		case "FGEQ64" : return FGEQ64;
 		case "FCOMPEQ64" : return FCOMPEQ64;
 		case "FNEQ64" : return FNEQ64;
+		case "FIFO_WRITE" : return FIFO_WRITE;
 		case "UNDEFINED" : return UNDEFINED;
 		default:
 			throw new Exception("Undefined operation : " + k);
