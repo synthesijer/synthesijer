@@ -1,9 +1,9 @@
 SYNTHESIJER ?= ../../bin
 
-SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java Test017.java Test018.java Test020.java Test021.java Test021_test.java Test022.java Test022_test.java Test_ArithInt.java
+SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java Test017.java Test018.java Test020.java Test021.java Test021_test.java Test022.java Test022_test.java Test_ArithInt.java Test023.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
-SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test004.VHD sim_Test005.VHD sim_Test006.VHD sim_Test007.VHD sim_Test017.VHD sim_Test018.VHD sim_Test020.VHD sim_Test_ArithInt.VHD sim_Test021.VHD sim_Test022.VHD
+SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test004.VHD sim_Test005.VHD sim_Test006.VHD sim_Test007.VHD sim_Test017.VHD sim_Test018.VHD sim_Test020.VHD sim_Test_ArithInt.VHD sim_Test021.VHD sim_Test022.VHD sim_Test023.VHD
 
 IVERILOG_OPT = -DDUMP_ENABLE
 
@@ -51,6 +51,7 @@ ghdl: $(VHDL_SOURCES)
 	ghdl -e sim_test021
 	ghdl -e sim_test022
 	ghdl -e sim_test_arithint
+	ghdl -e sim_test023
 
 test_java: $(VHDL_SOURCES)
 	java -cp $(SYNTHESIJER):. Test000
@@ -66,6 +67,7 @@ test_java: $(VHDL_SOURCES)
 	java -cp $(SYNTHESIJER):. Test020
 	java -cp $(SYNTHESIJER):. Test021_test
 	java -cp $(SYNTHESIJER):. Test022_test
+	java -cp $(SYNTHESIJER):. Test023
 
 test_vhdl: ghdl
 	./sim_test001
@@ -80,6 +82,7 @@ test_vhdl: ghdl
 	./sim_test020
 	./sim_test021
 	./sim_test022
+	./sim_test023
 	./sim_test_arithint
 
 iverilog: $(VERILOG_SOURCES)
@@ -96,6 +99,7 @@ iverilog: $(VERILOG_SOURCES)
 	iverilog $(IVERILOG_OPT) -o sim_verilog_Test021 sim_Test021.v Test021.v Test021_test.v ../../lib/verilog/singleportram.v ../../lib/verilog/dualportram.v ../../lib/verilog/synthesijer_mul32.v
 	iverilog $(IVERILOG_OPT) -o sim_verilog_Test022 sim_Test022.v Test022.v Test022_test.v ../../lib/verilog/singleportram.v ../../lib/verilog/dualportram.v ../../lib/verilog/synthesijer_mul32.v
 	iverilog $(IVERILOG_OPT) -o sim_verilog_Test_ArithInt sim_Test_ArithInt.v Test_ArithInt.v ../../lib/verilog/synthesijer_mul32.v ../../lib/verilog/synthesijer_mul64.v ../../lib/verilog/synthesijer_div.v ../../lib/verilog/synthesijer_div32.v ../../lib/verilog/synthesijer_div64.v
+	iverilog $(IVERILOG_OPT) -o sim_verilog_Test023 sim_Test023.v Test023.v
 
 test_verilog: iverilog
 	./sim_verilog_Test001
@@ -111,6 +115,7 @@ test_verilog: iverilog
 	./sim_verilog_Test021
 	./sim_verilog_Test022
 	./sim_verilog_Test_ArithInt
+	./sim_verilog_Test023
 
 test: test_java test_vhdl test_verilog
 
