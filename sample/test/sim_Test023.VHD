@@ -26,6 +26,9 @@ architecture RTL of sim_Test023 is
     port (
       clk : in std_logic;
       reset : in std_logic;
+      test_c1 : in signed(32-1 downto 0);
+      test_c2 : in signed(32-1 downto 0);
+      test_c3 : in signed(32-1 downto 0);
       test_return : out std_logic;
       test_busy : out std_logic;
       test_req : in std_logic
@@ -90,6 +93,9 @@ begin
     port map(
       clk => clk,
       reset => reset,
+      test_c1 => X"00000001",
+      test_c2 => X"00000002",
+      test_c3 => X"fffffffe",
       test_return => test_return,
       test_busy => run_busy,
       test_req => run_req

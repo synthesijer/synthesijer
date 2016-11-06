@@ -13,6 +13,9 @@ module sim_Test023;
    Test023 u(
 	     .clk(clk),
 	     .reset(reset),
+	     .test_c1(32'h00000001),
+	     .test_c2(32'h00000002),
+	     .test_c3(32'hfffffffe),
 	     .test_return(test_return),
 	     .test_busy(run_busy),
 	     .test_req(run_req)
