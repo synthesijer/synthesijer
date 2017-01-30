@@ -46,8 +46,10 @@ architecture rtl of rs232c_rx is
 
 begin
   --クロック分周モジュールのインスタンス生成
-  --受信側は送信側の16倍の速度で値を取り込み処理を行う
-  rx_div <= conv_std_logic_vector(((sys_clk / rate) / 16) - 1, 16);
+  ----受信側は送信側の16倍の速度で値を取り込み処理を行う
+  --rx_div <= conv_std_logic_vector(((sys_clk / rate) / 16) - 1, 16);
+  --受信側は送信側の4倍の速度で値を取り込み処理を行う
+  rx_div <= conv_std_logic_vector(((sys_clk / rate) / 4) - 1, 16);
   U0: clk_div port map (clk, reset, rx_div, rx_en);
 
   process(clk)
@@ -75,16 +77,17 @@ begin
           end if;
         else                          --受信中の場合
           case cbit is                --カウンタに合わせてデータをラッチ
-            when 6 =>                 --start
+            --when 6 =>                 --start
+            when 2 =>                 --start
               if(din_dd = '1') then
                 start <= '0';
               else
                 cbit <= cbit + 1;
               end if;
-            when 22 | 38 | 54 | 70 | 86 | 102 | 118 | 134 =>  --data
+            when 6 | 10 | 14 | 18 | 22 | 26 | 30 | 34 =>  --data
               cbit <= cbit + 1;
               buf  <= din_dd & buf(7 downto 1);  -- シリアル入力と既に受信したデータを連結
-            when 150 =>               --stop
+            when 38 =>               --stop
               cbit  <= 0;
               dout  <= buf;
               start <= '0';
