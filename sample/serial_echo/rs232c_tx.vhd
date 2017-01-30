@@ -60,7 +60,7 @@ begin
     if rising_edge(clk) then
       if(reset = '1') then --リセット時の動作, 初期値の設定
         load <= '0';
-      elsif(clk'event and clk='1') then --クロックの立ち上がり時の動作
+      else
         if(wr = '1' and run = '0') then --送信要求があり，かつ送信中でない場合
           load   <= '1'; --データを取り込んだことを示すフラグを立てる
           in_din <= din; --一時保存用レジスタに値を格納
