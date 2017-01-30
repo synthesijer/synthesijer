@@ -38,6 +38,7 @@ public enum Op {
 	JP(true),
 	JT(true),
 	RETURN(true),
+	MULTI_RETURN(true),
 	SELECT(true), // switch selector
 	AND,
 	NOT,
@@ -51,6 +52,7 @@ public enum Op {
 	ARRAY_ACCESS_WAIT,
 	ARRAY_ACCESS0,
 	ARRAY_INDEX,
+	FIFO_WRITE,
 	CALL(true),
 	EXT_CALL(true),
 	FIELD_ACCESS,
@@ -107,7 +109,7 @@ public enum Op {
 	 * @param latency fixed clock latency  
 	 */
 	private Op(int latency){
-		this(false, latency, PrimitiveTypeKind.UNDEFIEND);
+		this(false, latency, PrimitiveTypeKind.UNDEFINED);
 	}
 
 	/**
@@ -115,7 +117,7 @@ public enum Op {
 	 * @param flag branch instruction or not  
 	 */
 	private Op(boolean flag){
-		this(flag, 0, PrimitiveTypeKind.UNDEFIEND);
+		this(flag, 0, PrimitiveTypeKind.UNDEFINED);
 	}
 
 	/**
@@ -130,7 +132,7 @@ public enum Op {
 	 * Default constructor: not branch, latency=0, type=UNDEFINED
 	 */
 	private Op(){
-		this(false, 0, PrimitiveTypeKind.UNDEFIEND);
+		this(false, 0, PrimitiveTypeKind.UNDEFINED);
 	}
 	
 	private static boolean isFloat(Operand operand){
@@ -285,7 +287,7 @@ public enum Op {
 	}
 	
 	public boolean isForcedType(){
-		return (type != PrimitiveTypeKind.UNDEFIEND);
+		return (type != PrimitiveTypeKind.UNDEFINED);
 	}
 
 	public Type getType(){
@@ -327,6 +329,7 @@ public enum Op {
 		case "JP" : return JP;
 		case "JT" : return JT;
 		case "RETURN" : return RETURN;
+		case "MULTI_RETURN" : return MULTI_RETURN;
 		case "SELECT" : return SELECT;
 		case "AND" : return AND;
 		case "NOT" : return NOT;
@@ -371,6 +374,7 @@ public enum Op {
 		case "FGEQ64" : return FGEQ64;
 		case "FCOMPEQ64" : return FCOMPEQ64;
 		case "FNEQ64" : return FNEQ64;
+		case "FIFO_WRITE" : return FIFO_WRITE;
 		case "UNDEFINED" : return UNDEFINED;
 		default:
 			throw new Exception("Undefined operation : " + k);

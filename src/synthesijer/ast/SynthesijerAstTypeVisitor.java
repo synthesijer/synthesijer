@@ -2,8 +2,10 @@ package synthesijer.ast;
 
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
+import synthesijer.ast.type.ChannelType;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
+import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
@@ -20,5 +22,9 @@ public interface SynthesijerAstTypeVisitor {
 	public void visitMySelfType(MySelfType o);
 
 	public void visitPrimitiveTypeKind(PrimitiveTypeKind o);
+
+	public void visitMultipleType(MultipleType o);
+	
+	public void visitChannelType(ChannelType o);
 
 }

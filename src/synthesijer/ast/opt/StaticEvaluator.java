@@ -65,6 +65,7 @@ public class StaticEvaluator {
         if(newInitExpr != null){
             identTable.put(v.getVariable().getName(), newInitExpr);
         }
+        //System.out.println(identTable);
         return newV;
     }
     
@@ -224,7 +225,7 @@ public class StaticEvaluator {
     private Expr conv(Scope scope, Literal expr){
         Type t = expr.getType();
         Literal newE = new Literal(scope);
-        if(t == PrimitiveTypeKind.UNDEFIEND){
+        if(t == PrimitiveTypeKind.UNDEFINED){
             // nothing to do 
         }else if(t == PrimitiveTypeKind.BOOLEAN){
             newE.setValue(Boolean.parseBoolean(expr.getValueAsStr()));
@@ -282,9 +283,12 @@ public class StaticEvaluator {
     }
     
     private Expr conv(Scope scope, ParenExpr expr){
-        Expr e = expr.getExpr();
+        Expr e = conv(scope, expr.getExpr());
         if(e instanceof Literal){
             return e;
+        }else if(isConstant(e)){
+            Expr newE = conv(scope, e);
+            return newE;
         }else{
             ParenExpr newE = new ParenExpr(scope);
             newE.setExpr(e);
@@ -307,6 +311,7 @@ public class StaticEvaluator {
     }
     
     private Expr conv(Scope scope, UnaryExpr expr){
+        //System.out.println(identTable);
         Expr arg = conv(scope, expr.getArg());
         if(isConstant(arg)){
             Literal l = getLiteral(arg);
@@ -323,11 +328,14 @@ public class StaticEvaluator {
             }catch(Exception e){
                 System.out.println("eval failuer:" + expr);
             }
+        }else{
+            //System.out.println(expr);
         }
         UnaryExpr newE = new UnaryExpr(scope);
         newE.setArg(arg);
         newE.setOp(expr.getOp());
         newE.setPostfix(expr.isPostfix());
+        //System.out.println(newE);
         return newE;
     }
     

@@ -39,8 +39,10 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
+import synthesijer.ast.type.ChannelType;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
+import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
@@ -422,5 +424,21 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 	public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
 		dest.printf("<type kind=\"primitive\" name=\"%s\"/>\n", o.toString());
 	}
+
+    @Override
+	public void visitMultipleType(MultipleType o){
+		dest.printf("<type kind=\"multiple\">\n");
+		for(int i = 0; i < o.size(); i++){
+			o.get(i).accept(this);
+		}
+		dest.printf("</type>\n");
+    }
+
+    @Override
+	public void visitChannelType(ChannelType o){
+		dest.printf("<type kind=\"channel\">\n");
+		o.getElemType().accept(this);
+		dest.printf("</type>\n");
+    }
 
 }

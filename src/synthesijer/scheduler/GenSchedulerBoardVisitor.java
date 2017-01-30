@@ -47,8 +47,10 @@ import synthesijer.ast.statement.WhileStatement;
 import synthesijer.ast.type.ArrayRef;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.BitVector;
+import synthesijer.ast.type.ChannelType;
 import synthesijer.ast.type.ComponentRef;
 import synthesijer.ast.type.ComponentType;
+import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.MySelfType;
 import synthesijer.ast.type.PrimitiveTypeKind;
 import synthesijer.hdl.HDLPrimitiveType;
@@ -311,7 +313,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 
     @Override
     public void visitReturnStatement(ReturnStatement o) {
-		SchedulerItem ret;
+    	SchedulerItem ret;
 		if (o.getExpr() != null){
 			Operand v = stepIn(o.getExpr());
 			ret = addSchedulerItem(new SchedulerItem(board, Op.RETURN, new Operand[]{v}, null));
@@ -821,7 +823,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
     @Override
     public void visitFieldAccess(FieldAccess o) {
 		VariableOperand tmp;
-		Type type = PrimitiveTypeKind.UNDEFIEND;
+		Type type = PrimitiveTypeKind.UNDEFINED;
 		//		System.out.println("visitFieldAccess:Type: " + o.getType());
 		if(o.getType() instanceof ArrayType && o.getIdent().getSymbol().equals("length")){
 			type = PrimitiveTypeKind.INT;
@@ -1120,6 +1122,16 @@ class GenSchedulerBoardTypeVisitor implements SynthesijerAstTypeVisitor {
     @Override
     public void visitPrimitiveTypeKind(PrimitiveTypeKind o) {
 		this.type = o;
+    }
+
+    @Override
+	public void visitMultipleType(MultipleType o){
+		this.type = o;
+    }
+
+    @Override
+    public void visitChannelType(ChannelType o) {
+    	o.getElemType().accept(this);
     }
 
 }

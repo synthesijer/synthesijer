@@ -24,7 +24,7 @@ public class TypeBuilder {
 			type = new ArrayType(genType(t.elemtype));
 		}else{
 			SynthesijerUtils.error(String.format("Unknown type: %s (%s)\n", that, that.getClass()));
-			type = PrimitiveTypeKind.UNDEFIEND;
+			type = PrimitiveTypeKind.UNDEFINED;
 		}
 		return type;
 	}
@@ -52,7 +52,7 @@ public class TypeBuilder {
 		case PACKAGE:    knd = PrimitiveTypeKind.PACKAGE;    flag = false; break;
 		case TYPEVAR:    knd = PrimitiveTypeKind.TYPEVAR;    flag = false; break;
 		case WILDCARD:   knd = PrimitiveTypeKind.WILDCARD;   flag = false; break;
-		default: knd = PrimitiveTypeKind.UNDEFIEND; flag = false;
+		default: knd = PrimitiveTypeKind.UNDEFINED; flag = false;
 		}
 		if(!flag) System.err.println("unsupported type: " + k);
 		return knd;

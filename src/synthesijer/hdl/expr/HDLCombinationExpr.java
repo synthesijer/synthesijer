@@ -295,7 +295,8 @@ public class HDLCombinationExpr implements HDLExpr {
                     lsb = 0;
 
                 if (shift >= ta.getWidth()) {
-                    str = String.format("(%d-1 downto 0 => %s)", t0.getWidth(), padding);
+                    //str = String.format("(%d-1 downto 0 => %s)", t0.getWidth(), padding);
+                    str = args[0].getResultExpr().getVHDL(); // as is
                 } else if (shift >= 1 && shift < ta.getWidth()) {
                     str = String.format("(%d-1 downto %d => %s) & %s(%d downto %d)", t0.getWidth(), (msb - lsb + 1), // shift,
                             padding, args[0].getResultExpr().getVHDL(), msb, lsb);
@@ -325,7 +326,9 @@ public class HDLCombinationExpr implements HDLExpr {
                     msb = ta.getWidth() - 1;
                 String str = "";
 
-                if (shift >= 1) {
+                if (shift >= ta.getWidth()) {
+                    str = args[0].getResultExpr().getVHDL(); // as is
+                }else if (shift >= 1) {
                     str += String.format("%s(%d downto %d) & (%d-1 downto %d => '0')",
                             args[0].getResultExpr().getVHDL(), msb, 0, shift, 0);
                 } else {
@@ -438,17 +441,20 @@ public class HDLCombinationExpr implements HDLExpr {
                     lsb = 0;
                 String key = args[0].getResultExpr().getVerilogHDL();
                 if (shift >= ta.getWidth()) {
+                    str = args[0].getResultExpr().getVerilogHDL(); // as is
+                    /*
                     if (arith_shift_mode) {
                         str = String.format("{%s}", getPaddingBitInVerilog(key, ta.getWidth() - 1, t0.getWidth()));
                     } else {
                         str = String.format("%d'b0", t0.getWidth());
                     }
+                    */
                 } else if (shift >= 1 && shift < ta.getWidth()) {
                     String pad;
                     String val = String.format("%s[%d:%d]", key, msb, lsb);
 
                     if (arith_shift_mode) {
-                        pad = getPaddingBitInVerilog(key, ta.getWidth() - 1, t0.getWidth() - (msb - lsb));
+                        pad = getPaddingBitInVerilog(key, ta.getWidth() - 1, t0.getWidth() - (msb - lsb + 1));
                     } else {
                         pad = String.format("%d'b0", t0.getWidth() - (msb - lsb + 1));
                     }
@@ -461,7 +467,7 @@ public class HDLCombinationExpr implements HDLExpr {
                     } else {
                         String pad;
                         if (arith_shift_mode) {
-                            pad = getPaddingBitInVerilog(key, ta.getWidth() - 1, t0.getWidth() - (msb - lsb));
+                            pad = getPaddingBitInVerilog(key, ta.getWidth() - 1, t0.getWidth() - (msb - lsb + 1));
                         } else {
                             pad = String.format("%d'b0", t0.getWidth() - (msb - lsb));
                         }
@@ -492,7 +498,9 @@ public class HDLCombinationExpr implements HDLExpr {
                 if (msb > ta.getWidth() - 1)
                     msb = ta.getWidth() - 1;
                 String str = "";
-                if (shift >= 1) {
+                if (shift >= ta.getWidth()) {
+                    str = args[0].getResultExpr().getVerilogHDL(); // as is
+                }else if (shift >= 1) {
                     str = String.format("%s[%d:%d],%d'b0", args[0].getResultExpr().getVerilogHDL(),
                             t0.getWidth() - shift - 1, 0, shift);
                 } else {

@@ -6,6 +6,8 @@ import java.util.Hashtable;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Module;
 import synthesijer.ast.Type;
+import synthesijer.ast.type.ChannelType;
+import synthesijer.ast.type.MultipleType;
 import synthesijer.ast.type.TypeGen;
 
 public class IRReader {
@@ -131,6 +133,9 @@ public class IRReader {
 				case "INSTANCE-REF":
 					table.add(genInstanceRefOperand(child));
 					break;
+				case "VAR-REF":
+					table.add(genVarRefOperand(child, table));
+					break;
 				default:
 					throw new IRReaderException("Illegal format: expected VAR or CONSTANT, but " + o);
 				}
@@ -163,7 +168,30 @@ public class IRReader {
 	private VariableOperand genVariableOperand(SExp node, SchedulerInfo info, ArrayList<Operand> table, ArrayList<ChainingInfo> chainingVars) throws Exception{
 	
 		String name = node.get(2).toString();
-		Type type = TypeGen.get(node.get(1).toString());
+		Type type;
+		if(node.get(1) instanceof String){
+			type = TypeGen.get(node.get(1).toString());
+		}else if(node.get(1) instanceof SExp){
+			// too AD-HOC
+			SExp t = (SExp)(node.get(1));
+			if(t.get(0) instanceof String && t.get(0).toString().equals(MultipleType.KEY)){
+				ArrayList<Type> types = new ArrayList<Type>(); 
+				for(int i = 1; i < t.size(); i++){
+					types.add(TypeGen.get(t.get(i).toString()));
+				}
+				type = new MultipleType(types);
+			}else if(t.get(0) instanceof String && t.get(0).toString().equals(ChannelType.KEY)){
+				type = new ChannelType(TypeGen.get(t.get(1).toString()));
+			}else{
+				SynthesijerUtils.warn("unknown type: " + t);
+				SynthesijerUtils.warn("This type is handled as UNDEFINED");
+				type = TypeGen.get("UNDEFINED");
+			}
+		}else{
+			SynthesijerUtils.warn("unknown type: " + node.get(1));
+			SynthesijerUtils.warn("This type is handled as UNDEFINED");
+			type = TypeGen.get("UNDEFINED");
+		}
 		Operand initSrc = null;
 		boolean publicFlag = false;
 		boolean globalConstantFlag = false;
@@ -183,7 +211,7 @@ public class IRReader {
 			switch(k){
 			case ":public": publicFlag = Boolean.parseBoolean(v.toString()); break;
 			case ":global_constant": globalConstantFlag = Boolean.parseBoolean(v.toString()); break;
-			case ":method_param": methodParamFlag = Boolean.parseBoolean(v.toString()); break;
+			case ":method_param":methodParamFlag = Boolean.parseBoolean(v.toString()); break;
 			case ":original": origName = v.toString(); break;
 			case ":method": methodName = v.toString(); break;
 			case ":private_method": privateMethodFlag = Boolean.parseBoolean(v.toString()); break;
@@ -248,9 +276,53 @@ public class IRReader {
 		return o;
 	}
 
+	private VariableRefOperand genVarRefOperand(SExp node, ArrayList<Operand> table) throws Exception{
+		String name = node.get(2).toString();
+		Type type = TypeGen.get(node.get(1).toString());
+		VariableOperand ref = null;
+		Operand ptr = null;
+		boolean memberFlag = false;
+		for(int i = 3; i < node.size(); i = i + 2){
+			String k = node.get(i).toString();
+			Object v = node.get(i+1);
+			switch(k){
+			case ":ref": ref = (VariableOperand)(search(table, v.toString())); break;
+			case ":ptr": ptr = search(table, v.toString()); break;
+			case ":member": memberFlag = Boolean.parseBoolean(v.toString()); break;
+			default:
+				SynthesijerUtils.warn("skip option:" + k);
+			}
+		}
+		VariableRefOperand o = new VariableRefOperand(name, type, ref, ptr, memberFlag);
+		return o;
+	}
+	
 	private void parseBoard(SExp sexp, SchedulerInfo info, ArrayList<ChainingInfo> chainingVars) throws Exception{
 		String name = sexp.get(2).toString();
-		Type returnType = TypeGen.get(sexp.get(1).toString());
+		Type returnType;
+		if(sexp.get(1) instanceof String){
+			returnType = TypeGen.get(sexp.get(1).toString());
+		}else if(sexp.get(1) instanceof SExp){
+			// too AD-HOC
+			SExp t = (SExp)(sexp.get(1));
+			if(t.get(0) instanceof String && t.get(0).toString().equals(MultipleType.KEY)){
+				ArrayList<Type> types = new ArrayList<Type>(); 
+				for(int i = 1; i < t.size(); i++){
+					types.add(TypeGen.get(t.get(i).toString()));
+				}
+				returnType = new MultipleType(types);
+			}else if(t.get(0) instanceof String && t.get(0).toString().equals(ChannelType.KEY)){
+				returnType = new ChannelType(TypeGen.get(t.get(1).toString()));
+			}else{
+				SynthesijerUtils.warn("unknown type: " + t);
+				SynthesijerUtils.warn("This type is handled as UNDEFINED");
+				returnType = TypeGen.get("UNDEFINED");
+			}
+		}else{
+			SynthesijerUtils.warn("unknown type: " + sexp.get(1));
+			SynthesijerUtils.warn("This type is handled as UNDEFINED");
+			returnType = TypeGen.get("UNDEFINED");
+		}
 		boolean privateFlag = false;
 		boolean autoFlag = false;
 		boolean callStackFlag = false;
@@ -400,6 +472,7 @@ public class IRReader {
 			item = new SelectItem(board, target, pat);
 		}
 		break;
+		case "FIFO_WRITE":
 		case "SET":{
 			// with destination
 			Operand dest = search(info, board, node.get(1).toString());
@@ -438,6 +511,7 @@ public class IRReader {
 			}
 			break;
 			default:{
+				//System.out.println(dest.toSexp());
 				item = new SchedulerItem(board, op, src, (VariableOperand)dest);
 			}
 			}

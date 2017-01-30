@@ -12,7 +12,7 @@ public class TypeGen {
 		if(key.startsWith(ARRAY_TYPE)){
 			return new ArrayType(get(key.substring(ARRAY_TYPE.length())));
 		}else if(key.startsWith(ARRAY_REF_TYPE)){
-			return new ArrayType((ArrayType)(get(key.substring(ARRAY_REF_TYPE.length()))));
+			return new ArrayRef((ArrayType)(get(key.substring(ARRAY_REF_TYPE.length()))));
 		}else if(key.startsWith(COMPONENT_TYPE)){
 			return new ComponentType(key.substring(COMPONENT_TYPE.length()));
 		}
@@ -36,7 +36,7 @@ public class TypeGen {
 		case "PACKAGE" : return PrimitiveTypeKind.PACKAGE;
 		case "TYPEVAR" : return PrimitiveTypeKind.TYPEVAR;
 		case "WILDCARD" : return PrimitiveTypeKind.WILDCARD;
-		case "UNDEFIEND" : return PrimitiveTypeKind.UNDEFIEND;
+		case "UNDEFINED" : return PrimitiveTypeKind.UNDEFINED;
 		
 		default:
 			throw new Exception("Unknown keyword: " + key);

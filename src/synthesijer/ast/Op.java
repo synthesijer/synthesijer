@@ -32,6 +32,7 @@ public enum Op{
     INC("++", HDLOp.ADD),
     DEC("--", HDLOp.SUB),
     RETURN("return", HDLOp.UNDEFINED),
+    MULTI_RETURN("multi_return", HDLOp.UNDEFINED),
     CALL("call", HDLOp.UNDEFINED),
     JC("jc", HDLOp.UNDEFINED),
     JEQ("jeq", HDLOp.UNDEFINED),
