@@ -28,7 +28,7 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		GetOpt opt = new GetOpt("h",
-				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl",
+				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb",
 				args);
 		if (opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0) {
 			printHelp();
@@ -99,6 +99,7 @@ public class Main {
 		// Options.INSTANCE.chaining = !opt.flag("no-chaining");
 		Options.INSTANCE.chaining = opt.flag("chaining");
 		Options.INSTANCE.bb2 = opt.flag("bb2");
+		Options.INSTANCE.bb = opt.flag("bb");
 		Options.INSTANCE.legacy_instance_variable_name = opt.flag("legacy-instance-variable-name");
 		Options.INSTANCE.operation_strength_reduction = opt.flag("operation_strength_reduction");
 		Options.INSTANCE.iroha = opt.flag("iroha");
@@ -132,7 +133,7 @@ public class Main {
 
 		for (String f : irSrc) {
 			System.out.println(f);
-			Manager.INSTANCE.loadIR(f);
+			Manager.INSTANCE.loadIR(f, Options.INSTANCE);
 		}
 		Manager.INSTANCE.generate();
 

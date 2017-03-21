@@ -401,11 +401,19 @@ public enum Manager {
 		dest.printf("</modules>\n");
 	}
 	
-	public void loadIR(String path){
+	public void loadIR(String path, Options opt){
 		IRReader reader = new IRReader(path);
 		String name = reader.result.getName();
 		SynthesijerModuleInfo info = new SynthesijerModuleInfo(null, null, true);
 		info.setSchedulerInfo(reader.result);
+		if(opt.bb2){
+			optimize(new BasicParallelizer2(), info);
+		}else if(opt.bb){
+			optimize(new BasicParallelizer(), info);
+		}
+		if(opt.chaining){
+			optimize(new SimpleChaining(), info);
+		}
 		optimize(new ReduceRedundantJump(), info);
 		optimize(new RemoveUnreachableSlot(), info);
 		modules.put(name, info);

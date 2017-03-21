@@ -9,6 +9,8 @@ public enum Options {
     public boolean chaining;
     
     public boolean bb2;
+	
+    public boolean bb;
     
     public boolean operation_strength_reduction;
     
