@@ -16,6 +16,7 @@ clean:
 	-rm -f $(VERILOG_SOURCES)
 	-rm -f *.xml
 	-rm -f *.dot
+	-rm -f *.ir
 	-rm -f *.o
 	-rm -f *.vcd
 	-rm -f work-obj93.cf
