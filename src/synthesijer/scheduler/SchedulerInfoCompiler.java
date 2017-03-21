@@ -152,12 +152,14 @@ public class SchedulerInfoCompiler {
     }
 
     private HDLInstance genChannelInstance(String name, ChannelType t, boolean publicFlag){
+        //System.out.println("genChannelInstance");
 		SynthesijerModuleInfo info = null;
 		Type t0 = t.getElemType();
 		if(t0 instanceof PrimitiveTypeKind == false){
 			throw new RuntimeException("unsupported type: " + t);
 		}
 		info = searchChannelModuleInfo((PrimitiveTypeKind)t0, publicFlag);
+		//System.out.println(info.getHDLModule().getName());
 		HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), name);
 		inst.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
 		inst.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());
@@ -317,12 +319,13 @@ public class SchedulerInfoCompiler {
 		String name = v.getName();
 		Operand initSrc = v.getInitSrc();
 		HDLVariable ret = null;
-		if(initSrc != null && initSrc instanceof ArrayRefOperand){
+//        if(initSrc != null && initSrc instanceof ArrayRefOperand){
+		if(v.isMethodParam() == false){
 			HDLInstance array = genChannelInstance(name, t, v.isPublic());
-			ArrayRefOperand o = (ArrayRefOperand)initSrc;
-			array.getParameterPair("WORDS").setValue(new HDLValue(o.words));
-			int depth = o.depth;
-			array.getParameterPair("DEPTH").setValue(new HDLValue(depth));
+			//ArrayRefOperand o = (ArrayRefOperand)initSrc;
+			//array.getParameterPair("WORDS").setValue(new HDLValue(o.words));
+			//int depth = o.depth;
+			//array.getParameterPair("DEPTH").setValue(new HDLValue(depth));
 	    
 			if(v.isPublic() && (!v.isGlobalConstant())){
 				String n = v.getOrigName();
@@ -351,7 +354,7 @@ public class SchedulerInfoCompiler {
 			if(initSrc != null){
 				//SynthesijerUtils.warn("unsupported to init array with un-immediate number:" + initSrc.info());
 			}else{
-				SynthesijerUtils.warn("unsupported to array initializing expression: " + v.toSexp());
+				SynthesijerUtils.warn("unsupported to chann initializing expression: " + v.toSexp());
 			}
 			SynthesijerUtils.warn("the size of memory is set as default parameter(DEPTH=1024)");
 		}
@@ -930,6 +933,8 @@ public class SchedulerInfoCompiler {
 		case CALL :{
 			MethodInvokeItem item0 = (MethodInvokeItem)item;
 			Operand[] params = item0.getSrcOperand();
+			//System.out.println(item0.getSrcOperand().length);
+			//for(Operand param: params) System.out.println("Parameter : " + param.toString());
 			ArrayList<Pair> list = getMethodParamPairList(item0.name);
 			for(int i = 0; i < params.length; i++){
 				HDLSignal t = list.get(i).local;
@@ -1500,9 +1505,10 @@ public class SchedulerInfoCompiler {
 						call_req.setDefaultValue(HDLPreDefinedConstant.LOW); // otherwise '0'
 						//					call_body.setMaxConstantDelay(1);
 						if(item0.isNoWait() == true){
-							//System.out.println("no wait:" + call_req);
+                            System.out.println("no wait:" + call_req);
 							call_body.addStateTransit(states.get(item.getSlot().getNextStep()[0]));
 						}else{
+						    //System.out.println("block:" + call_req);
 							//						call_body.setStateExitFlag(flag);
 							call_body.addStateTransit(call_wait);
 							call_wait.addStateTransit(flag, states.get(item.getSlot().getNextStep()[0]));

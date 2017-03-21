@@ -237,7 +237,7 @@ public class IRReader {
 			}
 			break;
 			default:
-				SynthesijerUtils.warn("unknown keyword : " + k + ", the value " + v + " is skipped");
+				SynthesijerUtils.warn("unknown keyword : " + k + ", the value " + v + " is skipped for " + name);
 			}
 		}
 		
@@ -436,11 +436,14 @@ public class IRReader {
 		case "CALL":{
 			// MethodInvokeItem
 			String name = parseArgument(node, ":name").toString();
-			SExp n = (SExp)(parseArgument(node, ":args"));
+            SExp n = (SExp)(parseArgument(node, ":args"));
 			String[] args = new String[n.size()];
 			Operand[] src = parseSrcOperands(node, info, board);
 			for(int i = 0; i < args.length; i++) args[i] = n.get(i).toString();
-			item = new MethodInvokeItem(board, name, src, null, args);
+            MethodInvokeItem mii = new MethodInvokeItem(board, name, src, null, args);
+            boolean nowait = Boolean.parseBoolean(parseArgument(node, ":no_wait").toString());
+            mii.setNoWait(nowait);
+            item = mii;
 		}
 		break;
 		case "EXT_CALL":{
@@ -485,7 +488,10 @@ public class IRReader {
 				SExp n = (SExp)(parseArgument(expr, ":args"));
 				String[] args = new String[n.size()];
 				for(int i = 0; i < args.length; i++) args[i] = n.get(i).toString();
-				item = new MethodInvokeItem(board, name, src, (VariableOperand)dest, args);
+				MethodInvokeItem mii = new MethodInvokeItem(board, name, src, (VariableOperand)dest, args);
+				boolean nowait = Boolean.parseBoolean(parseArgument(expr, ":no_wait").toString());
+	            mii.setNoWait(nowait);
+	            item = mii;
 			}
 			break;
 			case EXT_CALL:{
