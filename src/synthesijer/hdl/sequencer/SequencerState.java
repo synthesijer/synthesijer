@@ -10,6 +10,7 @@ import synthesijer.hdl.expr.HDLValue;
 public class SequencerState{
 	
 	private ArrayList<StateTransitCondition> transitions = new ArrayList<>();
+	private StateTransitCondition defaultTransition = null;
 	
 	private final HDLSignal key;
 	private final HDLValue id;
@@ -44,11 +45,18 @@ public class SequencerState{
 	}
 
 	public void addStateTransit(SequencerState dest){
-		transitions.add(new StateTransitCondition(key, id, null, dest));
+		//transitions.add(new StateTransitCondition(key, id, null, dest));
+		defaultTransition = new StateTransitCondition(key, id, null, dest);
 	}
 
 	public ArrayList<StateTransitCondition> getTransitions(){
-		return transitions;
+		//return transitions;
+		ArrayList<StateTransitCondition> lst = new ArrayList<>();
+		lst.addAll(transitions);
+		if(defaultTransition != null){
+			lst.add(defaultTransition);
+		}
+		return lst;
 	}
 	
 	public void setMaxConstantDelay(int v){
