@@ -60,8 +60,12 @@ public class SchedulerSlot {
 	}
 
 	public void dump(PrintStream out){
+		dump(out, "");
+	}
+	
+	public void dump(PrintStream out, String sep){
 		for(SchedulerItem item: items){
-			out.println(item.info());
+			out.println(sep + item.info());
 		}
 	}
 

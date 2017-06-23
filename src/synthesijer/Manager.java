@@ -311,7 +311,6 @@ public enum Manager {
 			info.setHDLModule(loadUserHDLModule(info.m.getName())); 
 		}else{
 			info.state = CompileState.GENERATE_HDL;
-			//HDLModule hm = new HDLModule(info.m.getName(), "clk", "reset");
 			HDLModule hm = new HDLModule(info.getName(), "clk", "reset");
 			info.setHDLModule(hm); 
 			SchedulerInfoCompiler compiler = new SchedulerInfoCompiler(info.getSchedulerInfo(), hm);			

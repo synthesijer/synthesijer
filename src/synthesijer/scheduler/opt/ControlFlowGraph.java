@@ -3,6 +3,7 @@ package synthesijer.scheduler.opt;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.io.PrintStream;
 
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
@@ -14,30 +15,31 @@ import synthesijer.scheduler.VariableOperand;
 
 public class ControlFlowGraph{
 
-	private ControlFlowGraphNode top;
-
-	private ControlFlowGraphNode[] nodes;
+	public final BasicBlock[] bb;
 
 	public ControlFlowGraph(SchedulerBoard board){
 		SchedulerSlot[] slots = board.getSlots();
-		if(!(slots.length > 0)) return;
-		ArrayList<ControlFlowGraphNode> nodes = new ArrayList<>();
-		for(SchedulerSlot s: slots){
-			nodes.add(new ControlFlowGraphNode(s));
+		if(!(slots.length > 0)){
+			bb = new BasicBlock[]{};
+			return;
 		}
-		this.nodes = nodes.toArray(new ControlFlowGraphNode[]{});
-		this.top = this.nodes[0];
-		buildAll();
+		ArrayList<BasicBlockItem> items = prepareItems(slots);
+		bb = buildBasicBlocks(items);
 	}
 
-	private void buildAll(){
-		for(ControlFlowGraphNode n: nodes){
-			build(n);
+	private ArrayList<BasicBlockItem> prepareItems(SchedulerSlot[] slots){
+		ArrayList<BasicBlockItem> items = new ArrayList<>();
+		for(SchedulerSlot s: slots){
+			items.add(new BasicBlockItem(s));
 		}
+		for(BasicBlockItem n: items){
+			prepareItem(n, items);
+		}
+		return items;
 	}
 	
-	private void build(ControlFlowGraphNode target){
-		for(ControlFlowGraphNode n : nodes){
+	private void prepareItem(BasicBlockItem target, ArrayList<BasicBlockItem> items){
+		for(BasicBlockItem n : items){
 			for(int id : n.slot.getNextStep()){
 				if(target.slot.getStepId() == id){
 					target.pred.add(n);
@@ -47,72 +49,128 @@ public class ControlFlowGraph{
 		}
 	}
 
-	public ControlFlowGraphBB[] getBasicBlocks(){
-		ArrayList<ControlFlowGraphBB> list = new ArrayList<>();
-		ControlFlowGraphBB bb = new ControlFlowGraphBB();
-		Hashtable<ControlFlowGraphNode,Boolean> table = new Hashtable<>();
-		list.add(bb);
-		getBasicBlocks(list, table, top, bb);
-		return list.toArray(new ControlFlowGraphBB[]{});
+	private BasicBlock[] buildBasicBlocks(ArrayList<BasicBlockItem> items){
+		BasicBlock[] bb = getBasicBlocks(items);
+		for(BasicBlock b : bb){
+			for(BasicBlockItem n: b.items){
+				for(BasicBlockItem p: n.pred){
+					if(!b.pred.contains(p.bb) && b != p.bb){
+						b.pred.add(p.bb);
+					}
+				}
+				for(BasicBlockItem s: n.succ){
+					if(!b.succ.contains(s.bb) && b != s.bb){
+						b.succ.add(s.bb);
+					}
+				}
+			}
+		}
+		return bb;
+	}
+	
+	private BasicBlock[] getBasicBlocks(ArrayList<BasicBlockItem> items){
+		ArrayList<BasicBlock> list = new ArrayList<>();
+		Hashtable<BasicBlockItem,Boolean> table = new Hashtable<>();
+		for(BasicBlockItem n: items){
+			if(table.containsKey(n)) continue;
+			BasicBlock bb = new BasicBlock(idGen.get());
+			list.add(bb);
+			getBasicBlocks(list, table, n, bb);
+		}
+		return list.toArray(new BasicBlock[]{});
 	}
 
-	public void getBasicBlocks(ArrayList<ControlFlowGraphBB> list,
-							   Hashtable<ControlFlowGraphNode, Boolean> table,
-							   ControlFlowGraphNode node,
-							   ControlFlowGraphBB bb){
-		if(table.containsKey(node)){
-			return; // already treated.
-		}
+	private void getBasicBlocks(ArrayList<BasicBlock> list,
+								Hashtable<BasicBlockItem, Boolean> table,
+								BasicBlockItem node,
+								BasicBlock bb){
 		
+		if(table.containsKey(node)) return;
 		table.put(node, true); // make the node treated
-		if(node.pred.size() == 1){
-			bb.nodes.add(node);
-			if(node.succ.size() == 1){
-				getBasicBlocks(list, table, node.succ.get(0), bb);
-			}else if(node.succ.size() > 1){
-				for(int i = 0; i < node.succ.size(); i++){
-					ControlFlowGraphBB bb0 = new ControlFlowGraphBB(); // new basic block
-					list.add(bb0);
-					getBasicBlocks(list, table, node.succ.get(i), bb0);
-				}
+
+		if(node.pred.size() > 1){ // join node
+			if(bb.items.size() > 0){
+				bb = new BasicBlock(idGen.get());
+				list.add(bb);
 			}
-		}else{ // fork node
-			ControlFlowGraphBB bb0 = (list.size() == 0) ? bb : new ControlFlowGraphBB();
-			list.add(bb0);
-			bb0.nodes.add(node);
-			if(node.succ.size() == 1){
-				getBasicBlocks(list, table, node.succ.get(0), bb0);
-			}else if(node.succ.size() > 1){
-				for(int i = 0; i < node.succ.size(); i++){
-					ControlFlowGraphBB bb1 = new ControlFlowGraphBB(); // new basic block
-					list.add(bb1);
-					getBasicBlocks(list, table, node.succ.get(i), bb1);
-				}
+		}
+		bb.items.add(node); node.bb = bb;
+		
+		if(node.succ.size() == 1){
+			getBasicBlocks(list, table, node.succ.get(0), bb);
+		}else{
+			for(BasicBlockItem n: node.succ){
+				bb = new BasicBlock(idGen.get());
+				list.add(bb);
+				getBasicBlocks(list, table, n, bb);
 			}
 		}
 	}
 	
-
-}
-
-class ControlFlowGraphNode{
-
-	final ArrayList<ControlFlowGraphNode> pred = new ArrayList<>();
-	
-	final ArrayList<ControlFlowGraphNode> succ = new ArrayList<>();
-	
-	final SchedulerSlot slot;
-
-	public ControlFlowGraphNode(SchedulerSlot slot){
-		this.slot = slot;
+	public void dumpBB(PrintStream out){
+		for(BasicBlock b : bb){
+			b.dump(out);
+		}
 	}
 	
-}
+	class BasicBlockItem{
 
-class ControlFlowGraphBB{
+		final ArrayList<BasicBlockItem> pred = new ArrayList<>();
+	
+		final ArrayList<BasicBlockItem> succ = new ArrayList<>();
+	
+		final SchedulerSlot slot;
 
-	ArrayList<ControlFlowGraphNode> nodes = new ArrayList<>();
+		BasicBlock bb;
 
-	public ControlFlowGraphBB(){
+		public BasicBlockItem(SchedulerSlot slot){
+			this.slot = slot;
+		}
+
+		public void dump(PrintStream out){
+			slot.dump(out, "   ");
+		}
+	
 	}
+
+	class BasicBlock{
+
+		ArrayList<BasicBlockItem> items = new ArrayList<>();
+
+		public final int id;
+		public final ArrayList<BasicBlock> pred = new ArrayList<>();
+		public final ArrayList<BasicBlock> succ = new ArrayList<>();
+
+		public BasicBlock(int id){
+			this.id = id;
+		}
+	
+		public void dump(PrintStream out){
+			out.println(this.id);
+			out.print(" <-");
+			for(BasicBlock b: pred){
+				out.print(" " + b.id);
+			}
+			out.println();
+			out.print(" ->");
+			for(BasicBlock b: succ){
+				out.print(" " + b.id);
+			}
+			out.println();
+			for(BasicBlockItem n : items){
+				n.dump(out);
+			}
+		}
+	
+	}
+
+	private class BasicBlockID{
+		private int id = 0;
+		public int get(){
+			int ret = id; id++; return ret;
+		}
+	}
+	private BasicBlockID idGen = new BasicBlockID();
+	
 }
+
