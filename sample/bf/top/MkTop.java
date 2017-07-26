@@ -7,7 +7,7 @@ import synthesijer.hdl.expr.*;
 public class MkTop{
 	
 	public static void main(String... args) throws IOException{
-		HDLModule top = new HDLModule("top", "CLOCK", "USER_RESET");
+		HDLModule top = new HDLModule("top", "CLK100MHZ", "USER_RESET");
 		HDLPort din = top.newPort("RXD_IN", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
 		HDLPort dout = top.newPort("TXD_OUT", HDLPort.DIR.OUT, HDLPrimitiveType.genBitType());
 
