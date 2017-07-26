@@ -16,6 +16,9 @@ import synthesijer.scheduler.VariableOperand;
 public class ControlFlowGraph{
 
 	public final BasicBlock[] bb;
+	public BasicBlock entryBlock;
+	public BasicBlock exitBlock;
+	public final Hashtable<SchedulerSlot, BasicBlock> map = new Hashtable<>();
 
 	public ControlFlowGraph(SchedulerBoard board){
 		SchedulerSlot[] slots = board.getSlots();
@@ -50,7 +53,13 @@ public class ControlFlowGraph{
 	}
 
 	private BasicBlock[] buildBasicBlocks(ArrayList<BasicBlockItem> items){
-		BasicBlock[] bb = getBasicBlocks(items);
+		BasicBlock[] bb = genBasicBlocks(items);
+		genControlFlowGraph(bb);
+		genDominateGraph();
+		return bb;
+	}
+
+	private void genControlFlowGraph(BasicBlock[] bb){
 		for(BasicBlock b : bb){
 			for(BasicBlockItem n: b.items){
 				for(BasicBlockItem p: n.pred){
@@ -65,22 +74,43 @@ public class ControlFlowGraph{
 				}
 			}
 		}
-		return bb;
 	}
 	
-	private BasicBlock[] getBasicBlocks(ArrayList<BasicBlockItem> items){
+	private void genDominateGraph(){
+		ArrayList<BasicBlock> lst = new ArrayList<>();
+		for(BasicBlock bb: entryBlock.succ){
+			genDominateGraph(bb, lst);
+		}
+	}
+	
+	private void genDominateGraph(BasicBlock bb, ArrayList<BasicBlock> lst){
+		if(lst.contains(bb)) return;
+		BasicBlock d = getDominatedBy(bb);
+		bb.dominatedBy = d;
+		d.dominates.add(bb);
+	}
+
+	private BasicBlock getDominatedBy(BasicBlock bb){
+		if(bb.pred.size() == 1){
+			return bb.pred.get(0);
+		}else{
+			return getDominatedBy(bb.pred.get(0));
+		}
+	}
+	
+	private BasicBlock[] genBasicBlocks(ArrayList<BasicBlockItem> items){
 		ArrayList<BasicBlock> list = new ArrayList<>();
 		Hashtable<BasicBlockItem,Boolean> table = new Hashtable<>();
 		for(BasicBlockItem n: items){
 			if(table.containsKey(n)) continue;
 			BasicBlock bb = new BasicBlock(idGen.get());
 			list.add(bb);
-			getBasicBlocks(list, table, n, bb);
+			genBasicBlocks(list, table, n, bb);
 		}
 		return list.toArray(new BasicBlock[]{});
 	}
 
-	private void getBasicBlocks(ArrayList<BasicBlock> list,
+	private void genBasicBlocks(ArrayList<BasicBlock> list,
 								Hashtable<BasicBlockItem, Boolean> table,
 								BasicBlockItem node,
 								BasicBlock bb){
@@ -94,23 +124,75 @@ public class ControlFlowGraph{
 				list.add(bb);
 			}
 		}
-		bb.items.add(node); node.bb = bb;
-		
-		if(node.succ.size() == 1){
-			getBasicBlocks(list, table, node.succ.get(0), bb);
+		bb.items.add(node); node.bb = bb; map.put(node.slot, bb);
+
+		if(node.slot.getItems()[0].getOp() == Op.METHOD_ENTRY){
+			entryBlock = bb;
+			for(BasicBlockItem n: node.succ){
+				bb = new BasicBlock(idGen.get());
+				list.add(bb);
+				genBasicBlocks(list, table, n, bb);
+			}
+		}else if(node.slot.getItems()[0].getOp() == Op.METHOD_EXIT){
+			exitBlock = bb;
+			for(BasicBlockItem n: node.succ){
+				bb = new BasicBlock(idGen.get());
+				list.add(bb);
+				genBasicBlocks(list, table, n, bb);
+			}
+		}else if(node.succ.size() == 1){
+			genBasicBlocks(list, table, node.succ.get(0), bb);
 		}else{
 			for(BasicBlockItem n: node.succ){
 				bb = new BasicBlock(idGen.get());
 				list.add(bb);
-				getBasicBlocks(list, table, n, bb);
+				genBasicBlocks(list, table, n, bb);
 			}
 		}
 	}
+
+	public BasicBlock[] trace(){
+		ArrayList<BasicBlock> lst = new ArrayList<>();
+		trace(entryBlock, lst);
+		return lst.toArray(new BasicBlock[]{});
+	}
+	
+	public void trace(BasicBlock bb, ArrayList<BasicBlock> lst){
+		if(lst.contains(bb)) return;
+		lst.add(bb);
+		for(BasicBlock b : bb.succ){
+			trace(b, lst);
+		}
+	}
+
 	
 	public void dumpBB(PrintStream out){
-		for(BasicBlock b : bb){
-			b.dump(out);
+		ArrayList<BasicBlock> lst = new ArrayList<>();
+		dumpBB(out, entryBlock, lst);
+	}
+	
+	public void dumpBB(PrintStream out, BasicBlock bb, ArrayList<BasicBlock> lst){
+		if(lst.contains(bb)) return;
+		bb.dump(out); lst.add(bb);
+		for(BasicBlock b : bb.succ){
+			dumpBB(out, b, lst);
 		}
+	}
+
+	public void dumpDominantTree(PrintStream out){
+		ArrayList<BasicBlock> lst = new ArrayList<>();
+		dumpDominantTree(out, entryBlock, lst);
+	}
+
+	public void dumpDominantTree(PrintStream out, BasicBlock bb, ArrayList<BasicBlock> lst){
+		if(lst.contains(bb)) return;
+		lst.add(bb);
+		System.out.println(bb.id);
+		System.out.print("->");
+		for(BasicBlock b : bb.dominates){
+			System.out.print(" " + b.id);
+		}
+		System.out.print("<- " + bb.dominatedBy.id);
 	}
 	
 	class BasicBlockItem{
@@ -135,7 +217,10 @@ public class ControlFlowGraph{
 
 	class BasicBlock{
 
-		ArrayList<BasicBlockItem> items = new ArrayList<>();
+		final ArrayList<BasicBlockItem> items = new ArrayList<>();
+
+		final ArrayList<BasicBlock> dominates = new ArrayList<>();
+		BasicBlock dominatedBy;
 
 		public final int id;
 		public final ArrayList<BasicBlock> pred = new ArrayList<>();
