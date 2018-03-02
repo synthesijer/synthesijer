@@ -62,7 +62,7 @@ public class FieldAccess extends Expr{
 				return PrimitiveTypeKind.UNDEFINED;
 			}
 		}else{
-			throw new RuntimeException("Unsupported multi- field access");
+			throw new RuntimeException("Unsupported multi-field access:" + selected);
 		}
 	}
 
