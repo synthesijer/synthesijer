@@ -28,15 +28,12 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 
 	public SchedulerBoard conv(SchedulerBoard src){
 		ControlFlowGraph g = new ControlFlowGraph(src);
-		System.out.println("board: " + src.getName());
-		g.dumpBB(System.out);
+		g.getBasicBlocks();
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
 
-		for(ControlFlowGraph.BasicBlock bb : g.trace()){
-			for(ControlFlowGraph.BasicBlockItem item: bb.items){
-				ret.addSlot(item.slot);
-			}
+		for(SchedulerSlot s: slots){
+			ret.addSlot(s);
 		}
 
 		return ret;
