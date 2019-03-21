@@ -9,6 +9,7 @@ public class BF {
 	private int ptr, pc;
 
 	public void startup() {
+		io.putchar((byte) '\r');
 		io.putchar((byte) '\n');
 		io.putchar((byte) 'B');
 		io.putchar((byte) 'r');
@@ -19,6 +20,7 @@ public class BF {
 		io.putchar((byte) '*');
 		io.putchar((byte) '*');
 		io.putchar((byte) 'k');
+		io.putchar((byte) '\r');
 		io.putchar((byte) '\n');
 		return;
 	}
@@ -54,6 +56,7 @@ public class BF {
 			}
 			io.putchar(b);
 		}
+		io.putchar((byte) '\r');
 		io.putchar((byte) '\n');
 	}
 
@@ -72,6 +75,7 @@ public class BF {
 		} else {
 			io.putchar((byte) ((l - 10) + 'A'));
 		}
+		io.putchar((byte) '\r');
 		io.putchar((byte) '\n');
 	}
 
