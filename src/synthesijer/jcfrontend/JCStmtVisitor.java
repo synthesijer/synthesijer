@@ -1,24 +1,24 @@
 package synthesijer.jcfrontend;
 
-import openjdk.com.sun.tools.javac.tree.JCTree;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCBlock;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCBreak;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCCase;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCContinue;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCDoWhileLoop;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCForLoop;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCIf;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCReturn;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCSkip;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCStatement;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCSwitch;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCSynchronized;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCTry;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCVariableDecl;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCWhileLoop;
-import openjdk.com.sun.tools.javac.tree.JCTree.Visitor;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.BreakTree;
+import com.sun.source.tree.CaseTree;
+import com.sun.source.tree.ContinueTree;
+import com.sun.source.tree.DoWhileLoopTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.ForLoopTree;
+import com.sun.source.tree.IfTree;
+import com.sun.source.tree.ReturnTree;
+//import com.sun.source.tree.JCSkip;
+import com.sun.source.tree.StatementTree;
+import com.sun.source.tree.SwitchTree;
+import com.sun.source.tree.SynchronizedTree;
+import com.sun.source.tree.TryTree;
+import com.sun.source.tree.VariableTree;
+import com.sun.source.tree.WhileLoopTree;
+import com.sun.source.util.TreeScanner;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Module;
@@ -39,7 +39,7 @@ import synthesijer.ast.statement.TryStatement;
 import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 
-public class JCStmtVisitor extends Visitor{
+public class JCStmtVisitor extends TreeScanner<Void, Void>{
 	
     public final Scope scope;
 	
@@ -53,15 +53,15 @@ public class JCStmtVisitor extends Visitor{
 		return stmt;
     }
 	
-    private Statement stepIn(JCTree that, Scope scope){
+    private Statement stepIn(Tree that, Scope scope){
 		JCStmtVisitor visitor = new JCStmtVisitor(scope);
-		that.accept(visitor);
+		that.accept(visitor, null);
 		return visitor.getStatement();
     }
 	
-    private Expr stepIn(JCExpression that, Scope scope){
+    private Expr stepIn(ExpressionTree that, Scope scope){
 		JCExprVisitor visitor = new JCExprVisitor(scope);
-		that.accept(visitor);
+		that.accept(visitor, null);
 		return visitor.getExpr();
     }
 	
@@ -75,140 +75,140 @@ public class JCStmtVisitor extends Visitor{
 		}
     }
 	
-    public void visitIf(JCIf that){
+    public void visitIf(IfTree that){
 		IfStatement tmp = new IfStatement(scope);
-		tmp.setCondition(stepIn(that.cond, scope));
-		tmp.setThenPart(wrapBlockStatement(stepIn(that.thenpart, scope)));
-		if(that.elsepart != null){
-			tmp.setElsePart(wrapBlockStatement(stepIn(that.elsepart, scope)));
+		tmp.setCondition(stepIn(that.getCondition(), scope));
+		tmp.setThenPart(wrapBlockStatement(stepIn(that.getThenStatement(), scope)));
+		if(that.getElseStatement() != null){
+			tmp.setElsePart(wrapBlockStatement(stepIn(that.getElseStatement(), scope)));
 		}
 		stmt = tmp;
     }
 	
-    public void visitForLoop(JCForLoop that){
+    public void visitForLoop(ForLoopTree that){
 		ForStatement tmp = new ForStatement(scope);
-		for(JCStatement s: that.init){
+		for(StatementTree s: that.getInitializer()){
 			//tmp.addInitialize(stepIn(s, scope));
 			tmp.addInitialize(stepIn(s, tmp));
 		}
-		tmp.setCondition(stepIn(that.cond, tmp));
-		for(JCStatement s: that.step){
+		tmp.setCondition(stepIn(that.getCondition(), tmp));
+		for(StatementTree s: that.getUpdate()){
 			tmp.addUpdate(stepIn(s, tmp));
 		}
-		tmp.setBody(wrapBlockStatement(stepIn(that.body, tmp)));
+		tmp.setBody(wrapBlockStatement(stepIn(that.getStatement(), tmp)));
 		stmt = tmp;
     }
 	
-    public void visitWhileLoop(JCWhileLoop that){
+    public void visitWhileLoop(WhileLoopTree that){
 		WhileStatement tmp = new WhileStatement(scope);
-		tmp.setCondition(stepIn(that.cond, scope));
-		tmp.setBody(wrapBlockStatement(stepIn(that.body, scope)));
+		tmp.setCondition(stepIn(that.getCondition(), scope));
+		tmp.setBody(wrapBlockStatement(stepIn(that.getStatement(), scope)));
 		stmt = tmp;
     }
 	
-    public void visitDoLoop(JCDoWhileLoop that){
+    public void visitDoWhileLoop(DoWhileLoopTree that){
 		DoWhileStatement tmp = new DoWhileStatement(scope);
-		tmp.setCondition(stepIn(that.cond, scope));
-		tmp.setBody(wrapBlockStatement(stepIn(that.body, scope)));
+		tmp.setCondition(stepIn(that.getCondition(), scope));
+		tmp.setBody(wrapBlockStatement(stepIn(that.getStatement(), scope)));
 		stmt = tmp;
     }
 	
-    public void visitBlock(JCBlock that){
+    public void visitBlock(BlockTree that){
 		BlockStatement tmp = new BlockStatement(scope);
-		for(JCStatement s: that.getStatements()){
+		for(StatementTree s: that.getStatements()){
 			JCStmtVisitor visitor = new JCStmtVisitor(scope);
-			s.accept(visitor);
+			s.accept(visitor, null);
 			tmp.addStatement(visitor.getStatement());
 		}
 		stmt = tmp;
     }
 	
-    public void visitReturn(JCReturn that){
+    public void visitReturn(ReturnTree that){
 		ReturnStatement tmp = new ReturnStatement(scope);
-		if(that.expr != null){
+		if(that.getExpression() != null){
 			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.expr.accept(visitor);
+			that.getExpression().accept(visitor, null);
 			tmp.setExpr(visitor.getExpr());
 		}
 		stmt = tmp;
     }
 	
-    public void visitExec(JCExpressionStatement that){
+    public void visitExpressionStatement(ExpressionStatementTree that){
 		JCExprVisitor visitor = new JCExprVisitor(scope);
-		that.expr.accept(visitor);
+		that.getExpression().accept(visitor, null);
 		stmt = new ExprStatement(scope, visitor.getExpr());
     }
 	
-    public void visitBreak(JCBreak that){
+    public void visitBreak(BreakTree that){
 		stmt = new BreakStatement(scope);
     }
 	
-    public void visitContinue(JCContinue that){
+    public void visitContinue(ContinueTree that){
 		stmt = new ContinueStatement(scope);
     }
 	
-    public void visitSkip(JCSkip that){
-		stmt = new SkipStatement(scope);
-    }
+    //public void visitSkip(JCSkip that){
+	//	stmt = new SkipStatement(scope);
+    //}
 	
-    public void visitTry(JCTry that){
+    public void visitTry(TryTree that){
 		TryStatement tmp = new TryStatement(scope);
 		JCStmtVisitor visitor = new JCStmtVisitor(scope);
-		that.body.accept(visitor);
+		that.getBlock().accept(visitor, null);
 		tmp.setBody(visitor.getStatement());
 		stmt = tmp;
     }
 	
-    public void visitSynchronized(JCSynchronized that){
-		visitBlock(that.body);
+    public void visitSynchronized(SynchronizedTree that){
+		visitBlock(that.getBlock());
     }
 	
-    public void visitSwitch(JCSwitch that){
+    public void visitSwitch(SwitchTree that){
         SwitchStatement tmp = new SwitchStatement(scope);
-        tmp.setSelector(stepIn(that.selector, scope));
-        for(JCCase c: that.cases){
+        tmp.setSelector(stepIn(that.getExpression(), scope));
+        for(CaseTree c: that.getCases()){
             SwitchStatement.Elem elem;
-            if(c.pat != null){
-                elem = tmp.newElement(stepIn(c.pat, scope));
+            if(c.getExpression() != null){
+                elem = tmp.newElement(stepIn(c.getExpression(), scope));
             }else{
                 elem = tmp.getDefaultElement();
             }
-            for(JCStatement s: c.stats){
+            for(StatementTree s: c.getStatements()){
                 elem.addStatement(stepIn(s, scope));
             }
         }
         stmt = tmp;
     }
 	
-    public void visitVarDef(JCVariableDecl that) {
+    public void visitVariable(VariableTree that) {
 		String name = that.getName().toString();
 		Type type = TypeBuilder.genType(that.getType());
 		Expr init;
-		if(that.init != null){
+		if(that.getInitializer() != null){
 			JCExprVisitor visitor = new JCExprVisitor(scope);
-			that.init.accept(visitor);
+			that.getInitializer().accept(visitor, null);
 			init = visitor.getExpr();
 		}else{
 			init = null;
 		}
 		VariableDecl tmp = new VariableDecl(scope, name, type, init);
-		if(JCFrontendUtils.isGlobalConstant(that.mods)){
+		if(JCFrontendUtils.isGlobalConstant(that.getModifiers())){
 			tmp.setGlobalConstant(true);
 		}
-		if(JCFrontendUtils.isPrivate(that.mods) == false && scope instanceof Module){
+		if(JCFrontendUtils.isPrivate(that.getModifiers()) == false && scope instanceof Module){
 			tmp.setPublic(true);
 		}
-		if(JCFrontendUtils.isVolatile(that.mods)){
+		if(JCFrontendUtils.isVolatile(that.getModifiers())){
 			tmp.setVolatile(true);
 		}
-		if(JCFrontendUtils.isAnnotatedBy(that.mods.annotations, "Debug")){
+		if(JCFrontendUtils.isAnnotatedBy(that.getModifiers().getAnnotations(), "Debug")){
 			tmp.setDebug(true);
 		}
 		scope.addVariableDecl(tmp);
 		stmt = tmp;
     }
 	
-    public void visitTree(JCTree t){
+    public void visitOther(Tree t){
 		SynthesijerUtils.error("[JCStmtVisitor] The following is unexpected in this context.");
 		SynthesijerUtils.dump(t);
     }

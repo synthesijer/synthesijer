@@ -1,22 +1,22 @@
 package synthesijer.jcfrontend;
 
-import openjdk.com.sun.tools.javac.tree.JCTree;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCArrayAccess;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCAssign;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCAssignOp;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCBinary;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCConditional;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCExpression;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCFieldAccess;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCIdent;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCLiteral;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCNewArray;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCNewClass;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCParens;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCTypeCast;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCUnary;
-import openjdk.com.sun.tools.javac.tree.JCTree.Visitor;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.ArrayAccessTree;
+import com.sun.source.tree.AssignmentTree;
+import com.sun.source.tree.CompoundAssignmentTree;
+import com.sun.source.tree.BinaryTree;
+import com.sun.source.tree.ConditionalExpressionTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.NewArrayTree;
+import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.ParenthesizedTree;
+import com.sun.source.tree.TypeCastTree;
+import com.sun.source.tree.UnaryTree;
+import com.sun.source.util.TreeScanner;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Expr;
 import synthesijer.ast.Op;
@@ -39,7 +39,7 @@ import synthesijer.ast.expr.UnaryExpr;
 import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
 
-public class JCExprVisitor extends Visitor{
+public class JCExprVisitor extends TreeScanner<Void, Void>{
 	
 	public final Scope scope;
 	
@@ -53,70 +53,61 @@ public class JCExprVisitor extends Visitor{
 		return expr;
 	}
 
-	public void visitIdent(JCIdent that){
+	public void visitIdent(IdentifierTree that){
 		Ident tmp = new Ident(scope);
 		tmp.setIdent(that.toString());
 		expr = tmp;
 	}
 	
-	private Expr stepIn(JCExpression expr){
+	private Expr stepIn(ExpressionTree expr){
 		JCExprVisitor visitor = new JCExprVisitor(scope);
-		expr.accept(visitor);
+		expr.accept(visitor, null);
 		return visitor.getExpr();
 	}
 			
-	public void visitBinary(JCBinary that){
+	public void visitBinary(BinaryTree that){
 		//System.out.println(that);
 		BinaryExpr tmp = new BinaryExpr(scope);
-		Expr lhs = stepIn(that.lhs);
+		Expr lhs = stepIn(that.getLeftOperand());
 		tmp.setLhs(lhs);
-		Expr rhs = stepIn(that.rhs);
+		Expr rhs = stepIn(that.getRightOperand());
 		setForceTypeCast(lhs, rhs);
 		tmp.setRhs(rhs);
-		tmp.setOp(Op.getOp(that.operator.name.toString()));
+		tmp.setOp(Op.getOp(that.getKind().toString()));
 		expr = tmp;
 	}
 	
-	public void visitUnary(JCUnary that){
-		/*
-		System.out.println("unary:" + that.toString());
-		System.out.println("op:" + that.getOperator().name);
-		if(that.toString().startsWith(that.getOperator().name.toString())){
-			System.out.println("prefix");
-		}else if(that.toString().endsWith(that.getOperator().name.toString())){
-			System.out.println("postfix");
-		}
-		*/
+	public void visitUnary(UnaryTree that){
 		boolean postfix = false;
-		if(that.toString().endsWith(that.getOperator().name.toString())){
+		if(that.toString().endsWith(that.getKind().toString())){
 			postfix = true;
 		}
 		UnaryExpr tmp = new UnaryExpr(scope);
-		tmp.setOp(Op.getOp(that.operator.name.toString()));
-		tmp.setArg(stepIn(that.arg));
+		tmp.setOp(Op.getOp(that.getKind().toString()));
+		tmp.setArg(stepIn(that.getExpression()));
 		tmp.setPostfix(postfix);
 		expr = tmp;
 	}
 	
-	public void visitApply(JCMethodInvocation that){
+	public void visitMethodInvocation(MethodInvocationTree that){
 		MethodInvocation tmp = new MethodInvocation(scope);
 		tmp.setMethod(stepIn(that.getMethodSelect()));
-		for(JCExpression param: that.args){
+		for(ExpressionTree param: that.getArguments()){
 			tmp.addParameter(stepIn(param));
 		}
 		expr = tmp;
 	}
 	
-	public void visitSelect(JCFieldAccess that){
+	public void visitMemberSelect(MemberSelectTree that){
 		FieldAccess tmp = new FieldAccess(scope);
-		tmp.setSelected(stepIn(that.selected));
+		tmp.setSelected(stepIn(that.getExpression()));
 		Ident id = new Ident(scope);
-		id.setIdent(that.name.toString());
+		id.setIdent(that.getIdentifier().toString());
 		tmp.setIdent(id);
 		expr = tmp;
 	}
 	
-	public void visitLiteral(JCLiteral that){
+	public void visitLiteral(LiteralTree that){
 		Literal tmp = new Literal(scope);
 		switch(that.getKind()){
 		case INT_LITERAL:     tmp.setValue((int)(that.getValue()));     break;
@@ -147,35 +138,35 @@ public class JCExprVisitor extends Visitor{
 		//((Literal)rhs).castType(ltype);
 	}
 	
-	public void visitAssign(JCAssign that){
+	public void visitAssign(AssignmentTree that){
 		AssignExpr tmp = new AssignExpr(scope);
-		tmp.setLhs(stepIn(that.lhs));
-		tmp.setRhs(stepIn(that.rhs));
+		tmp.setLhs(stepIn(that.getVariable()));
+		tmp.setRhs(stepIn(that.getExpression()));
 		setForceTypeCast(tmp.getLhs(), tmp.getRhs());
 		expr = tmp;
 	}
 	
-	public void visitAssignop(JCAssignOp that){
+	public void visitCompoundAssignment(CompoundAssignmentTree that){
 		AssignOp tmp = new AssignOp(scope);
-		tmp.setLhs(stepIn(that.lhs));
-		tmp.setRhs(stepIn(that.rhs));
-		tmp.setOp(Op.getOp(that.operator.name.toString()));
+		tmp.setLhs(stepIn(that.getVariable()));
+		tmp.setRhs(stepIn(that.getExpression()));
+		tmp.setOp(Op.getOp(that.getKind().toString()));
 		expr = tmp;
 	}
 	
-	public void visitNewArray(JCNewArray that){
+	public void visitNewArray(NewArrayTree that){
 		NewArray tmp = new NewArray(scope);
-		for(JCExpression dim: that.dims){
+		for(ExpressionTree dim: that.getDimensions()){
 			tmp.addDimExpr(stepIn(dim));
 		}
 
-		if(that.elems != null){ // ad-hoc: to support array initialization 
-			for(JCExpression expr: that.elems){
+		if(that.getInitializers() != null){ // ad-hoc: to support array initialization 
+			for(ExpressionTree expr: that.getInitializers()){
 				tmp.addElem(stepIn(expr));
 			}
-			if(that.dims.size() == 0 && that.elems.size() > 0){
+			if(that.getDimensions().size() == 0 && that.getInitializers().size() > 0){
 				Literal d = new Literal(scope);
-				d.setValue(that.elems.size());
+				d.setValue(that.getInitializers().size());
 				tmp.addDimExpr(d);
 //				SynthesijerUtils.warn("In " + scope.getModule().getName());
 //				SynthesijerUtils.warn("Initialization with new expression is not supported.");
@@ -186,48 +177,48 @@ public class JCExprVisitor extends Visitor{
 		expr = tmp;
 	}
 	
-	public void visitIndexed(JCArrayAccess that){
+	public void visitArrayAccess(ArrayAccessTree that){
 		ArrayAccess tmp = new ArrayAccess(scope);
 		{
-			tmp.setIndexed(stepIn(that.indexed));
+			tmp.setIndexed(stepIn(that.getExpression()));
 		}
 		{
-			tmp.setIndex(stepIn(that.index));
+			tmp.setIndex(stepIn(that.getIndex()));
 		}
 		expr = tmp;
 	}
 	
-	public void visitTypeCast(JCTypeCast that){
+	public void visitTypeCast(TypeCastTree that){
 		TypeCast tmp = new TypeCast(scope);
-		tmp.setExpr(stepIn(that.expr));
+		tmp.setExpr(stepIn(that.getExpression()));
 		tmp.setTargetType(TypeBuilder.genType(that.getType()));
 		expr = tmp;
 	}
 	
-	public void visitParens(JCParens that){
+	public void visitParenthesized(ParenthesizedTree that){
 		ParenExpr tmp = new ParenExpr(scope);
-		tmp.setExpr(stepIn(that.expr));
+		tmp.setExpr(stepIn(that.getExpression()));
 		expr = tmp;
 	}
 
-	public void visitNewClass(JCNewClass that){
+	public void visitNewClass(NewClassTree that){
 		NewClassExpr tmp = new NewClassExpr(scope);
-		tmp.setClassName(that.constructor.owner.toString());
-		for(JCExpression arg: that.args){
+		tmp.setClassName(that.getIdentifier().toString());
+		for(ExpressionTree arg: that.getArguments()){
 			tmp.addParam(stepIn(arg));
 		}
 		expr = tmp;
 	}
 	
-    public void visitConditional(JCConditional that){
+    public void visitConditionalExpression(ConditionalExpressionTree that){
 		CondExpr tmp = new CondExpr(scope);
-		tmp.setCond(stepIn(that.cond));
-		tmp.setTruePart(stepIn(that.truepart));
-		tmp.setFalsePart(stepIn(that.falsepart));
+		tmp.setCond(stepIn(that.getCondition()));
+		tmp.setTruePart(stepIn(that.getTrueExpression()));
+		tmp.setFalsePart(stepIn(that.getFalseExpression()));
 		expr = tmp;
 	}
 
-	public void visitTree(JCTree t){
+	public void visitOther(Tree t){
 		SynthesijerUtils.error("[JCExprVisitor] The following is unexpected in this context.");
 		SynthesijerUtils.dump(t);
 	}

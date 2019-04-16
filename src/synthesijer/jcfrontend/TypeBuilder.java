@@ -1,9 +1,9 @@
 package synthesijer.jcfrontend;
 
-import openjdk.com.sun.tools.javac.tree.JCTree;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCArrayTypeTree;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCIdent;
-import openjdk.com.sun.tools.javac.tree.JCTree.JCPrimitiveTypeTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.ArrayTypeTree;
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.PrimitiveTypeTree;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Type;
 import synthesijer.ast.type.ArrayType;
@@ -12,16 +12,16 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class TypeBuilder {
 
-	public static Type genType(JCTree that){
+	public static Type genType(Tree that){
 		Type type;
-		if(that instanceof JCPrimitiveTypeTree){
-			JCPrimitiveTypeTree t = (JCPrimitiveTypeTree)that;
+		if(that instanceof PrimitiveTypeTree){
+			PrimitiveTypeTree t = (PrimitiveTypeTree)that;
 			type = getPrimitiveType(t.getPrimitiveTypeKind());
-		}else if(that instanceof JCIdent){
-			type = new ComponentType(((JCIdent) that).sym.toString());  
-		}else if(that instanceof JCArrayTypeTree){
-			JCArrayTypeTree t = (JCArrayTypeTree)that;
-			type = new ArrayType(genType(t.elemtype));
+		}else if(that instanceof IdentifierTree){
+			type = new ComponentType(((IdentifierTree) that).getName().toString());  
+		}else if(that instanceof ArrayTypeTree){
+			ArrayTypeTree t = (ArrayTypeTree)that;
+			type = new ArrayType(genType(t.getType()));
 		}else{
 			SynthesijerUtils.error(String.format("Unknown type: %s (%s)\n", that, that.getClass()));
 			type = PrimitiveTypeKind.UNDEFINED;
