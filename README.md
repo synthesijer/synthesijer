@@ -2,7 +2,7 @@
 
 ## Build from source code
 ### Requirement
-- JDK 8
+- JDK 11
 - Apache Ant
 
 ### Build
@@ -11,5 +11,5 @@
     % ant jar
 
 ### Run
-    % java -jar synthesijer.jar
+    % javac -cp synthesijer.jar -Xplugin:Synthesijer sample/test/Test000.java
 
