@@ -22,6 +22,8 @@ import java.util.Hashtable;
 import net.wasamon.mjlib.util.GetOpt;
 
 import synthesijer.jcfrontend.JCTopVisitor;
+import synthesijer.jcfrontend.SourceInfo;
+import synthesijer.jcfrontend.PreScanner;
 import synthesijer.ast.Module;
 import synthesijer.Manager.OutputFormat;
 import synthesijer.Manager.SynthesijerModuleInfo;
@@ -63,7 +65,9 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 			boolean synthesizeFlag = true;
 
 			CompilationUnitTree t = e.getCompilationUnit();
-			Module module = new Module(t.getSourceFile().getName().toString(), importTable, null, implementing);
+			SourceInfo info = new SourceInfo();
+			t.accept(new PreScanner(), info);
+			Module module = new Module(info.className, importTable, null, implementing);
 			JCTopVisitor visitor = new JCTopVisitor(module);
 			t.accept(visitor, null);
 			Manager.INSTANCE.addModule(module, synthesizeFlag);
@@ -74,7 +78,7 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 	public void finished(TaskEvent e){
 		if (e.getKind() == TaskEvent.Kind.GENERATE){
 			Manager.INSTANCE.preprocess();
-			Manager.INSTANCE.optimize(Options.INSTANCE);
+			//Manager.INSTANCE.optimize(Options.INSTANCE);
 			Manager.INSTANCE.generate();
 			boolean vhdlFlag = true;
 			boolean verilogFlag = true;

@@ -36,8 +36,9 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 	public Scope getScope(){
 		return module;
 	}
-	
-	public  void visitClass(ClassTree that){
+
+	@Override
+	public  Void visitClass(ClassTree that, Void aVoid){
 		for (Tree def : that.getMembers()) {
 			if(def == null){
 				;
@@ -49,9 +50,11 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 				System.err.printf("Unknown class: %s (%s)", def, def.getClass());
 			}
 		}
+		return super.visitClass(that, aVoid);
 	}
 	
-	public void visitMethod(MethodTree decl){
+	@Override
+	public Void visitMethod(MethodTree decl, Void aVoid){
 		String name = decl.getName().toString();
 		Type type;
 		if(JCFrontendUtils.isConstructor(decl)){
@@ -64,7 +67,7 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		m.setArgs(parseArgs(decl.getParameters(), m));
 		
 		if(JCFrontendUtils.isAnnotatedBy(decl.getModifiers().getAnnotations(), "unsynthesizable")){
-			return;
+			return super.visitMethod(decl, aVoid);
 		}
 		
 		m.setUnsynthesizableFlag(JCFrontendUtils.isAnnotatedBy(decl.getModifiers().getAnnotations(), "unsynthesizable"));
@@ -101,6 +104,7 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		}
 		
 		module.addMethod(m);
+		return super.visitMethod(decl, aVoid);
 	}
 	
 	/**
@@ -122,9 +126,11 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		return v;
 	}
 
-	public void visitOther(Tree t){
+	@Override
+	public Void visitOther(Tree t, Void aVoid){
 		SynthesijerUtils.error("[JCTopVisitor] The following is unexpected in this context.");
 		SynthesijerUtils.dump(t);
+		return super.visitOther(t, aVoid);
 	}
 	
 }

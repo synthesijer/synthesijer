@@ -53,10 +53,12 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		return expr;
 	}
 
-	public void visitIdent(IdentifierTree that){
+	@Override
+	public Void visitIdentifier(IdentifierTree that, Void aVoid){
 		Ident tmp = new Ident(scope);
 		tmp.setIdent(that.toString());
 		expr = tmp;
+		return super.visitIdentifier(that, aVoid);
 	}
 	
 	private Expr stepIn(ExpressionTree expr){
@@ -65,7 +67,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		return visitor.getExpr();
 	}
 			
-	public void visitBinary(BinaryTree that){
+	@Override
+	public Void visitBinary(BinaryTree that, Void aVoid){
 		//System.out.println(that);
 		BinaryExpr tmp = new BinaryExpr(scope);
 		Expr lhs = stepIn(that.getLeftOperand());
@@ -75,9 +78,11 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		tmp.setRhs(rhs);
 		tmp.setOp(Op.getOp(that.getKind().toString()));
 		expr = tmp;
+		return super.visitBinary(that, aVoid);
 	}
 	
-	public void visitUnary(UnaryTree that){
+	@Override
+	public Void visitUnary(UnaryTree that, Void aVoid){
 		boolean postfix = false;
 		if(that.toString().endsWith(that.getKind().toString())){
 			postfix = true;
@@ -87,27 +92,33 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		tmp.setArg(stepIn(that.getExpression()));
 		tmp.setPostfix(postfix);
 		expr = tmp;
+		return super.visitUnary(that, aVoid);
 	}
 	
-	public void visitMethodInvocation(MethodInvocationTree that){
+	@Override
+	public Void visitMethodInvocation(MethodInvocationTree that, Void aVoid){
 		MethodInvocation tmp = new MethodInvocation(scope);
 		tmp.setMethod(stepIn(that.getMethodSelect()));
 		for(ExpressionTree param: that.getArguments()){
 			tmp.addParameter(stepIn(param));
 		}
 		expr = tmp;
+		return super.visitMethodInvocation(that, aVoid);
 	}
 	
-	public void visitMemberSelect(MemberSelectTree that){
+	@Override
+	public Void visitMemberSelect(MemberSelectTree that, Void aVoid){
 		FieldAccess tmp = new FieldAccess(scope);
 		tmp.setSelected(stepIn(that.getExpression()));
 		Ident id = new Ident(scope);
 		id.setIdent(that.getIdentifier().toString());
 		tmp.setIdent(id);
 		expr = tmp;
+		return super.visitMemberSelect(that, aVoid);
 	}
 	
-	public void visitLiteral(LiteralTree that){
+	@Override
+	public Void visitLiteral(LiteralTree that, Void aVoid){
 		Literal tmp = new Literal(scope);
 		switch(that.getKind()){
 		case INT_LITERAL:     tmp.setValue((int)(that.getValue()));     break;
@@ -121,6 +132,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		default: tmp.setUndefined(); break;
 		}
 		expr = tmp;
+		return super.visitLiteral(that, aVoid);
 	}
 	
 	private void setForceTypeCast(Expr lhs, Expr rhs){
@@ -138,23 +150,28 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//((Literal)rhs).castType(ltype);
 	}
 	
-	public void visitAssign(AssignmentTree that){
+	@Override
+	public Void visitAssignment(AssignmentTree that, Void aVoid){
 		AssignExpr tmp = new AssignExpr(scope);
 		tmp.setLhs(stepIn(that.getVariable()));
 		tmp.setRhs(stepIn(that.getExpression()));
 		setForceTypeCast(tmp.getLhs(), tmp.getRhs());
 		expr = tmp;
+		return super.visitAssignment(that, aVoid);
 	}
 	
-	public void visitCompoundAssignment(CompoundAssignmentTree that){
+	@Override
+	public Void visitCompoundAssignment(CompoundAssignmentTree that, Void aVoid){
 		AssignOp tmp = new AssignOp(scope);
 		tmp.setLhs(stepIn(that.getVariable()));
 		tmp.setRhs(stepIn(that.getExpression()));
 		tmp.setOp(Op.getOp(that.getKind().toString()));
 		expr = tmp;
+		return super.visitCompoundAssignment(that, aVoid);
 	}
 	
-	public void visitNewArray(NewArrayTree that){
+	@Override
+	public Void visitNewArray(NewArrayTree that, Void aVoid){
 		NewArray tmp = new NewArray(scope);
 		for(ExpressionTree dim: that.getDimensions()){
 			tmp.addDimExpr(stepIn(dim));
@@ -175,9 +192,12 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		}
 
 		expr = tmp;
+
+		return super.visitNewArray(that, aVoid);
 	}
 	
-	public void visitArrayAccess(ArrayAccessTree that){
+	@Override
+	public Void visitArrayAccess(ArrayAccessTree that, Void aVoid){
 		ArrayAccess tmp = new ArrayAccess(scope);
 		{
 			tmp.setIndexed(stepIn(that.getExpression()));
@@ -186,40 +206,51 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 			tmp.setIndex(stepIn(that.getIndex()));
 		}
 		expr = tmp;
+		return super.visitArrayAccess(that, aVoid);
 	}
 	
-	public void visitTypeCast(TypeCastTree that){
+	@Override
+	public Void visitTypeCast(TypeCastTree that, Void aVoid){
 		TypeCast tmp = new TypeCast(scope);
 		tmp.setExpr(stepIn(that.getExpression()));
 		tmp.setTargetType(TypeBuilder.genType(that.getType()));
 		expr = tmp;
+		return super.visitTypeCast(that, aVoid);
 	}
-	
-	public void visitParenthesized(ParenthesizedTree that){
+
+	@Override
+	public Void visitParenthesized(ParenthesizedTree that, Void aVoid){
 		ParenExpr tmp = new ParenExpr(scope);
 		tmp.setExpr(stepIn(that.getExpression()));
 		expr = tmp;
+		return super.visitParenthesized(that, aVoid);
 	}
 
-	public void visitNewClass(NewClassTree that){
+	@Override
+	public Void visitNewClass(NewClassTree that, Void aVoid){
 		NewClassExpr tmp = new NewClassExpr(scope);
 		tmp.setClassName(that.getIdentifier().toString());
 		for(ExpressionTree arg: that.getArguments()){
 			tmp.addParam(stepIn(arg));
 		}
 		expr = tmp;
+		return super.visitNewClass(that, aVoid);
 	}
 	
-    public void visitConditionalExpression(ConditionalExpressionTree that){
+	@Override
+    public Void visitConditionalExpression(ConditionalExpressionTree that, Void aVoid){
 		CondExpr tmp = new CondExpr(scope);
 		tmp.setCond(stepIn(that.getCondition()));
 		tmp.setTruePart(stepIn(that.getTrueExpression()));
 		tmp.setFalsePart(stepIn(that.getFalseExpression()));
 		expr = tmp;
+		return super.visitConditionalExpression(that, aVoid);
 	}
 
-	public void visitOther(Tree t){
+	@Override
+	public Void visitOther(Tree t, Void aVoid){
 		SynthesijerUtils.error("[JCExprVisitor] The following is unexpected in this context.");
 		SynthesijerUtils.dump(t);
+		return super.visitOther(t, aVoid);
 	}
 }
