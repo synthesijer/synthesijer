@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * @author Takefumi MIYOSHI
  *
  */
-public class NamedArrayList extends ArrayList{
+public class NamedArrayList extends ArrayList<NamedObject>{
   
   /**
    * コンストラクタ
