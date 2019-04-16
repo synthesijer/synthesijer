@@ -5,7 +5,7 @@ import com.sun.source.util.Plugin;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,12 +17,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Hashtable;
 
 import net.wasamon.mjlib.util.GetOpt;
-// import synthesijer.Manager.OutputFormat;
-// import synthesijer.Manager.SynthesijerModuleInfo;
-// import synthesijer.hdl.HDLModule;
-// import synthesijer.tools.xilinx.HDLModuleToComponentXML;
+
+import synthesijer.jcfrontend.JCTopVisitor;
+import synthesijer.ast.Module;
+import synthesijer.Manager.OutputFormat;
+import synthesijer.Manager.SynthesijerModuleInfo;
+import synthesijer.hdl.HDLModule;
+import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 
 /**
  * The user interface for Synthesijer.
@@ -51,11 +55,35 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 
 	@Override
 	public void started(TaskEvent e){
-		//synthesijer.jcfrontend.Main.newModule(env, cdef); // add hook for synthesijer
+		if (e.getKind() == TaskEvent.Kind.GENERATE){
+			System.out.println(e);
+			Hashtable<String, String> importTable = new Hashtable<>();
+			ArrayList<String> implementing = new ArrayList<>();
+			String extending = "";
+			boolean synthesizeFlag = true;
+
+			CompilationUnitTree t = e.getCompilationUnit();
+			Module module = new Module(t.getSourceFile().getName().toString(), importTable, null, implementing);
+			JCTopVisitor visitor = new JCTopVisitor(module);
+			t.accept(visitor, null);
+			Manager.INSTANCE.addModule(module, synthesizeFlag);
+        }
 	}
 
 	@Override
 	public void finished(TaskEvent e){
+		if (e.getKind() == TaskEvent.Kind.GENERATE){
+			Manager.INSTANCE.preprocess();
+			Manager.INSTANCE.optimize(Options.INSTANCE);
+			Manager.INSTANCE.generate();
+			boolean vhdlFlag = true;
+			boolean verilogFlag = true;
+			boolean packaging = false;
+			if (vhdlFlag)
+				Manager.INSTANCE.output(OutputFormat.VHDL);
+			if (verilogFlag)
+				Manager.INSTANCE.output(OutputFormat.Verilog);
+		}
 	}
 	
 	private static void printHelp() {
