@@ -30,7 +30,7 @@ public class HDLValue implements HDLLiteral {
     }
 
     public HDLValue(boolean v) {
-        this(new Boolean(v).toString(), HDLPrimitiveType.genBitType());
+        this(Boolean.valueOf(v).toString(), HDLPrimitiveType.genBitType());
     }
 
     public String toString() {
