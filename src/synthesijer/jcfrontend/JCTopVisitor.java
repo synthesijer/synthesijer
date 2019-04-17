@@ -50,7 +50,8 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 				System.err.printf("Unknown class: %s (%s)", def, def.getClass());
 			}
 		}
-		return super.visitClass(that, aVoid);
+		//return super.visitClass(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -67,7 +68,8 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		m.setArgs(parseArgs(decl.getParameters(), m));
 		
 		if(JCFrontendUtils.isAnnotatedBy(decl.getModifiers().getAnnotations(), "unsynthesizable")){
-			return super.visitMethod(decl, aVoid);
+			//return super.visitMethod(decl, aVoid);
+			return null;
 		}
 		
 		m.setUnsynthesizableFlag(JCFrontendUtils.isAnnotatedBy(decl.getModifiers().getAnnotations(), "unsynthesizable"));
@@ -104,7 +106,8 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		}
 		
 		module.addMethod(m);
-		return super.visitMethod(decl, aVoid);
+		//return super.visitMethod(decl, aVoid);
+		return null;
 	}
 	
 	/**

@@ -9,7 +9,8 @@ public class PreScanner extends TreeScanner<Void, SourceInfo>{
 	@Override
 	public Void visitClass(ClassTree node, SourceInfo info) {
 		info.className = node.getSimpleName().toString();
-		return super.visitClass(node, null);
+		//return super.visitClass(node, null);
+		return null;
 	}
 	
 }

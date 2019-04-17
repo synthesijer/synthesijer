@@ -58,7 +58,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		Ident tmp = new Ident(scope);
 		tmp.setIdent(that.toString());
 		expr = tmp;
-		return super.visitIdentifier(that, aVoid);
+		//return super.visitIdentifier(that, aVoid);
+		return null;
 	}
 	
 	private Expr stepIn(ExpressionTree expr){
@@ -76,23 +77,26 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		Expr rhs = stepIn(that.getRightOperand());
 		setForceTypeCast(lhs, rhs);
 		tmp.setRhs(rhs);
-		tmp.setOp(Op.getOp(that.getKind().toString()));
+		tmp.setOp(Op.getOp(that.getKind()));
 		expr = tmp;
-		return super.visitBinary(that, aVoid);
+		//return super.visitBinary(that, aVoid);
+		return null;
 	}
 	
 	@Override
 	public Void visitUnary(UnaryTree that, Void aVoid){
 		boolean postfix = false;
-		if(that.toString().endsWith(that.getKind().toString())){
+		if(that.getKind() == Tree.Kind.POSTFIX_DECREMENT ||
+		   that.getKind() == Tree.Kind.POSTFIX_INCREMENT){
 			postfix = true;
 		}
 		UnaryExpr tmp = new UnaryExpr(scope);
-		tmp.setOp(Op.getOp(that.getKind().toString()));
+		tmp.setOp(Op.getOp(that.getKind()));
 		tmp.setArg(stepIn(that.getExpression()));
 		tmp.setPostfix(postfix);
 		expr = tmp;
-		return super.visitUnary(that, aVoid);
+		//return super.visitUnary(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -103,7 +107,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 			tmp.addParameter(stepIn(param));
 		}
 		expr = tmp;
-		return super.visitMethodInvocation(that, aVoid);
+		//return super.visitMethodInvocation(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -114,7 +119,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		id.setIdent(that.getIdentifier().toString());
 		tmp.setIdent(id);
 		expr = tmp;
-		return super.visitMemberSelect(that, aVoid);
+		//return super.visitMemberSelect(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -132,7 +138,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		default: tmp.setUndefined(); break;
 		}
 		expr = tmp;
-		return super.visitLiteral(that, aVoid);
+		//return super.visitLiteral(that, aVoid);
+		return null;
 	}
 	
 	private void setForceTypeCast(Expr lhs, Expr rhs){
@@ -157,7 +164,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		tmp.setRhs(stepIn(that.getExpression()));
 		setForceTypeCast(tmp.getLhs(), tmp.getRhs());
 		expr = tmp;
-		return super.visitAssignment(that, aVoid);
+		//return super.visitAssignment(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -165,9 +173,10 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		AssignOp tmp = new AssignOp(scope);
 		tmp.setLhs(stepIn(that.getVariable()));
 		tmp.setRhs(stepIn(that.getExpression()));
-		tmp.setOp(Op.getOp(that.getKind().toString()));
+		tmp.setOp(Op.getOp(that.getKind()));
 		expr = tmp;
-		return super.visitCompoundAssignment(that, aVoid);
+		//return super.visitCompoundAssignment(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -193,7 +202,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 
 		expr = tmp;
 
-		return super.visitNewArray(that, aVoid);
+		//return super.visitNewArray(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -206,7 +216,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 			tmp.setIndex(stepIn(that.getIndex()));
 		}
 		expr = tmp;
-		return super.visitArrayAccess(that, aVoid);
+		//return super.visitArrayAccess(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -215,7 +226,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		tmp.setExpr(stepIn(that.getExpression()));
 		tmp.setTargetType(TypeBuilder.genType(that.getType()));
 		expr = tmp;
-		return super.visitTypeCast(that, aVoid);
+		//return super.visitTypeCast(that, aVoid);
+		return null;
 	}
 
 	@Override
@@ -223,7 +235,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		ParenExpr tmp = new ParenExpr(scope);
 		tmp.setExpr(stepIn(that.getExpression()));
 		expr = tmp;
-		return super.visitParenthesized(that, aVoid);
+		//return super.visitParenthesized(that, aVoid);
+		return null;
 	}
 
 	@Override
@@ -234,7 +247,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 			tmp.addParam(stepIn(arg));
 		}
 		expr = tmp;
-		return super.visitNewClass(that, aVoid);
+		//return super.visitNewClass(that, aVoid);
+		return null;
 	}
 	
 	@Override
@@ -244,7 +258,8 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		tmp.setTruePart(stepIn(that.getTrueExpression()));
 		tmp.setFalsePart(stepIn(that.getFalseExpression()));
 		expr = tmp;
-		return super.visitConditionalExpression(that, aVoid);
+		//return super.visitConditionalExpression(that, aVoid);
+		return null;
 	}
 
 	@Override

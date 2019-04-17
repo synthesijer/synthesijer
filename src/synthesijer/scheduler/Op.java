@@ -281,7 +281,7 @@ public enum Op {
 		case XOR: return XOR;
 		case LNOT: return LNOT;
 		default:
-			System.out.println("undefiend:" + o);
+			System.out.println("undefined:" + o);
 			return UNDEFINED;
 		}
 	}

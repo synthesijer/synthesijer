@@ -467,7 +467,7 @@ public class GenSchedulerBoardVisitor implements SynthesijerAstVisitor{
 			String prefix =o.getScope().getMethod().getName();
 			vName = String.format("%s_%s_%04d", prefix, o.getName(), idGen.id());
 		}
-		
+		//System.out.println(o);
 		VariableOperand v;
 		Operand initSrc = null;
 		if(vv.getInitExpr() != null){

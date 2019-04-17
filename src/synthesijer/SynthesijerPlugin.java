@@ -43,6 +43,9 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 		return "Synthesijer";
 	}
 
+	boolean vhdlFlag = true;
+	boolean verilogFlag = true;
+
 	@Override
 	public void init(JavacTask task, String... args){
 		GetOpt opt = new GetOpt("h",
@@ -52,6 +55,21 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 			printHelp();
 			System.exit(0);
 		}
+
+		vhdlFlag = opt.flag("vhdl");
+		verilogFlag = opt.flag("verilog");
+		Options.INSTANCE.optimizing = !opt.flag("no-optimize");
+		// Options.INSTANCE.chaining = !opt.flag("no-chaining");
+		Options.INSTANCE.chaining = opt.flag("chaining");
+		Options.INSTANCE.bb2 = opt.flag("bb2");
+		Options.INSTANCE.bb = opt.flag("bb");
+		Options.INSTANCE.legacy_instance_variable_name = opt.flag("legacy-instance-variable-name");
+		Options.INSTANCE.operation_strength_reduction = opt.flag("operation_strength_reduction"
+																 );
+		Options.INSTANCE.iroha = opt.flag("iroha");
+		Options.INSTANCE.opencl = opt.flag("opencl");
+		Options.INSTANCE.with_ssa = opt.flag("ssa");
+		
 		task.addTaskListener(this);
 	}
 
@@ -78,7 +96,7 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 	public void finished(TaskEvent e){
 		if (e.getKind() == TaskEvent.Kind.GENERATE){
 			Manager.INSTANCE.preprocess();
-			//Manager.INSTANCE.optimize(Options.INSTANCE);
+			Manager.INSTANCE.optimize(Options.INSTANCE);
 			Manager.INSTANCE.generate();
 			boolean vhdlFlag = true;
 			boolean verilogFlag = true;

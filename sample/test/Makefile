@@ -16,7 +16,7 @@ OPT = --chaining --bb2 --ssa
 all: synthesis
 
 %.vhd : %.java
-	java -cp $(SYNTHESIJER) synthesijer.Main --vhdl $(OPT) $(SOURCES)
+	javac -cp $(SYNTHESIJER) -Xplugin:"Synthesijer --vhdl --chaining --bb2 --ssa" $(SOURCES)
 
 %.v : %.java
 	java -cp $(SYNTHESIJER) synthesijer.Main --verilog $(OPT) $(SOURCES)
