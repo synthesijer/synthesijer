@@ -9,6 +9,9 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.MalformedURLException;
 
 import synthesijer.ast.Module;
 import synthesijer.ast.opt.NullOptimizer;
@@ -276,11 +279,22 @@ public enum Manager {
 		doResolveExtends();
 		doGenSchedulerBoard();
 	}
+
+	private ArrayList<URL> loadpath = new ArrayList<>();;
+	public void addLoadPath(String path) throws MalformedURLException{
+		URL url = (new File(path)).toURI().toURL();
+		loadpath.add(url);
+	}
 	
 	private HDLModule loadUserHDLModule(String s){
 		try {
-			Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
-				Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
+			ClassLoader sysloader = ClassLoader.getSystemClassLoader();
+
+			URLClassLoader loader = URLClassLoader.newInstance(loadpath.toArray(new URL[]{}));
+			
+			//Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
+			Class<?> clazz = loader.loadClass(s);
+			Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
 			Object obj = ct.newInstance(new Object[]{new String[]{}});
 			if(!(obj instanceof HDLModule)){
 				System.err.printf("unsupported type: %s (%s)", obj, obj.getClass());
