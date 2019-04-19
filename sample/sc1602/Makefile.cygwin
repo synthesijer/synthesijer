@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../bin
+SYNTHESIJER ?= ../../synthesijer.jar
 
 SOURCES = SC1602Test.java SC1602Wrapper.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
