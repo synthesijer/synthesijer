@@ -12,6 +12,7 @@ import com.sun.source.tree.ForLoopTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.ReturnTree;
 //import com.sun.source.tree.JCSkip;
+import com.sun.source.tree.EmptyStatementTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.SwitchTree;
 import com.sun.source.tree.SynchronizedTree;
@@ -174,9 +175,11 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 		return null;
     }
 	
-    //public void visitSkip(JCSkip that){
-	//	stmt = new SkipStatement(scope);
-    //}
+	@Override
+    public Void visitEmptyStatement(EmptyStatementTree that, Void aVoid){
+		stmt = new SkipStatement(scope);
+		return null;
+	}
 	
 	@Override
     public Void visitTry(TryTree that, Void aVoid){
