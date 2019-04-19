@@ -18,7 +18,7 @@ import synthesijer.jcfrontend.PreScanner;
 import synthesijer.ast.Module;
 
 /**
- * The user interface for Synthesijer.
+ * javac plugin to generate Synthesijer-IR from Java source code
  * 
  * @author miyo
  *

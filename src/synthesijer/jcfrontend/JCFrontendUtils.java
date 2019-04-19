@@ -72,7 +72,8 @@ public class JCFrontendUtils {
 	
     public static boolean isInterfaceDecl(ModifiersTree mods){
 		//return (mods.getFlags().contains(Modifier.INTERFACE));
-		return (mods.getFlags().contains(Modifier.ABSTRACT));
+		//return (mods.getFlags().contains(Modifier.ABSTRACT));
+		return false;
     }
 	
     public static boolean isImplemented(List<ExpressionTree> implementing, String key){

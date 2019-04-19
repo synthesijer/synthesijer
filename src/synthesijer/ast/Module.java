@@ -141,6 +141,7 @@ public class Module implements Scope, SynthesijerAstTree{
 				ext = Manager.INSTANCE.searchModule(getExtending());
 			}catch(UnknownModuleException e){
 				SynthesijerUtils.error("cannot find the extending class:" + getExtending());
+				Manager.INSTANCE.HDLModuleInfoList();
 				throw new RuntimeException("cannot find the extending class:" + getExtending());
 			}
 			ext.resolveExtends();
