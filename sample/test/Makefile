@@ -1,6 +1,7 @@
-SYNTHESIJER ?= ../../bin
+SYNTHESIJER ?= ../../synthesijer.jar
 
-SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java Test017.java Test018.java Test020.java Test021.java Test021_test.java Test022.java Test022_test.java Test_ArithInt.java Test023.java
+#SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java Test017.java Test018.java Test020.java Test021.java Test021_test.java Test022.java Test022_test.java Test_ArithInt.java Test023.java
+SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test014.java Test017.java Test018.java Test020.java Test021.java Test021_test.java Test022.java Test022_test.java Test_ArithInt.java Test023.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
 SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test004.VHD sim_Test005.VHD sim_Test006.VHD sim_Test007.VHD sim_Test014.VHD sim_Test017.VHD sim_Test018.VHD sim_Test020.VHD sim_Test_ArithInt.VHD sim_Test021.VHD sim_Test022.VHD sim_Test023.VHD
@@ -16,13 +17,13 @@ OPT = --chaining --bb2 --ssa
 all: synthesis
 
 %.vhd : %.java
-	javac -cp $(SYNTHESIJER) -Xplugin:"Synthesijer --vhdl --chaining --bb2 --ssa" $(SOURCES)
+	java -cp . -jar $(SYNTHESIJER) synthesijer.Main --vhdl $(OPT) $(SOURCES)
 
 %.v : %.java
-	java -cp $(SYNTHESIJER) synthesijer.Main --verilog $(OPT) $(SOURCES)
+	java -cp . -jar $(SYNTHESIJER) synthesijer.Main --verilog $(OPT) $(SOURCES)
 
-#synthesis: $(SOURCES)
-#	java -cp $(SYNTHESIJER) synthesijer.Main --verilog --vhdl $(OPT) $(SOURCES)
+synthesis: $(SOURCES)
+	java -cp $(SYNTHESIJER) synthesijer.Main --verilog --vhdl $(OPT) $(SOURCES)
 
 ghdl64: $(VHDL_SOURCES)
 	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) sim.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/singleportram.vhd ../../lib/vhdl/dualportram.vhd $(SIM_SOURCES)
