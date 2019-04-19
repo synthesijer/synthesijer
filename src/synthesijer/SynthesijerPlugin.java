@@ -58,20 +58,6 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 	}
 
 	public void newModule(CompilationUnitTree t){
-		/*
-			Hashtable<String, String> importTable = new Hashtable<>();
-			ArrayList<String> implementing = new ArrayList<>();
-			String extending = "";
-			boolean synthesizeFlag = true;
-
-			CompilationUnitTree t = ;
-			SourceInfo info = new SourceInfo();
-			t.accept(new PreScanner(), info);
-			Module module = new Module(info.className, importTable, null, implementing);
-			JCTopVisitor visitor = new JCTopVisitor(module);
-			t.accept(visitor, null);
-			Manager.INSTANCE.addModule(module, synthesizeFlag);
-		*/
 		
 		SourceInfo info = new SourceInfo();
 		t.accept(new PreScanner(), info);
