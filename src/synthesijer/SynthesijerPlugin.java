@@ -41,6 +41,7 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 	@Override
 	public void started(TaskEvent e){
 		if (e.getKind() == TaskEvent.Kind.GENERATE){
+			System.out.println("source: " + e.getSourceFile());
 			newModule(e.getCompilationUnit());
         }
 	}

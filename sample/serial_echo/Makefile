@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../bin
+SYNTHESIJER ?= ../../synthesijer.jar
 
 SOURCES = EchoTest.java RS232C_RX_Wrapper.java RS232C_TX_Wrapper.java ToUpper.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)

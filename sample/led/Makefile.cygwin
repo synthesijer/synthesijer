@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../bin
+SYNTHESIJER ?= ../../synthesijer.jar
 
 SOURCES = led.java counter.java FireFly.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)

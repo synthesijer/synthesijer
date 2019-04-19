@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../bin
+SYNTHESIJER ?= ../../synthesijer.jar
 SOURCES = Prime.java PrimeSim.java BubbleSort.java BubbleSortSim.java MergeSort.java MergeSortSim.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)

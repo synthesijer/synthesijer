@@ -15,6 +15,7 @@ architecture RTL of microboard_top is
 
   attribute mark_debug : string;
   attribute keep : string;
+  attribute S : string;
 
   component ToUpper
     port (
@@ -27,17 +28,17 @@ architecture RTL of microboard_top is
     );
   end component ToUpper;
 
-  signal CLOCK_Y3_sig : std_logic;
-  signal USER_RESET_sig : std_logic;
-  signal USB_RS232_RXD_sig : std_logic;
-  signal USB_RS232_TXD_sig : std_logic;
+  signal CLOCK_Y3_sig : std_logic := '0';
+  signal USER_RESET_sig : std_logic := '0';
+  signal USB_RS232_RXD_sig : std_logic := '0';
+  signal USB_RS232_TXD_sig : std_logic := '0';
 
-  signal U_clk : std_logic;
-  signal U_reset : std_logic;
-  signal U_run_req : std_logic;
-  signal U_run_busy : std_logic;
-  signal U_tx_dout_exp : std_logic;
-  signal U_rx_din_exp : std_logic;
+  signal U_clk : std_logic := '0';
+  signal U_reset : std_logic := '0';
+  signal U_run_req : std_logic := '0';
+  signal U_run_busy : std_logic := '0';
+  signal U_tx_dout_exp : std_logic := '0';
+  signal U_rx_din_exp : std_logic := '0';
 
 begin
 
@@ -63,8 +64,8 @@ begin
 
   inst_U : ToUpper
   port map(
-    clk => U_clk,
-    reset => U_reset,
+    clk => CLOCK_Y3,
+    reset => USER_RESET,
     run_req => U_run_req,
     run_busy => U_run_busy,
     tx_dout_exp => U_tx_dout_exp,
