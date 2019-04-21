@@ -11,5 +11,5 @@
     % ant jar
 
 ### Run
-    % javac -cp synthesijer.jar -Xplugin:Synthesijer sample/test/Test000.java
+    % java -jar synthesijer.jar sample/test/Test000.java
 

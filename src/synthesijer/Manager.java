@@ -288,7 +288,6 @@ public enum Manager {
 	
 	private HDLModule loadUserHDLModule(String s){
 		try {
-			ClassLoader sysloader = ClassLoader.getSystemClassLoader();
 
 			URLClassLoader loader = URLClassLoader.newInstance(loadpath.toArray(new URL[]{}));
 			
