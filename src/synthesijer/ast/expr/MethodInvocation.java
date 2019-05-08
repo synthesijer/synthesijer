@@ -99,7 +99,7 @@ public class MethodInvocation extends Expr{
 				m = Manager.INSTANCE.searchModule(type.getName()).searchMethod(getMethodName());
 			}catch(UnknownModuleException e){
 				SynthesijerUtils.error(method + ": cannot find type:" + type.getName());
-				throw new RuntimeException("cannot find class:" + type.getName());
+				throw new RuntimeException("cannot find class:" + type.getName() + ", " + method.getClass().getName());
 			}
 			return m.getType();
 		}

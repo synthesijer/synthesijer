@@ -1,17 +1,23 @@
 import java.util.Arrays;
 import java.util.List;
-import java.util.List;
 
 import synthesijer.rt.*;
 
 public class Test024 {
  
-    public int test024_1(List<Integer> lst) { 
-        return lst.stream().mapToInt(i -> i).sum();
+	public int test024_1(List<Integer> lst) { 
+        return lst
+			.stream()
+			.mapToInt(i -> i)
+			.sum();
     }
 	
     public int test024_2(List<Integer> lst) { 
-        return lst.stream().filter(x -> x % 3 == 1).mapToInt(i -> i).sum();
+        return lst
+			.stream()
+			.filter(x -> x % 2 == 1)
+			.mapToInt(i -> i)
+			.sum();
     }
 
 	@unsynthesizable

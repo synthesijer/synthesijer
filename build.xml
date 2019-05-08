@@ -51,5 +51,13 @@
       <service type="com.sun.source.util.Plugin" provider="synthesijer.SynthesijerPlugin"/>
     </jar>
   </target>
+  <target name="stream" depends="init,build">
+    <jar basedir="./bin/" jarfile="synthesijer-stream.jar">
+      <manifest>
+	<attribute name="Main-class" value="synthesijer.Main"/>
+      </manifest>
+      <service type="com.sun.source.util.Plugin" provider="synthesijer.StreamAnalysisPlugin"/>
+    </jar>
+  </target>
 
 </project>

@@ -75,6 +75,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		Expr lhs = stepIn(that.getLeftOperand());
 		tmp.setLhs(lhs);
 		Expr rhs = stepIn(that.getRightOperand());
+		//System.out.println(lhs + " <-[cast]- "+ rhs);
 		setForceTypeCast(lhs, rhs);
 		tmp.setRhs(rhs);
 		tmp.setOp(Op.getOp(that.getKind()));

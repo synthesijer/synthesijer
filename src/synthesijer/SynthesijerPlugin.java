@@ -30,9 +30,6 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 		return "Synthesijer";
 	}
 
-	boolean vhdlFlag = true;
-	boolean verilogFlag = true;
-
 	@Override
 	public void init(JavacTask task, String... args){
 		task.addTaskListener(this);
