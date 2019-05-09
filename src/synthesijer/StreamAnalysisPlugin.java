@@ -1,13 +1,15 @@
 package synthesijer;
 
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.Plugin;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import synthesijer.stream.*;
 
 /**
  * javac plugin to generate Synthesijer-IR from Java source code
@@ -17,6 +19,8 @@ import com.sun.source.util.TreeScanner;
  */
 public class StreamAnalysisPlugin implements Plugin, TaskListener{
 
+	StreamModuleScanner top;
+	
 	@Override
 	public String getName(){
 		return "StreamAnalysis";
@@ -31,37 +35,20 @@ public class StreamAnalysisPlugin implements Plugin, TaskListener{
 	@Override
 	public void started(TaskEvent e){
 		if (e.getKind() == TaskEvent.Kind.GENERATE){
-			System.out.println(e.getCompilationUnit());
-			TopVisitor top = new TopVisitor();
+			//System.out.println(e.getCompilationUnit());
+			top = new StreamModuleScanner();
 			e.getCompilationUnit().accept(top, null);
         }
 	}
 
 	@Override
 	public void finished(TaskEvent e){
+		if (e.getKind() == TaskEvent.Kind.GENERATE){
+			for(var m: top.modules){
+				//m.output(System.out);
+				System.out.println(m);
+			}
+		}
 	}
 
-}
-
-class TopVisitor extends TreeScanner<Void, Void>{
-
-	public TopVisitor(){
-
-	}
-
-	@Override
-	public  Void visitClass(ClassTree t, Void aVoid){
-		return super.visitOther(t, aVoid);
-	}
-	
-	@Override
-	public Void visitMethod(MethodTree t, Void aVoid){
-		return super.visitOther(t, aVoid);
-	}
-
-	@Override
-	public Void visitOther(Tree t, Void aVoid){
-		return super.visitOther(t, aVoid);
-	}
-	
 }
