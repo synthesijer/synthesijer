@@ -35,7 +35,7 @@ public class StreamAnalysisPlugin implements Plugin, TaskListener{
 	@Override
 	public void started(TaskEvent e){
 		if (e.getKind() == TaskEvent.Kind.GENERATE){
-			//System.out.println(e.getCompilationUnit());
+			System.out.println(e.getCompilationUnit());
 			top = new StreamModuleScanner();
 			e.getCompilationUnit().accept(top, null);
         }
@@ -45,8 +45,8 @@ public class StreamAnalysisPlugin implements Plugin, TaskListener{
 	public void finished(TaskEvent e){
 		if (e.getKind() == TaskEvent.Kind.GENERATE){
 			for(var m: top.modules){
-				//m.output(System.out);
 				System.out.println(m);
+				m.output(System.out);
 			}
 		}
 	}

@@ -1,2 +1,7 @@
 /bin
 /synthesijer.jar
+/synthesijer-stream.jar
+*~
+*.vcd
+a.out
+*.iml

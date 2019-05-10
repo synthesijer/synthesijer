@@ -1,5 +1,8 @@
 package synthesijer.stream;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
 public class StreamOutput{
 
 	String name;
@@ -11,6 +14,10 @@ public class StreamOutput{
 
 	public void setType(String name){
 		this.type = type;
+	}
+
+	public void output(PrintStream out){
+		out.println("  output: " + "name:" + name + ", type:" + type);
 	}
 
 }

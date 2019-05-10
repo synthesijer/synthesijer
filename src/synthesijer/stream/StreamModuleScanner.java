@@ -42,7 +42,6 @@ class TypeScanner extends BaseScanner<String, Void>{
 class StreamUnitScanner extends BaseScanner<Void, Void>{
 
 	StreamModule module;
-	ArrayList<StreamUnit> units = new ArrayList<>();
 
 	public StreamUnitScanner(StreamModule m){
 		this.module = m;
@@ -57,11 +56,11 @@ class StreamUnitScanner extends BaseScanner<Void, Void>{
 			return null;
 		}
 		StreamUnit unit = new StreamUnit(node.getName().toString());
-		units.add(unit);
+		module.units.add(unit);
 		
 		System.out.println("       parameters: " + node.getParameters());
 		for(var t: node.getParameters()){
-			t.accept(this, null);
+			t.accept(new VariableScanner(), null);
 			StreamInput input = new StreamInput(t.getName().toString());
 			unit.inputs.add(input);
 		}
@@ -91,23 +90,82 @@ class StreamUnitScanner extends BaseScanner<Void, Void>{
 		return false;
 	}
 
+	@Override
+	public Void visitIdentifier(IdentifierTree node, Void aVoid){
+		System.out.println("id:" + node);
+		return null;
+	}
+
+	@Override
+	public Void visitBlock(BlockTree node, Void aVoid){
+		System.out.println("<block>");
+		for(var n: node.getStatements()){
+			n.accept(this, null);
+		}
+		System.out.println("</block>");
+		return null;
+	}
+
+	@Override
+	public Void visitReturn(ReturnTree node, Void aVoid){
+		System.out.println("<return>");
+		node.getExpression().accept(this, null);
+		System.out.println("</return>");
+		return null;
+	}
+
+	@Override
+	public Void visitBinary(BinaryTree node, Void aVoid){
+		System.out.println("<binary>");
+		node.getLeftOperand().accept(this, null);
+		node.getRightOperand().accept(this, null);
+		System.out.println("</binary>");
+		return null;
+	}
+
+	@Override
+	public Void visitMethodInvocation(MethodInvocationTree node, Void aVoid){
+		System.out.println("<invocation>");
+		node.getMethodSelect().accept(this, null);
+		System.out.println("<arguments>");
+		for(var n: node.getArguments()){
+			n.accept(this, null);
+		}
+		System.out.println("</arguments>");
+		System.out.println("</invocation>");
+		return null;
+	}
+
+	@Override
+	public Void visitMemberSelect(MemberSelectTree node, Void aVoid){
+		System.out.println("<method>");
+		System.out.println("<expression>");
+		node.getExpression().accept(this, null);
+		System.out.println("</expression>");
+		System.out.println("<ident>");
+		System.out.println(node.getIdentifier().toString());
+		System.out.println("</ident>");
+		System.out.println("</method>");
+		return null;
+	}
+
 }
-/*
+
+class VariableScanner extends BaseScanner<Void, Void>{
 	@Override
 	public Void visitVariable(VariableTree node, Void aVoid){
 		System.out.println("variable name: " + node.getName());
 		System.out.println("         modifiers: " + node.getModifiers());
 		System.out.println("         init: " + node.getInitializer());
 		System.out.println("         type: " + node.getType());
+		node.getType().accept(this, null);
 		return null;
 	}
-
 
 	@Override
-	public Void visitOther(Tree t, Void aVoid){
-		System.out.println("rule has not been implemented: " + t.getClass().getName());
+	public Void visitIdentifier(IdentifierTree node, Void aVoid){
+		System.out.println("VariableScanner::id: " + node);
 		return null;
 	}
-	
+
 }
-*/

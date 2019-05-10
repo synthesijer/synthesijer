@@ -191,7 +191,7 @@ public class BaseScanner<R,P> extends TreeScanner<R, P>{
 	}
 	@Override
 	public R visitMemberSelect(MemberSelectTree node, P p){
-		debug("unimplemented: " + node.getClass().getName());
+		debug("unimplemented:fi " + node.getClass().getName());
 		return null;
 	}
 	@Override

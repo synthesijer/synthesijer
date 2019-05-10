@@ -1,5 +1,7 @@
 package synthesijer.stream;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class StreamUnit{
@@ -14,6 +16,15 @@ public class StreamUnit{
 
 	public String getName(){
 		return name;
+	}
+
+	public void output(PrintStream out){
+		for(var v: inputs){
+			v.output(out);
+		}
+		for(var v: outputs){
+			v.output(out);
+		}
 	}
 
 }
