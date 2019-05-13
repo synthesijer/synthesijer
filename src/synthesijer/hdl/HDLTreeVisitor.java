@@ -11,7 +11,7 @@ public interface HDLTreeVisitor {
     public void visitHDLModule(HDLModule o);
 
     public void visitHDLPort(HDLPort o);
-	
+
     public void visitHDLParameter(HDLParameter o);
 
     public void visitHDLSequencer(HDLSequencer o);

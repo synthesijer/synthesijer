@@ -8,19 +8,19 @@ import synthesijer.hdl.sequencer.SequencerState;
 import synthesijer.hdl.sequencer.StateTransitCondition;
 
 public class HDLSequencerToDot {
-	
+
 	private final HDLModule module;
-	
+
 	public HDLSequencerToDot(HDLModule m){
 		this.module = m;
 	}
-	
+
 	public void generate(PrintWriter dest){
 		for(HDLSequencer seq: module.getSequencers()){
 			generate(dest, seq);
 		}
 	}
-	
+
 	private void generate(PrintWriter dest, HDLSequencer seq){
 		String name = module.getName() + "_" + seq.getStateKey().getName();
 		dest.printf("digraph " + name + "{\n");
@@ -32,11 +32,11 @@ public class HDLSequencerToDot {
 		}
 		dest.printf("}\n");
 	}
-	
+
 	private String getLabel(SequencerState s){
 		return s.getStateId().getValue();
 	}
-	
+
 	private String getCondNode(StateTransitCondition t){
 		return "\"" + t.toLabel() + "\"";
 	}
@@ -44,7 +44,7 @@ public class HDLSequencerToDot {
 	private void generate_node(PrintWriter dest, SequencerState s){
 //		dest.println(getLabel(s) + ";");
 	}
-	
+
 	private void generate_edge(PrintWriter dest, SequencerState s){
 		for(StateTransitCondition t: s.getTransitions()){
 			if(t.hasCondition() == false){

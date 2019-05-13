@@ -21,23 +21,23 @@ import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.expr.HDLValue;
 
 public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
-	
-    private PrintWriter dest;
-    private int offset;
-	
-    public GenerateVHDLDefVisitor(PrintWriter dest, int offset){
+
+	private PrintWriter dest;
+	private int offset;
+
+	public GenerateVHDLDefVisitor(PrintWriter dest, int offset){
 		this.dest = dest;
 		this.offset = offset;
-    }
+	}
 
-    @Override
-    public void visitHDLExpr(HDLExpr o) {
+	@Override
+	public void visitHDLExpr(HDLExpr o) {
 		// TODO Auto-generated method stub
-		
-    }
 
-    @Override
-    public void visitHDLInstance(HDLInstance o) {
+	}
+
+	@Override
+	public void visitHDLInstance(HDLInstance o) {
 		if(o.getSubModule().isComponentDeclRequired() == false) return;
 		HDLUtils.println(dest, offset, String.format("component %s", o.getSubModule().getName()));
 		if(o.getSubModule().getParameters().length > 0){
@@ -45,15 +45,15 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		}
 		genPortList(dest, offset+2, o.getSubModule().getPorts(), (o.getSubModule().getParameters().length > 0));
 		HDLUtils.println(dest, offset, String.format("end component %s;", o.getSubModule().getName()));
-    }
+	}
 
-    @Override
-    public void visitHDLLitral(HDLLiteral o) {
+	@Override
+	public void visitHDLLitral(HDLLiteral o) {
 		// TODO Auto-generated method stub
-		
-    }
-	
-    private void genGenericList(PrintWriter dest, int offset, HDLParameter[] params){
+
+	}
+
+	private void genGenericList(PrintWriter dest, int offset, HDLParameter[] params){
 		HDLUtils.println(dest, offset, "generic (");
 		String sep = "";
 		for(HDLParameter p: params){
@@ -63,9 +63,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
-    }
+	}
 
-    private void genPortList(PrintWriter dest, int offset, HDLPort[] ports, boolean paramFlag){
+	private void genPortList(PrintWriter dest, int offset, HDLPort[] ports, boolean paramFlag){
 		HDLUtils.println(dest, offset, "port (");
 		String sep = "";
 		for(HDLPort p: ports){
@@ -76,26 +76,26 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
-    }
+	}
 
-    private void genParamList(PrintWriter dest, int offset, HDLParameter[] params, boolean paramFlag){
+	private void genParamList(PrintWriter dest, int offset, HDLParameter[] params, boolean paramFlag){
 		HDLUtils.println(dest, offset, "generic (");
 		String sep = "";
 		for(HDLParameter p: params){
 			dest.print(sep);
 			//p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
 			HDLUtils.print(dest, offset+2, String.format("%s : %s := %s",
-														 p.getName(),
-														 ((HDLPrimitiveType)p.getType()).getVHDL(),
-														 p.getDefaultValue().getVHDL()));
+					p.getName(),
+					((HDLPrimitiveType)p.getType()).getVHDL(),
+					p.getDefaultValue().getVHDL()));
 			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
 		HDLUtils.println(dest, offset, ");");
-    }
+	}
 
-    @Override
-    public void visitHDLModule(HDLModule o) {
+	@Override
+	public void visitHDLModule(HDLModule o) {
 
 		HDLUtils.println(dest, offset, String.format("entity %s is", o.getName()));
 		if(o.getParameters().length > 0){
@@ -106,7 +106,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		}
 		HDLUtils.println(dest, offset, String.format("end %s;", o.getName()));
 		HDLUtils.nl(dest);
-		
+
 		// architecture
 		HDLUtils.println(dest, offset, String.format("architecture RTL of %s is", o.getName()));
 		HDLUtils.nl(dest);
@@ -114,7 +114,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset+2, String.format("attribute keep : string;"));
 		HDLUtils.println(dest, offset+2, String.format("attribute S : string;"));
 		HDLUtils.nl(dest);
-		
+
 		Hashtable<String, Boolean> componentFlags = new Hashtable<>();
 		for(HDLInstance i: o.getModuleInstances()){
 			if(componentFlags.containsKey(i.getSubModule().getName())) continue; // already			
@@ -122,7 +122,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			//System.out.println(i.getSubModule().getName());
 			componentFlags.put(i.getSubModule().getName(), true);
 		}
-		
+
 		HDLUtils.nl(dest);
 		for(HDLPort p: o.getPorts()){
 			if(p.isSet(OPTION.NO_SIG)) continue;
@@ -132,26 +132,26 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		HDLUtils.nl(dest);
 		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
 		HDLUtils.nl(dest);
-		
-    }
 
-    @Override
-    public void visitHDLPort(HDLPort o) {
+	}
+
+	@Override
+	public void visitHDLPort(HDLPort o) {
 		//System.out.println(o);
 		HDLUtils.print(dest, offset, String.format("%s : %s %s", o.getName(), o.getDir().getVHDL(), o.getType().getVHDL()));
-    }
+	}
 
-    @Override
-    public void visitHDLParameter(HDLParameter o) {
+	@Override
+	public void visitHDLParameter(HDLParameter o) {
 		HDLUtils.print(dest, offset, String.format("%s : %s := %s", o.getName(), o.getType().getVHDL(), o.getDefaultValue().getVHDL()));
-    }
+	}
 
-    @Override
-    public void visitHDLSequencer(HDLSequencer o) {
-    }
+	@Override
+	public void visitHDLSequencer(HDLSequencer o) {
+	}
 
-    @Override
-    public void visitHDLSignal(HDLSignal o) {
+	@Override
+	public void visitHDLSignal(HDLSignal o) {
 		if(o.getType() instanceof HDLUserDefinedType){
 			((HDLUserDefinedType)o.getType()).accept(this);
 		}
@@ -168,16 +168,16 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			HDLUtils.println(dest, offset, String.format("attribute keep of %s : signal is \"true\";", o.getName()));
 			HDLUtils.println(dest, offset, String.format("attribute S of %s : signal is \"true\";", o.getName()));
 		}
-    }
+	}
 
-    @Override
-    public void visitHDLType(HDLPrimitiveType o) {
+	@Override
+	public void visitHDLType(HDLPrimitiveType o) {
 		// TODO Auto-generated method stub
-		
-    }
 
-    @Override
-    public void visitHDLUserDefinedType(HDLUserDefinedType o) {
+	}
+
+	@Override
+	public void visitHDLUserDefinedType(HDLUserDefinedType o) {
 		HDLUtils.println(dest, offset, String.format("type %s is (", o.getName()));
 		String sep = "";
 		for(HDLValue s: o.getItems()){
@@ -186,10 +186,10 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			sep = "," + Constant.BR;
 		}
 		HDLUtils.println(dest, offset, String.format("%s  );", Constant.BR));
-    }
+	}
 
-    @Override
-    public void visitHDLInstanceRef(HDLInstanceRef o){
-    }
+	@Override
+	public void visitHDLInstanceRef(HDLInstanceRef o){
+	}
 
 }

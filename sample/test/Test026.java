@@ -28,6 +28,14 @@ public class Test026 {
 		.sum();
     }
 
+    public int test026_4(List<Integer> lst) { 
+        return lst
+		.stream()
+		.filter(x -> x % 2 == 1)
+		.mapToInt(i -> i)
+		.sum();
+    }
+	
     @unsynthesizable
     public static void main(String... args){
 	Test026 t = new Test026();
@@ -36,6 +44,7 @@ public class Test026 {
 	System.out.println(t.test026_1(l));
 	System.out.println(t.test026_2(l));
 	System.out.println(t.test026_3(l));
+	System.out.println(t.test026_4(l));
     }
 
 }

@@ -3,7 +3,7 @@ package synthesijer.hdl;
 import synthesijer.SynthesijerUtils;
 
 public class HDLTreeVisitorBase implements HDLTreeVisitor{
-	
+
 	public void visitHDLTree(HDLTree o){
 		SynthesijerUtils.warn("unhandled syntax");
 		SynthesijerUtils.dump(o);
@@ -20,7 +20,7 @@ public class HDLTreeVisitorBase implements HDLTreeVisitor{
 		visitHDLTree(o);
 	}
 
-    	@Override
+	@Override
 	public void visitHDLInstanceRef(HDLInstanceRef o) {
 		visitHDLTree(o);
 	}

@@ -11,18 +11,18 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.sequencer.SequencerState;
 
 public class ResourceUsageTable {
-	
+
 	private final HDLModule module;
 	private ArrayList<HDLSignal> signals = new ArrayList<>();
 	private Hashtable<SequencerState, ArrayList<HDLSignal>> writeTable = new Hashtable<>();
 	private Hashtable<SequencerState, ArrayList<HDLSignal>> readTable = new Hashtable<>();
 	private Hashtable<HDLSignal, Integer> index = new Hashtable<>();
-	
+
 	public ResourceUsageTable(HDLModule m){
 		this.module = m;
 		generate();
 	}
-	
+
 	private void addEntry(HDLSignal s, int i){
 		index.put(s, i);
 		signals.add(s);
@@ -34,7 +34,7 @@ public class ResourceUsageTable {
 			addReadEntries(a.getSequencerState(), a.getValue().getSrcSignals());
 		}
 	}
-	
+
 	private void addWriteEntry(SequencerState state, HDLSignal sig){
 		ArrayList<HDLSignal> l = writeTable.get(state);
 		if(l == null) l = new ArrayList<>();
@@ -48,25 +48,25 @@ public class ResourceUsageTable {
 			addReadEntry(state, s);
 		}
 	}
-	
+
 	private void addReadEntry(SequencerState state, HDLSignal s){
 		ArrayList<HDLSignal> l = readTable.get(state);
 		if(l == null) l = new ArrayList<>();
 		l.add(s);
 		readTable.put(state, l);
 	}
-	
+
 	private void generate(){
 		int i = 0;
 		for(HDLSignal s: module.getSignals()){
 			addEntry(s, i++);
 		}
-		
+
 		for(HDLPort p: module.getPorts()){
 			addEntry(p.getSignal(), i++);
 		}
 	}
-	
+
 	public void generate(PrintWriter dest){
 		dest.println("<html>");
 		dest.println("<head>");
@@ -80,7 +80,7 @@ public class ResourceUsageTable {
 		dest.println("</body>");
 		dest.println("</html>");
 	}
-	
+
 	private void generate_signals(PrintWriter dest){
 		dest.println("<tr>");
 		dest.print("<th></th>");
@@ -90,7 +90,7 @@ public class ResourceUsageTable {
 		dest.println();
 		dest.println("</tr>");
 	}
-	
+
 	private void generate_entries(PrintWriter dest){
 
 		for(HDLSequencer seq: module.getSequencers()){
@@ -101,7 +101,7 @@ public class ResourceUsageTable {
 			}
 		}
 	}
-	
+
 	private boolean[] getBitVector(ArrayList<HDLSignal> list){
 		boolean[] v = new boolean[signals.size()];
 		for(int i = 0; i < v.length; i++) v[i] = false;

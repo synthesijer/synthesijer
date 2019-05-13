@@ -7,9 +7,9 @@ import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.sequencer.SequencerState;
 
 public class HDLSequencer implements HDLTree{
-	
+
 	private final HDLModule module;
-	
+
 	private final HDLSignal stateKey;
 	private final HDLUserDefinedType stateType;
 	private ArrayList<SequencerState> states;
@@ -17,8 +17,8 @@ public class HDLSequencer implements HDLTree{
 	private ArrayList<Triple> seqCondExprList = new ArrayList<>();
 	private SequencerState idle;
 	private int timestep = -1;
-	
-	private final HDLSignal delayCounter; 
+
+	private final HDLSignal delayCounter;
 
 	public HDLSequencer(HDLModule module, String key){
 		this.module = module;
@@ -32,22 +32,22 @@ public class HDLSequencer implements HDLTree{
 		delayCounter.setDefaultValue(HDLPreDefinedConstant.VECTOR_ZERO);
 		delayCounter.setIgnore(true);
 	}
-	
+
 	private int id = 0;
 	private int genUniqId(){ int tmp = id; id++; return tmp; }
-	
+
 	public void setTransitionTime(int step){
 		this.timestep = step;
 	}
-	
+
 	public int getTransitionTime(){
 		return timestep;
 	}
-	
+
 	public boolean hasTransitionTime(){
 		return (timestep > 0);
 	}
-	
+
 	public SequencerState addSequencerState(String id, boolean flag){
 		String n = flag ? stateKey.getName()+"_"+id : id;
 		HDLValue value = stateType.addItem(n);
@@ -68,28 +68,28 @@ public class HDLSequencer implements HDLTree{
 	public HDLModule getModule(){
 		return module;
 	}
-	
+
 	public HDLSignal getStateKey(){
 		return stateKey;
 	}
-	
+
 	public ArrayList<SequencerState> getStates(){
 		return states;
 	}
-	
+
 	public SequencerState getIdleState(){
 		return idle;
 	}
-	
+
 	public HDLSignal getDelayCounter(){
 		return delayCounter;
 	}
-		
+
 	@Override
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLSequencer(this);
 	}
-	
+
 	public void addSeqExpr(HDLSignal dest, HDLExpr expr){
 		seqExprList.add(new Pair(dest, expr));
 	}
@@ -101,12 +101,12 @@ public class HDLSequencer implements HDLTree{
 	public Pair[] getSeqExprList(){
 		return seqExprList.toArray(new Pair[0]);
 	}
-	
+
 	public Triple[] getSeqCondExprList(){
 		return seqCondExprList.toArray(new Triple[0]);
 	}
 
-	
+
 	public class Pair{
 		public final HDLSignal dest;
 		public final HDLExpr expr;
@@ -115,7 +115,7 @@ public class HDLSequencer implements HDLTree{
 			this.expr = e;
 		}
 	}
-	
+
 	public class Triple{
 		public final HDLSignal dest;
 		public final HDLExpr cond;

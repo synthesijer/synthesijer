@@ -7,7 +7,7 @@ import synthesijer.hdl.HDLTreeVisitor;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public enum HDLPreDefinedConstant implements HDLLiteral{
-	
+
 	VECTOR_ZERO("(others => '0')", "0"),
 	INTEGER_ZERO("0", "0"),
 	INTEGER_ONE("1", "1"),
@@ -15,14 +15,14 @@ public enum HDLPreDefinedConstant implements HDLLiteral{
 	BOOLEAN_FALSE("false", "1'b0"),
 	LOW("'0'", "1'b0"),
 	HIGH("'1'", "1'b1");
-	
+
 	private final String vhdl, verilog;
-	
+
 	private HDLPreDefinedConstant(String vhdl, String verilog){
 		this.vhdl = vhdl;
 		this.verilog = verilog;
 	}
-	
+
 	public String getVHDL(){
 		return vhdl;
 	}
@@ -35,25 +35,25 @@ public enum HDLPreDefinedConstant implements HDLLiteral{
 	public void accept(HDLTreeVisitor v) {
 		v.visitHDLLitral(this);
 	}
-	
+
 	public HDLExpr getResultExpr(){
 		return this;
 	}
-	
+
 	public HDLPrimitiveType getType(){
 		switch(this){
-		case BOOLEAN_FALSE:
-		case BOOLEAN_TRUE:
-			return HDLPrimitiveType.genBitType();
-		case HIGH:
-		case LOW:
-			return HDLPrimitiveType.genBitType();
-		case INTEGER_ZERO:
-		case INTEGER_ONE:
-			return HDLPrimitiveType.genSignedType(-1);
-		case VECTOR_ZERO:
-			return HDLPrimitiveType.genVectorType(-1);
-		default: return HDLPrimitiveType.genUnknowType();
+			case BOOLEAN_FALSE:
+			case BOOLEAN_TRUE:
+				return HDLPrimitiveType.genBitType();
+			case HIGH:
+			case LOW:
+				return HDLPrimitiveType.genBitType();
+			case INTEGER_ZERO:
+			case INTEGER_ONE:
+				return HDLPrimitiveType.genSignedType(-1);
+			case VECTOR_ZERO:
+				return HDLPrimitiveType.genVectorType(-1);
+			default: return HDLPrimitiveType.genUnknowType();
 		}
 	}
 

@@ -7,278 +7,399 @@ import synthesijer.Options;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.sequencer.SequencerState;
 
+/**
+ * Sub-module instantiated in HDL module
+ */
 public class HDLInstance implements HDLTree, HDLExpr, HDLVariable{
-	
-    private final HDLModule module;
-    private final String name;
-    private final String origName;
-    private final HDLModule target;
-	
-    private ArrayList<PortPair> pairs = new ArrayList<>();
-    private ArrayList<ParamPair> params = new ArrayList<>();
-	
-    HDLInstance(HDLModule module, String name, HDLModule target, String origName){
-	this.module = module;
-	this.name = name;
-	this.target = target;
-	this.origName = origName;
-	genPortSignals();
-	for(HDLParameter param: target.getParameters()){
-	    params.add(new ParamPair(param, null));
-	}	
-    }
-    
-    HDLInstance(HDLModule module, String name, HDLModule target){
-	this(module, name, target, name);
-    }
 
-    /**
-     * return this module, not the target module to make a insntace
-     */
-    public HDLModule getModule(){
-	return module;
-    }
-	
-    private String getAbsoluteName(String n){
-	return this.name + "_" + n;
-    }
-	
-    private void clearPortPair(){
-	for(PortPair pair: pairs){
-	    if(pair.item instanceof HDLSignal) module.rmSignal((HDLSignal)(pair.item));
-	}
-	pairs.clear();
-    }
-	
-    private void genPortSignals(){
-	clearPortPair();
-	for(HDLPort p: target.getPorts()){
-	    if(p.isSet(HDLPort.OPTION.NO_SIG)) continue;
-	    HDLSignal.ResourceKind k = p.isOutput() ? HDLSignal.ResourceKind.WIRE : HDLSignal.ResourceKind.REGISTER;
-	    HDLSignal s;
-	    if(p.hasWireName()){
-		s = module.getSignal(p.getWireName());
-		if(s == null){
-		    s = module.newSignal(p.getWireName(), p.getType(), HDLSignal.ResourceKind.WIRE);
-		}else{
-		    //if(p.getType() != s.getType()) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
-		    if(!p.getType().isEqual(s.getType())) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
+	/**
+	 * parent module
+	 */
+	private final HDLModule module;
+
+	/**
+	 * instance name
+	 */
+	private final String name;
+
+	/**
+	 * original instance name
+	 */
+	private final String origName;
+
+	/**
+	 * target module to make instance
+	 */
+	private final HDLModule target;
+
+	/**
+	 * port map
+	 */
+	private ArrayList<PortPair> pairs = new ArrayList<>();
+
+	/**
+	 * parameter map
+	 */
+	private ArrayList<ParamPair> params = new ArrayList<>();
+
+	/**
+	 * create target module instance with user-defined name
+	 * @param module parent module
+	 * @param name name
+	 * @param target target module to make instance
+	 * @param origName original name
+	 */
+	HDLInstance(HDLModule module, String name, HDLModule target, String origName){
+		this.module = module;
+		this.name = name;
+		this.target = target;
+		this.origName = origName;
+		genPortSignals();
+		for(HDLParameter param: target.getParameters()){
+			params.add(new ParamPair(param, null));
 		}
-	    }else{
-		if(p.isSet(HDLPort.OPTION.EXPORT) && Options.INSTANCE.legacy_instance_variable_name == false){
-		    s = module.newSignal(origName + "_" + p.getName(), p.getType(), k);
-		}else{
-		    s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
+	}
+
+	/**
+	 * create target module instance with user-defined name
+	 * @param module parent module
+	 * @param name name
+	 * @param target target module to make instance
+	 */
+	HDLInstance(HDLModule module, String name, HDLModule target){
+		this(module, name, target, name);
+	}
+
+	/**
+	 * return this module, not the target module to make a instance
+	 */
+	public HDLModule getModule(){
+		return module;
+	}
+
+	/**
+	 * get absolute name, which is combined module name and instance name
+	 * @param n target module name
+	 * @return absolute name
+	 */
+	private String getAbsoluteName(String n){
+		return this.name + "_" + n;
+	}
+
+	/**
+	 * clear port pair
+	 */
+	private void clearPortPair(){
+		for(PortPair pair: pairs){
+			if(pair.item instanceof HDLSignal) module.rmSignal((HDLSignal)(pair.item));
 		}
-		//System.out.println("n=" + p.getName());
-		//System.out.println("s=" + s);
-	    }
-	    pairs.add(new PortPair(s, p));
+		pairs.clear();
 	}
-    }
-	
-    public void addPortPair(HDLPortPairItem item, HDLPort port){
-	//System.out.println("add:" + item);
-	pairs.add(new PortPair(item, port));
-    }
-	
-    public void rmPortPair(PortPair pair){
-	if(pair == null){
-	    SynthesijerUtils.warn("not specified remove pair, nothing to do.");
-	    return;
+
+	/**
+	 * generate pairs of ports and signals
+	 */
+	private void genPortSignals(){
+		clearPortPair();
+		for(HDLPort p: target.getPorts()){
+			if(p.isSet(HDLPort.OPTION.NO_SIG)) continue;
+			HDLSignal.ResourceKind k = p.isOutput() ? HDLSignal.ResourceKind.WIRE : HDLSignal.ResourceKind.REGISTER;
+			HDLSignal s;
+			if(p.hasWireName()){
+				s = module.getSignal(p.getWireName());
+				if(s == null){
+					s = module.newSignal(p.getWireName(), p.getType(), HDLSignal.ResourceKind.WIRE);
+				}else{
+					if(!p.getType().isEqual(s.getType())) SynthesijerUtils.warn("instance wire type missmatch: " + p.getWireName());
+				}
+			}else{
+				if(p.isSet(HDLPort.OPTION.EXPORT) && Options.INSTANCE.legacy_instance_variable_name == false){
+					s = module.newSignal(origName + "_" + p.getName(), p.getType(), k);
+				}else{
+					s = module.newSignal(getAbsoluteName(p.getName()), p.getType(), k);
+				}
+			}
+			pairs.add(new PortPair(s, p));
+		}
 	}
-	pairs.remove(pair);
-	if(pair.item instanceof HDLSignal) module.rmSignal((HDLSignal)pair.item);
-    }
 
-    public void replacePortPair(HDLPortPairItem oldItem, HDLPortPairItem newItem){
-	PortPair pair = getPortPairByItem(oldItem);
-	if(pair == null){
-	    SynthesijerUtils.warn("not specified remove pair, nothing to do.");
-	    return;
+	/**
+	 * add port pair
+	 * @param item port pair
+	 * @param port target port
+	 */
+	public void addPortPair(HDLPortPairItem item, HDLPort port){
+		pairs.add(new PortPair(item, port));
 	}
-	pairs.remove(pair);
-	pairs.add(new PortPair(newItem, pair.port));
-    }
 
-    public void update(){
-	genPortSignals();
-    }
-	
-    @Override
-    public String getName(){
-	return name;
-    }
-	
-    public HDLModule getSubModule(){
-	return target;
-    }
-	
-    public ArrayList<PortPair> getPairs(){
-	return pairs;
-    }
-
-    public PortPair getPortPair(HDLPort port){
-	for(PortPair pair: pairs){
-	    if(pair.port.getName().equals(port.getName())) return pair;
+	/**
+	 * remove port pair
+	 * @param pair port pair
+	 */
+	public void rmPortPair(PortPair pair){
+		if(pair == null){
+			SynthesijerUtils.warn("not specified remove pair, nothing to do.");
+			return;
+		}
+		pairs.remove(pair);
+		if(pair.item instanceof HDLSignal) module.rmSignal((HDLSignal)pair.item);
 	}
-	return null;
-    }
 
-    private PortPair getPortPairByItem(HDLPortPairItem item){
-	for(PortPair pair: pairs){
-	    //System.out.println(pair.item.getName() + "<->" + item.getName());
-	    if(pair.item.getName().equals(item.getName())) return pair;
+	/**
+	 * replace port pair
+	 * @param oldItem old pair
+	 * @param newItem new pair
+	 */
+	public void replacePortPair(HDLPortPairItem oldItem, HDLPortPairItem newItem){
+		PortPair pair = getPortPairByItem(oldItem);
+		if(pair == null){
+			SynthesijerUtils.warn("not specified remove pair, nothing to do.");
+			return;
+		}
+		pairs.remove(pair);
+		pairs.add(new PortPair(newItem, pair.port));
 	}
-	return null;
-    }
 
-    public HDLPort getPort(String name){
-	for(PortPair pair: pairs){
-	    if(pair.port.getName().equals(name)) return pair.port;
+	/**
+	 * update pair of signals and ports
+	 */
+	public void update(){
+		genPortSignals();
 	}
-	return null;
-    }
 
-    public HDLSignal getSignalForPort(String name){
-	for(PortPair pair: pairs){
-	    if(pair.port.getName().equals(name) && pair.item instanceof HDLSignal) return (HDLSignal)pair.item;
+	/**
+	 *
+	 * @return name of instance module
+	 */
+	@Override
+	public String getName(){
+		return name;
 	}
-	return null;
-    }
-	
-    public HDLPortPairItem getPairItemForPort(HDLPort port){
-	//System.out.println("getSignalForPort:" + port);
-	for(PortPair pair: pairs){
-	    //System.out.println("  pair:" + pair);
-	    if(pair.port.getName().equals(port.getName())) return (HDLSignal)pair.item;
+
+	/**
+	 *
+	 * @return target module to make instance
+	 */
+	public HDLModule getSubModule(){
+		return target;
 	}
-	return null;
-    }
-	
-    public ParamPair getParameterPair(String name){
-	for(ParamPair pair: params){
-	    if(pair.param.getName().equals(name)) return pair;
+
+	/**
+	 *
+	 * @return reference of all pairs
+	 */
+	public ArrayList<PortPair> getPairs(){
+		return pairs;
 	}
-	return null;
-    }
 
-    public void setParameterOverwrite(String name, HDLValue value){
-	for(ParamPair pair: params){
-	    if(pair.param.getName().equals(name)){
-		pair.value = value;
-		return; 
-	    }
+	/**
+	 * search and return port pair from port
+	 * @param port port to find port pair
+	 * @return port pair, null when no such pair
+	 */
+	public PortPair getPortPair(HDLPort port){
+		for(PortPair pair: pairs){
+			if(pair.port.getName().equals(port.getName())) return pair;
+		}
+		return null;
 	}
-    }
 
-    public ArrayList<ParamPair> getParameterPairs(){
-	return params;
-    }
-
-    public String toString(){
-	String s = "";
-	s += "HDLInstance : " + name + "\n";
-	for(HDLPort p: target.getPorts()){
-	    s += " " + p + "\n";
+	/**
+	 * search and return port pair form port air
+	 * @param item
+	 * @return port pair, null when no such pair
+	 */
+	private PortPair getPortPairByItem(HDLPortPairItem item){
+		for(PortPair pair: pairs){
+			if(pair.item.getName().equals(item.getName())) return pair;
+		}
+		return null;
 	}
-	return s;
-    }
-	
 
-    @Override
-    public void accept(HDLTreeVisitor v) {
-	v.visitHDLInstance(this);
-    }
-	
-    public class PortPair{
-	public final HDLPortPairItem item;
-	public final HDLPort port;
-	PortPair(HDLPortPairItem item, HDLPort port){this.item = item; this.port = port;}
-    }
-	
-    public class ParamPair{
-	public final HDLParameter param;
-	private HDLValue value;
-	ParamPair(HDLParameter param, HDLValue value){this.param = param; this.value = value;}
-	public void setValue(HDLValue value){
-	    this.value = value;
+	/**
+	 * return port with the name
+	 * @param name name of the port
+	 * @return port
+	 */
+	public HDLPort getPort(String name){
+		for(PortPair pair: pairs){
+			if(pair.port.getName().equals(name)) return pair.port;
+		}
+		return null;
 	}
-	public HDLValue getValue(){
-	    return value;
+
+	/**
+	 * return signal corresponding the the port with name
+	 * @param name name of the port
+	 * @return signal
+	 */
+	public HDLSignal getSignalForPort(String name){
+		for(PortPair pair: pairs){
+			if(pair.port.getName().equals(name) && pair.item instanceof HDLSignal) return (HDLSignal)pair.item;
+		}
+		return null;
 	}
-    }
 
-    @Override
-    public void setAssignForSequencer(HDLSequencer s, HDLExpr expr){
-	// TODO Auto-generated method stub
-		
-    }
+	/**
+	 * return port pair
+	 * @param port
+	 * @return
+	 */
+	public HDLPortPairItem getPairItemForPort(HDLPort port){
+		//System.out.println("getSignalForPort:" + port);
+		for(PortPair pair: pairs){
+			//System.out.println("  pair:" + pair);
+			if(pair.port.getName().equals(port.getName())) return (HDLSignal)pair.item;
+		}
+		return null;
+	}
 
-    @Override
-    public void setAssign(SequencerState s, HDLExpr expr) {
-	// TODO Auto-generated method stub
-		
-    }
+	/**
+	 * return parameter pair
+	 * @param name
+	 * @return
+	 */
+	public ParamPair getParameterPair(String name){
+		for(ParamPair pair: params){
+			if(pair.param.getName().equals(name)) return pair;
+		}
+		return null;
+	}
 
-    @Override
-    public void setAssign(SequencerState s, int count, HDLExpr expr) {
-	// TODO Auto-generated method stub
-		
-    }
+	/**
+	 * overwrite parameter with given value
+	 * @param name name of parameter to set
+	 * @param value new value
+	 */
+	public void setParameterOverwrite(String name, HDLValue value){
+		for(ParamPair pair: params){
+			if(pair.param.getName().equals(name)){
+				pair.value = value;
+				return;
+			}
+		}
+	}
 
-    @Override
-    public void setAssign(SequencerState s, HDLExpr cond, HDLExpr expr) {
-	// TODO Auto-generated method stub
-		
-    }
+	/**
+	 *
+	 * @return reference to all parameters
+	 */
+	public ArrayList<ParamPair> getParameterPairs(){
+		return params;
+	}
 
-    @Override
-    public void setResetValue(HDLExpr s) {
-	// TODO Auto-generated method stub
-		
-    }
+	public String toString(){
+		String s = "";
+		s += "HDLInstance : " + name + "\n";
+		for(HDLPort p: target.getPorts()){
+			s += " " + p + "\n";
+		}
+		return s;
+	}
 
-    @Override
-    public void setDefaultValue(HDLExpr s) {
-	// TODO Auto-generated method stub
-		
-    }
+	/**
+	 * Visitor-pattern method
+	 * @param v
+	 */
+	@Override
+	public void accept(HDLTreeVisitor v) {
+		v.visitHDLInstance(this);
+	}
 
-    @Override
-    public String getVHDL() {
-	// TODO Auto-generated method stub
-	return null;
-    }
+	/**
+	 * port pair
+	 */
+	public class PortPair{
+		public final HDLPortPairItem item;
+		public final HDLPort port;
+		PortPair(HDLPortPairItem item, HDLPort port){this.item = item; this.port = port;}
+	}
 
-    @Override
-    public String getVerilogHDL() {
-	// TODO Auto-generated method stub
-	return null;
-    }
+	/**
+	 * parameter pair
+	 */
+	public class ParamPair{
+		public final HDLParameter param;
+		private HDLValue value;
+		ParamPair(HDLParameter param, HDLValue value){this.param = param; this.value = value;}
+		public void setValue(HDLValue value){
+			this.value = value;
+		}
+		public HDLValue getValue(){
+			return value;
+		}
+	}
 
-    @Override
-    public HDLExpr getResultExpr() {
-	// TODO Auto-generated method stub
-	return null;
-    }
+	@Override
+	public void setAssignForSequencer(HDLSequencer s, HDLExpr expr){
+		// TODO Auto-generated method stub
 
-    @Override
-    public HDLType getType() {
-	// TODO Auto-generated method stub
-	return null;
-    }
+	}
 
-    @Override
-    public HDLSignal[] getSrcSignals() {
-	// TODO Auto-generated method stub
-	return null;
-    }
+	@Override
+	public void setAssign(SequencerState s, HDLExpr expr) {
+		// TODO Auto-generated method stub
 
-    @Override
-    public void setAssignForSequencer(HDLSequencer s, HDLExpr cond, HDLExpr expr) {
-	// TODO Auto-generated method stub
-		
-    }
+	}
+
+	@Override
+	public void setAssign(SequencerState s, int count, HDLExpr expr) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setAssign(SequencerState s, HDLExpr cond, HDLExpr expr) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setResetValue(HDLExpr s) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setDefaultValue(HDLExpr s) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String getVHDL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getVerilogHDL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HDLExpr getResultExpr() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HDLType getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HDLSignal[] getSrcSignals() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setAssignForSequencer(HDLSequencer s, HDLExpr cond, HDLExpr expr) {
+		// TODO Auto-generated method stub
+
+	}
 
 }

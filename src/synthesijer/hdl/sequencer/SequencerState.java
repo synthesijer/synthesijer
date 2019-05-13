@@ -8,31 +8,31 @@ import synthesijer.hdl.HDLSignal;
 import synthesijer.hdl.expr.HDLValue;
 
 public class SequencerState{
-	
+
 	private ArrayList<StateTransitCondition> transitions = new ArrayList<>();
 	private StateTransitCondition defaultTransition = null;
-	
+
 	private final HDLSignal key;
 	private final HDLValue id;
 	private final HDLSequencer seq;
-			
+
 	private int constantDelay = 0;
 	private HDLSignal exitFlag = null;
-	
+
 	public SequencerState(HDLSequencer seq, HDLSignal key, HDLValue id){
 		this.key = key;
 		this.id = id;
 		this.seq = seq;
 	}
-	
+
 	public HDLSequencer getSequencer(){
 		return seq;
 	}
-	
+
 	public HDLValue getStateId(){
 		return id;
 	}
-	
+
 	public HDLSignal getKey(){
 		return key;
 	}
@@ -58,21 +58,21 @@ public class SequencerState{
 		}
 		return lst;
 	}
-	
+
 	public void setMaxConstantDelay(int v){
 		if(constantDelay < v){
 			constantDelay = v;
 		}
 	}
-	
+
 	public int getConstantDelay(){
 		return constantDelay;
 	}
-	
+
 	public void setStateExitFlag(HDLSignal expr){
 		this.exitFlag = expr;
 	}
-	
+
 	public String getExitConditionAsVHDL(){
 		String s = "";
 		String sep = "";
