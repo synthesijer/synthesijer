@@ -9,7 +9,7 @@ import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 
 public class RemoveUnreachableSlot implements SchedulerInfoOptimizer{
-	
+
 	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
@@ -17,15 +17,15 @@ public class RemoveUnreachableSlot implements SchedulerInfoOptimizer{
 		}
 		return result;
 	}
-	
+
 	public String getKey(){
 		return "remove_unreachable_slot";
 	}
-	
+
 	Hashtable<Integer, Boolean> usedFlag;
-	
+
 	public SchedulerBoard conv(SchedulerBoard src){
-		usedFlag = new Hashtable<>(); 
+		usedFlag = new Hashtable<>();
 		for(SchedulerSlot slot: src.getSlots()){
 			for(int id: slot.getNextStep()){
 				usedFlag.put(id, true);
@@ -39,5 +39,5 @@ public class RemoveUnreachableSlot implements SchedulerInfoOptimizer{
 		}
 		return ret;
 	}
-	
+
 }

@@ -8,17 +8,17 @@ import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
 
 public class CondExpr extends Expr {
-	
+
 	private Expr cond, truePart, falsePart;
 
 	public CondExpr(Scope scope) {
 		super(scope);
 	}
-	
+
 	public void setCond(Expr cond){
 		this.cond = cond;
 	}
-	
+
 	public Expr getCond(){
 		return this.cond;
 	}
@@ -26,7 +26,7 @@ public class CondExpr extends Expr {
 	public void setTruePart(Expr cond){
 		this.truePart = cond;
 	}
-	
+
 	public Expr getTruePart(){
 		return this.truePart;
 	}

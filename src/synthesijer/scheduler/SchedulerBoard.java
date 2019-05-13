@@ -10,39 +10,39 @@ import synthesijer.ast.Type;
 
 /**
  * SchdulerBoard manages scheduling table of instances of SchdulerItem. 
- * 
+ *
  * @author miyo
  *
  */
 public class SchedulerBoard {
 
 	private final String name;
-	
+
 //	private final Method method;
-	
+
 	/**
 	 * container of slots.
 	 * the index in this array corresponds to computation step. 
 	 */
 	private ArrayList<SchedulerSlot> slots;
-	
+
 	//private final ArrayList<VariableOperand> varList;
 	private final ArrayList<Operand> varList;
-	
+
 	private final Type returnType;
-	
+
 	private final boolean privateFlag;
-	
+
 	private final boolean autoFlag;
-	
+
 	private final boolean callStackFlag;
-	
+
 	private final int callStackSize;
-	
+
 	private final boolean hasWaitDependsBoardFlag;
-	
+
 	private final String waitDependsBoardName;
-	
+
 	SchedulerBoard(
 			String name,
 			Type returnType,
@@ -60,10 +60,10 @@ public class SchedulerBoard {
 		this.autoFlag = autoFlag;
 		this.callStackFlag = callStackFlag;
 		this.callStackSize = callStackSize;
-		this.hasWaitDependsBoardFlag = hasWaitWithMethod; 
+		this.hasWaitDependsBoardFlag = hasWaitWithMethod;
 		this.waitDependsBoardName = waitMethodName;
 	}
-	
+
 	SchedulerBoard(String name, Method m){
 		this.name = name;
 		this.slots = new ArrayList<>();
@@ -98,7 +98,7 @@ public class SchedulerBoard {
 	public SchedulerBoard genSameEnvBoard() {
 		return new SchedulerBoard(this);
 	}
-	
+
 	public String getName(){
 		return name;
 	}
@@ -122,7 +122,7 @@ public class SchedulerBoard {
 	public int getCallStackSize(){
 		return callStackSize;
 	}
-	
+
 	public boolean hasWaitDependsBoard(){
 		return hasWaitDependsBoardFlag;
 	}
@@ -135,7 +135,7 @@ public class SchedulerBoard {
 		return slots.toArray(new SchedulerSlot[]{});
 	}
 
-//	public ArrayList<VariableOperand> getVarList(){
+	//	public ArrayList<VariableOperand> getVarList(){
 	public ArrayList<Operand> getVarList(){
 		return varList;
 	}
@@ -160,7 +160,7 @@ public class SchedulerBoard {
 	public void addSlot(SchedulerSlot slot){
 		slots.add(slot);
 	}
-	
+
 	public SchedulerSlot getSlot(int id){
 		for(SchedulerSlot s: slots){
 			if(s.getStepId() == id) return s;
@@ -203,6 +203,6 @@ public class SchedulerBoard {
 		}
 	}
 
-	
+
 }
 

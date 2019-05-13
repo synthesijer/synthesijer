@@ -15,20 +15,20 @@ public class PackArrayWriteAccess implements SchedulerInfoOptimizer{
 		}
 		return result;
 	}
-	
+
 	public String getKey(){
 		return "pack_array_write";
 	}
-	
+
 	private SchedulerSlot copySlots(SchedulerSlot slot){
-		SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId()); 
+		SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 		for(SchedulerItem item: slot.getItems()){
 			newSlot.addItem(item);
 			item.setSlot(newSlot);
 		}
 		return newSlot;
 	}
-	
+
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
@@ -72,5 +72,5 @@ public class PackArrayWriteAccess implements SchedulerInfoOptimizer{
 	// 	}
 	// 	return null; // not found
 	// }
-	
+
 }

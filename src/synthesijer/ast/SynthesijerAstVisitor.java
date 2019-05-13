@@ -37,7 +37,7 @@ public interface SynthesijerAstVisitor extends SynthesijerModuleVisitor, Synthes
 	public void visitSwitchStatement(SwitchStatement o);
 
 	public void visitSwitchCaseElement(SwitchStatement.Elem o);
-	
+
 	public void visitSynchronizedBlock(SynchronizedBlock o);
 
 	public void visitTryStatement(TryStatement o);
@@ -45,7 +45,7 @@ public interface SynthesijerAstVisitor extends SynthesijerModuleVisitor, Synthes
 	public void visitVariableDecl(VariableDecl o);
 
 	public void visitWhileStatement(WhileStatement o);
-	
+
 	public void visitDoWhileStatement(DoWhileStatement o);
 
 }

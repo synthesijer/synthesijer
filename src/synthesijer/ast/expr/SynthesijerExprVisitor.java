@@ -28,7 +28,7 @@ public interface SynthesijerExprVisitor {
 	public void visitTypeCast(TypeCast o);
 
 	public void visitUnaryExpr(UnaryExpr o);
-	
+
 	public void visitCondExpr(CondExpr o);
-	
+
 }

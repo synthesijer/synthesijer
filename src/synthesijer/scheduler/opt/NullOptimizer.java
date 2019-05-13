@@ -13,19 +13,19 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class NullOptimizer implements SchedulerInfoOptimizer{
-	
-    public static final boolean DEBUG = false;
 
-    public SchedulerInfo opt(SchedulerInfo info){
+	public static final boolean DEBUG = false;
+
+	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
 			result.addBoard(b);
 		}
 		return result;
-    }
-	
-    public String getKey(){
+	}
+
+	public String getKey(){
 		return "null_optimizer";
-    }
-	
+	}
+
 }

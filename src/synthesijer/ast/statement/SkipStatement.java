@@ -5,7 +5,7 @@ import synthesijer.ast.Statement;
 import synthesijer.ast.SynthesijerAstVisitor;
 
 public class SkipStatement extends Statement{
-	
+
 	public SkipStatement(Scope scope){
 		super(scope);
 	}
@@ -13,5 +13,5 @@ public class SkipStatement extends Statement{
 	public void accept(SynthesijerAstVisitor v){
 		v.visitSkipStatement(this);
 	}
-	
+
 }

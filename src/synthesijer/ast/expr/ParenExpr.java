@@ -6,9 +6,9 @@ import synthesijer.ast.Type;
 import synthesijer.ast.Variable;
 
 public class ParenExpr extends Expr{
-	
+
 	private Expr expr;
-	
+
 	public ParenExpr(Scope scope){
 		super(scope);
 	}
@@ -16,7 +16,7 @@ public class ParenExpr extends Expr{
 	public void setExpr(Expr expr){
 		this.expr = expr;
 	}
-	
+
 	public Expr getExpr(){
 		return this.expr;
 	}
@@ -29,31 +29,31 @@ public class ParenExpr extends Expr{
 	public boolean isConstant() {
 		return expr.isConstant();
 	}
-	
+
 	@Override
 	public boolean isVariable() {
 		return expr.isVariable();
 	}
-	
+
 	@Override
 	public Type getType() {
 		return expr.getType();
 	}
-	
+
 	public String toString(){
 		return "ParenExpr(" + expr + ")";
 	}
-	
+
 	@Override
 	public Variable[] getSrcVariables(){
 		return expr.getSrcVariables();
 	}
-	
+
 	@Override
 	public Variable[] getDestVariables(){
 		return expr.getDestVariables();
 	}
-	
+
 	@Override
 	public boolean hasMethodInvocation() {
 		return expr.hasMethodInvocation();

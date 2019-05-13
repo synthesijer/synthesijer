@@ -13,8 +13,8 @@ import synthesijer.ast.Variable;
 
 public class ForStatement extends Statement implements Scope {
 
-    private final Scope parent;
-	
+	private final Scope parent;
+
 	private ArrayList<Statement> initializations = new ArrayList<>();
 	private Expr condition;
 	private ArrayList<Statement> updates = new ArrayList<>();
@@ -28,11 +28,11 @@ public class ForStatement extends Statement implements Scope {
 		this.parent = scope;
 		addScope(this);
 	}
-	
+
 	public void replaceInitializations(ArrayList<Statement> newList){
 		initializations = newList;
 	}
-	
+
 	public void addScope(Scope s){
 		parent.addScope(s);
 	}
@@ -44,7 +44,7 @@ public class ForStatement extends Statement implements Scope {
 	public Module getModule(){
 		return parent.getModule();
 	}
-	
+
 	public Method getMethod(){
 		return parent.getMethod();
 	}
@@ -52,7 +52,7 @@ public class ForStatement extends Statement implements Scope {
 	public void addInitialize(Statement s) {
 		initializations.add(s);
 	}
-	
+
 	public ArrayList<Statement> getInitializations(){
 		return initializations;
 	}
@@ -60,7 +60,7 @@ public class ForStatement extends Statement implements Scope {
 	public void setCondition(Expr expr) {
 		condition = expr;
 	}
-	
+
 	public Expr getCondition(){
 		return condition;
 	}
@@ -76,16 +76,16 @@ public class ForStatement extends Statement implements Scope {
 	public void setBody(BlockStatement s) {
 		this.body = s;
 	}
-	
+
 	public BlockStatement getBody(){
 		return body;
 	}
 
 	public void addVariableDecl(VariableDecl v){
-	    variableDecls.add(v);
+		variableDecls.add(v);
 		varTable.put(v.getVariable().getName(), v.getVariable());
 	}
-	
+
 	public VariableDecl[] getVariableDecls(){
 		return variableDecls.toArray(new VariableDecl[]{});
 	}
@@ -95,7 +95,7 @@ public class ForStatement extends Statement implements Scope {
 		if(v != null) return v;
 		return parent.search(s);
 	}
-	
+
 	public void accept(SynthesijerAstVisitor v){
 		v.visitForStatement(this);
 	}

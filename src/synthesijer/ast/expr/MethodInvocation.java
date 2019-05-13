@@ -13,44 +13,44 @@ import synthesijer.ast.Variable;
 import synthesijer.ast.type.ComponentType;
 
 public class MethodInvocation extends Expr{
-	
+
 	private Expr method;
 	private ArrayList<Expr> params = new ArrayList<>();
-	
+
 	public MethodInvocation(Scope scope){
 		super(scope);
 	}
-	
+
 	public void setMethod(Expr expr){
 		method = expr;
 	}
-	
+
 	public void addParameter(Expr expr){
-		params.add(expr);		
+		params.add(expr);
 	}
-	
+
 	public Expr getMethod(){
 		return method;
 	}
-		
+
 	public ArrayList<Expr> getParameters(){
 		return params;
 	}
-	
+
 	public void setParameter(int index, Expr expr){
 		params.set(index, expr);
 	}
-	
+
 	public String getMethodName(){
 		if(method instanceof Ident){
 			return ((Ident)method).getSymbol();
-		
+
 		}else if(method instanceof FieldAccess){
 			return ((FieldAccess)method).getIdent().getSymbol();
 		}
 		return method.toString();
 	}
-	
+
 	public void accept(SynthesijerExprVisitor v){
 		v.visitMethodInvocation(this);
 	}
@@ -59,21 +59,21 @@ public class MethodInvocation extends Expr{
 	public boolean isConstant() {
 		return false;
 	}
-	
+
 	public String toString(){
 		String str = "MethodInvocation::(" + method;
 		for(Expr expr: params){
-			str += " " + expr; 
+			str += " " + expr;
 		}
 		str += ")";
-		return str; 
+		return str;
 	}
-	
+
 	@Override
 	public boolean isVariable() {
 		return false;
 	}
-	
+
 	public Method getTargetMethod(){
 		if(method instanceof FieldAccess){
 			ComponentType type = (ComponentType)(method.getType());
@@ -104,7 +104,7 @@ public class MethodInvocation extends Expr{
 			return m.getType();
 		}
 	}
-	
+
 	@Override
 	public Variable[] getSrcVariables(){
 		ArrayList<Variable> list = new ArrayList<>();

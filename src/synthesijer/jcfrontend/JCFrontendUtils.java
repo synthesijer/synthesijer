@@ -13,7 +13,7 @@ import com.sun.source.tree.ModifiersTree;
 
 public class JCFrontendUtils {
 
-    public static boolean isAnnotatedBy(List<? extends AnnotationTree> annotations, String key){
+	public static boolean isAnnotatedBy(List<? extends AnnotationTree> annotations, String key){
 		for(AnnotationTree a: annotations){
 			if(a.getAnnotationType() instanceof IdentifierTree){
 				Name s = ((IdentifierTree)(a.getAnnotationType())).getName();
@@ -24,9 +24,9 @@ public class JCFrontendUtils {
 			}
 		}
 		return false;
-    }
+	}
 
-    public static AnnotationTree getAnnotation(List<? extends AnnotationTree> annotations, String key){
+	public static AnnotationTree getAnnotation(List<? extends AnnotationTree> annotations, String key){
 		for(AnnotationTree a: annotations){
 			if(a.getAnnotationType() instanceof IdentifierTree){
 				Name s = ((IdentifierTree)(a.getAnnotationType())).getName();
@@ -34,53 +34,53 @@ public class JCFrontendUtils {
 			}
 		}
 		return null;
-    }
+	}
 
-    public static boolean isSynchronized(ModifiersTree mods){
+	public static boolean isSynchronized(ModifiersTree mods){
 		if(mods == null) return false;
 		return (mods.getFlags().contains(Modifier.SYNCHRONIZED));
-    }
-	
-    public static boolean isPrivate(ModifiersTree mods){
+	}
+
+	public static boolean isPrivate(ModifiersTree mods){
 		if(mods == null) return false;
 		return (mods.getFlags().contains(Modifier.PRIVATE));
-    }
+	}
 
-    public static boolean isFinal(ModifiersTree mods){
+	public static boolean isFinal(ModifiersTree mods){
 		if(mods == null) return false;
 		return (mods.getFlags().contains(Modifier.FINAL));
-    }
+	}
 
-    public static boolean isVolatile(ModifiersTree mods){
+	public static boolean isVolatile(ModifiersTree mods){
 		if(mods == null) return false;
 		return (mods.getFlags().contains(Modifier.VOLATILE));
-    }
+	}
 
-    public static boolean isGlobalConstant(ModifiersTree mods){
+	public static boolean isGlobalConstant(ModifiersTree mods){
 		if(mods == null) return false;
 		boolean f = true;
 		f &= (mods.getFlags().contains(Modifier.PUBLIC));
 		f &= (mods.getFlags().contains(Modifier.FINAL));
 		f &= (mods.getFlags().contains(Modifier.STATIC));
 		return f;
-    }
+	}
 
-    public static boolean isAnnotationDecl(ModifiersTree mods){
+	public static boolean isAnnotationDecl(ModifiersTree mods){
 		//return (mods.getFlags().contains(Modifier.ANNOTATION));
 		return false;
-    }
-	
-    public static boolean isInterfaceDecl(ModifiersTree mods){
+	}
+
+	public static boolean isInterfaceDecl(ModifiersTree mods){
 		//return (mods.getFlags().contains(Modifier.INTERFACE));
 		//return (mods.getFlags().contains(Modifier.ABSTRACT));
 		return false;
-    }
-	
-    public static boolean isImplemented(List<ExpressionTree> implementing, String key){
+	}
+
+	public static boolean isImplemented(List<ExpressionTree> implementing, String key){
 		System.out.println(implementing);
 		for(ExpressionTree expr: implementing){
 			if(expr instanceof IdentifierTree){
-				IdentifierTree ident = (IdentifierTree) expr; 
+				IdentifierTree ident = (IdentifierTree) expr;
 				if(ident.getName().toString().equals(key)) return true;
 			}else if(expr instanceof MemberSelectTree){
 				MemberSelectTree fa = (MemberSelectTree)expr;
@@ -90,10 +90,10 @@ public class JCFrontendUtils {
 			}
 		}
 		return false;
-    }
-	
-    public static boolean isConstructor(MethodTree decl){
+	}
+
+	public static boolean isConstructor(MethodTree decl){
 		return "<init>".equals(decl.getName().toString());
-    }
+	}
 
 }

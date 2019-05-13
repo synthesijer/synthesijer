@@ -19,7 +19,7 @@ public class BaseScanner<R,P> extends TreeScanner<R, P>{
 		debug("unimplemented: " + node.getClass().getName());
 		return null;
 	}
-	
+
 	@Override
 	public R visitMethod(MethodTree node, P p){
 		debug("unimplemented: " + node.getClass().getName());

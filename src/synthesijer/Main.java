@@ -26,7 +26,7 @@ import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 
 /**
  * The user interface for Synthesijer.
- * 
+ *
  * @author miyo
  *
  */
@@ -98,16 +98,16 @@ public class Main {
 			for(String s: javaSrc){
 				files.add(new File(s));
 			}
-			
+
 			Iterable<? extends JavaFileObject> compilationUnits1 =
-				fileManager.getJavaFileObjectsFromFiles(files);
+					fileManager.getJavaFileObjectsFromFiles(files);
 			compiler.getTask(new PrintWriter(System.err),
-							 fileManager,
-							 null, // a diagnostic listener
-							 Arrays.asList(new String[]{"-Xplugin:Synthesijer", "-cp", classPathStr}),
-							 null, // names of classes to be processed by annotation processing
-							 compilationUnits1
-							 ).call();
+					fileManager,
+					null, // a diagnostic listener
+					Arrays.asList(new String[]{"-Xplugin:Synthesijer", "-cp", classPathStr}),
+					null, // names of classes to be processed by annotation processing
+					compilationUnits1
+			).call();
 
 			fileManager.close();
 		}

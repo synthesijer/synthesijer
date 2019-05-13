@@ -6,11 +6,11 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 
 public class BreakStatement extends Statement{
-	
+
 	public BreakStatement(Scope scope){
 		super(scope);
 	}
-		
+
 	public void generateHDL(HDLModule m) {
 	}
 

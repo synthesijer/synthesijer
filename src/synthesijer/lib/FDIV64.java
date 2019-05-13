@@ -5,13 +5,13 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class FDIV64 extends HDLModule{
-	
+
 	public double a;
 	public double b;
 	public double result;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public FDIV64(){
 		super("synthesijer_fdiv64", "clk", "reset");
 		newPort("a",      DIR.IN,  HDLPrimitiveType.genVectorType(64));

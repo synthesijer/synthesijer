@@ -9,9 +9,9 @@ import synthesijer.hdl.HDLPrimitiveType;
 import synthesijer.hdl.expr.HDLValue;
 
 public class INPUT64 extends HDLModule{
-	
+
 	public long value;
-	
+
 	public INPUT64(){
 		super("inputport64", "clk", "reset");
 		newParameter("WIDTH", HDLPrimitiveType.genIntegerType(), new HDLValue(64));

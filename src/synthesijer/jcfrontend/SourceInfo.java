@@ -10,9 +10,9 @@ public class SourceInfo{
 	public boolean isAnnotation = false;
 	public boolean isInterface = false;
 	public boolean isSynthesijerHDL = false;
-	
+
 	public String extending = null;
 	public ArrayList<String> implementing = new ArrayList<>();
 	public Hashtable<String, String> importTable = new Hashtable<>();
-	
+
 }

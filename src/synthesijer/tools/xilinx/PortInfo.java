@@ -14,7 +14,7 @@ public class PortInfo {
 	}
 
 	public PortInfo(String n, String d, String t, boolean vector, long left,
-			long right) {
+					long right) {
 		this.name = n;
 		this.dir = d;
 		this.type = t;

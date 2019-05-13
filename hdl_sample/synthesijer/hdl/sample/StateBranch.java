@@ -11,7 +11,7 @@ import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.sequencer.SequencerState;
 
 public class StateBranch extends HDLModule{
-	
+
 	public StateBranch(){
 		super("state_branch", "clk", "reset");
 		HDLPort sel = newPort("sel", HDLPort.DIR.IN, HDLPrimitiveType.genBitType());
@@ -28,14 +28,14 @@ public class StateBranch extends HDLModule{
 		q.getSignal().setAssign(s1, HDLPreDefinedConstant.HIGH);
 		q.getSignal().setAssign(s2, HDLPreDefinedConstant.LOW);
 	}
-	
+
 	public static void main(String... args){
 		StateBranch m = new StateBranch();
 		BasicSim sim = new BasicSim(m, m.getName() + "_sim");
-		
+
 		HDLSignal sig = sim.getModuleInstances()[0].getSignalForPort("sel");
 		sig.setAssign(null, HDLPreDefinedConstant.HIGH);
-		
+
 		HDLUtils.generate(m, HDLUtils.VHDL);
 		HDLUtils.generate(sim, HDLUtils.VHDL);
 		HDLUtils.generate(m, HDLUtils.Verilog);

@@ -6,7 +6,7 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.hdl.HDLModule;
 
 public class ContinueStatement extends Statement{
-	
+
 	public ContinueStatement(Scope parent){
 		super(parent);
 	}

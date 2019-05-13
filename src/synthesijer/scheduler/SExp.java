@@ -41,7 +41,7 @@ public class SExp {
 		}
 		return s;
 	}
-	
+
 	private boolean isWhite(String s){
 		return (s.trim().length() == 0);
 	}
@@ -82,7 +82,7 @@ public class SExp {
 			throw (new Exception("[SExp] could not close bracket"));
 		}
 		if (point0 != index) {
-			String s = src.substring(point0, index).trim(); 
+			String s = src.substring(point0, index).trim();
 			if(isWhite(s) == false) atoms.add(s);
 		}
 		return index;
@@ -95,19 +95,19 @@ public class SExp {
 	public Object get(int index) throws Exception {
 		return atoms.get(index);
 	}
-	
+
 	public static SExp load(String path) throws Exception{
-		Path src = Paths.get(path); 
+		Path src = Paths.get(path);
 		String str = new String(Files.readAllBytes(src));
 		str = str.replaceAll("\n", " ");
 		SExp s = new SExp();
 		int index = s.parse(str);
 		return s;
 	}
-	
+
 	public static void main(String... args) throws Exception{
 		SExp s = SExp.load(args[0]);
 		System.out.println(s);
 	}
-	
+
 }

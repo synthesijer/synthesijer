@@ -5,13 +5,13 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class FSUB32 extends HDLModule{
-	
+
 	public float a;
 	public float b;
 	public float result;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public FSUB32(){
 		super("synthesijer_fsub32", "clk", "reset");
 		newPort("a",      DIR.IN,  HDLPrimitiveType.genVectorType(32));

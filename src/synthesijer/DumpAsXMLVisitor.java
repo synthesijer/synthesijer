@@ -48,14 +48,14 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 
 /**
  * A visitor class to dump module hierarchy of AST as XML.
- * 
+ *
  * @author miyo
  *
  */
 public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprVisitor, SynthesijerAstTypeVisitor{
-	
+
 	private final PrintWriter dest;
-	
+
 	public DumpAsXMLVisitor(PrintWriter dest){
 		this.dest = dest;
 	}
@@ -70,7 +70,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		for(Method m: o.getMethods()){ m.accept(this); }
 		dest.println("</methods>");
 		dest.printf("</module>\n");
-		
+
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		options += " parallelFlag=\"%b\"";
 		options += " noWaitFlag=\"%b\"";
 		options += " constructorFlag=\"%b\"";
-		
+
 		dest.printf("<method name=\"%s\"" + options + ">\n",
 				SynthesijerUtils.escapeXML(o.getName()),
 				o.isUnsynthesizable(),
@@ -113,7 +113,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		dest.printf("</index>");
 		dest.printf("</expr>", "ArrayAccess");
 	}
-	
+
 	@Override
 	public void visitAssignExpr(AssignExpr o) {
 		dest.printf("<expr kind=\"%s\">", "AssignExpr");
@@ -230,13 +230,13 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		dest.printf("</arg>\n");
 		dest.printf("</expr>\n");
 	}
-	
+
 	@Override
 	public void visitCondExpr(CondExpr o){
 		dest.printf("<type kind=\"select\">\n");
-		dest.printf("<cond>\n"); o.getCond().accept(this); dest.printf("</cond>\n"); 
-		dest.printf("<true>\n"); o.getTruePart().accept(this); dest.printf("</true>\n"); 
-		dest.printf("<false>\n"); o.getFalsePart().accept(this); dest.printf("</false>\n"); 
+		dest.printf("<cond>\n"); o.getCond().accept(this); dest.printf("</cond>\n");
+		dest.printf("<true>\n"); o.getTruePart().accept(this); dest.printf("</true>\n");
+		dest.printf("<false>\n"); o.getFalsePart().accept(this); dest.printf("</false>\n");
 		dest.printf("</type>\n");
 	}
 
@@ -329,7 +329,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		dest.printf("</elements>\n");
 		dest.printf("</statement>\n");
 	}
-	
+
 	public void visitSwitchCaseElement(SwitchStatement.Elem o){
 		dest.printf("<element>\n");
 		dest.printf("<pattern>\n");
@@ -338,7 +338,7 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		dest.printf("<statements>\n");
 		for(Statement s: o.getStatements()) s.accept(this);
 		dest.printf("</statements>\n");
-		dest.printf("</element>\n");	
+		dest.printf("</element>\n");
 	}
 
 
@@ -394,14 +394,14 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		o.getElemType().accept(this);
 		dest.printf("</type>\n");
 	}
-	
+
 	@Override
 	public void visitArrayRef(ArrayRef o){
 		dest.printf("<type kind=\"array_ref\">\n");
 		o.getRefType().accept(this);
 		dest.printf("</type>\n");
 	}
-	
+
 	@Override
 	public void visitComponentRef(ComponentRef o){
 		dest.printf("<type kind=\"component_ref\">\n");
@@ -425,20 +425,20 @@ public class DumpAsXMLVisitor implements SynthesijerAstVisitor, SynthesijerExprV
 		dest.printf("<type kind=\"primitive\" name=\"%s\"/>\n", o.toString());
 	}
 
-    @Override
+	@Override
 	public void visitMultipleType(MultipleType o){
 		dest.printf("<type kind=\"multiple\">\n");
 		for(int i = 0; i < o.size(); i++){
 			o.get(i).accept(this);
 		}
 		dest.printf("</type>\n");
-    }
+	}
 
-    @Override
+	@Override
 	public void visitChannelType(ChannelType o){
 		dest.printf("<type kind=\"channel\">\n");
 		o.getElemType().accept(this);
 		dest.printf("</type>\n");
-    }
+	}
 
 }

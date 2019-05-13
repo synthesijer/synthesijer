@@ -23,7 +23,7 @@ public class PreScanner extends TreeScanner<Void, SourceInfo>{
 		for(Tree i: node.getImplementsClause()){
 			info.implementing.add(getImplementingIntarfaceName(info.importTable, i.toString()));
 		}
-		
+
 		return null;
 	}
 
@@ -45,5 +45,5 @@ public class PreScanner extends TreeScanner<Void, SourceInfo>{
 		}
 	}
 
-	
+
 }

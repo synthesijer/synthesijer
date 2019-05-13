@@ -13,7 +13,7 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class BasicParallelizer2 implements SchedulerInfoOptimizer{
-	
+
 	public static final boolean DEBUG = false;
 
 	public SchedulerInfo opt(SchedulerInfo info){
@@ -25,21 +25,21 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		}
 		return result;
 	}
-	
+
 	public String getKey(){
 		return "basic_parallelize2";
 	}
-	
+
 	private SchedulerSlot copySlots(SchedulerSlot slot){
-		SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId()); 
+		SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 		for(SchedulerItem item: slot.getItems()){
 			newSlot.addItem(item);
 			item.setSlot(newSlot);
 		}
 		return newSlot;
 	}
-	
-	
+
+
 	private Hashtable<SchedulerSlot, ArrayList<SchedulerSlot>> analyze(ArrayList<SchedulerSlot> bb){
 		Hashtable<Operand, ArrayList<SchedulerSlot>> writing = new Hashtable<>();
 		Hashtable<Operand, ArrayList<SchedulerSlot>> reading = new Hashtable<>();
@@ -71,7 +71,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 					}
 				}
 			}
-			
+
 			for(Operand dest: s.getDestOperands()){
 				if(dest == null) continue;
 				ArrayList<SchedulerSlot> l = writing.get(dest);
@@ -92,7 +92,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		}
 		return dependents;
 	}
-	
+
 	private boolean isReady(SchedulerSlot slot, ArrayList<SchedulerSlot> dependent, ArrayList<SchedulerSlot> restList){
 		if(dependent == null) return true;
 		for(SchedulerSlot s: dependent){
@@ -102,7 +102,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		}
 		return true;
 	}
-	
+
 	private SchedulerSlot parallelize(SchedulerBoard board, ArrayList<SchedulerSlot> bb, Hashtable<Integer, Integer> id_map){
 		SchedulerSlot target = null;
 		SchedulerSlot prev = null;
@@ -145,68 +145,68 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 //		}
 		return prev;
 	}
-	
+
 	private boolean isExcept(SchedulerItem item){
 		Op op = item.getOp();
 		switch(op){
-		case METHOD_ENTRY:
-		case METHOD_EXIT:
-		case MUL32:
-		case MUL64:
-		case DIV32:
-		case DIV64:
-		case MOD32:
-		case MOD64:
-		case LSHIFT32:
-		case LOGIC_RSHIFT32:
-		case ARITH_RSHIFT32:
-		case LSHIFT64:
-		case LOGIC_RSHIFT64:
-		case ARITH_RSHIFT64:
-		case JP:
-		case JT:
-		case RETURN:
-		case SELECT:
+			case METHOD_ENTRY:
+			case METHOD_EXIT:
+			case MUL32:
+			case MUL64:
+			case DIV32:
+			case DIV64:
+			case MOD32:
+			case MOD64:
+			case LSHIFT32:
+			case LOGIC_RSHIFT32:
+			case ARITH_RSHIFT32:
+			case LSHIFT64:
+			case LOGIC_RSHIFT64:
+			case ARITH_RSHIFT64:
+			case JP:
+			case JT:
+			case RETURN:
+			case SELECT:
 //		case ARRAY_ACCESS:
 //		case ARRAY_INDEX:
-		case CALL:
-		case EXT_CALL:
-		case FIELD_ACCESS:
-		case BREAK:
-		case CONTINUE:
-		case FADD32:
-		case FSUB32:
-		case FMUL32:
-		case FDIV32:
-		case FADD64:
-		case FSUB64:
-		case FMUL64:
-		case FDIV64:
-		case CONV_F2I:
-		case CONV_I2F:
-		case CONV_D2L:
-		case CONV_L2D:
-		case CONV_F2D:
-		case CONV_D2F:
-		case FLT32:
-		case FLEQ32:
-		case FGT32:
-		case FGEQ32:
-		case FCOMPEQ32:
-		case FNEQ32:
-		case FLT64:
-		case FLEQ64:
-		case FGT64:
-		case FGEQ64:
-		case FCOMPEQ64:
-		case FNEQ64:
-		case UNDEFINED:
-			return true;
-		default:
-			return false;
+			case CALL:
+			case EXT_CALL:
+			case FIELD_ACCESS:
+			case BREAK:
+			case CONTINUE:
+			case FADD32:
+			case FSUB32:
+			case FMUL32:
+			case FDIV32:
+			case FADD64:
+			case FSUB64:
+			case FMUL64:
+			case FDIV64:
+			case CONV_F2I:
+			case CONV_I2F:
+			case CONV_D2L:
+			case CONV_L2D:
+			case CONV_F2D:
+			case CONV_D2F:
+			case FLT32:
+			case FLEQ32:
+			case FGT32:
+			case FGEQ32:
+			case FCOMPEQ32:
+			case FNEQ32:
+			case FLT64:
+			case FLEQ64:
+			case FGT64:
+			case FGEQ64:
+			case FCOMPEQ64:
+			case FNEQ64:
+			case UNDEFINED:
+				return true;
+			default:
+				return false;
 		}
 	}
-	
+
 	private boolean isExcept(SchedulerItem[] items){
 		boolean flag = false;
 		for(SchedulerItem i: items){
@@ -214,7 +214,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		}
 		return flag;
 	}
-	
+
 	private boolean isConflicted(SchedulerSlot s, SchedulerItem item){
 		boolean f = false;
 		for(SchedulerItem prev: s.getItems()){
@@ -222,7 +222,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		}
 		return f;
 	}
-	
+
 	private boolean isConflicted(ArrayList<SchedulerSlot> bb, SchedulerItem item){
 		if(bb == null) return false;
 		boolean f = false;
@@ -249,7 +249,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 			System.out.println(s.getStepId() + " -> " + degrees.get(s));
 		}
 	}
-	
+
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();

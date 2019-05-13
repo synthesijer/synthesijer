@@ -9,14 +9,14 @@ import synthesijer.ast.Variable;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class FieldAccess extends Expr{
-	
+
 	Expr selected;
 	Ident ident;
-	
+
 	public FieldAccess(Scope scope){
 		super(scope);
 	}
-	
+
 	public void setSelected(Expr selected){
 		this.selected = selected;
 	}
@@ -28,11 +28,11 @@ public class FieldAccess extends Expr{
 	public void setIdent(Ident ident){
 		this.ident = ident;
 	}
-	
+
 	public Ident getIdent(){
 		return ident;
 	}
-	
+
 	public void accept(SynthesijerExprVisitor v){
 		v.visitFieldAccess(this);
 	}
@@ -41,11 +41,11 @@ public class FieldAccess extends Expr{
 	public boolean isConstant() {
 		return false;
 	}
-	
+
 	public String toString(){
 		return "FieldAccess: " + ident;
 	}
-	
+
 	@Override
 	public boolean isVariable() {
 		//return false;
@@ -80,7 +80,7 @@ public class FieldAccess extends Expr{
 		for(Variable var: selected.getSrcVariables()) list.add(var);
 		return list.toArray(new Variable[]{});
 	}
-	
+
 	@Override
 	public boolean hasMethodInvocation() {
 		//return selected.hasMethodInvocation();

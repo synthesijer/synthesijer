@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import synthesijer.ast.Module;
 
 public class SchedulerInfo {
-	
+
 	private ArrayList<SchedulerBoard> boardsList = new ArrayList<>();
-	
+
 	private final String name;
 
 	private final Module module;
-	
+
 	//private final ArrayList<VariableOperand> varList;
 	private final ArrayList<Operand> varList;
-	
+
 	public SchedulerInfo(String name, Module module){
 		this.name = name;
 		this.module = module;
@@ -25,7 +25,7 @@ public class SchedulerInfo {
 		this.module = i.module;
 		varList = i.varList;
 	}
-	
+
 	public SchedulerInfo getSameInfo(){
 		return new SchedulerInfo(this);
 	}
@@ -37,7 +37,7 @@ public class SchedulerInfo {
 	public Module getModule(){
 		return module;
 	}
-	
+
 	public SchedulerBoard[] getBoardsList(){
 		return boardsList.toArray(new SchedulerBoard[]{});
 	}
@@ -60,21 +60,21 @@ public class SchedulerInfo {
 	public void addBoard(SchedulerBoard b){
 		boardsList.add(b);
 	}
-	
+
 	public void addOperand(Operand o){
 		varList.add(o);
 	}
-	
+
 //	public void addModuleVarList(ArrayList<VariableOperand> t){
 //		if(varList != null){
 //			SynthesijerUtils.warn("DUPLICATE addModuleVarTable:" + name);
 //		}
 //		this.varList = t;
 //	}
-		
+
 	//public ArrayList<VariableOperand> getModuleVarList(){
 	public ArrayList<Operand> getModuleVarList(){
 		return varList;
 	}
-	
+
 }

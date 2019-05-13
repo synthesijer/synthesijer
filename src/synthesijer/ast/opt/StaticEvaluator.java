@@ -31,7 +31,7 @@ import synthesijer.ast.type.StringType;
 public class StaticEvaluator {
 
     private Hashtable<String, Expr> identTable = new Hashtable<>();
-    
+
     public Module conv(Module m){
         Module newM = new Module(m.getParentScope(), m.getName(), m.getImportTable(), m.getExtending(), m.getImplementingList());
         newM.setSynthesijerHDL(m.isSynthesijerHDL());
@@ -47,14 +47,14 @@ public class StaticEvaluator {
                 v.setInitExpr(e);
             }
         }
-        
+
         // methods are copied as is
         for(Method method: m.getMethods()){
             newM.addMethod(method);
         }
         return newM;
     }
-        
+
     private VariableDecl conv(Scope parent, VariableDecl v){
         Expr newInitExpr = conv(parent, v.getInitExpr());
         VariableDecl newV = new VariableDecl(parent, v.getName(), v.getType(), newInitExpr);
@@ -68,7 +68,7 @@ public class StaticEvaluator {
         //System.out.println(identTable);
         return newV;
     }
-    
+
     /*
      *  convert expressions
      */
@@ -114,7 +114,7 @@ public class StaticEvaluator {
         newE.setIndexed(conv(scope, expr.getIndexed()));
         return newE;
     }
-    
+
     private Expr conv(Scope scope, AssignExpr expr){
         Expr rhs = conv(scope, expr.getRhs());
         Expr lhs = conv(scope, expr.getRhs());
@@ -149,7 +149,7 @@ public class StaticEvaluator {
         }
         return ret;
     }
-    
+
     private boolean isConstant(Expr e){
         if(e instanceof Literal) return true;
         else if(e instanceof Ident){
@@ -281,7 +281,7 @@ public class StaticEvaluator {
         newE.setClassName(expr.getClassName());
         return newE;
     }
-    
+
     private Expr conv(Scope scope, ParenExpr expr){
         Expr e = conv(scope, expr.getExpr());
         if(e instanceof Literal){
@@ -295,7 +295,7 @@ public class StaticEvaluator {
             return newE;
         }
     }
-    
+
     private Expr conv(Scope scope, TypeCast expr){
         Expr e = conv(scope, expr.getExpr());
         Type t = expr.getType();
@@ -309,7 +309,7 @@ public class StaticEvaluator {
             return newE;
         }
     }
-    
+
     private Expr conv(Scope scope, UnaryExpr expr){
         //System.out.println(identTable);
         Expr arg = conv(scope, expr.getArg());
@@ -338,5 +338,5 @@ public class StaticEvaluator {
         //System.out.println(newE);
         return newE;
     }
-    
+
 }

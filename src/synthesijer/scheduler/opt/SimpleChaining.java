@@ -21,26 +21,26 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		}
 		return result;
 	}
-	
+
 	@Override
 	public String getKey(){
 		return "simple_chaining";
 	}
-	
+
 	private SchedulerSlot copySlots(SchedulerSlot slot){
-		SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId()); 
+		SchedulerSlot newSlot = new SchedulerSlot(slot.getStepId());
 		for(SchedulerItem item: slot.getItems()){
 			newSlot.addItem(item);
 			item.setSlot(newSlot);
 		}
 		return newSlot;
 	}
-		
+
 	private SchedulerSlot chaining(ArrayList<SchedulerSlot> bb){
 
 		Hashtable<Operand, SchedulerItem> predItem = new Hashtable<>();
 		SchedulerSlot newSlot = null;
-		
+
 		int last = 0;
 		for(SchedulerSlot s: bb){
 			last = s.getNextStep()[0];
@@ -52,7 +52,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 						((VariableOperand)o).setChaining(item, predItem.get(o));
 					}
 				}
-				predItem.put(item.getDestOperand(), item);				
+				predItem.put(item.getDestOperand(), item);
 			}
 			if(newSlot == null){
 				newSlot = copySlots(s);
@@ -68,70 +68,70 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		}
 		return newSlot;
 	}
-	
+
 	private boolean isExcept(SchedulerItem item){
 		Op op = item.getOp();
 		switch(op){
-		case METHOD_ENTRY:
-		case METHOD_EXIT:
-		case MUL32:
-		case MUL64:
-		case DIV32:
-		case DIV64:
-		case MOD32:
-		case MOD64:
-		case LSHIFT32:
-		case LOGIC_RSHIFT32:
-		case ARITH_RSHIFT32:
-		case LSHIFT64:
-		case LOGIC_RSHIFT64:
-		case ARITH_RSHIFT64:
-		case JP:
-		case JT:
-		case RETURN:
-		case SELECT:
-		case ARRAY_ACCESS:
-		case ARRAY_ACCESS0:
-		case ARRAY_ACCESS_WAIT:
-		case ARRAY_INDEX:
-		case CALL:
-		case EXT_CALL:
-		case FIELD_ACCESS:
-		case BREAK:
-		case CONTINUE:
-		case FADD32:
-		case FSUB32:
-		case FMUL32:
-		case FDIV32:
-		case FADD64:
-		case FSUB64:
-		case FMUL64:
-		case FDIV64:
-		case CONV_F2I:
-		case CONV_I2F:
-		case CONV_D2L:
-		case CONV_L2D:
-		case CONV_F2D:
-		case CONV_D2F:
-		case FLT32:
-		case FLEQ32:
-		case FGT32:
-		case FGEQ32:
-		case FCOMPEQ32:
-		case FNEQ32:
-		case FLT64:
-		case FLEQ64:
-		case FGT64:
-		case FGEQ64:
-		case FCOMPEQ64:
-		case FNEQ64:
-		case UNDEFINED:
-			return true;
-		default:
-			return false;
+			case METHOD_ENTRY:
+			case METHOD_EXIT:
+			case MUL32:
+			case MUL64:
+			case DIV32:
+			case DIV64:
+			case MOD32:
+			case MOD64:
+			case LSHIFT32:
+			case LOGIC_RSHIFT32:
+			case ARITH_RSHIFT32:
+			case LSHIFT64:
+			case LOGIC_RSHIFT64:
+			case ARITH_RSHIFT64:
+			case JP:
+			case JT:
+			case RETURN:
+			case SELECT:
+			case ARRAY_ACCESS:
+			case ARRAY_ACCESS0:
+			case ARRAY_ACCESS_WAIT:
+			case ARRAY_INDEX:
+			case CALL:
+			case EXT_CALL:
+			case FIELD_ACCESS:
+			case BREAK:
+			case CONTINUE:
+			case FADD32:
+			case FSUB32:
+			case FMUL32:
+			case FDIV32:
+			case FADD64:
+			case FSUB64:
+			case FMUL64:
+			case FDIV64:
+			case CONV_F2I:
+			case CONV_I2F:
+			case CONV_D2L:
+			case CONV_L2D:
+			case CONV_F2D:
+			case CONV_D2F:
+			case FLT32:
+			case FLEQ32:
+			case FGT32:
+			case FGEQ32:
+			case FCOMPEQ32:
+			case FNEQ32:
+			case FLT64:
+			case FLEQ64:
+			case FGT64:
+			case FGEQ64:
+			case FCOMPEQ64:
+			case FNEQ64:
+			case UNDEFINED:
+				return true;
+			default:
+				return false;
 		}
 	}
-	
+
 	private boolean hasVolatile(SchedulerSlot slot){
 		for(SchedulerItem item: slot.getItems()){
 			VariableOperand o = item.getDestOperand();
@@ -144,7 +144,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		if(slot.hasBranchOp()) return false;
 		if(slot.getNextStep().length > 1) return false;
 		if(degree > 1) return false;
-		
+
 		if(slot.getLatency() > 0) return false; // just simple
 		if(isExcept(slot.getItems()[0])) return false; // just simple
 		if(hasVolatile(slot)) return false; // jsut simple
@@ -153,7 +153,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		int last = bb.get(bb.size()-1).getNextStep()[0];
 		return last == slot.getStepId(); // true when chained
 	}
-	
+
 	public SchedulerBoard conv(SchedulerBoard src){
 		Hashtable<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
 		SchedulerBoard ret = src.genSameEnvBoard();

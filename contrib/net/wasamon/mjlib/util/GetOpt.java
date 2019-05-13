@@ -11,10 +11,10 @@ import java.util.StringTokenizer;
  * この引数は空白または"="で識別される。<br>
  * また、オプションに"::"をつけると、その後の文字列すべてを、そのオプションの引数として処理する。<br>
  * - や -- の次、また、-ではじまらない文字列からを引数として保持する。<br>
- * 
+ *
  * @version $Id: GetOpt.java,v 1.3 2004/05/24 05:24:35 miyo Exp $
  * @author Takefumi MIYOSHI
- * 
+ *
  */
 public class GetOpt {
 
@@ -37,7 +37,7 @@ public class GetOpt {
 
 	/**
 	 * コンストラクタ
-	 * 
+	 *
 	 * @param sp
 	 *            解析したい一文字オプションの連続(-vとか)
 	 * @param lps
@@ -51,7 +51,7 @@ public class GetOpt {
 
 	/**
 	 * コンストラクタ
-	 * 
+	 *
 	 * @param sp
 	 *            解析したい一文字オプションの連続(-vとか)
 	 * @param lps
@@ -82,7 +82,7 @@ public class GetOpt {
 
 	/**
 	 * デバッグ用コンストラクタ
-	 * 
+	 *
 	 */
 	public GetOpt(String sp, String lps, String ptn[], boolean flag) {
 		this(sp, lps, ptn);
@@ -108,12 +108,12 @@ public class GetOpt {
 
 	/**
 	 * 引数すべてに対し指定したパターンがあるかどうか判定する
-	 * 
+	 *
 	 * @param ptn
 	 *            引数の配列
 	 * @param offset
 	 *            解析する引数のオフセット
-	 * 
+	 *
 	 * @TODO もっといいアルゴリズムに
 	 */
 	private void analyze(String[] ptn, int offset) {
@@ -160,8 +160,8 @@ public class GetOpt {
 	private boolean makeOptList(String sp, String[] lp) {
 		int i = 0;
 		while (i < sp.length()) {
-		    if (sp.length() > (i + 1) && sp.charAt(i + 1) == ':') { /* もし文字の後に':'が続いていた場合引数を伴う */
-			if (sp.length() > (i + 2) && sp.charAt(i + 2) == ':') { /* もう一つ続いていたらラスト */
+			if (sp.length() > (i + 1) && sp.charAt(i + 1) == ':') { /* もし文字の後に':'が続いていた場合引数を伴う */
+				if (sp.length() > (i + 2) && sp.charAt(i + 2) == ':') { /* もう一つ続いていたらラスト */
 					opt_with_arg_rest = new NamedObject(sp.substring(i, i + 1));
 					i += 3;
 				} else {
@@ -175,7 +175,7 @@ public class GetOpt {
 		}
 		i = 0;
 		while (i < lp.length) {
-		    if (lp[i].charAt(lp[i].length() - 1) == ':') { /* 最終の文字が':'なら引数を伴う */
+			if (lp[i].charAt(lp[i].length() - 1) == ':') { /* 最終の文字が':'なら引数を伴う */
 				opt_with_arg.add(new NamedObject(lp[i].substring(0,
 						lp[i].length() - 1)));
 			} else {
@@ -188,7 +188,7 @@ public class GetOpt {
 
 	/**
 	 * パターンに該当するフラグオプションがるかどうか
-	 * 
+	 *
 	 * @param ptn
 	 *            パターン文字列
 	 * @return 該当オプションがあるかどうか
@@ -215,7 +215,7 @@ public class GetOpt {
 
 	/**
 	 * 引数つきオプションの解析 hoge=fefe または hoge fefe をオプション hoge と、その引数 fefe と解析
-	 * 
+	 *
 	 * @param ptn
 	 *            ためすパターン
 	 * @param arg
@@ -260,7 +260,7 @@ public class GetOpt {
 
 	/**
 	 * オプションが指定されていたかどうかを判定する
-	 * 
+	 *
 	 * @param key
 	 *            検索するオプション名
 	 * @return 指定されていた/いなかった
@@ -271,7 +271,7 @@ public class GetOpt {
 
 	/**
 	 * オプションで指定されていた値を取得する。
-	 * 
+	 *
 	 * @param key
 	 *            検索するオプション名
 	 * @return 指定されていた値(文字列)
@@ -296,7 +296,7 @@ public class GetOpt {
 
 	/**
 	 * すべてのオプションを配列で得る。
-	 * 
+	 *
 	 * @return オプションの配列
 	 */
 	private String[] getAllOpt() {
@@ -309,7 +309,7 @@ public class GetOpt {
 
 	/**
 	 * すべての引数を配列にして返す
-	 * 
+	 *
 	 * @return 引数の配列
 	 */
 	public String[] getArgs() {
@@ -318,7 +318,7 @@ public class GetOpt {
 
 	/**
 	 * パタンのうちoffset以降を配列に格納して返す
-	 * 
+	 *
 	 * @param ptn
 	 *            パタン
 	 * @param offset
@@ -343,7 +343,7 @@ public class GetOpt {
 
 		/**
 		 * コンストラクタ
-		 * 
+		 *
 		 * @param name
 		 *            名前
 		 * @param value

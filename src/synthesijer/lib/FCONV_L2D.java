@@ -5,12 +5,12 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class FCONV_L2D extends HDLModule{
-	
+
 	public long a;
 	public double result;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public FCONV_L2D(){
 		super("synthesijer_fconv_l2d", "clk", "reset");
 		newPort("a",      DIR.IN, HDLPrimitiveType.genSignedType(64));

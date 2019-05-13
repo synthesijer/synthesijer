@@ -6,12 +6,12 @@ import synthesijer.ast.Type;
 public class ChannelType implements Type {
 
 	public static final String KEY = "CHANNEL";
-	
+
 	private final Type elemType;
 
 	public ChannelType(Type k){
-			elemType = k;
-		}
+		elemType = k;
+	}
 
 	public Type getElemType() {
 		return elemType;

@@ -21,18 +21,18 @@ import synthesijer.ast.type.MySelfType;
 
 /**
  * A visitor to generate an instance of Module from a given instance of JCClassDecl.
- * 
+ *
  * @author miyo
  *
  */
 public class JCTopVisitor extends TreeScanner<Void, Void>{
-	
+
 	private final Module module;
-	
+
 	public JCTopVisitor(Module m){
 		this.module = m;
 	}
-	
+
 	public Scope getScope(){
 		return module;
 	}
@@ -53,7 +53,7 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		//return super.visitClass(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitMethod(MethodTree decl, Void aVoid){
 		String name = decl.getName().toString();
@@ -64,14 +64,14 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 			type = TypeBuilder.genType(decl.getReturnType());
 		}
 		Method m = new Method(module, name, type);
-		
+
 		m.setArgs(parseArgs(decl.getParameters(), m));
-		
+
 		if(JCFrontendUtils.isAnnotatedBy(decl.getModifiers().getAnnotations(), "unsynthesizable")){
 			//return super.visitMethod(decl, aVoid);
 			return null;
 		}
-		
+
 		m.setUnsynthesizableFlag(JCFrontendUtils.isAnnotatedBy(decl.getModifiers().getAnnotations(), "unsynthesizable"));
 		m.setAutoFlag(JCFrontendUtils.isAnnotatedBy(decl.getModifiers().getAnnotations(), "auto"));
 		m.setSynchronizedFlag(JCFrontendUtils.isSynchronized(decl.getModifiers()));
@@ -96,7 +96,7 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		}else{
 			m.setCallStackFlag(false);
 		}
-		
+
 		if(decl.getBody() != null){
 			for(StatementTree stmt: decl.getBody().getStatements()){
 				JCStmtVisitor visitor = new JCStmtVisitor(m);
@@ -104,12 +104,12 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 				m.getBody().addStatement(visitor.getStatement());
 			}
 		}
-		
+
 		module.addMethod(m);
 		//return super.visitMethod(decl, aVoid);
 		return null;
 	}
-	
+
 	/**
 	 * parse arguments of method declaration.
 	 * @param args
@@ -122,7 +122,7 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		for(int i = 0; i < v.length; i++){
 			JCStmtVisitor visitor = new JCStmtVisitor(scope);
 			args.get(i).accept(visitor, null); // Since args.get(i) is an instance of JCVariableDecl,
-			                                   // this visitor should visit visitVarDef
+			// this visitor should visit visitVarDef
 			v[i] = (VariableDecl)(visitor.getStatement()); // this type cast should occur no errors.
 			v[i].setMethodParam(true);
 		}
@@ -135,5 +135,5 @@ public class JCTopVisitor extends TreeScanner<Void, Void>{
 		SynthesijerUtils.dump(t);
 		return super.visitOther(t, aVoid);
 	}
-	
+
 }

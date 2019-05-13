@@ -12,17 +12,17 @@ import synthesijer.hdl.HDLSignalBinding;
 import synthesijer.hdl.HDLType;
 
 public class HDLModuleToComponentXML {
-	
+
 	private static String dir(HDLPort.DIR d){
 		switch(d){
-		case IN:
-			return "in";
-		case OUT:
-			return "out";
-		case INOUT:
-			return "inout";
-		default: 
-			throw new RuntimeException("Unknown port DIR:" + d);
+			case IN:
+				return "in";
+			case OUT:
+				return "out";
+			case INOUT:
+				return "inout";
+			default:
+				throw new RuntimeException("Unknown port DIR:" + d);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class HDLModuleToComponentXML {
 			return "std_logic_vector";
 		}
 	}
-	
+
 	public static void listOfRequires(HDLModule m, ArrayList<HDLModule> list){
 		if(list.contains(m)) return;
 		list.add(m);
@@ -78,7 +78,7 @@ public class HDLModuleToComponentXML {
 			src.add("src/" + m.getName() + ".vhd");
 		}
 		src.add("src/" + module.getName() + ".vhd");
-		
+
 		ArrayList<HDLSignalBinding> bindings = new ArrayList<>();
 		for(HDLPort p: module.getPorts()){
 			if(p.isBinded()){
@@ -86,18 +86,18 @@ public class HDLModuleToComponentXML {
 				if(bindings.contains(b) == false) bindings.add(b);
 			}
 		}
-		
+
 		GenComponentXML o = new GenComponentXML(vendor, lib, module.getName(), 1, 0, list.toArray(new PortInfo[0]), src.toArray(new String[0]), bindings.toArray(new HDLSignalBinding[0]));
-		
+
 		File basedir = new File(o.getCoreUniqName());
 		basedir.mkdir();
 
 		File file = new File(basedir, "component.xml");
 		o.write(file);
-		
+
 		File srcdir = new File(basedir, "src");
 		srcdir.mkdir();
-		
+
 		File xguidir = new File(basedir, "xgui");
 		xguidir.mkdir();
 		try(PrintStream xgui = new PrintStream(new File(xguidir, o.getCoreUniqName() + ".tcl"))){
@@ -110,5 +110,5 @@ public class HDLModuleToComponentXML {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 }

@@ -5,12 +5,12 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class FCONV_D2F extends HDLModule{
-	
+
 	public double a;
 	public float result;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public FCONV_D2F(){
 		super("synthesijer_fconv_d2f", "clk", "reset");
 		newPort("a",      DIR.IN, HDLPrimitiveType.genVectorType(64));

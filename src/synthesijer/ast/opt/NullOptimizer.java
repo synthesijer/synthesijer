@@ -35,7 +35,7 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 
 public class NullOptimizer {
-    
+
     public Module conv(Module m){
         Module newM = new Module(m.getParentScope(), m.getName(), m.getImportTable(), m.getExtending(), m.getImplementingList());
         newM.setSynthesijerHDL(m.isSynthesijerHDL());
@@ -49,7 +49,7 @@ public class NullOptimizer {
         }
         return newM;
     }
-    
+
     private VariableDecl conv(Scope parent, VariableDecl v){
         Expr newInitExpr = conv(parent, v.getInitExpr());
         VariableDecl newV = new VariableDecl(parent, v.getName(), v.getType(), newInitExpr);
@@ -59,11 +59,11 @@ public class NullOptimizer {
         newV.setMethodParam(v.isMethodParam());
         return newV;
     }
-        
+
     private Method conv(Module parent, Method m){
 
         Method newMethod = new Method(parent, m.getName(), m.getType());
-        
+
         newMethod.setUnsynthesizableFlag(m.isUnsynthesizable());
         newMethod.setAutoFlag(m.isAuto());
         newMethod.setAutoFlag(m.isSynchronized());
@@ -75,7 +75,7 @@ public class NullOptimizer {
         newMethod.setConstructorFlag(m.isConstructor());
         newMethod.setCallStackFlag(m.hasCallStack());
         newMethod.setCallStackSize(m.getCallStackSize());
-        
+
         newMethod.setArgs(m.getArgs());
         for(VariableDecl v: m.getVariableDecls()){
             VariableDecl newV = conv(newMethod, v);
@@ -133,7 +133,7 @@ public class NullOptimizer {
             throw new RuntimeException("[Internal Error] no convesion rule for " + stmt);
         }
     }
-    
+
     /*
      *  convert expressions
      */
@@ -188,25 +188,25 @@ public class NullOptimizer {
         BreakStatement newS = new BreakStatement(scope);
         return newS;
     }
-    
+
     private ContinueStatement conv(Scope scope, ContinueStatement stmt){
         ContinueStatement newS = new ContinueStatement(scope);
         return newS;
     }
-    
+
     private DoWhileStatement conv(Scope scope, DoWhileStatement stmt){
         DoWhileStatement newS = new DoWhileStatement(scope);
         newS.setBody(conv(scope, stmt.getBody()));
         newS.setCondition(conv(scope, stmt.getCondition()));
         return newS;
     }
-    
+
     private ExprStatement conv(Scope scope, ExprStatement stmt){
         Expr newE = conv(scope, stmt.getExpr());
         ExprStatement newS = new ExprStatement(scope, newE);
         return newS;
     }
-    
+
     private ForStatement conv(Scope scope, ForStatement stmt){
         ForStatement newS = new ForStatement(scope);
         for(VariableDecl v: stmt.getVariableDecls()){
@@ -222,7 +222,7 @@ public class NullOptimizer {
         newS.setBody(conv(newS, stmt.getBody()));
         return newS;
     }
-    
+
     private IfStatement conv(Scope scope, IfStatement stmt){
         IfStatement newS = new IfStatement(scope);
         newS.setCondition(conv(scope, stmt.getCondition()));
@@ -232,18 +232,18 @@ public class NullOptimizer {
         }
         return newS;
     }
-    
+
     private ReturnStatement conv(Scope scope, ReturnStatement stmt){
         ReturnStatement newS = new ReturnStatement(scope);
         newS.setExpr(conv(scope, stmt.getExpr()));
         return newS;
     }
-    
+
     private SkipStatement conv(Scope scope, SkipStatement stmt){
         SkipStatement newS = new SkipStatement(scope);
         return newS;
     }
-    
+
     private SwitchStatement conv(Scope scope, SwitchStatement stmt){
         SwitchStatement newS = new SwitchStatement(scope);
         newS.setSelector(conv(scope, stmt.getSelector()));
@@ -259,7 +259,7 @@ public class NullOptimizer {
         }
         return newS;
     }
-    
+
     private SynchronizedBlock conv(Scope scope, SynchronizedBlock stmt){
         SynchronizedBlock newS = new SynchronizedBlock(scope);
         for(VariableDecl v: stmt.getVariableDecls()){
@@ -270,20 +270,20 @@ public class NullOptimizer {
         }
         return newS;
     }
-    
+
     private TryStatement conv(Scope scope, TryStatement stmt){
         TryStatement newS = new TryStatement(scope);
         newS.setBody(stmt.getBody());
         return newS;
     }
-    
+
     private WhileStatement conv(Scope scope, WhileStatement stmt){
         WhileStatement newS = new WhileStatement(scope);
         newS.setCondition(conv(scope, stmt.getCondition()));
         newS.setBody(conv(scope, stmt.getBody()));
         return newS;
     }
-    
+
     private Expr conv(Scope scope, ArrayAccess expr){
         ArrayAccess newE = new ArrayAccess(scope);
         newE.setIndex(conv(scope, expr.getIndex()));
@@ -372,20 +372,20 @@ public class NullOptimizer {
         newE.setClassName(expr.getClassName());
         return newE;
     }
-    
+
     private Expr conv(Scope scope, ParenExpr expr){
         ParenExpr newE = new ParenExpr(scope);
         newE.setExpr(conv(scope, expr.getExpr()));
         return newE;
     }
-    
+
     private Expr conv(Scope scope, TypeCast expr){
         TypeCast newE = new TypeCast(scope);
         newE.setExpr(conv(scope, expr.getExpr()));
         newE.setTargetType(expr.getType());
         return newE;
     }
-    
+
     private Expr conv(Scope scope, UnaryExpr expr){
         UnaryExpr newE = new UnaryExpr(scope);
         newE.setArg(conv(scope, expr.getArg()));
@@ -393,5 +393,5 @@ public class NullOptimizer {
         newE.setPostfix(expr.isPostfix());
         return newE;
     }
-    
+
 }

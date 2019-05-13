@@ -22,16 +22,16 @@ import synthesijer.hdl.HDLSignalBinding;
 public class GenComponentXML {
 
 	private Document document;
-	
+
 	public final String VENDOR_NAME;
 	public final String LIBRARY_NAME;
 	public final String CORE_NAME;
 	public final PortInfo[] ports;
 	public final String[] files;
 	public final HDLSignalBinding[] bindings;
-	
+
 	public final int MajorVersion;
-	public final int MinorVersion; 
+	public final int MinorVersion;
 
 	public GenComponentXML(String vendor, String lib, String core, int major, int minor, PortInfo[] ports, String[] files, HDLSignalBinding[] bindings) {
 		this.VENDOR_NAME = vendor;
@@ -42,7 +42,7 @@ public class GenComponentXML {
 		this.ports = ports;
 		this.files = files;
 		this.bindings = bindings;
-		
+
 		try {
 			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			document = documentBuilder.newDocument();
@@ -71,7 +71,7 @@ public class GenComponentXML {
 		root.appendChild(genGlobalParameters());
 		root.appendChild(genVendorExtensions());
 	}
-	
+
 	private boolean hasAddressSpaces(){
 		for(HDLSignalBinding b: bindings){
 			if(b.hasAddressSpace()) return true;
@@ -87,7 +87,7 @@ public class GenComponentXML {
 	}
 
 	public String getCoreUniqName(){
-		return CORE_NAME + "_" + "v" + MajorVersion + "_" + MinorVersion; 
+		return CORE_NAME + "_" + "v" + MajorVersion + "_" + MinorVersion;
 	}
 
 	private Element genRoot(){
@@ -97,13 +97,13 @@ public class GenComponentXML {
 		element.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 		return element;
 	}
-	
+
 	private Element genTextNode(String label, String value){
 		Element element = document.createElement(label);
 		element.appendChild(document.createTextNode(value));
 		return element;
 	}
-	
+
 	private Element genTextNode(String label, String value, ParameterPair[] list){
 		Element element = document.createElement(label);
 		element.appendChild(document.createTextNode(value));
@@ -112,7 +112,7 @@ public class GenComponentXML {
 		}
 		return element;
 	}
-	
+
 	public Element genBusInterfaces(){
 		Element element = document.createElement("spirit:busInterfaces");
 		for(HDLSignalBinding b: bindings){
@@ -122,19 +122,19 @@ public class GenComponentXML {
 			e0.appendChild(
 					genTextNode("spirit:busType", "",
 							new ParameterPair[]{
-							   new ParameterPair("spirit:vendor", b.getVendor()),
-							   new ParameterPair("spirit:library", b.getLibrary()),
-							   new ParameterPair("spirit:name", b.getBusTypeName()),
-							   new ParameterPair("spirit:version", b.getVersion()),
-					}));
+									new ParameterPair("spirit:vendor", b.getVendor()),
+									new ParameterPair("spirit:library", b.getLibrary()),
+									new ParameterPair("spirit:name", b.getBusTypeName()),
+									new ParameterPair("spirit:version", b.getVersion()),
+							}));
 			e0.appendChild(
 					genTextNode("spirit:abstractionType", "",
 							new ParameterPair[]{
-							   new ParameterPair("spirit:vendor", b.getVendor()),
-							   new ParameterPair("spirit:library", b.getLibrary()),
-							   new ParameterPair("spirit:name", b.getBusAbstractionTypeName()),
-							   new ParameterPair("spirit:version", b.getVersion()),
-					}));
+									new ParameterPair("spirit:vendor", b.getVendor()),
+									new ParameterPair("spirit:library", b.getLibrary()),
+									new ParameterPair("spirit:name", b.getBusAbstractionTypeName()),
+									new ParameterPair("spirit:version", b.getVersion()),
+							}));
 			if(b.isMaster()){
 				Element e1 = document.createElement("spirit:master");
 				e0.appendChild(e1);
@@ -152,9 +152,9 @@ public class GenComponentXML {
 			}
 			e0.appendChild(genPortMaps(b));
 		}
-		return element; 
+		return element;
 	}
-	
+
 	private Element genPortMaps(HDLSignalBinding b){
 		Element element = document.createElement("spirit:portMaps");
 		Enumeration<HDLPort> keys = b.getKeys();
@@ -176,7 +176,7 @@ public class GenComponentXML {
 		}
 		return element;
 	}
-	
+
 	private Element genAddressSpaces(){
 		Element element = document.createElement("spirit:addressSpaces");
 		for(HDLSignalBinding b: bindings){
@@ -186,14 +186,14 @@ public class GenComponentXML {
 			e0.appendChild(genTextNode("spirit:name", b.getName()));
 			e0.appendChild(genTextNode("spirit:range", String.valueOf(b.getRange()), //"4294967296",
 					new ParameterPair[]{
-					  new ParameterPair("spirit:format", "long"),
-					  new ParameterPair("spirit:resolve", "user")
-			}));
+							new ParameterPair("spirit:format", "long"),
+							new ParameterPair("spirit:resolve", "user")
+					}));
 			e0.appendChild(genTextNode("spirit:width", "32",
 					new ParameterPair[]{
-					  new ParameterPair("spirit:format", "long"),
-					  new ParameterPair("spirit:resolve", "user")
-			}));
+							new ParameterPair("spirit:format", "long"),
+							new ParameterPair("spirit:resolve", "user")
+					}));
 		}
 		return element;
 	}
@@ -211,20 +211,20 @@ public class GenComponentXML {
 				e1.appendChild(genTextNode("spirit:name", b.getAddressBlockName()));
 				e1.appendChild(genTextNode("spirit:baseAddress", "0",
 						new ParameterPair[]{
-					  	  new ParameterPair("spirit:format", "bitString"),
-					  	  new ParameterPair("spirit:resolve", "user"),
-					  	  new ParameterPair("spirit:bitStringLength", "32"),
-				}));
+								new ParameterPair("spirit:format", "bitString"),
+								new ParameterPair("spirit:resolve", "user"),
+								new ParameterPair("spirit:bitStringLength", "32"),
+						}));
 				e1.appendChild(genTextNode("spirit:range", String.valueOf(b.getRange()), //"4294967296",
 						new ParameterPair[]{
-						  new ParameterPair("spirit:format", "long"),
-						  new ParameterPair("spirit:resolve", "user")
-				}));
+								new ParameterPair("spirit:format", "long"),
+								new ParameterPair("spirit:resolve", "user")
+						}));
 				e1.appendChild(genTextNode("spirit:width", "32",
 						new ParameterPair[]{
-						  new ParameterPair("spirit:format", "long"),
-						  new ParameterPair("spirit:resolve", "user")
-				}));
+								new ParameterPair("spirit:format", "long"),
+								new ParameterPair("spirit:resolve", "user")
+						}));
 			}
 		}
 		return element;
@@ -236,7 +236,7 @@ public class GenComponentXML {
 		element.appendChild(genPorts());
 		return element;
 	}
-	
+
 	private Element genViews(){
 		Element element = document.createElement("spirit:views");
 		element.appendChild(genView("xilinx_vhdlsynthesis", "VHDL Synthesis", "vhdlSource:vivado.xilinx.com:synthesis", "vhdl", CORE_NAME, "xilinx_vhdlsynthesis_view_fileset"));
@@ -270,7 +270,7 @@ public class GenComponentXML {
 		element.appendChild(genTextNode("spirit:localName", label));
 		return element;
 	}
-	
+
 	class ParameterPair{
 		public final String key, value;
 		public ParameterPair(String k, String v){
@@ -297,7 +297,7 @@ public class GenComponentXML {
 		}
 		return element;
 	}
-		
+
 	private Element genPort(PortInfo info){
 		Element element = document.createElement("spirit:port");
 		element.appendChild(genTextNode("spirit:name", info.name));
@@ -309,7 +309,7 @@ public class GenComponentXML {
 				Element e1 = document.createElement("spirit:vector");
 				e1.appendChild(genTextNode("spirit:left", String.valueOf(info.left), new ParameterPair[]{new ParameterPair("spirit:format", "long"), new ParameterPair("spirit:resolve", "immediate")}));
 				e1.appendChild(genTextNode("spirit:right", String.valueOf(info.right), new ParameterPair[]{new ParameterPair("spirit:format", "long"), new ParameterPair("spirit:resolve", "immediate")}));
-		        e0.appendChild(e1);
+				e0.appendChild(e1);
 			}
 			{
 				Element e1 = document.createElement("spirit:wireTypeDefs");
@@ -325,7 +325,7 @@ public class GenComponentXML {
 		}
 		return element;
 	}
-	
+
 	private Element genFileSets(){
 		Element element = document.createElement("spirit:fileSets");
 		String gui = "xgui/" + getCoreUniqName() + ".tcl";
@@ -334,7 +334,7 @@ public class GenComponentXML {
 		element.appendChild(genXpguiFileSet("xilinx_xpgui_view_fileset", gui));
 		return element;
 	}
-	
+
 	private Element genSrcFileSet(String name, String[] list){
 		Element element = document.createElement("spirit:fileSet");
 		element.appendChild(genTextNode("spirit:name", name));
@@ -348,7 +348,7 @@ public class GenComponentXML {
 		}
 		return element;
 	}
-	
+
 	private Element genXpguiFileSet(String name, String src){
 		Element element = document.createElement("spirit:fileSet");
 		element.appendChild(genTextNode("spirit:name", name));
@@ -360,7 +360,7 @@ public class GenComponentXML {
 		element.appendChild(e0);
 		return element;
 	}
-	
+
 	public Element genGlobalParameters(){
 		Element element = document.createElement("spirit:parameters");
 		Element e0 = document.createElement("spirit:parameter");
@@ -369,7 +369,7 @@ public class GenComponentXML {
 		element.appendChild(e0);
 		return element;
 	}
-	
+
 	public Element genVendorExtensions(){
 		Element element = document.createElement("spirit:vendorExtensions");
 		{
@@ -402,7 +402,7 @@ public class GenComponentXML {
 				"azynq",
 				"virtexu",
 				"kintexu"
-				};
+		};
 		for(String f: families){
 			element.appendChild(genTextNode("xilinx:family", f, new ParameterPair[]{ new ParameterPair("xilinx:lifeCycle", "Production") }));
 		}

@@ -4,23 +4,23 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class SchedulerSlot {
-	
+
 	private final int stepId;
-	
+
 	public SchedulerSlot(int id){
 		this.stepId = id;
 	}
-	
+
 	/**
 	 * container of items.
 	 * the index in this array corresponds to computation step. 
 	 */
 	private ArrayList<SchedulerItem> items = new ArrayList<>();
-	
+
 	public SchedulerItem[] getItems(){
 		return items.toArray(new SchedulerItem[]{});
 	}
-	
+
 	/**
 	 * adds an item into the container with new slot, and set stepId into the item.
 	 * @param item
@@ -30,11 +30,11 @@ public class SchedulerSlot {
 		items.add(item);
 		return item;
 	}
-	
+
 	public int getStepId(){
 		return this.stepId;
 	}
-	
+
 	public int[] getNextStep(){
 		int max = 0;
 		for(SchedulerItem item: items){
@@ -51,7 +51,7 @@ public class SchedulerSlot {
 		}
 		return max;
 	}
-	
+
 	public boolean hasBranchOp(){
 		for(SchedulerItem item: items){
 			if(item.getOp().isBranch) return true;
@@ -62,7 +62,7 @@ public class SchedulerSlot {
 	public void dump(PrintStream out){
 		dump(out, "");
 	}
-	
+
 	public void dump(PrintStream out, String sep){
 		for(SchedulerItem item: items){
 			out.println(sep + item.info());
@@ -79,7 +79,7 @@ public class SchedulerSlot {
 			}
 		}
 	}
-	
+
 	public Operand[] getSrcOperands(){
 		ArrayList<Operand> operand = new ArrayList<>();
 		for(SchedulerItem item: items){
@@ -91,7 +91,7 @@ public class SchedulerSlot {
 		}
 		return operand.toArray(new Operand[]{});
 	}
-	
+
 	public Operand[] getDestOperands(){
 		ArrayList<Operand> operand = new ArrayList<>();
 		for(SchedulerItem item: items){
@@ -100,5 +100,5 @@ public class SchedulerSlot {
 		}
 		return operand.toArray(new Operand[]{});
 	}
-	
+
 }

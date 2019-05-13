@@ -11,21 +11,21 @@ import synthesijer.ast.SynthesijerAstVisitor;
 import synthesijer.ast.Variable;
 
 public class BlockStatement extends Statement implements Scope{
-	
-    private final Scope parent;
 
-    private ArrayList<Statement> statements = new ArrayList<>();
-    
-    private ArrayList<VariableDecl> variableDecls = new ArrayList<>();
-    
-    private LinkedHashMap<String, Variable> varTable = new LinkedHashMap<>();
-	
+	private final Scope parent;
+
+	private ArrayList<Statement> statements = new ArrayList<>();
+
+	private ArrayList<VariableDecl> variableDecls = new ArrayList<>();
+
+	private LinkedHashMap<String, Variable> varTable = new LinkedHashMap<>();
+
 	public BlockStatement(Scope scope){
 		super(scope);
 		this.parent = scope;
 		parent.addScope(this);
 	}
-	
+
 	public void addScope(Scope s){
 		parent.addScope(s);
 	}
@@ -47,20 +47,20 @@ public class BlockStatement extends Statement implements Scope{
 			statements.add(stmt);
 		}
 	}
-	
+
 	public void replaceStatements(ArrayList<Statement> newList){
 		statements = newList;
 		//System.out.println(" replace -> #" + statements.size());
 	}
-	
+
 	public ArrayList<Statement> getStatements(){
 		return statements;
 	}
-	
-    public void addVariableDecl(VariableDecl v){
-        variableDecls.add(v);
-        varTable.put(v.getVariable().getName(), v.getVariable());
-    }
+
+	public void addVariableDecl(VariableDecl v){
+		variableDecls.add(v);
+		varTable.put(v.getVariable().getName(), v.getVariable());
+	}
 
 	public VariableDecl[] getVariableDecls(){
 		return variableDecls.toArray(new VariableDecl[]{});

@@ -18,13 +18,13 @@ public interface SynthesijerAstTypeVisitor {
 	public void visitComponentType(ComponentType o);
 
 	public void visitComponentRef(ComponentRef o);
-	
+
 	public void visitMySelfType(MySelfType o);
 
 	public void visitPrimitiveTypeKind(PrimitiveTypeKind o);
 
 	public void visitMultipleType(MultipleType o);
-	
+
 	public void visitChannelType(ChannelType o);
 
 }

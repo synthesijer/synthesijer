@@ -40,11 +40,11 @@ import synthesijer.ast.type.ArrayType;
 import synthesijer.ast.type.ComponentType;
 
 public class JCExprVisitor extends TreeScanner<Void, Void>{
-	
+
 	public final Scope scope;
-	
+
 	private Expr expr;
-	
+
 	public JCExprVisitor(Scope scope){
 		this.scope = scope;
 	}
@@ -61,13 +61,13 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitIdentifier(that, aVoid);
 		return null;
 	}
-	
+
 	private Expr stepIn(ExpressionTree expr){
 		JCExprVisitor visitor = new JCExprVisitor(scope);
 		expr.accept(visitor, null);
 		return visitor.getExpr();
 	}
-			
+
 	@Override
 	public Void visitBinary(BinaryTree that, Void aVoid){
 		//System.out.println(that);
@@ -83,12 +83,12 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitBinary(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitUnary(UnaryTree that, Void aVoid){
 		boolean postfix = false;
 		if(that.getKind() == Tree.Kind.POSTFIX_DECREMENT ||
-		   that.getKind() == Tree.Kind.POSTFIX_INCREMENT){
+				that.getKind() == Tree.Kind.POSTFIX_INCREMENT){
 			postfix = true;
 		}
 		UnaryExpr tmp = new UnaryExpr(scope);
@@ -99,7 +99,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitUnary(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitMethodInvocation(MethodInvocationTree that, Void aVoid){
 		MethodInvocation tmp = new MethodInvocation(scope);
@@ -111,7 +111,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitMethodInvocation(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitMemberSelect(MemberSelectTree that, Void aVoid){
 		FieldAccess tmp = new FieldAccess(scope);
@@ -123,26 +123,26 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitMemberSelect(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitLiteral(LiteralTree that, Void aVoid){
 		Literal tmp = new Literal(scope);
 		switch(that.getKind()){
-		case INT_LITERAL:     tmp.setValue((int)(that.getValue()));     break;
-		case BOOLEAN_LITERAL: tmp.setValue((boolean)(that.getValue())); break;
-		case CHAR_LITERAL:    tmp.setValue((char)(that.getValue()));    break;
-		case DOUBLE_LITERAL:  tmp.setValue((double)(that.getValue()));  break;
-		case FLOAT_LITERAL:   tmp.setValue((float)(that.getValue()));   break;
-		case LONG_LITERAL:    tmp.setValue((long)(that.getValue()));    break;
-		case STRING_LITERAL:  tmp.setValue((String)(that.getValue()));  break;
-		case NULL_LITERAL:    tmp.setNull(); break;
-		default: tmp.setUndefined(); break;
+			case INT_LITERAL:     tmp.setValue((int)(that.getValue()));     break;
+			case BOOLEAN_LITERAL: tmp.setValue((boolean)(that.getValue())); break;
+			case CHAR_LITERAL:    tmp.setValue((char)(that.getValue()));    break;
+			case DOUBLE_LITERAL:  tmp.setValue((double)(that.getValue()));  break;
+			case FLOAT_LITERAL:   tmp.setValue((float)(that.getValue()));   break;
+			case LONG_LITERAL:    tmp.setValue((long)(that.getValue()));    break;
+			case STRING_LITERAL:  tmp.setValue((String)(that.getValue()));  break;
+			case NULL_LITERAL:    tmp.setNull(); break;
+			default: tmp.setUndefined(); break;
 		}
 		expr = tmp;
 		//return super.visitLiteral(that, aVoid);
 		return null;
 	}
-	
+
 	private void setForceTypeCast(Expr lhs, Expr rhs){
 		if(rhs instanceof Literal == false) return;
 		Type ltype, rtype;
@@ -157,7 +157,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//System.out.printf("JCExprVisitor: RHS is casted into %s from %s\n", ltype, rtype);
 		//((Literal)rhs).castType(ltype);
 	}
-	
+
 	@Override
 	public Void visitAssignment(AssignmentTree that, Void aVoid){
 		AssignExpr tmp = new AssignExpr(scope);
@@ -168,7 +168,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitAssignment(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitCompoundAssignment(CompoundAssignmentTree that, Void aVoid){
 		AssignOp tmp = new AssignOp(scope);
@@ -179,7 +179,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitCompoundAssignment(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitNewArray(NewArrayTree that, Void aVoid){
 		NewArray tmp = new NewArray(scope);
@@ -206,7 +206,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitNewArray(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitArrayAccess(ArrayAccessTree that, Void aVoid){
 		ArrayAccess tmp = new ArrayAccess(scope);
@@ -220,7 +220,7 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitArrayAccess(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
 	public Void visitTypeCast(TypeCastTree that, Void aVoid){
 		TypeCast tmp = new TypeCast(scope);
@@ -251,9 +251,9 @@ public class JCExprVisitor extends TreeScanner<Void, Void>{
 		//return super.visitNewClass(that, aVoid);
 		return null;
 	}
-	
+
 	@Override
-    public Void visitConditionalExpression(ConditionalExpressionTree that, Void aVoid){
+	public Void visitConditionalExpression(ConditionalExpressionTree that, Void aVoid){
 		CondExpr tmp = new CondExpr(scope);
 		tmp.setCond(stepIn(that.getCondition()));
 		tmp.setTruePart(stepIn(that.getTrueExpression()));

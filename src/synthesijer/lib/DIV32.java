@@ -5,14 +5,14 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class DIV32 extends HDLModule{
-	
+
 	public int a;
 	public int b;
 	public int quantient;
 	public int remainder;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public DIV32(){
 		super("synthesijer_div32", "clk", "reset");
 		newPort("a",      DIR.IN,  HDLPrimitiveType.genSignedType(32));

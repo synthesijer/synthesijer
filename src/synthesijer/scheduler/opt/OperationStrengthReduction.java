@@ -11,7 +11,7 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class OperationStrengthReduction implements SchedulerInfoOptimizer{
-	
+
 	private final IdentifierGenerator idGen = new IdentifierGenerator();
 
 	public SchedulerInfo opt(SchedulerInfo info){
@@ -22,11 +22,11 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		return result;
 	}
 
-	
+
 	public String getKey(){
 		return "strength_reduction";
 	}
-	
+
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		for(SchedulerSlot slot: src.getSlots()){
@@ -38,15 +38,15 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		}
 		return ret;
 	}
-	
+
 	private double log2(double x){
 		return Math.log(x) / Math.log(2);
 	}
-	
+
 	private boolean isPowerOfTwo(long x){
 		return ((int)log2(x)) == log2(x);
 	}
-	
+
 	private SchedulerItem convMulToShift(SchedulerItem item){
 		Operand[] src = item.getSrcOperand();
 		if(src[0] instanceof VariableOperand && src[1] instanceof VariableOperand){
@@ -67,7 +67,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		item.overwriteSrc(1, new ConstantOperand(String.format("reduction_constant_%05d", idGen.id()), String.valueOf(shift), k.getType()));
 		return item;
 	}
-	
+
 	private SchedulerItem convDivToShift(SchedulerItem item){
 		Operand[] src = item.getSrcOperand();
 		if((src[0] instanceof VariableOperand && src[1] instanceof ConstantOperand) == false){
@@ -83,7 +83,7 @@ public class OperationStrengthReduction implements SchedulerInfoOptimizer{
 		item.overwriteSrc(1, new ConstantOperand(String.format("reduction_constant_%05d", idGen.id()), String.valueOf(shift), k.getType()));
 		return item;
 	}
-	
+
 	public SchedulerItem conv(SchedulerItem item){
 		if(item.getOp() == Op.MUL32 || item.getOp() == Op.MUL64){
 			return convMulToShift(item);

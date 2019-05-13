@@ -9,7 +9,7 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
-	
+
 	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
@@ -17,11 +17,11 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 		}
 		return result;
 	}
-	
+
 	public String getKey(){
 		return "conv_array_access";
 	}
-	
+
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		for(SchedulerSlot slot: src.getSlots()){
@@ -35,7 +35,7 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 		}
 		return ret;
 	}
-	
+
 	public SchedulerItem conv(SchedulerBoard board, SchedulerItem item, SchedulerBoard ret){
 		if(item.getOp() != Op.ARRAY_ACCESS){
 			// nothing to do
@@ -62,7 +62,7 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 			return item;
 		}
 	}
-	
+
 	private boolean isUsedAsSrc(SchedulerBoard board, VariableOperand op){
 		for(SchedulerSlot slot: board.getSlots()){
 			for(SchedulerItem item: slot.getItems()){
@@ -74,5 +74,5 @@ public class ConvArrayAccessToArrayIndex implements SchedulerInfoOptimizer{
 		}
 		return false;
 	}
-	
+
 }

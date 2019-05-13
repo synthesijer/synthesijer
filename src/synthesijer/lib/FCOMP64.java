@@ -5,13 +5,13 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class FCOMP64 extends HDLModule{
-	
+
 	public float a;
 	public float b;
 	public float result;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public static final int UNORDERED = 0x04; // 000100
 	public static final int LT        = 0x0C; // 001100
 	public static final int EQ        = 0x14; // 010100
@@ -19,7 +19,7 @@ public class FCOMP64 extends HDLModule{
 	public static final int GT        = 0x24; // 100100
 	public static final int NEQ       = 0x2C; // 101100
 	public static final int GEQ       = 0x34; // 110100
-	
+
 	public FCOMP64(){
 		super("synthesijer_fcomp64", "clk", "reset");
 		newPort("a",      DIR.IN,  HDLPrimitiveType.genVectorType(64));

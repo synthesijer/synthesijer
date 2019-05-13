@@ -1,7 +1,7 @@
 package synthesijer;
 
 public class SynthesijerUtils {
-	
+
 	public static void error(String s){
 		System.err.println("Error: "+ s);
 	}
@@ -19,7 +19,7 @@ public class SynthesijerUtils {
 		s = s.replaceAll(">", "&gt;");
 		return s;
 	}
-	
+
 	public static void dump(Object o){
 		System.err.printf("%s[%s]\n", o.toString(), o.getClass().toString());
 	}

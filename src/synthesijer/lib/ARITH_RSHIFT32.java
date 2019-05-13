@@ -5,13 +5,13 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class ARITH_RSHIFT32 extends HDLModule{
-	
+
 	public int a;
 	public int b;
 	public int result;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public ARITH_RSHIFT32(){
 		super("synthesijer_arith_rshift32", "clk", "reset");
 		newPort("a",      DIR.IN,  HDLPrimitiveType.genSignedType(32));

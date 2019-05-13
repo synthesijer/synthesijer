@@ -3,10 +3,10 @@ package net.wasamon.mjlib.util;
 
 /**
  * 名前つきオブジェクトの基底クラス
- * 
+ *
  * @version $Id: NamedObject.java,v 1.1.1.1 2003/12/29 11:46:16 miyo Exp $
  * @author Takefumi MIYOSHI
- * 
+ *
  */
 public class NamedObject extends Object{
 

@@ -23,21 +23,21 @@ public class ControlDataFlowGraph{
 	}
 
 	public void add(ControlDataFlowGraphNode n){
-		
+
 	}
-	
+
 }
 
 class ControlDataFlowGraphNode{
 
 	private final ArrayList<ControlDataFlowGraphNode> pred = new ArrayList<>();
-	
+
 	private final ArrayList<ControlDataFlowGraphNode> succ = new ArrayList<>();
-	
+
 	private final SchedulerSlot slot;
 
 	public ControlDataFlowGraphNode(SchedulerSlot slot){
 		this.slot = slot;
 	}
-	
+
 }

@@ -19,7 +19,7 @@ import synthesijer.ast.Module;
 
 /**
  * javac plugin to generate Synthesijer-IR from Java source code
- * 
+ *
  * @author miyo
  *
  */
@@ -40,13 +40,13 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 		if (e.getKind() == TaskEvent.Kind.GENERATE){
 			System.out.println("source: " + e.getSourceFile().getName());
 			newModule(e.getCompilationUnit());
-        }
+		}
 	}
 
 	@Override
 	public void finished(TaskEvent e){
 	}
-	
+
 
 	private boolean isHDLModule(String extending, Hashtable<String, String> importTable){
 		if(extending == null) return false;
@@ -56,7 +56,7 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 	}
 
 	public void newModule(CompilationUnitTree t){
-		
+
 		SourceInfo info = new SourceInfo();
 		t.accept(new PreScanner(), info);
 
@@ -71,21 +71,21 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 		for(ImportTree s: t.getImports()){
 			info.importTable.put(s.getQualifiedIdentifier().toString(), s.toString());
 		}
-			   		
+
 		boolean synthesizeFlag = true;
 		if(isHDLModule(info.extending, info.importTable) == true){
 			synthesizeFlag = false;
 		}
-		
+
 		Module module = new Module(info.className, info.importTable, info.extending, info.implementing);
 		module.setSynthesijerHDL(info.isSynthesijerHDL);
-		
+
 		JCTopVisitor visitor = new JCTopVisitor(module);
 		t.accept(visitor, null);
-		
+
 		Manager.INSTANCE.addModule(module, synthesizeFlag);
 	}
-	
+
 
 }
 

@@ -7,7 +7,7 @@ public class StreamOutput{
 
 	String name;
 	String type;
-	
+
 	public StreamOutput(String name){
 		this.name = name;
 	}

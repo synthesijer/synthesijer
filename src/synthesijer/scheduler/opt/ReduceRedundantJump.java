@@ -7,7 +7,7 @@ import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 
 public class ReduceRedundantJump implements SchedulerInfoOptimizer{
-	
+
 	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
@@ -15,11 +15,11 @@ public class ReduceRedundantJump implements SchedulerInfoOptimizer{
 		}
 		return result;
 	}
-	
+
 	public String getKey(){
 		return "reduce_redundant_jump";
 	}
-	
+
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		for(SchedulerSlot slot: src.getSlots()){
@@ -40,7 +40,7 @@ public class ReduceRedundantJump implements SchedulerInfoOptimizer{
 		}
 		return ret;
 	}
-	
+
 	public int getTargetState(SchedulerBoard b, int id){
 		SchedulerSlot slot = b.getSlot(id);
 		if(slot.getItems().length == 1 && slot.getItems()[0].getOp() == Op.JP){
@@ -59,5 +59,5 @@ public class ReduceRedundantJump implements SchedulerInfoOptimizer{
 		return false;
 	}
 
-	
+
 }

@@ -7,7 +7,7 @@ import synthesijer.ast.SynthesijerAstTypeVisitor;
 import synthesijer.ast.Type;
 
 public class MultipleType implements Type{
-	
+
 	public static final String KEY = "MULTIPLE";
 
 	private ArrayList<Type> types = new ArrayList<>();
@@ -15,7 +15,7 @@ public class MultipleType implements Type{
 	public MultipleType(Collection<Type> types){
 		this.types.addAll(types);
 	}
-	
+
 	public Type get(int i){
 		return types.get(i);
 	}
@@ -27,7 +27,7 @@ public class MultipleType implements Type{
 	public void accept(SynthesijerAstTypeVisitor v){
 		v.visitMultipleType(this);
 	}
-	
+
 	public String toString(){
 		String s = "(";
 		s += KEY;

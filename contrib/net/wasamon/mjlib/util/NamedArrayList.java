@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  */
 public class NamedArrayList extends ArrayList<NamedObject>{
-  
+
   /**
    * コンストラクタ
    */
@@ -29,7 +29,7 @@ public class NamedArrayList extends ArrayList<NamedObject>{
     for(int i = 0; i < super.size(); i++){
       obj = (NamedObject)(super.get(i));
       if(name.equals(obj.getName()) == true){
-	return obj;
+        return obj;
       }
     }
     throw new NoSuchException(name + " is not found.");

@@ -6,17 +6,17 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public class IRWriter {
-	
+
 	private final String name;
-	
+
 	public IRWriter(String name){
 		this.name = name;
 	}
-	
+
 	public void generate(SchedulerInfo info) throws IOException{
 		try(
-			PrintStream ir = new PrintStream(new FileOutputStream(new File(name + ".ir")));
-			){
+				PrintStream ir = new PrintStream(new FileOutputStream(new File(name + ".ir")));
+		){
 			ir.println("(MODULE " + info.getName());
 			//genVariables(ir, info.getModuleVarList().toArray(new VariableOperand[]{}));
 			genVariables(ir, info.getModuleVarList().toArray(new Operand[]{}));
@@ -29,7 +29,7 @@ public class IRWriter {
 			throw new IOException(e);
 		}
 	}
-	
+
 	private void genSchedulerBoard(PrintStream ir, SchedulerBoard b){
 		ir.println(" (BOARD " + b.getReturnType() + " " + b.getName());
 		//genVariables(ir, b.getVarList().toArray(new VariableOperand[]{}));

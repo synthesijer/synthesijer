@@ -9,18 +9,18 @@ import synthesijer.ast.Variable;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class NewClassExpr extends Expr{
-	
+
 	private String clazz;
 	private ArrayList<Expr> params = new ArrayList<>();
-	
+
 	public NewClassExpr(Scope scope){
 		super(scope);
 	}
-	
+
 	public void setClassName(String str){
 		clazz = str;
 	}
-	
+
 	public void addParam(Expr expr){
 		params.add(expr);
 	}
@@ -28,7 +28,7 @@ public class NewClassExpr extends Expr{
 	public String getClassName(){
 		return clazz;
 	}
-	
+
 	public ArrayList<Expr> getParameters(){
 		return params;
 	}
@@ -46,12 +46,12 @@ public class NewClassExpr extends Expr{
 	public boolean isVariable() {
 		return false;
 	}
-	
+
 	@Override
 	public Type getType() {
 		return PrimitiveTypeKind.DECLARED;
 	}
-	
+
 	@Override
 	public Variable[] getSrcVariables(){
 		ArrayList<Variable> list = new ArrayList<>();

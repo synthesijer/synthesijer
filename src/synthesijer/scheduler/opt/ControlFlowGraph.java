@@ -35,7 +35,7 @@ public class ControlFlowGraph{
 			build(n);
 		}
 	}
-	
+
 	private void build(ControlFlowGraphNode target){
 		for(ControlFlowGraphNode n : nodes){
 			for(int id : n.slot.getNextStep()){
@@ -63,7 +63,7 @@ public class ControlFlowGraph{
 		if(table.containsKey(node)){
 			return; // already treated.
 		}
-		
+
 		table.put(node, true); // make the node treated
 		if(node.pred.size() == 1){
 			bb.nodes.add(node);
@@ -91,22 +91,22 @@ public class ControlFlowGraph{
 			}
 		}
 	}
-	
+
 
 }
 
 class ControlFlowGraphNode{
 
 	final ArrayList<ControlFlowGraphNode> pred = new ArrayList<>();
-	
+
 	final ArrayList<ControlFlowGraphNode> succ = new ArrayList<>();
-	
+
 	final SchedulerSlot slot;
 
 	public ControlFlowGraphNode(SchedulerSlot slot){
 		this.slot = slot;
 	}
-	
+
 }
 
 class ControlFlowGraphBB{

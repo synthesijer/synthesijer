@@ -7,7 +7,7 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 
 /**
  * SchdulerItem is a unit of computation to be scheduled.
- * 
+ *
  * @author miyo
  *
  */
@@ -44,7 +44,7 @@ public class SchedulerItem {
 	private SchedulerSlot slot;
 
 	/**
-	 * 
+	 *
 	 * @param op
 	 *            operator
 	 * @param src
@@ -220,19 +220,19 @@ public class SchedulerItem {
 
 		return s;
 	}
-	
+
 	private boolean isArrayAccess(){
 		switch(op){
-		case ARRAY_ACCESS:
-		case ARRAY_ACCESS_WAIT:
-		case ARRAY_ACCESS0:
-		case ARRAY_INDEX:
-			return true;
-		default:
-			return false;
+			case ARRAY_ACCESS:
+			case ARRAY_ACCESS_WAIT:
+			case ARRAY_ACCESS0:
+			case ARRAY_INDEX:
+				return true;
+			default:
+				return false;
 		}
 	}
-	
+
 	public boolean isConflicted(SchedulerItem prev){
 		if(this.getDestOperand() != null){
 			for(Operand src: prev.getSrcOperand()){
@@ -241,7 +241,7 @@ public class SchedulerItem {
 			if(this.getDestOperand() instanceof VariableRefOperand && prev.isArrayAccess()){
 				if(((VariableRefOperand)getDestOperand()).getRef() == prev.getSrcOperand()[0]){
 					return true; // index operation dependency	
-				}	
+				}
 			}
 		}
 		if(prev.getDestOperand() != null){
@@ -262,7 +262,7 @@ public class SchedulerItem {
 		}
 		return false;
 	}
-	
+
 
 }
 
@@ -299,7 +299,7 @@ class MethodInvokeItem extends SchedulerItem {
 	}
 
 	public MethodInvokeItem(SchedulerBoard board, VariableOperand obj, String name, Operand[] src, VariableOperand dest,
-			String[] args) {
+							String[] args) {
 		super(board, Op.EXT_CALL, src, dest);
 		this.name = name;
 		this.obj = obj;
@@ -350,7 +350,7 @@ class FieldAccessItem extends SchedulerItem {
 	public final String name;
 
 	public FieldAccessItem(SchedulerBoard board, VariableOperand obj, String name, Operand[] src,
-			VariableOperand dest) {
+						   VariableOperand dest) {
 		super(board, Op.FIELD_ACCESS, src, dest);
 		this.name = name;
 		this.obj = obj;
@@ -404,19 +404,19 @@ class TypeCastItem extends SchedulerItem {
 	}
 
 	public static TypeCastItem newCastItem(SchedulerBoard board, Operand src, VariableOperand dest, Type orig,
-			Type target) {
+										   Type target) {
 		Op op;
 		if (isFloating(orig) == true && isFloating(target) == false) { // floating
-																		// ->
-																		// integer
+			// ->
+			// integer
 			op = isFloat(orig) ? Op.CONV_F2I : Op.CONV_D2L;
 		} else if (isFloating(orig) == false && isFloating(target) == true) { // integer
-																				// ->
-																				// floating
+			// ->
+			// floating
 			op = isFloat(target) ? Op.CONV_I2F : Op.CONV_L2D;
 		} else if (isFloating(orig) == true && isFloating(target) == true) { // floating
-																				// ->
-																				// floating
+			// ->
+			// floating
 			op = isFloat(orig) ? Op.CONV_F2D : Op.CONV_D2F;
 		} else {
 			op = Op.CAST;

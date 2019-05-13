@@ -13,23 +13,23 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class ConstantPropagation implements SchedulerInfoOptimizer{
-	
+
     public static final boolean DEBUG = false;
 
     public SchedulerInfo opt(SchedulerInfo info){
-	SchedulerInfo result = info.getSameInfo();
-	for(SchedulerBoard b: info.getBoardsList()){
-	    result.addBoard(b);
-	}
-	return result;
+        SchedulerInfo result = info.getSameInfo();
+        for(SchedulerBoard b: info.getBoardsList()){
+            result.addBoard(b);
+        }
+        return result;
     }
 
     public String getKey(){
-	return "null_optimizer";
+        return "null_optimizer";
     }
-    
+
     private void printVars(){
-	
+
     }
-	
+
 }

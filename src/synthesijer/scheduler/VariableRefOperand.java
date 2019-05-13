@@ -3,11 +3,11 @@ package synthesijer.scheduler;
 import synthesijer.ast.Type;
 
 public class VariableRefOperand extends VariableOperand{
-	
+
 	private final VariableOperand ref;
-	
+
 	private final Operand ptr;
-	
+
 	public VariableRefOperand(String name, Type type, VariableOperand ref, Operand ptr, boolean memberFlag){
 		super(name, type, memberFlag);
 		this.ref = ref;
@@ -17,11 +17,11 @@ public class VariableRefOperand extends VariableOperand{
 	public VariableOperand getRef(){
 		return ref;
 	}
-	
+
 	public Operand getPtr(){
 		return ptr;
 	}
-	
+
 	public String toSexp(){
 		String v = "";
 		v += "(VAR-REF";
@@ -33,5 +33,5 @@ public class VariableRefOperand extends VariableOperand{
 		v += ")";
 		return v;
 	}
-	
+
 }

@@ -41,32 +41,32 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.statement.WhileStatement;
 
 public class JCStmtVisitor extends TreeScanner<Void, Void>{
-	
-    public final Scope scope;
-	
-    private Statement stmt;
-	
-    public JCStmtVisitor(Scope scope){
+
+	public final Scope scope;
+
+	private Statement stmt;
+
+	public JCStmtVisitor(Scope scope){
 		this.scope = scope;
-    }
-	
-    public Statement getStatement(){
+	}
+
+	public Statement getStatement(){
 		return stmt;
-    }
-	
-    private Statement stepIn(Tree that, Scope scope){
+	}
+
+	private Statement stepIn(Tree that, Scope scope){
 		JCStmtVisitor visitor = new JCStmtVisitor(scope);
 		that.accept(visitor, null);
 		return visitor.getStatement();
-    }
-	
-    private Expr stepIn(ExpressionTree that, Scope scope){
+	}
+
+	private Expr stepIn(ExpressionTree that, Scope scope){
 		JCExprVisitor visitor = new JCExprVisitor(scope);
 		that.accept(visitor, null);
 		return visitor.getExpr();
-    }
-	
-    private BlockStatement wrapBlockStatement(Statement stmt){
+	}
+
+	private BlockStatement wrapBlockStatement(Statement stmt){
 		if(stmt instanceof BlockStatement){
 			return (BlockStatement)stmt;
 		}else{
@@ -74,10 +74,10 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 			block.addStatement(stmt);
 			return block;
 		}
-    }
-	
+	}
+
 	@Override
-    public Void visitIf(IfTree that, Void aVoid){
+	public Void visitIf(IfTree that, Void aVoid){
 		IfStatement tmp = new IfStatement(scope);
 		tmp.setCondition(stepIn(that.getCondition(), scope));
 		tmp.setThenPart(wrapBlockStatement(stepIn(that.getThenStatement(), scope)));
@@ -87,10 +87,10 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 		stmt = tmp;
 		//return super.visitIf(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitForLoop(ForLoopTree that, Void aVoid){
+	public Void visitForLoop(ForLoopTree that, Void aVoid){
 		ForStatement tmp = new ForStatement(scope);
 		for(StatementTree s: that.getInitializer()){
 			//tmp.addInitialize(stepIn(s, scope));
@@ -104,30 +104,30 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 		stmt = tmp;
 		//return super.visitForLoop(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitWhileLoop(WhileLoopTree that, Void aVoid){
+	public Void visitWhileLoop(WhileLoopTree that, Void aVoid){
 		WhileStatement tmp = new WhileStatement(scope);
 		tmp.setCondition(stepIn(that.getCondition(), scope));
 		tmp.setBody(wrapBlockStatement(stepIn(that.getStatement(), scope)));
 		stmt = tmp;
 		//return super.visitWhileLoop(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitDoWhileLoop(DoWhileLoopTree that, Void aVoid){
+	public Void visitDoWhileLoop(DoWhileLoopTree that, Void aVoid){
 		DoWhileStatement tmp = new DoWhileStatement(scope);
 		tmp.setCondition(stepIn(that.getCondition(), scope));
 		tmp.setBody(wrapBlockStatement(stepIn(that.getStatement(), scope)));
 		stmt = tmp;
 		//return super.visitDoWhileLoop(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitBlock(BlockTree that, Void aVoid){
+	public Void visitBlock(BlockTree that, Void aVoid){
 		BlockStatement tmp = new BlockStatement(scope);
 		for(StatementTree s: that.getStatements()){
 			JCStmtVisitor visitor = new JCStmtVisitor(scope);
@@ -137,10 +137,10 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 		stmt = tmp;
 		//return super.visitBlock(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitReturn(ReturnTree that, Void aVoid){
+	public Void visitReturn(ReturnTree that, Void aVoid){
 		ReturnStatement tmp = new ReturnStatement(scope);
 		if(that.getExpression() != null){
 			JCExprVisitor visitor = new JCExprVisitor(scope);
@@ -150,39 +150,39 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 		stmt = tmp;
 		//return super.visitReturn(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitExpressionStatement(ExpressionStatementTree that, Void aVoid){
+	public Void visitExpressionStatement(ExpressionStatementTree that, Void aVoid){
 		JCExprVisitor visitor = new JCExprVisitor(scope);
 		that.getExpression().accept(visitor, null);
 		stmt = new ExprStatement(scope, visitor.getExpr());
 		//return super.visitExpressionStatement(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitBreak(BreakTree that, Void aVoid){
+	public Void visitBreak(BreakTree that, Void aVoid){
 		stmt = new BreakStatement(scope);
 		//return super.visitBreak(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitContinue(ContinueTree that, Void aVoid){
+	public Void visitContinue(ContinueTree that, Void aVoid){
 		stmt = new ContinueStatement(scope);
 		//return super.visitContinue(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitEmptyStatement(EmptyStatementTree that, Void aVoid){
+	public Void visitEmptyStatement(EmptyStatementTree that, Void aVoid){
 		stmt = new SkipStatement(scope);
 		return null;
 	}
-	
+
 	@Override
-    public Void visitTry(TryTree that, Void aVoid){
+	public Void visitTry(TryTree that, Void aVoid){
 		TryStatement tmp = new TryStatement(scope);
 		JCStmtVisitor visitor = new JCStmtVisitor(scope);
 		that.getBlock().accept(visitor, null);
@@ -190,37 +190,37 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 		stmt = tmp;
 		//return super.visitTry(that, aVoid);
 		return null;
-    }
+	}
 
-	@Override	
-    public Void visitSynchronized(SynchronizedTree that, Void aVoid){
+	@Override
+	public Void visitSynchronized(SynchronizedTree that, Void aVoid){
 		visitBlock(that.getBlock(), null);
 		//return super.visitSynchronized(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitSwitch(SwitchTree that, Void aVoid){
-        SwitchStatement tmp = new SwitchStatement(scope);
-        tmp.setSelector(stepIn(that.getExpression(), scope));
-        for(CaseTree c: that.getCases()){
-            SwitchStatement.Elem elem;
-            if(c.getExpression() != null){
-                elem = tmp.newElement(stepIn(c.getExpression(), scope));
-            }else{
-                elem = tmp.getDefaultElement();
-            }
-            for(StatementTree s: c.getStatements()){
-                elem.addStatement(stepIn(s, scope));
-            }
-        }
-        stmt = tmp;
+	public Void visitSwitch(SwitchTree that, Void aVoid){
+		SwitchStatement tmp = new SwitchStatement(scope);
+		tmp.setSelector(stepIn(that.getExpression(), scope));
+		for(CaseTree c: that.getCases()){
+			SwitchStatement.Elem elem;
+			if(c.getExpression() != null){
+				elem = tmp.newElement(stepIn(c.getExpression(), scope));
+			}else{
+				elem = tmp.getDefaultElement();
+			}
+			for(StatementTree s: c.getStatements()){
+				elem.addStatement(stepIn(s, scope));
+			}
+		}
+		stmt = tmp;
 		//return super.visitSwitch(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitVariable(VariableTree that, Void aVoid) {
+	public Void visitVariable(VariableTree that, Void aVoid) {
 		String name = that.getName().toString();
 		Type type = TypeBuilder.genType(that.getType());
 		Expr init;
@@ -248,13 +248,13 @@ public class JCStmtVisitor extends TreeScanner<Void, Void>{
 		stmt = tmp;
 		//return super.visitVariable(that, aVoid);
 		return null;
-    }
-	
+	}
+
 	@Override
-    public Void visitOther(Tree t, Void aVoid){
+	public Void visitOther(Tree t, Void aVoid){
 		SynthesijerUtils.error("[JCStmtVisitor] The following is unexpected in this context.");
 		SynthesijerUtils.dump(t);
 		return super.visitOther(t, aVoid);
-    }
+	}
 
 }

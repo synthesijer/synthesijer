@@ -13,14 +13,14 @@ import synthesijer.stream.*;
 
 /**
  * javac plugin to generate Synthesijer-IR from Java source code
- * 
+ *
  * @author miyo
  *
  */
 public class StreamAnalysisPlugin implements Plugin, TaskListener{
 
 	StreamModuleScanner top;
-	
+
 	@Override
 	public String getName(){
 		return "StreamAnalysis";
@@ -38,7 +38,7 @@ public class StreamAnalysisPlugin implements Plugin, TaskListener{
 			System.out.println(e.getCompilationUnit());
 			top = new StreamModuleScanner();
 			e.getCompilationUnit().accept(top, null);
-        }
+		}
 	}
 
 	@Override

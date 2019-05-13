@@ -17,7 +17,7 @@ public class StreamModuleScanner extends BaseScanner<Void, Void>{
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Void visitClass(ClassTree node, Void aVoid){
 		StreamModule m = new StreamModule(node.getSimpleName().toString());
@@ -46,7 +46,7 @@ class StreamUnitScanner extends BaseScanner<Void, Void>{
 	public StreamUnitScanner(StreamModule m){
 		this.module = m;
 	}
-	
+
 	@Override
 	public Void visitMethod(MethodTree node, Void aVoid){
 		if(isConstructor(node)){
@@ -57,7 +57,7 @@ class StreamUnitScanner extends BaseScanner<Void, Void>{
 		}
 		StreamUnit unit = new StreamUnit(node.getName().toString());
 		module.units.add(unit);
-		
+
 		System.out.println("       parameters: " + node.getParameters());
 		for(var t: node.getParameters()){
 			t.accept(new VariableScanner(), null);

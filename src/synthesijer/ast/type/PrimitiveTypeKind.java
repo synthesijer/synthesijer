@@ -27,42 +27,42 @@ public enum PrimitiveTypeKind implements Type{
 	UNDEFINED;
 
 	private final int width;
-	
+
 	private PrimitiveTypeKind(int w){
 		this.width = w;
 	}
-	
+
 	private PrimitiveTypeKind(){
 		this.width = -1;
 	}
-	
+
 	public void accept(SynthesijerAstTypeVisitor v){
 		v.visitPrimitiveTypeKind(this);
 	}
-	
+
 	public boolean isInteger(){
 		switch(this){
-		case BYTE:
-		case CHAR:
-		case INT:
-		case LONG:
-		case SHORT: return true;
-		default: return false;
+			case BYTE:
+			case CHAR:
+			case INT:
+			case LONG:
+			case SHORT: return true;
+			default: return false;
 		}
 	}
-	
+
 	public boolean isFloating(){
 		switch(this){
-		case FLOAT:
-		case DOUBLE: return true;
-		default: return false;
+			case FLOAT:
+			case DOUBLE: return true;
+			default: return false;
 		}
 	}
-	
+
 	public int getWidth(){
 		return width;
 	}
-	
+
 	public boolean isCastAllowed(){
 		if(isInteger() || isFloating()){
 			return true;
@@ -70,5 +70,5 @@ public enum PrimitiveTypeKind implements Type{
 			return false;
 		}
 	}
-	
+
 }

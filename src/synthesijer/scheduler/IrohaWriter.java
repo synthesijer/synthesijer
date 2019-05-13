@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class IrohaWriter {
-	
+
 	private final String name;
-	
+
 	public IrohaWriter(String name){
 		this.name = name;
 	}
-	
+
 	public void generate(SchedulerInfo info) throws IOException{
 		try(
-			PrintStream ir = new PrintStream(new FileOutputStream(new File(name + ".iroha")));
-			){
+				PrintStream ir = new PrintStream(new FileOutputStream(new File(name + ".iroha")));
+		){
 			ir.println("(MODULE " + info.getName());
 			//genVariables(ir, info.getModuleVarList().toArray(new VariableOperand[]{}));
 			//genVariables(ir, info.getModuleVarList().toArray(new Operand[]{}));
@@ -74,49 +74,49 @@ public class IrohaWriter {
 		println(ir, 6, String.format("(INSN %d tr 1 () (%d) () ())", id, nextId));
 		return 1;
 	}
-	
+
 	private int genStateInsn(PrintStream ir, SchedulerBoard b, SchedulerItem item, int id){
 		switch(item.getOp()){
-		case METHOD_EXIT:
-			// busy <= 0
-			println(ir, 6, String.format("(INSN %d ext_output %d () () (%d) ())", id++, 3, 2));
-			return 1;
-		case METHOD_ENTRY:
-			// req -> req_wire
-			println(ir, 6, String.format("(INSN %d ext_input %d () () () (%d))", id++, 2, 1));
-			// tr into 2 when req_wire == '1'
-			println(ir, 6, String.format("(INSN %d tr 1 () (2 3) (1) ())", id++));
-			// req_wire -> busy
-			println(ir, 6, String.format("(INSN %d ext_output %d () () (%d) ())", id++, 3, 1));
-			ArrayList<VariableOperand> params = getMethodParams(b);
-			for(VariableOperand v: params){
-				int s = ext_variables.get(v);
-				int d = registers.get(v);
-				println(ir, 6, String.format("(INSN %d ext_input %d () () () (%d))", id++, s, d));
-			}
-			return 3 + params.size();
-		case RETURN:
-			Operand o = item.getSrcOperand()[0];
-			println(ir, 6, String.format("(INSN %d ext_output %d () () (%d) ())", id++, 4, registers.get(o)));
-			println(ir, 6, String.format("(INSN %d tr 1 () (1) () ())", id++));
-			return 2;
-		case JP:
-			println(ir, 6, String.format("(INSN %d tr 1 () (1) () ())", id++));
-			return 1;
-		default:
-			int r = resources.get(item);
-			int s0 = registers.get(item.getSrcOperand()[0]);
-			int s1 = registers.get(item.getSrcOperand()[1]);
-			int d = registers.get(item.getDestOperand());
-			println(ir, 6, String.format("(INSN %d %s %d () () (%d %d) (%d))", id, convOp(item.getOp()), r, s0, s1, d));
-			return 1;
+			case METHOD_EXIT:
+				// busy <= 0
+				println(ir, 6, String.format("(INSN %d ext_output %d () () (%d) ())", id++, 3, 2));
+				return 1;
+			case METHOD_ENTRY:
+				// req -> req_wire
+				println(ir, 6, String.format("(INSN %d ext_input %d () () () (%d))", id++, 2, 1));
+				// tr into 2 when req_wire == '1'
+				println(ir, 6, String.format("(INSN %d tr 1 () (2 3) (1) ())", id++));
+				// req_wire -> busy
+				println(ir, 6, String.format("(INSN %d ext_output %d () () (%d) ())", id++, 3, 1));
+				ArrayList<VariableOperand> params = getMethodParams(b);
+				for(VariableOperand v: params){
+					int s = ext_variables.get(v);
+					int d = registers.get(v);
+					println(ir, 6, String.format("(INSN %d ext_input %d () () () (%d))", id++, s, d));
+				}
+				return 3 + params.size();
+			case RETURN:
+				Operand o = item.getSrcOperand()[0];
+				println(ir, 6, String.format("(INSN %d ext_output %d () () (%d) ())", id++, 4, registers.get(o)));
+				println(ir, 6, String.format("(INSN %d tr 1 () (1) () ())", id++));
+				return 2;
+			case JP:
+				println(ir, 6, String.format("(INSN %d tr 1 () (1) () ())", id++));
+				return 1;
+			default:
+				int r = resources.get(item);
+				int s0 = registers.get(item.getSrcOperand()[0]);
+				int s1 = registers.get(item.getSrcOperand()[1]);
+				int d = registers.get(item.getDestOperand());
+				println(ir, 6, String.format("(INSN %d %s %d () () (%d %d) (%d))", id, convOp(item.getOp()), r, s0, s1, d));
+				return 1;
 		}
 	}
 
 	private String convOp(Op o){
 		switch(o){
-		case ADD: return "add";
-		default: return "UNKNOWN";
+			case ADD: return "add";
+			default: return "UNKNOWN";
 		}
 	}
 
@@ -161,7 +161,7 @@ public class IrohaWriter {
 	private void genResources(PrintStream ir, SchedulerBoard b){
 		int resource_id = 1;
 		println(ir, 4, "(RESOURCES");
-		
+
 		// basic state transition
 		println(ir, 6, "(RESOURCE " + (resource_id++) + " tr");
 		println(ir, 6, "  () ()");
@@ -174,7 +174,7 @@ public class IrohaWriter {
 		println(ir, 6, "  (PARAMS (INPUT " + b.getName() + "_req" + ")");
 		println(ir, 6, "   (WIDTH " + 0 + "))");
 		println(ir, 6, ")");
-		
+
 		// method busy
 		println(ir, 6, "(RESOURCE " + (resource_id++) + " ext_output");
 		println(ir, 6, "  () ()");
@@ -190,7 +190,7 @@ public class IrohaWriter {
 			println(ir, 6, "   (WIDTH " + ((PrimitiveTypeKind)b.getReturnType()).getWidth() + "))");
 			println(ir, 6, ")");
 		}
-		
+
 		// method parameters
 		ArrayList<VariableOperand> params = getMethodParams(b);
 		for(VariableOperand v: params){
@@ -203,7 +203,7 @@ public class IrohaWriter {
 				genResource(ir, i, resource_id++);
 			}
 		}
-		
+
 		println(ir, 4, ")");
 	}
 
@@ -216,12 +216,12 @@ public class IrohaWriter {
 		println(ir, 6, "(REGISTER " + (register_id++) + " " + b.getName() + "_req_wire");
 		println(ir, 6, "  WIRE UINT 0 ()");
 		println(ir, 6, ")");
-		
+
 		// method request internal wire
 		println(ir, 6, "(REGISTER " + (register_id++) + " SJR_CONST_ZERO");
 		println(ir, 6, "  CONST UINT 0 0");
 		println(ir, 6, ")");
-		
+
 		for(Operand v: vars){
 			if(!(v instanceof VariableOperand)) continue; // skip
 			VariableOperand vo = (VariableOperand)v;

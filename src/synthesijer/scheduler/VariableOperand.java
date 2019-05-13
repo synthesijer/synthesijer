@@ -6,35 +6,35 @@ import java.util.Hashtable;
 import synthesijer.ast.Type;
 
 public class VariableOperand implements Operand{
-	
+
 	private final String name;
-	
+
 	private final Type type;
-	
+
 	private Operand initSrc;
-	
+
 	private final boolean publicFlag;
-	
+
 	private final boolean globalConstantFlag;
 
 	private final boolean methodParamFlag;
-	
+
 	private final String origName;
-	
+
 	private final String methodName;
-	
+
 	private final boolean privateMethodFlag;
-	
+
 	private final boolean volatileFlag;
-	
+
 	private boolean chaining = false;
-	
+
 	private final boolean memberFlag;
-    
-    private boolean debugFlag = false;
-	
+
+	private boolean debugFlag = false;
+
 	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
-	
+
 	public VariableOperand(String name, Type type, boolean memberFlag){
 		this(name, type, null, false, false, false, name, null, false, false, memberFlag);
 	}
@@ -51,7 +51,7 @@ public class VariableOperand implements Operand{
 			boolean privateMethodFlag,
 			boolean volatileFlag,
 			boolean memberFlag
-			){
+	){
 		this.name = name;
 		this.type = type;
 		this.initSrc = initSrc;
@@ -73,7 +73,7 @@ public class VariableOperand implements Operand{
 	public Type getType(){
 		return type;
 	}
-	
+
 	public Operand getInitSrc(){
 		return initSrc;
 	}
@@ -85,7 +85,7 @@ public class VariableOperand implements Operand{
 	public boolean isPublic(){
 		return publicFlag;
 	}
-	
+
 	public boolean isGlobalConstant(){
 		return globalConstantFlag;
 	}
@@ -93,7 +93,7 @@ public class VariableOperand implements Operand{
 	public boolean isMethodParam(){
 		return methodParamFlag;
 	}
-	
+
 	public String getOrigName(){
 		return origName;
 	}
@@ -101,7 +101,7 @@ public class VariableOperand implements Operand{
 	public String getMethodName(){
 		return methodName;
 	}
-	
+
 	public boolean isPrivateMethod(){
 		return privateMethodFlag;
 	}
@@ -114,7 +114,7 @@ public class VariableOperand implements Operand{
 		chaining = true;
 		predItemMap.put(ctx, pred);
 	}
-	
+
 	@Override
 	public boolean isChaining(SchedulerItem ctx){
 		return predItemMap.containsKey(ctx);
@@ -124,18 +124,18 @@ public class VariableOperand implements Operand{
 		return memberFlag;
 	}
 
-    public void setDebug(boolean flag){
-	debugFlag = flag;
-    }
+	public void setDebug(boolean flag){
+		debugFlag = flag;
+	}
 
-    public boolean isDebug(){
-	return debugFlag;
-    }
+	public boolean isDebug(){
+		return debugFlag;
+	}
 
 	public SchedulerItem getPredItem(SchedulerItem ctx){
 		return predItemMap.get(ctx);
 	}
-	
+
 	@Override
 	public String info(){
 		return name + ":" + type;
@@ -144,7 +144,7 @@ public class VariableOperand implements Operand{
 	public String dump(){
 		String s = name
 				+ ":" + type
-				+ ", public=" + publicFlag 
+				+ ", public=" + publicFlag
 				+ ", globalConstant=" + globalConstantFlag
 				+ ", methodParam=" + methodParamFlag
 				+ ", origName=" + origName
@@ -164,23 +164,23 @@ public class VariableOperand implements Operand{
 		s += "VAR";
 		s += " " + type;
 		s += " " + name;
-	    s += " :public " + isPublic();
-	    s += " :global_constant " + isGlobalConstant();
-	    s += " :method_param " + methodParamFlag;
-	    s += " :original " + getOrigName();
-	    s += " :method " + getMethodName();
-	    s += " :private_method " + isPrivateMethod();
-	    s += " :volatile " + isVolatileFlag();
-	    if(chaining){
-	    	String sep = "";
-	    	s += " :chaining (";
-	    	Enumeration<SchedulerItem> e = predItemMap.keys();
-	    	while(e.hasMoreElements()){
-	    		SchedulerItem ctx = e.nextElement();
-	    		SchedulerItem pred = predItemMap.get(ctx);
-	    		s += sep + "(" + ctx.getBoardName() + " " + ctx.getStepId() + " " + pred.getBoardName()+" "+pred.getStepId() + ")";
-	    		sep = " ";
-	    	}
+		s += " :public " + isPublic();
+		s += " :global_constant " + isGlobalConstant();
+		s += " :method_param " + methodParamFlag;
+		s += " :original " + getOrigName();
+		s += " :method " + getMethodName();
+		s += " :private_method " + isPrivateMethod();
+		s += " :volatile " + isVolatileFlag();
+		if(chaining){
+			String sep = "";
+			s += " :chaining (";
+			Enumeration<SchedulerItem> e = predItemMap.keys();
+			while(e.hasMoreElements()){
+				SchedulerItem ctx = e.nextElement();
+				SchedulerItem pred = predItemMap.get(ctx);
+				s += sep + "(" + ctx.getBoardName() + " " + ctx.getStepId() + " " + pred.getBoardName()+" "+pred.getStepId() + ")";
+				sep = " ";
+			}
 			s += ")";
 		}
 		s += " :member " + isMember();

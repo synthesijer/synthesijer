@@ -77,14 +77,14 @@ import synthesijer.scheduler.opt.SchedulerInfoOptimizer;
 import synthesijer.scheduler.opt.SimpleChaining;
 
 public enum Manager {
-	
+
 	INSTANCE;
-	
+
 	/**
 	 * A table of modules to treat this synthesis session
 	 */
 	private Hashtable<String, SynthesijerModuleInfo> modules = new Hashtable<>();
-		
+
 	private Manager(){
 		addHDLModule("BlockRAM1",  null, new BlockRAM(1, 10, 1024), false);
 		addHDLModule("BlockRAM8",  null, new BlockRAM(8, 10, 1024), false);
@@ -154,11 +154,11 @@ public enum Manager {
 		addHDLModule("FCOMP32", null, new FCOMP32(), false);
 		addHDLModule("FCOMP64", null, new FCOMP64(), false);
 	}
-	
+
 	public void addModule(Module m, boolean synthesisFlag){
 		if(hasModule(m.getName())) return;
-        Module optM = (new NullOptimizer()).conv(m);
-        optM = (new StaticEvaluator()).conv(m);
+		Module optM = (new NullOptimizer()).conv(m);
+		optM = (new StaticEvaluator()).conv(m);
 		addHDLModule(optM.getName(), optM, null, synthesisFlag);
 	}
 
@@ -178,7 +178,7 @@ public enum Manager {
 		SynthesijerModuleInfo info = modules.get(name);
 		return info;
 	}
-	
+
 	public void HDLModuleInfoList(){
 		Enumeration<String> keys = modules.keys();
 		while(keys.hasMoreElements()){
@@ -194,7 +194,7 @@ public enum Manager {
 	public boolean hasModule(String key){
 		return modules.contains(key);
 	}
-	
+
 	private void genGlobalSymbolTable(){
 		Enumeration<String> keys = modules.keys();
 		while(keys.hasMoreElements()){
@@ -207,12 +207,12 @@ public enum Manager {
 			}
 		}
 	}
-	
+
 	private void dumpSchedulerInfo(SchedulerInfo si, String postfix){
 		try(
 				PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".txt")));
 				PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")));
-				){
+		){
 			(new IRWriter(si.getName() + "_scheduler_board_" + postfix)).generate(si);
 			txt.println("Variables:");
 			//for(ArrayList<VariableOperand> va: si.getVarTableList()){
@@ -249,7 +249,7 @@ public enum Manager {
 			if(info.sysnthesisFlag == false){
 				// skip
 				continue;
-			}			
+			}
 			String name = info.m.getName();
 			System.out.println("SchdulerBoard init: " + name);
 			IdentifierGenerator i = new IdentifierGenerator();
@@ -259,21 +259,21 @@ public enum Manager {
 			info.setSchedulerInfo(si);
 			dumpSchedulerInfo(si, "init");
 			if(Options.INSTANCE.iroha){
-			    outIroha(info.getSchedulerInfo());
+				outIroha(info.getSchedulerInfo());
 			}
 		}
 	}
-	
+
 	private void doResolveExtends(){
 		for(SynthesijerModuleInfo info : modules.values()){
 			if(info.sysnthesisFlag == false){
 				// skip
 				continue;
-			}			
+			}
 			info.m.resolveExtends();
 		}
 	}
-	
+
 	public void preprocess(){
 		genGlobalSymbolTable();
 		doResolveExtends();
@@ -285,12 +285,12 @@ public enum Manager {
 		URL url = (new File(path)).toURI().toURL();
 		loadpath.add(url);
 	}
-	
+
 	private HDLModule loadUserHDLModule(String s){
 		try {
 
 			URLClassLoader loader = URLClassLoader.newInstance(loadpath.toArray(new URL[]{}));
-			
+
 			//Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
 			Class<?> clazz = loader.loadClass(s);
 			Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
@@ -304,38 +304,38 @@ public enum Manager {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private void compileSchedulerInfoAll(){
 		for(SynthesijerModuleInfo info: modules.values()){
 			compileSchedulerInfo(info);
 		}
 	}
-	
+
 	public void compileSchedulerInfo(String name){
 		compileSchedulerInfo(modules.get(name));
 	}
-	
+
 	public void compileSchedulerInfo(SynthesijerModuleInfo info){
 		if(info.getCompileState() == CompileState.GENERATE_HDL){ // nothing to do
 			return;
 		}
 		if(info.getCompileState() == CompileState.WAIT_FOR_LOADING){
 			info.state = CompileState.GENERATE_HDL;
-			info.setHDLModule(loadUserHDLModule(info.m.getName())); 
+			info.setHDLModule(loadUserHDLModule(info.m.getName()));
 		}else{
 			info.state = CompileState.GENERATE_HDL;
 			HDLModule hm = new HDLModule(info.getName(), "clk", "reset");
-			info.setHDLModule(hm); 
-			SchedulerInfoCompiler compiler = new SchedulerInfoCompiler(info.getSchedulerInfo(), hm);			
+			info.setHDLModule(hm);
+			SchedulerInfoCompiler compiler = new SchedulerInfoCompiler(info.getSchedulerInfo(), hm);
 			compiler.compile();
 		}
 	}
-	
+
 	private void optimize(SchedulerInfoOptimizer obj, SynthesijerModuleInfo info){
 		info.setSchedulerInfo(obj.opt(info.getSchedulerInfo()));
 		dumpSchedulerInfo(info.getSchedulerInfo(), obj.getKey());
 	}
-	
+
 	private void optimize(SynthesijerModuleInfo info, Options opt){
 		if(info.sysnthesisFlag == false){
 			// skip, nothing to do
@@ -360,19 +360,19 @@ public enum Manager {
 		optimize(new ReduceRedundantJump(), info);
 		optimize(new RemoveUnreachableSlot(), info);
 	}
-	
+
 	private void optimizeAll(Options opt){
 		for(SynthesijerModuleInfo info: modules.values()){
 			optimize(info, opt);
 		}
 	}
-	
+
 	public void optimize(Options opt){
 		if(opt.optimizing){
 			optimizeAll(opt);
 		}
 	}
-	
+
 	public void generate(){
 		compileSchedulerInfoAll();
 	}
@@ -386,7 +386,7 @@ public enum Manager {
 			if(format == OutputFormat.VHDL){
 				String destFileName = String.format("%s.vhd", hm.getName());
 				System.out.printf("Output VHDL: %s\n", destFileName);
-				try(PrintWriter dest = new PrintWriter(new FileOutputStream(destFileName), true)){ 
+				try(PrintWriter dest = new PrintWriter(new FileOutputStream(destFileName), true)){
 					hm.genVHDL(dest);
 				}catch(IOException e){
 					e.printStackTrace();
@@ -394,7 +394,7 @@ public enum Manager {
 			}else{
 				String destFileName = String.format("%s.v", hm.getName());
 				System.out.printf("Output Verilog HDL: %s\n", destFileName);
-				try(PrintWriter dest = new PrintWriter(new FileOutputStream(destFileName), true)){ 
+				try(PrintWriter dest = new PrintWriter(new FileOutputStream(destFileName), true)){
 					hm.genVerilogHDL(dest);
 				}catch(IOException e){
 					e.printStackTrace();
@@ -412,7 +412,7 @@ public enum Manager {
 		}
 		dest.printf("</modules>\n");
 	}
-	
+
 	public void loadIR(String path, Options opt){
 		IRReader reader = new IRReader(path);
 		String name = reader.result.getName();
@@ -430,30 +430,30 @@ public enum Manager {
 		optimize(new RemoveUnreachableSlot(), info);
 		modules.put(name, info);
 	}
-	
+
 	public class SynthesijerModuleInfo{
 		/**
 		 * A given module
 		 */
 		public final Module m;
-		
+
 		/**
 		 *
 		 */
 		private SchedulerInfo info;
-		
+
 		/**
 		 * A generated HDL module form the corresponding given module
 		 */
 		private HDLModule hm;
-		
+
 		/**
 		 * Flat whether this module should be synthesized or not
 		 */
 		public final boolean sysnthesisFlag;
-		
+
 		private CompileState state;
-		
+
 		public SynthesijerModuleInfo(Module m, HDLModule hm, boolean synthesisFlag) {
 			this.m = m;
 			this.hm = hm;
@@ -468,7 +468,7 @@ public enum Manager {
 				this.state = CompileState.INITIALIZE;
 			}
 		}
-		
+
 		public String getName(){
 			if(m != null){
 				return m.getName();
@@ -476,7 +476,7 @@ public enum Manager {
 				return info.getName();
 			}
 		}
-		
+
 		/**
 		 * whether a given source code exists or not
 		 * @return
@@ -484,19 +484,19 @@ public enum Manager {
 		public boolean hasSource(){
 			return m != null;
 		}
-		
+
 		public void setHDLModule(HDLModule hm){
 			this.hm = hm;
 		}
-		
+
 		public HDLModule getHDLModule(){
 			return this.hm;
 		}
-		
+
 		public void setSchedulerInfo(SchedulerInfo info){
 			this.info = info;
 		}
-		
+
 		public SchedulerInfo getSchedulerInfo(){
 			return info;
 		}
@@ -504,10 +504,10 @@ public enum Manager {
 		public void setCompileState(CompileState s){
 			state = s;
 		}
-		
+
 		public CompileState getCompileState(){
 			return state;
 		}
-	}	
+	}
 
 }

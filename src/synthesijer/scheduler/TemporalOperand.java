@@ -3,12 +3,12 @@ package synthesijer.scheduler;
 import synthesijer.ast.Type;
 
 public class TemporalOperand implements Operand {
-	
+
 	public final String name;
-	
+
 	public TemporalOperand(String n){
 		this.name = n;
-	} 
+	}
 
 	@Override
 	public String info(){

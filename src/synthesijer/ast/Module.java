@@ -14,25 +14,25 @@ import synthesijer.ast.statement.VariableDecl;
 import synthesijer.ast.type.PrimitiveTypeKind;
 
 public class Module implements Scope, SynthesijerAstTree{
-	
-    
-    // properties
-    private final Scope parent;
+
+
+	// properties
+	private final Scope parent;
 	private final String name;
 	private final Hashtable<String, String> importTable;
 	private final String extending;
 	private final ArrayList<String> implementing;
 
-    // inner data
-    private LinkedHashMap<String, Method> methodTable = new LinkedHashMap<>();
-    private LinkedHashMap<String, Variable> variableTable = new LinkedHashMap<>();
-    private ArrayList<VariableDecl> variableDecls = new ArrayList<>();
-    
-    private boolean synthesijerHDLFlag = false;
+	// inner data
+	private LinkedHashMap<String, Method> methodTable = new LinkedHashMap<>();
+	private LinkedHashMap<String, Variable> variableTable = new LinkedHashMap<>();
+	private ArrayList<VariableDecl> variableDecls = new ArrayList<>();
+
+	private boolean synthesijerHDLFlag = false;
 	private final Method moduleInitMethod;
-	
-    private ArrayList<Scope> scopes = new ArrayList<>();
-	
+
+	private ArrayList<Scope> scopes = new ArrayList<>();
+
 	public Module(String name, Hashtable<String, String> importTable, String extending, ArrayList<String> implementing){
 		this(null, name, importTable, extending, implementing);
 	}
@@ -48,35 +48,35 @@ public class Module implements Scope, SynthesijerAstTree{
 		//this.moduleInitMethod.setPrivateFlag(true);
 		this.moduleInitMethod = null;
 	}
-	
-    public Hashtable<String, String> getImportTable(){
-        return importTable;
-    }
-    
-    public ArrayList<String> getImplementingList(){
-        return implementing;
-    }
+
+	public Hashtable<String, String> getImportTable(){
+		return importTable;
+	}
+
+	public ArrayList<String> getImplementingList(){
+		return implementing;
+	}
 
 	public void addScope(Scope s){
 		scopes.add(s);
 	}
-	
+
 	public Scope[] getChildScope(){
 		return scopes.toArray(new Scope[]{});
 	}
-	
+
 	public String getName(){
 		return name;
 	}
-	
+
 	public Scope getParentScope(){
 		return parent;
 	}
-	
+
 	public String getExtending(){
 		return extending;
 	}
-	
+
 	public Variable search(String name){
 		Variable var = variableTable.get(name);
 		if(var != null)
@@ -85,11 +85,11 @@ public class Module implements Scope, SynthesijerAstTree{
 			return parent.search(name);
 		return null;
 	}
-	
+
 	public Module getModule(){
 		return this;
 	}
-	
+
 	public Method getMethod(){
 		return moduleInitMethod;
 	}
@@ -97,16 +97,16 @@ public class Module implements Scope, SynthesijerAstTree{
 	public void addMethod(Method m){
 		methodTable.put(m.getName(), m);
 	}
-	
+
 	public Method searchMethod(String name){
 		return methodTable.get(name);
 	}
-	
+
 	public void addVariableDecl(VariableDecl v){
 		variableTable.put(v.getName(), v.getVariable());
 		variableDecls.add(v);
 	}
-	
+
 	public VariableDecl[] getVariableDecls(){
 		return variableDecls.toArray(new VariableDecl[]{});
 	}
@@ -117,9 +117,9 @@ public class Module implements Scope, SynthesijerAstTree{
 
 	public Method[] getMethods(){
 		return methodTable.values().toArray(new Method[]{});
-	}	
-	
-    public void accept(SynthesijerModuleVisitor v){
+	}
+
+	public void accept(SynthesijerModuleVisitor v){
 		v.visitModule(this);
 	}
 
@@ -157,7 +157,7 @@ public class Module implements Scope, SynthesijerAstTree{
 			}
 		}
 	}
-	
+
 	public boolean isSynthesijerHDL(){
 		return this.synthesijerHDLFlag;
 	}
@@ -182,7 +182,7 @@ public class Module implements Scope, SynthesijerAstTree{
 		Method join = new Method(m, "join", PrimitiveTypeKind.VOID);
 		m.addMethod(join);
 		join.setWaitWithMethod(start); // "join" must wait for "start".
-		
+
 		Method yield = new Method(m, "yield", PrimitiveTypeKind.VOID);
 		m.addMethod(yield);
 	}

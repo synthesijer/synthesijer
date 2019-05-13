@@ -5,13 +5,13 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class FADD64 extends HDLModule{
-	
+
 	public double a;
 	public double b;
 	public double result;
 	public boolean valid;
 	public boolean nd;
-	
+
 	public FADD64(){
 		super("synthesijer_fadd64", "clk", "reset");
 		newPort("a",      DIR.IN,  HDLPrimitiveType.genVectorType(64));

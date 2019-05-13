@@ -8,9 +8,9 @@ import synthesijer.hdl.HDLPort.DIR;
 import synthesijer.hdl.HDLPrimitiveType;
 
 public class OUTPUT1 extends HDLModule{
-	
+
 	public boolean flag;
-	
+
 	public OUTPUT1(){
 		super("outputflag", "clk", "reset");
 		newPort("flag",  DIR.IN, HDLPrimitiveType.genBitType());
