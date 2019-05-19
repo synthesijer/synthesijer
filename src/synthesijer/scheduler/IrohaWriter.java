@@ -104,11 +104,29 @@ public class IrohaWriter {
 				println(ir, 6, String.format("(INSN %d tr 1 () (1) () ())", id++));
 				return 1;
 			default:
-				int r = resources.get(item);
-				int s0 = registers.get(item.getSrcOperand()[0]);
-				int s1 = registers.get(item.getSrcOperand()[1]);
-				int d = registers.get(item.getDestOperand());
-				println(ir, 6, String.format("(INSN %d %s %d () () (%d %d) (%d))", id, convOp(item.getOp()), r, s0, s1, d));
+				System.out.println(item.toSexp());
+				if(item.getSrcOperand().length == 2){
+					System.out.println(item.getSrcOperand()[0]);
+					System.out.println(item.getSrcOperand()[1]);
+					int r = resources.get(item);
+					int s0 = registers.get(item.getSrcOperand()[0]);
+					int s1 = registers.get(item.getSrcOperand()[1]);
+					int d = registers.get(item.getDestOperand());
+					println(ir, 6, String.format("(INSN %d %s %d () () (%d %d) (%d))", id, convOp(item.getOp()), r, s0, s1, d));
+				}else if(item.getSrcOperand().length == 1){
+					int r = resources.get(item);
+					Operand operand_s0 = item.getSrcOperand()[0];
+					int s0;
+					if(operand_s0 instanceof ConstantOperand){
+						s0 = Integer.parseInt(((ConstantOperand)operand_s0).getValue());
+					}else{
+						s0 = registers.get(operand_s0);
+					}
+					int d = registers.get(item.getDestOperand());
+					println(ir, 6, String.format("(INSN %d %s %d () () (%d) (%d))", id, convOp(item.getOp()), r, s0, d));
+				}else{
+					System.out.println("skip unknown item [ " + item.toSexp() + " ]");
+				}
 				return 1;
 		}
 	}

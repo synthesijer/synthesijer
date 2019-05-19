@@ -22,4 +22,6 @@ public enum Options {
 
     public boolean with_ssa = false;
 
+	public boolean verbose = false;
+
 }
