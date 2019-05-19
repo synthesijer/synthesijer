@@ -34,18 +34,21 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		GetOpt opt = new GetOpt("h",
-				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa",
+				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa,verbose",
 				args);
 		if (opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0) {
 			printHelp();
 			System.exit(0);
 		}
+		Options.INSTANCE.verbose = opt.flag("verbose");
 
 		ArrayList<String> javaSrc = new ArrayList<>();
 		ArrayList<String> irSrc = new ArrayList<>();
 
 		ArrayList<String> classPath = new ArrayList<>();
 		ArrayList<String> javacPath = new ArrayList<>();
+
+		String pathDelim = System.getProperty("os.name").startsWith("Windows") ? ";" : ":";
 
 		classPath.add(".");
 		javacPath.add(".");
@@ -77,17 +80,22 @@ public class Main {
 			}
 		}
 
-		String osName = System.getProperty("os.name");
-		String pathDelim = ":";
-		if (osName.startsWith("Windows")) {
-			pathDelim = ";";
-		}
 		String classPathStr = System.getProperty("java.class.path");
 		for (String s : javacPath) {
 			classPathStr += pathDelim + s;
 		}
-		for (String s : classPath) {
-			classPathStr += pathDelim + s;
+
+		if(Options.INSTANCE.verbose){
+			System.out.print("javac path =");
+			for(var s: javacPath){
+				System.out.print(" " + s);
+			}
+			System.out.println();
+			System.out.print("class path =");
+			for(var s: classPath){
+				System.out.print(" " + s);
+			}
+			System.out.println();
 		}
 
 		if (javaSrc.size() > 0) {
@@ -208,9 +216,7 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-
 	public static void addClassPath(String classPath) throws IOException {
 		Manager.INSTANCE.addLoadPath(classPath);
 	}
-
 }

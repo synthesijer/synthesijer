@@ -7,6 +7,7 @@ import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ImportTree;
+import com.sun.source.tree.ExpressionTree;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -83,9 +84,10 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 		JCTopVisitor visitor = new JCTopVisitor(module);
 		t.accept(visitor, null);
 
-		Manager.INSTANCE.addModule(module, synthesizeFlag);
+		ExpressionTree pt = t.getPackageName();
+		String pkgStr = pt != null ? pt.toString() : "";
+		
+		Manager.INSTANCE.addModule(module, synthesizeFlag, pkgStr);
 	}
 
-
 }
-
