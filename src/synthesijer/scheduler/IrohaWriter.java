@@ -105,24 +105,50 @@ public class IrohaWriter {
 				return 1;
 			default:
 				System.out.println(item.toSexp());
-				if(item.getSrcOperand().length == 2){
-					System.out.println(item.getSrcOperand()[0]);
-					System.out.println(item.getSrcOperand()[1]);
+				if(item.getSrcOperand() == null){
+					System.out.println("Warning : source operand is null");
+				}else if(item.getSrcOperand().length == 2){
 					int r = resources.get(item);
-					int s0 = registers.get(item.getSrcOperand()[0]);
-					int s1 = registers.get(item.getSrcOperand()[1]);
-					int d = registers.get(item.getDestOperand());
+					int s0 = 0, s1 = 0, d = 0;
+					if(registers.get(item.getSrcOperand()[0]) == null){
+						System.out.println("Warning : skip :" + item.getSrcOperand()[0].dump());
+					}else{
+						s0 = registers.get(item.getSrcOperand()[0]);
+					}
+					if(registers.get(item.getSrcOperand()[1]) == null){
+						System.out.println("Warning : skip :" + item.getSrcOperand()[1].dump());
+					}else{
+						s1 = registers.get(item.getSrcOperand()[1]);
+					}
+					if(registers.get(item.getDestOperand()) == null){
+						System.out.println("Warning : skip :" + item.getDestOperand().dump());
+					}else{
+						d = registers.get(item.getDestOperand());
+					}
 					println(ir, 6, String.format("(INSN %d %s %d () () (%d %d) (%d))", id, convOp(item.getOp()), r, s0, s1, d));
 				}else if(item.getSrcOperand().length == 1){
 					int r = resources.get(item);
 					Operand operand_s0 = item.getSrcOperand()[0];
-					int s0;
+					int s0 = 0;
 					if(operand_s0 instanceof ConstantOperand){
-						s0 = Integer.parseInt(((ConstantOperand)operand_s0).getValue());
+						try{
+							s0 = Integer.parseInt(((ConstantOperand)operand_s0).getValue());
+						}catch(NumberFormatException e){
+							System.out.println("Warning : skip [number format exception]:" + ((ConstantOperand)operand_s0).getValue());
+						}
+					}else if(registers.get(operand_s0) == null){
+						System.out.println("Warning : skip :" + operand_s0.dump());
 					}else{
 						s0 = registers.get(operand_s0);
 					}
-					int d = registers.get(item.getDestOperand());
+					int d = 0;
+					if(item.getDestOperand() == null){
+						System.out.println("Warning : destination is null");
+					}else if(registers.get(item.getDestOperand()) == null){
+						System.out.println("Warning : skip :" + item.getDestOperand().dump());
+					}else{
+						d = registers.get(item.getDestOperand());
+					}
 					println(ir, 6, String.format("(INSN %d %s %d () () (%d) (%d))", id, convOp(item.getOp()), r, s0, d));
 				}else{
 					System.out.println("skip unknown item [ " + item.toSexp() + " ]");
