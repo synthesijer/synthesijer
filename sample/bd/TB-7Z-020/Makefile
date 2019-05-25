@@ -1,5 +1,5 @@
-SYNTHESIJER ?= ../../../bin
-SYNTHESIJER_EXTRA_LIB ?= ../../../../synthesijer_extra-libs
+SYNTHESIJER ?= ../../../synthesijer.jar
+SYNTHESIJER_EXTRA_LIB ?= ../../../extra-libs
 CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_EXTRA_LIB)/bin:.
 
 SOURCES = $(SYNTHESIJER_EXTRA_LIB)/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
