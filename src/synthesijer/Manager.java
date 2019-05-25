@@ -293,7 +293,11 @@ public enum Manager {
 	}
 
 	private HDLModule loadUserHDLModule(String s){
-		String ss = pkgTable.get(s) + "." + s;
+		String ss = s;
+		String pkg = pkgTable.get(s);
+		if(pkg != null && !pkg.equals("")){
+			ss = pkg + "." + ss;
+		}
 		if(Options.INSTANCE.verbose){
 			System.out.println("loadUserHDLModule: " + ss);
 			for(var url: loadpath){
