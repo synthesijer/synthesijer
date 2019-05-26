@@ -832,10 +832,10 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
 		}else if(o.getType() instanceof ComponentType){
 			ComponentType ct = (ComponentType)o.getType();
-			//			System.out.println(" component:" + ct.getName());
-			//			System.out.println(" field:" + o.getIdent());
+			//System.out.println(" component:" + ct.getName());
+			//System.out.println(" field:" + o.getIdent());
 			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(ct.getName(), o.getIdent().getSymbol());
-			//			System.out.println(var);
+			//System.out.println(var);
 			if(var == null){
 				SynthesijerUtils.error("visitFieldAccess:" + ct.getName() + ":" + o.getIdent().getSymbol());
 			}

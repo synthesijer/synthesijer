@@ -169,7 +169,13 @@ public enum Manager {
 	}
 
 	private void addHDLModule(String name, Module m, HDLModule hm, boolean synthesisFlag){
-		modules.put(name, new SynthesijerModuleInfo(m, hm, synthesisFlag));
+		SynthesijerModuleInfo info = new SynthesijerModuleInfo(m, hm, synthesisFlag);
+		modules.put(name, info);
+		String[] ns = name.split("\\.", 0);
+		if(ns.length > 0 && !name.equals(ns[ns.length-1])){
+			//System.out.println("add short name: " + ns[ns.length-1]);
+			modules.put(ns[ns.length-1], info);
+		}
 	}
 
 	public Module searchModule(String name) throws UnknownModuleException{
@@ -207,7 +213,7 @@ public enum Manager {
 			String k = keys.nextElement();
 			SynthesijerModuleInfo info = modules.get(k);
 			if(info.m != null){
-				GlobalSymbolTable.INSTANCE.add(info.m);
+				GlobalSymbolTable.INSTANCE.add(k, info.m);
 			}else{
 				GlobalSymbolTable.INSTANCE.add(k, info.hm);
 			}
@@ -294,10 +300,10 @@ public enum Manager {
 
 	private HDLModule loadUserHDLModule(String s){
 		String ss = s;
-		String pkg = pkgTable.get(s);
-		if(pkg != null && !pkg.equals("")){
-			ss = pkg + "." + ss;
-		}
+		//String pkg = pkgTable.get(s);
+		//if(pkg != null && !pkg.equals("")){
+		//	ss = pkg + "." + ss;
+		//}
 		if(Options.INSTANCE.verbose){
 			System.out.println("loadUserHDLModule: " + ss);
 			for(var url: loadpath){

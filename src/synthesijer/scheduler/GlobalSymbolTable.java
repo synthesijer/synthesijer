@@ -2,7 +2,9 @@ package synthesijer.scheduler;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Method;
 import synthesijer.ast.Module;
 import synthesijer.ast.Variable;
@@ -15,10 +17,11 @@ public enum GlobalSymbolTable {
 
 	Hashtable<String, ClassInfo> map = new Hashtable<>();
 
-	public void add(Module m){
-
+	public void add(String k, Module m){
+		//System.out.println("GlobalSymboldTable add : " + m.getName());
 		ClassInfo i = new ClassInfo();
-		map.put(m.getName(), i);
+		//map.put(m.getName(), i);
+		map.put(k, i);
 		for(Method method: m.getMethods()){
 			i.methods.put(method.getName(), new MethodInfo(method));
 		}
@@ -37,7 +40,10 @@ public enum GlobalSymbolTable {
 
 	public VariableInfo searchVariable(String klass, String name){
 		ClassInfo info = map.get(klass);
-		if(info == null) return null;
+		if(info == null){
+			SynthesijerUtils.warn("[" + getClass().getName() + "searchVariable" + "] " + klass + " not found in GlobalSymbolTable");
+			return null;
+		}
 		VariableInfo var = info.variables.get(name);
 		return var;
 	}

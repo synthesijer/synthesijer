@@ -78,14 +78,15 @@ public class SynthesijerPlugin implements Plugin, TaskListener{
 			synthesizeFlag = false;
 		}
 
-		Module module = new Module(info.className, info.importTable, info.extending, info.implementing);
+		ExpressionTree pt = t.getPackageName();
+		String pkgStr = pt != null ? pt.toString() : "";
+		String className = pkgStr.equals("") ? info.className : pkgStr + "." + info.className;
+		System.out.println("className = " + className);
+		Module module = new Module(className, info.importTable, info.extending, info.implementing);
 		module.setSynthesijerHDL(info.isSynthesijerHDL);
 
 		JCTopVisitor visitor = new JCTopVisitor(module);
 		t.accept(visitor, null);
-
-		ExpressionTree pt = t.getPackageName();
-		String pkgStr = pt != null ? pt.toString() : "";
 		
 		Manager.INSTANCE.addModule(module, synthesizeFlag, pkgStr);
 	}
