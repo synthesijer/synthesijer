@@ -1,4 +1,6 @@
-SYNTHESIJER ?= ../../../bin
+SYNTHESIJER ?= ../../../synthesijer.jar
+
+all: microboard_top.vhd microboard_top.v
 
 microboard_top.vhd: MicroboardTop.java
 	javac -cp $(SYNTHESIJER):. $<
@@ -29,6 +31,7 @@ clean:
 	-rm -f MicroboardTop.class
 	-rm -f microboard_top.vhd
 	-rm -f microboard_top.v
+	-rm -f microboard_top.prj
 	-rm -f microboard_top.bgn
 	-rm -f microboard_top.bld
 	-rm -f microboard_top.drc
@@ -65,3 +68,4 @@ clean:
 	-rm -rf xlnx_auto_0_xdb
 	-rm -f par_usage_statistics.html
 	-rm -f webtalk.log
+	-rm -f *.ir

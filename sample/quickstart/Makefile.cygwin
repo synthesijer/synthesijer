@@ -3,9 +3,12 @@ SYNTHESIJER ?= ../../synthesijer.jar
 SOURCES = Test.java Top.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
+OPT = --chaining
+
+all: led
 
 led: $(SOURCES)
-	java -cp $(SYNTHESIJER) synthesijer.Main --vhdl --verilog $(SOURCES)
+	java -cp $(SYNTHESIJER) synthesijer.Main --vhdl --verilog $(OPT) $(SOURCES)
 
 clean:
 	-rm -f *.class
@@ -16,6 +19,7 @@ clean:
 	-rm -f *.o
 	-rm -f sim
 	-rm -f *.vcd
+	-rm -f *.ir
 	-rm -f *.txt
 	-rm -f work-obj93.cf
 	-rm -f led_top.vhd

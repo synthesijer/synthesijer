@@ -22,4 +22,5 @@ clean:
 	-rm -f work-obj93.cf
 	-rm -f *.svg
 	-rm -f *.txt
+	-rm -rf HW_v1_0
 

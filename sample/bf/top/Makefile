@@ -1,4 +1,6 @@
-SYNTHESIJER ?= ../../../bin
+SYNTHESIJER ?= ../../../synthesijer.jar
+
+all: top.vhd top.v
 
 top.vhd: MkTop.java
 	javac -cp $(SYNTHESIJER):. $<
@@ -48,3 +50,6 @@ clean:
 	-rm -rf xlnx_auto_0_xdb
 	-rm -f par_usage_statistics.html
 	-rm -f webtalk.log
+	-rm -f *.ir
+	-rm -f top.vhd
+	-rm -f top.v

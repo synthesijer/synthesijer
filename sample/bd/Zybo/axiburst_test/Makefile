@@ -1,5 +1,5 @@
-SYNTHESIJER ?= ../../../../bin
-SYNTHESIJER_EXTRA_LIB ?= ../../../../../synthesijer_extra-libs
+SYNTHESIJER ?= ../../../../synthesijer.jar
+SYNTHESIJER_EXTRA_LIB ?= ../../../../extra-libs
 SYNTHESIJER_LIB ?= ../../../../lib
 
 CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_EXTRA_LIB)/bin:.
@@ -39,3 +39,5 @@ clean:
 	-rm -f synthesijer_lib_axi_AXIMemIface32RTLTest.vhd
 	-rm -f synthesijer_lib_axi_AXILiteSlave32RTL.vhd
 	-rm -rf AXIHP_MEMCPY2_v1_0
+	-rm -f AXIMemIface32RTLTest.v
+	-rm -f AXIMemIface32RTLTest.vhd

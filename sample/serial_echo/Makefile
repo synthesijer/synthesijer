@@ -27,6 +27,7 @@ clean:
 	-rm -f *.o
 	-rm -f sim
 	-rm -f *.vcd
+	-rm -f *.ir
 	-rm -f *.txt
 	-rm -f work-obj93.cf
 	-rm -f top.vhd top.v

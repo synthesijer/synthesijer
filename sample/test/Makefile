@@ -141,3 +141,4 @@ clean:
 	-rm -f sim???
 	-rm -f sim_test*
 	-rm -f sim_verilog_*
+	-rm -f *.iroha

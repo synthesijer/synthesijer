@@ -1,1 +1,7 @@
-java -cp ../../../../synthesijer_extra-libs/bin:../../../bin:. synthesijer.Main ../../../../synthesijer_extra-libs/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java ../../../../synthesijer_extra-libs/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java TestFrame.java RGBTest.java SinTableRom.java
+java -cp ../../../extra-libs/bin:../../../synthesijer.jar:. \
+  synthesijer.Main \
+  ../../../extra-libs/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
+  ../../../extra-libs/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \
+  TestFrame.java \
+  RGBTest.java \
+  SinTableRom.java
