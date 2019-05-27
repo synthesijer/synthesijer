@@ -85,11 +85,6 @@ public enum Manager {
 	 */
 	private Hashtable<String, SynthesijerModuleInfo> modules = new Hashtable<>();
 
-	/**
-	 * A table of module name and package name.
-	 */
-	private Hashtable<String, String> pkgTable = new Hashtable<>();
-
 	private Manager(){
 		addHDLModule("BlockRAM1",  null, new BlockRAM(1, 10, 1024), false);
 		addHDLModule("BlockRAM8",  null, new BlockRAM(8, 10, 1024), false);
@@ -165,7 +160,6 @@ public enum Manager {
 		Module optM = (new NullOptimizer()).conv(m);
 		optM = (new StaticEvaluator()).conv(m);
 		addHDLModule(optM.getName(), optM, null, synthesisFlag);
-		pkgTable.put(m.getName(), pkgStr);
 	}
 
 	private void addHDLModule(String name, Module m, HDLModule hm, boolean synthesisFlag){
@@ -299,13 +293,8 @@ public enum Manager {
 	}
 
 	private HDLModule loadUserHDLModule(String s){
-		String ss = s;
-		//String pkg = pkgTable.get(s);
-		//if(pkg != null && !pkg.equals("")){
-		//	ss = pkg + "." + ss;
-		//}
 		if(Options.INSTANCE.verbose){
-			System.out.println("loadUserHDLModule: " + ss);
+			System.out.println("loadUserHDLModule: " + s);
 			for(var url: loadpath){
 				System.out.println("search path: " + url);
 			}
@@ -313,7 +302,7 @@ public enum Manager {
 		try {
 			URLClassLoader loader = URLClassLoader.newInstance(loadpath.toArray(new URL[]{}));
 			//Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(s);
-			Class<?> clazz = loader.loadClass(ss);
+			Class<?> clazz = loader.loadClass(s);
 			Constructor<?> ct = clazz.getConstructor(new Class[]{String[].class});
 			Object obj = ct.newInstance(new Object[]{new String[]{}});
 			if(!(obj instanceof HDLModule)){
