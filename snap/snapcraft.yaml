@@ -1,20 +1,20 @@
 name: synthesijer
 base: core18
 version: '3.0.0'
-summary: A compiler from Java to VHDL/Verilog HDL
+summary: Synthesijer is a compiler from Java to VHDL/Verilog HDL
 description: |
-  A compiler from Java to VHDL/Verilog HDL
-
+  TBD
 grade: stable
 confinement: strict
-
 parts:
   synthesijer:
     plugin: dump
-    source: pkg.tar.gz
-
+    source: pkg.tar.gz # 'ant jar;mkdir -p pkg;cp synthesijer.jar pkg; tar cvzf pkg.tar.gz pkg'
+    build-packages: [openjdk-11-jdk, ca-certificates-java]
+    stage-packages: [openjdk-11-jdk]
+ 
 apps:
   synthesijer:
-    command: java -jar $SNAP/synthesijer.jar
+    command: usr/lib/jvm/java-11-openjdk-amd64/bin/java -jar $SNAP/synthesijer.jar
     plugs:
       - home
