@@ -1,0 +1,20 @@
+name: synthesijer
+base: core18
+version: '3.0.0'
+summary: A compiler from Java to VHDL/Verilog HDL
+description: |
+  A compiler from Java to VHDL/Verilog HDL
+
+grade: stable
+confinement: strict
+
+parts:
+  synthesijer:
+    plugin: dump
+    source: pkg.tar.gz
+
+apps:
+  synthesijer:
+    command: java -jar $SNAP/synthesijer.jar
+    plugs:
+      - home
