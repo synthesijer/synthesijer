@@ -11,6 +11,9 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Arrays;
+import java.util.Locale;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -100,7 +103,7 @@ public class Main {
 
 		if (javaSrc.size() > 0) {
 			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-			StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+			StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, Locale.ENGLISH, StandardCharsets.UTF_8);
 
 			ArrayList<File> files = new ArrayList<File>();
 			for(String s: javaSrc){
@@ -109,13 +112,15 @@ public class Main {
 
 			Iterable<? extends JavaFileObject> compilationUnits1 =
 					fileManager.getJavaFileObjectsFromFiles(files);
+                        JavaCompiler.CompilationTask t = 
 			compiler.getTask(new PrintWriter(System.err),
 					fileManager,
 					null, // a diagnostic listener
-					Arrays.asList(new String[]{"-Xplugin:Synthesijer", "-cp", classPathStr}),
+					Arrays.asList(new String[]{"-encoding", "UTF-8", "-Xplugin:Synthesijer", "-cp", classPathStr}),
 					null, // names of classes to be processed by annotation processing
 					compilationUnits1
-			).call();
+			);
+			t.call();
 
 			fileManager.close();
 		}

@@ -15,6 +15,6 @@ parts:
  
 apps:
   synthesijer:
-    command: usr/lib/jvm/java-11-openjdk-amd64/bin/java -jar $SNAP/synthesijer.jar
+    command: usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -jar $SNAP/synthesijer.jar
     plugs:
       - home
