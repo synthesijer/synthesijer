@@ -4,17 +4,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SExp {
 
-	private ArrayList<Object> atoms = new ArrayList<Object>();
+	private ArrayList<Object> nodes = new ArrayList<Object>();
 
 	public SExp() {
 	}
 
 	public String toString() {
 		String exp = "";
-		for (Object o : atoms) {
+		for (Object o : nodes) {
 			if (exp.length() != 0) {
 				exp += " ";
 			}
@@ -29,7 +30,7 @@ public class SExp {
 
 	private String toTreeString(String tab) {
 		String s = "";
-		for (Object o : atoms) {
+		for (Object o : nodes) {
 			if (s.length() != 0) {
 				s += "\n";
 			}
@@ -63,7 +64,7 @@ public class SExp {
 			if (bytes[index] == ' ') {
 				if (point0 < index) {
 					String s = src.substring(point0, index).trim();
-					if(isWhite(s) == false) atoms.add(s);
+					if(isWhite(s) == false) nodes.add(s);
 				}
 				for (index++; bytes.length != index && bytes[index] == ' '; index++){
 					;
@@ -73,7 +74,7 @@ public class SExp {
 			} else if (bytes[index] == '(') {
 				SExp exp = new SExp();
 				int prog_index = exp.parse(src.substring(index));
-				atoms.add(exp);
+				nodes.add(exp);
 				index += prog_index;
 				point0 = index + 1;
 			}
@@ -83,17 +84,44 @@ public class SExp {
 		}
 		if (point0 != index) {
 			String s = src.substring(point0, index).trim();
-			if(isWhite(s) == false) atoms.add(s);
+			if(isWhite(s) == false) nodes.add(s);
 		}
 		return index;
 	}
 
 	public int size() {
-		return atoms.size();
+		return nodes.size();
 	}
 
 	public Object get(int index) throws Exception {
-		return atoms.get(index);
+		return nodes.get(index);
+	}
+
+	public Object car() throws Exception{
+		if(nodes.size() == 0) return null;
+		return nodes.get(0);
+	}
+
+	public List<Object> cdr() throws Exception{
+		if(nodes.size() < 2) return null;
+		return nodes.subList(1, nodes.size());
+	}
+
+	public void append(String s){
+		nodes.add(s);
+	}
+
+	public void append(SExp s){
+		nodes.add(s);
+	}
+
+	public boolean is_a(String key) throws Exception{
+		Object o = car();
+		if(o != null && o instanceof String && ((String)o).equals(key)){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public static SExp load(String path) throws Exception{
