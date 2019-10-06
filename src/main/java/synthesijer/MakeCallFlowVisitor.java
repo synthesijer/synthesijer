@@ -31,7 +31,6 @@ import synthesijer.ast.statement.IfStatement;
 import synthesijer.ast.statement.ReturnStatement;
 import synthesijer.ast.statement.SkipStatement;
 import synthesijer.ast.statement.SwitchStatement;
-import synthesijer.ast.statement.SwitchStatement.Elem;
 import synthesijer.ast.statement.SynchronizedBlock;
 import synthesijer.ast.statement.TryStatement;
 import synthesijer.ast.statement.VariableDecl;
@@ -230,7 +229,7 @@ public class MakeCallFlowVisitor implements SynthesijerAstVisitor, SynthesijerEx
 	}
 
 	@Override
-	public void visitSwitchCaseElement(Elem o) {
+	public void visitSwitchCaseElement(SwitchStatement.Elem o) {
 		o.getPattern().accept(this);
 		for(Statement s: o.getStatements()){
 			s.accept(this);

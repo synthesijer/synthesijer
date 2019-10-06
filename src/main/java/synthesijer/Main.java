@@ -22,8 +22,7 @@ import javax.tools.StandardJavaFileManager;
 
 import net.wasamon.mjlib.util.GetOpt;
 
-import synthesijer.Manager.OutputFormat;
-import synthesijer.Manager.SynthesijerModuleInfo;
+import synthesijer.Manager;
 import synthesijer.hdl.HDLModule;
 import synthesijer.tools.xilinx.HDLModuleToComponentXML;
 
@@ -170,11 +169,11 @@ public class Main {
 		Manager.INSTANCE.generate();
 
 		if (vhdlFlag)
-			Manager.INSTANCE.output(OutputFormat.VHDL);
+			Manager.INSTANCE.output(Manager.OutputFormat.VHDL);
 		if (verilogFlag)
-			Manager.INSTANCE.output(OutputFormat.Verilog);
+			Manager.INSTANCE.output(Manager.OutputFormat.Verilog);
 		if (packaging) {
-			SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(packageTop);
+			Manager.SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(packageTop);
 			if (info == null) {
 				SynthesijerUtils.warn("unknown module for ip-exact: " + packageTop);
 			} else {

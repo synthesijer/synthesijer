@@ -9,7 +9,6 @@ import java.util.Optional;
 import synthesijer.CompileState;
 import synthesijer.IdentifierGenerator;
 import synthesijer.Manager;
-import synthesijer.Manager.SynthesijerModuleInfo;
 import synthesijer.Options;
 import synthesijer.SynthesijerUtils;
 import synthesijer.ast.Type;
@@ -71,8 +70,8 @@ public class SchedulerInfoCompiler {
 		}
 	}
 
-	private SynthesijerModuleInfo searchArrayModuleInfo(PrimitiveTypeKind t, boolean publicFlag){
-		SynthesijerModuleInfo info = null;
+	private Manager.SynthesijerModuleInfo searchArrayModuleInfo(PrimitiveTypeKind t, boolean publicFlag){
+		Manager.SynthesijerModuleInfo info = null;
 		if(publicFlag){
 			switch(t){
 				case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("BlockRAM1");  break;
@@ -99,8 +98,8 @@ public class SchedulerInfoCompiler {
 		return info;
 	}
 
-	private SynthesijerModuleInfo searchChannelModuleInfo(PrimitiveTypeKind t, boolean publicFlag){
-		SynthesijerModuleInfo info = null;
+	private Manager.SynthesijerModuleInfo searchChannelModuleInfo(PrimitiveTypeKind t, boolean publicFlag){
+		Manager.SynthesijerModuleInfo info = null;
 		if(publicFlag){
 			switch(t){
 				case BOOLEAN: info = Manager.INSTANCE.searchHDLModuleInfo("FIFO1");  break;
@@ -128,7 +127,7 @@ public class SchedulerInfoCompiler {
 	}
 
 	private HDLInstance genArrayInstance(String name, ArrayType t, boolean publicFlag){
-		SynthesijerModuleInfo info = null;
+		Manager.SynthesijerModuleInfo info = null;
 		Type t0 = t.getElemType();
 		if(t0 instanceof PrimitiveTypeKind == false){
 			throw new RuntimeException("unsupported type: " + t);
@@ -141,7 +140,7 @@ public class SchedulerInfoCompiler {
 	}
 
 	private HDLInstanceRef genArrayInstanceRef(String name, ArrayType t, boolean publicFlag){
-		SynthesijerModuleInfo info = null;
+		Manager.SynthesijerModuleInfo info = null;
 		Type t0 = t.getElemType();
 		if(t0 instanceof PrimitiveTypeKind == false){
 			throw new RuntimeException("unsupported type: " + t);
@@ -153,7 +152,7 @@ public class SchedulerInfoCompiler {
 
 	private HDLInstance genChannelInstance(String name, ChannelType t, boolean publicFlag){
 		//System.out.println("genChannelInstance");
-		SynthesijerModuleInfo info = null;
+		Manager.SynthesijerModuleInfo info = null;
 		Type t0 = t.getElemType();
 		if(t0 instanceof PrimitiveTypeKind == false){
 			throw new RuntimeException("unsupported type: " + t);
@@ -167,7 +166,7 @@ public class SchedulerInfoCompiler {
 	}
 
 	private HDLInstanceRef genChannelInstanceRef(String name, ChannelType t, boolean publicFlag){
-		SynthesijerModuleInfo info = null;
+		Manager.SynthesijerModuleInfo info = null;
 		Type t0 = t.getElemType();
 		if(t0 instanceof PrimitiveTypeKind == false){
 			throw new RuntimeException("unsupported type: " + t);
@@ -1684,7 +1683,7 @@ public class SchedulerInfoCompiler {
 	}
 
 	private HDLInstance newInstModule(String mName, String uName){
-		SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(mName);
+		Manager.SynthesijerModuleInfo info = Manager.INSTANCE.searchHDLModuleInfo(mName);
 		HDLInstance inst = hm.newModuleInstance(info.getHDLModule(), uName);
 		inst.getSignalForPort("clk").setAssign(null, hm.getSysClk().getSignal());
 		inst.getSignalForPort("reset").setAssign(null, hm.getSysReset().getSignal());

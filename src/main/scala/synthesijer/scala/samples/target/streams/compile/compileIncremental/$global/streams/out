@@ -1,0 +1,329 @@
+[0m[[0mdebug[0m] [0m[naha] [0m
+[0m[[0mdebug[0m] [0m[naha] Initial source changes: [0m
+[0m[[0mdebug[0m] [0m[naha] 	removed:Set()[0m
+[0m[[0mdebug[0m] [0m[naha] 	added: Set(/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkOddEvenSortingNetwork.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/VendingMachine.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SevenSeg.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SyncGenerator.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/led.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/XORSHIFT32.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSimpleFifoTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkJigsaw.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/UDPTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSystolicMatrixMultiplicationUnit.scala)[0m
+[0m[[0mdebug[0m] [0m[naha] 	modified: Set()[0m
+[0m[[0mdebug[0m] [0m[naha] Invalidated products: Set()[0m
+[0m[[0mdebug[0m] [0m[naha] External API changes: API Changes: Set()[0m
+[0m[[0mdebug[0m] [0m[naha] Modified binary dependencies: Set()[0m
+[0m[[0mdebug[0m] [0m[naha] Initial directly invalidated sources: Set(/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkOddEvenSortingNetwork.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/VendingMachine.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SevenSeg.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SyncGenerator.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/led.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/XORSHIFT32.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSimpleFifoTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkJigsaw.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/UDPTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSystolicMatrixMultiplicationUnit.scala)[0m
+[0m[[0mdebug[0m] [0m[naha] [0m
+[0m[[0mdebug[0m] [0m[naha] Sources indirectly invalidated by:[0m
+[0m[[0mdebug[0m] [0m[naha] 	product: Set()[0m
+[0m[[0mdebug[0m] [0m[naha] 	binary dep: Set()[0m
+[0m[[0mdebug[0m] [0m[naha] 	external source: Set()[0m
+[0m[[0mdebug[0m] [0mAll initially invalidated sources: Set(/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkOddEvenSortingNetwork.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/VendingMachine.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SevenSeg.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SyncGenerator.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/led.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/XORSHIFT32.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSimpleFifoTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkJigsaw.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/UDPTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSystolicMatrixMultiplicationUnit.scala)[0m
+[0m[[0mdebug[0m] [0m[naha] Initial set of included nodes: Set(/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkOddEvenSortingNetwork.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/VendingMachine.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SevenSeg.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SyncGenerator.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/led.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/XORSHIFT32.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSimpleFifoTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkJigsaw.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/UDPTest.scala, /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/mkSystolicMatrixMultiplicationUnit.scala)[0m
+[0m[[0mdebug[0m] [0m[naha] Recompiling all 15 sources: invalidated sources (15) exceeded 50.0% of all sources[0m
+[0m[[0minfo[0m] [0mCompiling 15 Scala sources to /Users/miyo/work/synthesijer/synthesijer.scala/src/samples/target/scala-2.10/classes...[0m
+[0m[[0mdebug[0m] [0mGetting org.scala-sbt:compiler-interface:0.13.13:component from component compiler for Scala 2.10.6[0m
+[0m[[0mdebug[0m] [0mGetting org.scala-sbt:compiler-interface:0.13.13:component from component compiler for Scala 2.10.6[0m
+[0m[[0mdebug[0m] [0mRunning cached compiler 702f3c07, interfacing (CompilerInterface) with Scala compiler version 2.10.6[0m
+[0m[[0mdebug[0m] [0mCalling Scala compiler with arguments  (CompilerInterface):[0m
+[0m[[0mdebug[0m] [0m	-bootclasspath[0m
+[0m[[0mdebug[0m] [0m	/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/classes:/Users/miyo/.sbt/boot/scala-2.10.6/lib/scala-library.jar[0m
+[0m[[0mdebug[0m] [0m	-classpath[0m
+[0m[[0mdebug[0m] [0m	/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/target/scala-2.10/classes[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:4: object lib is not a member of package synthesijer[0m
+[0m[[31merror[0m] [0mimport synthesijer.lib.SimpleBlockRAM[0m
+[0m[[31merror[0m] [0m                   ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:6: not found: type Module[0m
+[0m[[31merror[0m] [0mclass Bram2Fifo(n:String, c:String, r:String, words:Int, width:Int) extends Module(n,c,r){[0m
+[0m[[31merror[0m] [0m                                                                            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:6: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass Bram2Fifo(n:String, c:String, r:String, words:Int, width:Int) extends Module(n,c,r){[0m
+[0m[[31merror[0m] [0m               ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:10: not found: value inP[0m
+[0m[[31merror[0m] [0m  val init = inP("init")[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:11: not found: value inP[0m
+[0m[[31merror[0m] [0m  val kick = inP("kick")[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:12: not found: value outP[0m
+[0m[[31merror[0m] [0m  val busy = outP("busy")[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:13: not found: value inP[0m
+[0m[[31merror[0m] [0m  val test = inP("test")[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:14: not found: value inP[0m
+[0m[[31merror[0m] [0m  val offset = inP("offset", 32)[0m
+[0m[[31merror[0m] [0m               ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:16: not found: type BRAM[0m
+[0m[[31merror[0m] [0m  val bram = new BRAM(this, "bram", width)[0m
+[0m[[31merror[0m] [0m                 ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:17: not found: type FIFO_OUT[0m
+[0m[[31merror[0m] [0m  val fifo = new FIFO_OUT(this, "fifo", width)[0m
+[0m[[31merror[0m] [0m                 ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:18: not found: value signal[0m
+[0m[[31merror[0m] [0m  val write_count = signal(32);[0m
+[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:20: not found: value sequencer[0m
+[0m[[31merror[0m] [0m  val seq = sequencer("main")[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:22: not found: value signal[0m
+[0m[[31merror[0m] [0m  val busy_reg = signal()[0m
+[0m[[31merror[0m] [0m                 ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:32: not found: value signal[0m
+[0m[[31merror[0m] [0m  val write_addr = signal(32)[0m
+[0m[[31merror[0m] [0m                   ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:35: not found: type State[0m
+[0m[[31merror[0m] [0m  def gen_init_entry():State = {[0m
+[0m[[31merror[0m] [0m                       ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:45: not found: type State[0m
+[0m[[31merror[0m] [0m  def gen_emit_prepare():State = {[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:51: not found: type State[0m
+[0m[[31merror[0m] [0m  def gen_emit_entry():State = {[0m
+[0m[[31merror[0m] [0m                       ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:68: not found: type SimModule[0m
+[0m[[31merror[0m] [0mclass Bram2FifoSim(name:String, target:Bram2Fifo) extends SimModule(name){[0m
+[0m[[31merror[0m] [0m                                                          ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:68: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass Bram2FifoSim(name:String, target:Bram2Fifo) extends SimModule(name){[0m
+[0m[[31merror[0m] [0m                  ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:72: not found: value system[0m
+[0m[[31merror[0m] [0m  val (clk, reset, counter) = system(10)[0m
+[0m[[31merror[0m] [0m                              ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:74: not found: value instance[0m
+[0m[[31merror[0m] [0m  val inst = instance(target, "U")[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:75: not found: value instance[0m
+[0m[[31merror[0m] [0m  val ram = instance(new SimpleBlockRAM(32, 5, 32), "MEM")[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:96: value visualize_statemachine is not a member of synthesijer.scala.Bram2Fifo[0m
+[0m[[31merror[0m] [0m    m.visualize_statemachine();[0m
+[0m[[31merror[0m] [0m      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:97: value genVHDL is not a member of synthesijer.scala.Bram2Fifo[0m
+[0m[[31merror[0m] [0m    m.genVHDL()[0m
+[0m[[31merror[0m] [0m      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:99: value genVHDL is not a member of synthesijer.scala.Bram2Fifo[0m
+[0m[[31merror[0m] [0m    debug.genVHDL()[0m
+[0m[[31merror[0m] [0m          ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Bram2Fifo.scala:101: value genVHDL is not a member of synthesijer.scala.Bram2FifoSim[0m
+[0m[[31merror[0m] [0m    sim.genVHDL()[0m
+[0m[[31merror[0m] [0m        ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:5: not found: type Module[0m
+[0m[[31merror[0m] [0mclass Conv64to24(n:String, c:String, r:String) extends Module(n, c, r){[0m
+[0m[[31merror[0m] [0m                                                       ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:5: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass Conv64to24(n:String, c:String, r:String) extends Module(n, c, r){[0m
+[0m[[31merror[0m] [0m                ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:9: not found: type FIFO_IN[0m
+[0m[[31merror[0m] [0m  val recv = new FIFO_IN(this, "fifo64", 64)[0m
+[0m[[31merror[0m] [0m                 ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:10: not found: type FIFO_OUT[0m
+[0m[[31merror[0m] [0m  val send = new FIFO_OUT(this, "fifo24", 24)[0m
+[0m[[31merror[0m] [0m                 ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:12: not found: value signal[0m
+[0m[[31merror[0m] [0m  val reg = signal(64) [0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:13: not found: value sequencer[0m
+[0m[[31merror[0m] [0m  val seq = sequencer("main")[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:103: not found: type SimModule[0m
+[0m[[31merror[0m] [0mclass Conv64to24Sim(n:String) extends SimModule(n) {[0m
+[0m[[31merror[0m] [0m                                      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:103: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass Conv64to24Sim(n:String) extends SimModule(n) {[0m
+[0m[[31merror[0m] [0m                   ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:107: not found: value system[0m
+[0m[[31merror[0m] [0m  val (clk, reset, count) = system(10)[0m
+[0m[[31merror[0m] [0m                            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:110: not found: value instance[0m
+[0m[[31merror[0m] [0m  val inst = instance(m, "U")[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:114: not found: value signal[0m
+[0m[[31merror[0m] [0m  val sig = signal("fe", 64)[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:127: value visualize_statemachine is not a member of synthesijer.scala.Conv64to24[0m
+[0m[[31merror[0m] [0m    m.visualize_statemachine()[0m
+[0m[[31merror[0m] [0m      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:128: value genVHDL is not a member of synthesijer.scala.Conv64to24[0m
+[0m[[31merror[0m] [0m    m.genVHDL()[0m
+[0m[[31merror[0m] [0m      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/Conv64to24.scala:130: value genVHDL is not a member of synthesijer.scala.Conv64to24Sim[0m
+[0m[[31merror[0m] [0m    sim.genVHDL()[0m
+[0m[[31merror[0m] [0m        ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:3: object xilinx is not a member of package synthesijer.scala[0m
+[0m[[31merror[0m] [0mimport synthesijer.scala.xilinx._[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:4: object xilinx is not a member of package synthesijer.scala[0m
+[0m[[31merror[0m] [0mimport synthesijer.scala.xilinx.series7._[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:7: not found: type Module[0m
+[0m[[31merror[0m] [0m    extends Module("PLA", "clk", "reset"){[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:6: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass PLA(depth:Int, width:Int)[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:41: not found: type Module[0m
+[0m[[31merror[0m] [0m    extends Module("AndArray", "clk", "reset"){[0m
+[0m[[31merror[0m] [0m            ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:9: value genVHDL is not a member of AndArray[0m
+[0m[[31merror[0m] [0m  private val tmpl = new AndArray(depth); tmpl.genVHDL()[0m
+[0m[[31merror[0m] [0m                                               ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:12: not found: value instance[0m
+[0m[[31merror[0m] [0m    instance(tmpl, "AndArray_" + i)[0m
+[0m[[31merror[0m] [0m    ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:15: not found: value inP[0m
+[0m[[31merror[0m] [0m    for(j <- 0 until depth) yield inP("WE_" + i + "_" + j)[0m
+[0m[[31merror[0m] [0m                                  ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:18: not found: value inP[0m
+[0m[[31merror[0m] [0m      for(k <- 0 until 4) yield inP("ADDR_" + i + "_" + j + "_" + k, 6)[0m
+[0m[[31merror[0m] [0m                                ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:21: not found: value inP[0m
+[0m[[31merror[0m] [0m      for(k <- 0 until 4) yield inP("DI_" + i + "_" + j + "_" + k)[0m
+[0m[[31merror[0m] [0m                                ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:24: value sysClk is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    u(i).sysClk := sysClk[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:25: value sysReset is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    u(i).sysReset := sysReset[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:27: value signalFor is not a member of Nothing[0m
+[0m[[31merror[0m] [0m      u(i).signalFor(tmpl.WE(j)) := WE(i)(j)[0m
+[0m[[31merror[0m] [0m           ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:53: not found: value inP[0m
+[0m[[31merror[0m] [0m    for(j <- 0 until 4) yield inP("ADDR_" + i + "_" + j, 6)[0m
+[0m[[31merror[0m] [0m                              ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:28: value signalFor is not a member of Nothing[0m
+[0m[[31merror[0m] [0m      (ADDR(i)(j) zip tmpl.ADDR(j)).foreach(n => u(i).signalFor(n._2) := n._1)[0m
+[0m[[31merror[0m] [0m                                                      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:55: not found: value inP[0m
+[0m[[31merror[0m] [0m    for(j <- 0 until 4) yield inP("DI_" + i + "_" + j)[0m
+[0m[[31merror[0m] [0m                              ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:29: value signalFor is not a member of Nothing[0m
+[0m[[31merror[0m] [0m      (DI(i)(j) zip tmpl.DI(j)).foreach(n => u(i).signalFor(n._2) := n._1)[0m
+[0m[[31merror[0m] [0m                                                  ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:33: not found: value signal[0m
+[0m[[31merror[0m] [0m  private val outputs = for(i <- 0 until width) yield signal()[0m
+[0m[[31merror[0m] [0m                                                      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:34: value := is not a member of Nothing[0m
+[0m[[31merror[0m] [0m  for(i <- 0 until width) outputs(i) := u(i).signalFor(tmpl.Q)[0m
+[0m[[31merror[0m] [0m                                     ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:35: not found: value outP[0m
+[0m[[31merror[0m] [0m  val Q = outP("Q")[0m
+[0m[[31merror[0m] [0m          ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:40: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass AndArray(depth:Int)[0m
+[0m[[31merror[0m] [0m              ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:42: not found: value Xilinx[0m
+[0m[[31merror[0m] [0m  Xilinx.init(this)[0m
+[0m[[31merror[0m] [0m  ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:6: object xilinx is not a member of package synthesijer.scala[0m
+[0m[[31merror[0m] [0mimport synthesijer.scala.xilinx._[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:7: object xilinx is not a member of package synthesijer.scala[0m
+[0m[[31merror[0m] [0mimport synthesijer.scala.xilinx.series7._[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:9: not found: type Module[0m
+[0m[[31merror[0m] [0mclass PlaElem extends Module("PlaElem", "clk", "reset"){[0m
+[0m[[31merror[0m] [0m                      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:49: not found: value instance[0m
+[0m[[31merror[0m] [0m    instance(tmpl, "PlaElem_" + i)[0m
+[0m[[31merror[0m] [0m    ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:51: not found: value inP[0m
+[0m[[31merror[0m] [0m  val WE = for(i <- 0 until depth) yield inP("WE_" + i);[0m
+[0m[[31merror[0m] [0m                                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:56: not found: value outP[0m
+[0m[[31merror[0m] [0m  val Q = outP("Q");[0m
+[0m[[31merror[0m] [0m          ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:61: value sysClk is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    u(i).sysClk := sysClk     // クロック[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:62: value sysReset is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    u(i).sysReset := sysReset // リセット[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:63: value signalFor is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    u(i).signalFor(tmpl.WE) := WE(i) // 書き込みイネーブル[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:35: not found: value inP[0m
+[0m[[31merror[0m] [0m  val ADDR = IndexedSeq(inP("ADDRA", 6), inP("ADDRB", 6), inP("ADDRC", 6), inP("ADDRD", 6))[0m
+[0m[[31merror[0m] [0m                        ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:35: not found: value inP[0m
+[0m[[31merror[0m] [0m  val ADDR = IndexedSeq(inP("ADDRA", 6), inP("ADDRB", 6), inP("ADDRC", 6), inP("ADDRD", 6))[0m
+[0m[[31merror[0m] [0m                                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:35: not found: value inP[0m
+[0m[[31merror[0m] [0m  val ADDR = IndexedSeq(inP("ADDRA", 6), inP("ADDRB", 6), inP("ADDRC", 6), inP("ADDRD", 6))[0m
+[0m[[31merror[0m] [0m                                                          ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:35: not found: value inP[0m
+[0m[[31merror[0m] [0m  val ADDR = IndexedSeq(inP("ADDRA", 6), inP("ADDRB", 6), inP("ADDRC", 6), inP("ADDRD", 6))[0m
+[0m[[31merror[0m] [0m                                                                           ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:29: not found: value inP[0m
+[0m[[31merror[0m] [0m  val DI = IndexedSeq(inP("DIA"), inP("DIB"), inP("DIC"), inP("DID"))[0m
+[0m[[31merror[0m] [0m                      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:29: not found: value inP[0m
+[0m[[31merror[0m] [0m  val DI = IndexedSeq(inP("DIA"), inP("DIB"), inP("DIC"), inP("DID"))[0m
+[0m[[31merror[0m] [0m                                  ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:29: not found: value inP[0m
+[0m[[31merror[0m] [0m  val DI = IndexedSeq(inP("DIA"), inP("DIB"), inP("DIC"), inP("DID"))[0m
+[0m[[31merror[0m] [0m                                              ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:29: not found: value inP[0m
+[0m[[31merror[0m] [0m  val DI = IndexedSeq(inP("DIA"), inP("DIB"), inP("DIC"), inP("DID"))[0m
+[0m[[31merror[0m] [0m                                                          ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:71: value signalFor is not a member of Nothing[0m
+[0m[[31merror[0m] [0m  u(0).signalFor(tmpl.CYINIT) := HIGH[0m
+[0m[[31merror[0m] [0m       ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:74: value signalFor is not a member of Nothing[0m
+[0m[[31merror[0m] [0m    u(i).signalFor(tmpl.CI) := ref(u(i-1).signalFor(tmpl.CO), 3)[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PLA.scala:84: value genVHDL is not a member of PLA[0m
+[0m[[31merror[0m] [0m    m.genVHDL()[0m
+[0m[[31merror[0m] [0m      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:9: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass PlaElem extends Module("PlaElem", "clk", "reset"){[0m
+[0m[[31merror[0m] [0m              ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:11: not found: value Xilinx[0m
+[0m[[31merror[0m] [0m  Xilinx.init(this)[0m
+[0m[[31merror[0m] [0m  ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:13: not found: type RAM64M[0m
+[0m[[31merror[0m] [0m  private val ram64m_tmpl = new RAM64M()[0m
+[0m[[31merror[0m] [0m                                ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:14: not found: type CARRY4[0m
+[0m[[31merror[0m] [0m  private val carry4_tmpl = new CARRY4()[0m
+[0m[[31merror[0m] [0m                                ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:16: not found: value instance[0m
+[0m[[31merror[0m] [0m  private val u_ram64m = instance(ram64m_tmpl)[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:17: not found: value instance[0m
+[0m[[31merror[0m] [0m  private val u_carry4 = instance(carry4_tmpl)[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:20: not found: value inP[0m
+[0m[[31merror[0m] [0m  val WE = inP("WE")[0m
+[0m[[31merror[0m] [0m           ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:41: not found: value outP[0m
+[0m[[31merror[0m] [0m  val O = outP("O", 4); O := u_carry4.signalFor(carry4_tmpl.O)[0m
+[0m[[31merror[0m] [0m          ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:42: not found: value outP[0m
+[0m[[31merror[0m] [0m  val CO = outP("CO", 4); CO := u_carry4.signalFor(carry4_tmpl.CO)[0m
+[0m[[31merror[0m] [0m           ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:44: not found: value inP[0m
+[0m[[31merror[0m] [0m  val CI = inP("CI"); u_carry4.signalFor(carry4_tmpl.CI) := CI[0m
+[0m[[31merror[0m] [0m           ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:45: not found: value inP[0m
+[0m[[31merror[0m] [0m  val CYINIT = inP("CYINIT"); u_carry4.signalFor(carry4_tmpl.CYINIT) := CYINIT[0m
+[0m[[31merror[0m] [0m               ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/PlaElem.scala:53: value genVHDL is not a member of PlaElem[0m
+[0m[[31merror[0m] [0m    m.genVHDL()[0m
+[0m[[31merror[0m] [0m      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala:2: object xilinx is not a member of package synthesijer.scala[0m
+[0m[[31merror[0m] [0mimport synthesijer.scala.xilinx._[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala:3: object xilinx is not a member of package synthesijer.scala[0m
+[0m[[31merror[0m] [0mimport synthesijer.scala.xilinx.series7._[0m
+[0m[[31merror[0m] [0m                         ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala:5: not found: type Module[0m
+[0m[[31merror[0m] [0mclass SRLBasedPLDElem extends Module("SRLBasedPLDElem", "clk", "reset"){[0m
+[0m[[31merror[0m] [0m                              ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala:5: too many arguments for constructor Object: ()Object[0m
+[0m[[31merror[0m] [0mclass SRLBasedPLDElem extends Module("SRLBasedPLDElem", "clk", "reset"){[0m
+[0m[[31merror[0m] [0m                      ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala:7: not found: value Xilinx[0m
+[0m[[31merror[0m] [0m  Xilinx.init(this)[0m
+[0m[[31merror[0m] [0m  ^[0m
+[0m[[31merror[0m] [0m/Users/miyo/work/synthesijer/synthesijer.scala/src/samples/SRLBasedPLDElem.scala:9: not found: type RAM64M[0m
+[0m[[31merror[0m] [0m  private val ram64m_tmpl = new RAM64M()[0m
+[0m[[31merror[0m] [0m                                ^[0m
+[0m[[31merror[0m] [0m288 errors found[0m
+[0m[[0mdebug[0m] [0mCompilation failed (CompilerInterface)[0m
+[0m[[31merror[0m] [0m(compile:[31mcompileIncremental[0m) Compilation failed[0m

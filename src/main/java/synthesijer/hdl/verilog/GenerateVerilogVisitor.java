@@ -7,7 +7,6 @@ import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLInstanceRef;
-import synthesijer.hdl.HDLInstance.ParamPair;
 import synthesijer.hdl.HDLLiteral;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLParameter;
@@ -41,7 +40,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.println(dest, offset, String.format("#("));
 		String sep = "";
 
-		for(ParamPair pair: o.getParameterPairs()){
+		for(HDLInstance.ParamPair pair: o.getParameterPairs()){
 			if(pair.getValue() != null){
 				HDLUtils.print(dest, 0, sep);
 				HDLUtils.print(dest, offset+2, String.format(".%s(%s)", pair.param.getName(), pair.getValue().getVerilogHDL()));
