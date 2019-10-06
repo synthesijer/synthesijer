@@ -6,11 +6,7 @@ SUBDIRS = ./led \
 	./test \
 	./bf/microboard \
 	./bf/top \
-	./bf \
-	./bd/TB-7Z-020 \
-	./bd/zynq/axi_test \
-	./bd/Zybo/quickstart \
-	./bd/Zybo/axiburst_test 
+	./bf 
 
 all: $(SUBDIRS)
 
