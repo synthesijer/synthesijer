@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../synthesijer.jar
+SYNTHESIJER ?= ../../target/synthesijer
 
 SOURCES = Test.java Top.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)

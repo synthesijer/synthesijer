@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../../synthesijer.jar
+SYNTHESIJER ?= ../../../target/synthesijer
 SYNTHESIJER_EXTRA_LIB ?= ../../../extra-libs
 CLASSPATH = $(SYNTHESIJER):$(SYNTHESIJER_EXTRA_LIB)/bin:.
 

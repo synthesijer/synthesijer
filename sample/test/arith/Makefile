@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../../synthesijer.jar
+SYNTHESIJER ?= ../../../target/synthesijer
 
 OPT = --chaining --bb2 --ssa
 

@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../synthesijer.jar
+SYNTHESIJER ?= ../../target/synthesijer
 
 SOURCES = Test000.java Test001.java Test001Sim.java Test002.java Test003.java Test004.java Test005.java Test006.java Test007.java Test008.java Test009.java Test010.java Test011.java Test012.java Test013.java Test013_A.java Test013_B.java Test013_C.java Test014.java Test017.java Test018.java Test020.java Test021.java Test021_test.java Test022.java Test022_test.java Test_ArithInt.java Test023.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)

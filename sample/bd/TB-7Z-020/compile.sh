@@ -1,4 +1,4 @@
-java -cp ../../../extra-libs/bin:../../../synthesijer.jar:. \
+java -cp ../../../extra-libs/bin:../../../target/synthesijer:. \
   synthesijer.Main \
   ../../../extra-libs/src/synthesijer/lib/axi/SimpleAXIMemIface32RTL.java \
   ../../../extra-libs/src/synthesijer/lib/axi/SimpleAXIMemIface32RTLTest.java \

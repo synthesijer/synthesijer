@@ -1,4 +1,4 @@
-SYNTHESIJER ?= ../../../synthesijer.jar
+SYNTHESIJER ?= ../../../target/synthesijer
 
 all: microboard_top.vhd microboard_top.v
 
