@@ -1,0 +1,9 @@
+@ 2>/dev/null # 2>nul & echo off & goto BOF:
+LANG=en_US.UTF-8 LANG=en_US.UTF-8 exec $SNAP/usr/lib/jvm/java-11-openjdk-amd64/bin/java -jar $JAVA_OPTS "$0" "$@"
+exit
+
+:BOF
+java -jar %JAVA_OPTS% "%~dpnx0" %*
+exit /B %errorlevel%
+
+
