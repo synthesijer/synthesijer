@@ -2,14 +2,13 @@
 
 ## Build from source code
 ### Requirement
-- JDK 11
-- Apache Ant
+- JDK 11  https://openjdk.java.net/install/
+- sbt https://www.scala-sbt.org/index.html
 
 ### Build
     % git clone https://github.com/synthesijer/synthesijer.git
     % cd synthesijer
-    % ant jar
+    % sbt assembly
 
 ### Run
-    % java -jar synthesijer.jar sample/test/Test000.java
-
+    % ./target/synthesijer sample/test/Test000.java
