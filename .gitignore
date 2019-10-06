@@ -6,3 +6,5 @@
 a.out
 *.iml
 .idea
+/target
+/snap
