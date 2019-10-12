@@ -217,7 +217,7 @@ end Test000;
 architecture RTL of Test000 is
 begin
 end RTL;
-""").get should be (new Architecture("RTL", "Test000", List()))
+""").get should be (new Architecture("RTL", "Test000", List(), List()))
   }
 
   "attribute_decl" should " be parsed" in {
@@ -359,7 +359,7 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parse(obj.process_statement, "process begin end process;").
-      get should be ( new ProcessStatement(None, None) )
+      get should be ( new ProcessStatement(None, None, List()) )
   }
 
   "sensitivity_list \"()\"" should " be parsed" in
@@ -384,35 +384,60 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parse(obj.process_statement, "process() begin end process;").
-      get should be ( new ProcessStatement(Some(List()), None) )
+      get should be ( new ProcessStatement(Some(List()), None, List()) )
   }
 
   "process (empty, with label)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parse(obj.process_statement, "LABEL: process() begin end process LABEL;").
-      get should be ( new ProcessStatement(Some(List()), Some("LABEL")) )
+      get should be ( new ProcessStatement(Some(List()), Some("LABEL"), List()) )
   }
 
   "process (with clk)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parse(obj.process_statement, "process(clk) begin end process;").
-      get should be ( new ProcessStatement(Some(List("clk")), None) )
+      get should be ( new ProcessStatement(Some(List("clk")), None, List()) )
   }
 
   "process (with clk and reset)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parse(obj.process_statement, "process(clk, reset) begin end process;").
-      get should be ( new ProcessStatement(Some(List("clk", "reset")), None) )
+      get should be ( new ProcessStatement(Some(List("clk", "reset")), None, List()) )
   }
 
   "process (with multiple)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parse(obj.process_statement, "process(a, b, c) begin end process;").
-      get should be ( new ProcessStatement(Some(List("a","b","c")), None) )
+      get should be ( new ProcessStatement(Some(List("a","b","c")), None, List()) )
+  }
+
+  "process (with clk and body)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.process_statement, """
+process(clk)
+begin
+  if rising_edge(clk) then
+  end if;
+end process;
+""").
+      get should be (
+        new ProcessStatement(
+          Some(List("clk")),
+          None,
+          List(new IfStatement(
+            new CallExpr("rising_edge", List("clk")),
+            List(),
+            List(),
+            None
+          )
+          )
+        )
+      )
   }
 
   "expr '1'" should " be parsed" in
@@ -673,6 +698,53 @@ end if;
     )
   }
 
+  "module instantiation (minimal)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.instantiation_statement, """
+  inst_u_synthesijer_fsub64_test : synthesijer_fsub64
+  port map(
+  );
+""").get should be (
+      new InstanceStatement(
+        new Ident("inst_u_synthesijer_fsub64_test"),
+        new Ident("synthesijer_fsub64"),
+        List()
+      )
+    )
+  }
+
+  "module instantiation" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.instantiation_statement, """
+  inst_u_synthesijer_fsub64_test : synthesijer_fsub64
+  port map(
+    clk => clk,
+    reset => reset,
+    a => u_synthesijer_fsub64_test_a,
+    b => u_synthesijer_fsub64_test_b,
+    nd => u_synthesijer_fsub64_test_nd,
+    result => u_synthesijer_fsub64_test_result,
+    valid => u_synthesijer_fsub64_test_valid
+  );
+""").get should be (
+      new InstanceStatement(
+        new Ident("inst_u_synthesijer_fsub64_test"),
+        new Ident("synthesijer_fsub64"),
+        List(
+          new PortMapItem(new Ident("clk"),    new Ident("clk")),
+          new PortMapItem(new Ident("reset"),  new Ident("reset")),
+          new PortMapItem(new Ident("a"),      new Ident("u_synthesijer_fsub64_test_a")),
+          new PortMapItem(new Ident("b"),      new Ident("u_synthesijer_fsub64_test_b")),
+          new PortMapItem(new Ident("nd"),     new Ident("u_synthesijer_fsub64_test_nd")),
+          new PortMapItem(new Ident("result"), new Ident("u_synthesijer_fsub64_test_result")),
+          new PortMapItem(new Ident("valid"),  new Ident("u_synthesijer_fsub64_test_valid"))
+        )
+      )
+    )
+  }
+
   "architecture" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -705,6 +777,33 @@ architecture RTL of Test000 is
   signal test_method : Type_test_method := test_method_IDLE;
 begin
 
+    clk_sig <= clk;
+    process begin end process;
+
+    process(clk)
+    begin
+      if rising_edge(clk) then
+        if test_method = test_method_S_0000 then
+          test_busy_sig <= '0';
+        elsif test_method = test_method_S_0001 then
+          test_busy_sig <= '1';
+        else
+          test_busy_sig <= '1';
+        end if;
+      end if;
+    end process;
+
+    inst_u_synthesijer_fsub64_test : synthesijer_fsub64
+    port map(
+      clk => clk,
+      reset => reset,
+      a => u_synthesijer_fsub64_test_a,
+      b => u_synthesijer_fsub64_test_b,
+      nd => u_synthesijer_fsub64_test_nd,
+      result => u_synthesijer_fsub64_test_result,
+      valid => u_synthesijer_fsub64_test_valid
+    );
+
 end RTL;
 """).get should be(
       new Architecture("RTL", "Test000",
@@ -726,6 +825,47 @@ end RTL;
           new Signal("test_dc_0079", new VectorKind("std_logic_vector", "downto", "64-1", "0"), Some("(others=>'0')")),
           new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")),
           new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE"))
+        ),
+        List(
+          new AssignStatement("clk_sig", new Ident("clk")),
+          new ProcessStatement(None, None, List()),
+          new ProcessStatement(
+            Some(List("clk")),
+            None,
+            List(new IfStatement(
+              new CallExpr("rising_edge", List("clk")),
+              List(
+                new IfStatement(
+                  new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
+                  List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+                  List(
+                    new IfStatement(
+                      new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
+                      List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+                      List(),
+                      None
+                    )),
+                  Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+                )
+              ),
+              List(),
+              None
+            )
+            )
+          ),
+          new InstanceStatement(
+            new Ident("inst_u_synthesijer_fsub64_test"),
+            new Ident("synthesijer_fsub64"),
+            List(
+              new PortMapItem(new Ident("clk"),    new Ident("clk")),
+              new PortMapItem(new Ident("reset"),  new Ident("reset")),
+              new PortMapItem(new Ident("a"),      new Ident("u_synthesijer_fsub64_test_a")),
+              new PortMapItem(new Ident("b"),      new Ident("u_synthesijer_fsub64_test_b")),
+              new PortMapItem(new Ident("nd"),     new Ident("u_synthesijer_fsub64_test_nd")),
+              new PortMapItem(new Ident("result"), new Ident("u_synthesijer_fsub64_test_result")),
+              new PortMapItem(new Ident("valid"),  new Ident("u_synthesijer_fsub64_test_valid"))
+            )
+          )
         )
       )
     )
