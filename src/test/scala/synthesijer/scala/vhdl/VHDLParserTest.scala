@@ -341,6 +341,337 @@ end component synthesijer_mul32;
       get should be ( new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE")) )
   }
 
+  "simple_expression signal" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.simple_expression, "clk").
+      get should be ( "clk" )
+  }
+
+  "clk_sig <= clk;" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.assign_statement, "clk_sig <= clk;").
+      get should be ( new AssignStatement("clk_sig", new Ident("clk")) )
+  }
+
+  "process, \"process begin end process;\"" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.process_statement, "process begin end process;").
+      get should be ( new ProcessStatement(None, None) )
+  }
+
+  "sensitivity_list \"()\"" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.sensitivity_list, "()").get should be (List())
+  }
+
+  "sensitivity_list \"(clk)\"" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.sensitivity_list, "(clk)").get should be (List("clk"))
+  }
+
+  "sensitivity_list \"(clk, reset)\"" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.sensitivity_list, "(clk, reset)").get should be (List("clk", "reset"))
+  }
+
+  "process \"process() begin end process;\"" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.process_statement, "process() begin end process;").
+      get should be ( new ProcessStatement(Some(List()), None) )
+  }
+
+  "process (empty, with label)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.process_statement, "LABEL: process() begin end process LABEL;").
+      get should be ( new ProcessStatement(Some(List()), Some("LABEL")) )
+  }
+
+  "process (with clk)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.process_statement, "process(clk) begin end process;").
+      get should be ( new ProcessStatement(Some(List("clk")), None) )
+  }
+
+  "process (with clk and reset)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.process_statement, "process(clk, reset) begin end process;").
+      get should be ( new ProcessStatement(Some(List("clk", "reset")), None) )
+  }
+
+  "process (with multiple)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.process_statement, "process(a, b, c) begin end process;").
+      get should be ( new ProcessStatement(Some(List("a","b","c")), None) )
+  }
+
+  "expr '1'" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "'1'").get should be (new Constant("'1'"))
+  }
+
+  "expr clk" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "clk").get should be (new Ident("clk"))
+  }
+
+  "expr clk'event" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "clk'event").get should be (new Ident("clk'event"))
+  }
+
+  "expr clk = '1'" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "clk = '1'").get should be (new BinaryExpr("=", new Ident("clk"), new Constant("'1'")))
+  }
+
+  "expr clk'event and clk = '1'" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "clk'event and clk = '1'").
+      get should be (new BinaryExpr("and", new Ident("clk'event"), new BinaryExpr("=", new Ident("clk"), new Constant("'1'"))))
+  }
+
+  "expr rising_edge(clk)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "rising_edge(clk)").get should be (new CallExpr("rising_edge", List("clk")))
+  }
+
+
+  "if \"if clk'event and clk = '1' then...end if;\"" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.if_statement, """
+if clk'event and clk = '1' then
+end if;
+""").get should be (
+      new IfStatement(
+        new BinaryExpr("and", new Ident("clk'event"), new BinaryExpr("=", new Ident("clk"), new Constant("'1'"))),
+        List(),
+        List(),
+        None
+      )
+    )
+  }
+
+  "if \"if rising_edge(clk) then...end if;\"" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.if_statement, """
+if rising_edge(clk) then
+end if;
+""").get should be (
+      new IfStatement(
+        new CallExpr("rising_edge", List("clk")),
+        List(),
+        List(),
+        None
+      )
+    )
+  }
+
+  "if if-then" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.if_statement, """
+        if test_method = test_method_S_0000 then
+          test_busy_sig <= '0';
+        end if;
+""").get should be (
+      new IfStatement(
+        new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
+        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(),
+        None
+      )
+    )
+  }
+
+  "if if-then-else" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.if_statement, """
+        if test_method = test_method_S_0000 then
+          test_busy_sig <= '0';
+        else
+          test_busy_sig <= '1';
+        end if;
+""").get should be (
+      new IfStatement(
+        new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
+        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(),
+        Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+      )
+    )
+  }
+
+  "if if-then-elsif-else" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.if_statement, """
+        if test_method = test_method_S_0000 then
+          test_busy_sig <= '0';
+        elsif test_method = test_method_S_0001 then
+          test_busy_sig <= '1';
+        else
+          test_busy_sig <= '1';
+        end if;
+""").get should be (
+      new IfStatement(
+        new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
+        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(
+          new IfStatement(
+            new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
+            List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+            List(),
+            None
+          )),
+        Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+      )
+    )
+  }
+
+  "if if-then-elsif-elsif-else" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.if_statement, """
+        if test_method = test_method_S_0000 then
+          test_busy_sig <= '0';
+        elsif test_method = test_method_S_0001 then
+          test_busy_sig <= '1';
+        elsif test_method = test_method_S_0002 then
+          test_busy_sig <= '0';
+        else
+          test_busy_sig <= '1';
+        end if;
+""").get should be (
+      new IfStatement(
+        new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
+        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(
+          new IfStatement(
+            new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
+            List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+            List(),
+            None
+          ),
+          new IfStatement(
+            new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0002")),
+            List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+            List(),
+            None
+          )
+        ),
+        Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+      )
+    )
+  }
+
+  "if if-then-elsif" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.if_statement, """
+        if test_method = test_method_S_0000 then
+          test_busy_sig <= '0';
+        elsif test_method = test_method_S_0001 then
+          test_busy_sig <= '1';
+        end if;
+""").get should be (
+      new IfStatement(
+        new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
+        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(
+          new IfStatement(
+            new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
+            List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+            List(),
+            None
+          )),
+        None
+      )
+    )
+  }
+
+  "case statements minimal" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.case_statement, """
+        case (test_method) is
+        end case;
+""").get should be (
+      new CaseStatement(new Ident("test_method"),
+        List()
+      )
+    )
+  }
+
+  "case statements with a when-clause" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.case_statement, """
+        case (test_method) is
+          when others => null;
+        end case;
+""").get should be (
+      new CaseStatement(new Ident("test_method"),
+        List(new CaseWhenClause(new Ident("others"), List(new NullStatement())))
+      )
+    )
+  }
+
+  "case statements" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.case_statement, """
+        case (test_method) is
+          when test_method_IDLE => 
+            test_method <= test_method_S_0000;
+          when test_method_S_0000 => 
+            test_method <= test_method_S_0001;
+          when test_method_S_0001 => 
+            if tmp_0008 = '1' then
+              test_method <= test_method_S_0002;
+            end if;
+          when others => null;
+        end case;
+""").get should be (
+      new CaseStatement(new Ident("test_method"),
+        List(
+          new CaseWhenClause(
+            new Ident("test_method_IDLE"),
+            List(new AssignStatement("test_method", new Ident("test_method_S_0000")))),
+          new CaseWhenClause(
+            new Ident("test_method_S_0000"),
+            List(new AssignStatement("test_method", new Ident("test_method_S_0001")))),
+          new CaseWhenClause(
+            new Ident("test_method_S_0001"),
+            List(
+              new IfStatement(new BinaryExpr("=", new Ident("tmp_0008"), new Constant("'1'")),
+                List(new AssignStatement("test_method", new Ident("test_method_S_0002"))),
+                List(),
+                None))),
+          new CaseWhenClause(new Ident("others"), List(new NullStatement()))
+        )
+      )
+    )
+  }
 
   "architecture" should " be parsed" in
   {
