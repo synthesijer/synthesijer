@@ -44,10 +44,16 @@ case class CaseStatement(cond:Expr, whenPart:List[CaseWhenClause]) extends Node
 case class CaseWhenClause(label:Expr, stmts:List[Node]) extends Node
 case class NullStatement() extends Node
 
+case class BasedValue(value:String, base:Int) extends Expr
 case class Constant(value:String) extends Expr
 case class Ident(name:String) extends Expr
 case class BinaryExpr(op:String, lhs:Expr, rhs:Expr) extends Expr
+case class UnaryExpr(op:String, expr:Expr) extends Expr
 case class CallExpr(name:String, args:List[String]) extends Expr // TODO args should be List of Exprs
+case class WhenExpr(cond:Expr, thenExpr:Expr, elseExpr:Expr) extends Expr
+case class BitPaddingExpr(step:String, b:Expr, e:Expr, value:Expr) extends Expr
+case class BitVectorSelect(ident:Ident, step:String, b:Expr, e:Expr) extends Expr
+case class BitSelect(ident:Ident, idx:Expr) extends Expr
 
 
 //class VHDLParser extends RegexParsers {
@@ -205,9 +211,12 @@ class VHDLParser extends JavaTokenParsers {
       case name~_~sensitivities~_~stmts~_~_~name2 => new ProcessStatement(sensitivities, name, stmts)
     }
 
-  def binary_operation = mul_div_operation | add_sub_operation | compare_operation | logic_operation
+  def unary_expression = ("-"|"NOT") ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
 
-  def compare_operation = "=" | "/=" | ">=" | "<=" | ">" | "<"
+  def binary_operation = compare_operation | mul_div_operation | add_sub_operation | logic_operation | concat_operation
+
+  def compare_operation = ( "=" | ">=" | "<=" | ">" | "<" ) ^^ { case x => x } |
+                          "/" ~ "=" ^^ { case x~y => x+y }
 
   def logic_operation = "AND" | "OR"
 
@@ -215,16 +224,45 @@ class VHDLParser extends JavaTokenParsers {
 
   def add_sub_operation = "+" | "-"
 
-  def value_expression = 
+  def concat_operation = "&"
+
+  def hex_value = ("X"|"x") ~> stringLiteral ^^ { case x => new BasedValue(x, 16) }
+
+  def bit_padding_expression =
+    "(" ~ simple_expression ~ ("downto"|"upto") ~ simple_expression ~ "=>" ~ bit_value ~ ")" ^^ {
+      case _~b~step~e~_~v~_ => new BitPaddingExpr(step, new Constant(b), new Constant(e), new Constant(v))
+    }
+
+
+  def value_expression : Parser[Expr] =
+    hex_value   ^^ { case x => x } |
     bit_value   ^^ { case x => new Constant(x) } |
     others_decl ^^ { case x => new Constant(x) } |
     identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"$x'$y") } |
     identifier  ^^ { case x => new Ident(x) }
 
+  def when_expression : Parser[Expr] = value_expression ~ "WHEN" ~ binary_expression ~ "ELSE" ~ expression ^^ {
+    case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
+  }
+
+  def bit_vector_select = long_name ~ "(" ~ simple_expression ~ ("downto"|"upto") ~ simple_expression ~ ")" ^^ {
+    case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n), step, new Constant(b), new Constant(e))
+  }
+
+  def bit_select = long_name ~ "(" ~ decimalNumber ~ ")" ^^ {
+    case n~_~idx~_ => new BitSelect(new Ident(n), new Constant(idx))
+  }
+
+  def binary_expression = value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+
   def expression : Parser[Expr] =
+    unary_expression |
+    bit_vector_select | 
+    bit_select |
+    when_expression |
     "(" ~> expression <~ ")" ^^ {case x => x } | 
     identifier ~ sensitivity_list ^^ {case x~y => new CallExpr(x, y) } |
-    value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) } |
+    binary_expression ^^ {case x => x } |
     value_expression
 
   def null_statement = "NULL" ~ ";" ^^ { _ => new NullStatement() }

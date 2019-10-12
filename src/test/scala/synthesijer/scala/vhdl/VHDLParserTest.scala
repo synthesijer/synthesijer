@@ -477,6 +477,145 @@ end process;
     obj.parse(obj.expression, "rising_edge(clk)").get should be (new CallExpr("rising_edge", List("clk")))
   }
 
+  "compare =" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.compare_operation, "=").get should be ( "=" )
+  }
+
+  "compare /=" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.compare_operation, "/=").get should be ( "/=" )
+  }
+
+  "when expr 1" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.when_expression, "ic_in_sig when ic_we_sig = '1' else class_ic_0000").
+      get should be (
+        new WhenExpr(
+          new BinaryExpr("=", new Ident("ic_we_sig"), new Constant("'1'")), // cond
+          new Ident("ic_in_sig"),    // then-expr
+          new Ident("class_ic_0000") // else-expr
+        )
+      )
+  }
+
+  "when expr 2" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.when_expression, "'1' when test_method = test_method_S_0000 else '0'").
+      get should be (
+        new WhenExpr(
+          new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")), // cond
+          new Constant("'1'"),    // then-expr
+          new Constant("'0'") // else-expr
+        )
+      )
+  }
+
+  "assignement with when" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.assign_statement, "tmp_0001 <= ic_in_sig when ic_we_sig = '1' else class_ic_0000;").
+      get should be (
+        new AssignStatement("tmp_0001",
+          new WhenExpr(
+            new BinaryExpr("=", new Ident("ic_we_sig"), new Constant("'1'")), // cond
+            new Ident("ic_in_sig"),    // then-expr
+            new Ident("class_ic_0000") // else-expr
+          )
+        )
+      )
+  }
+
+  "expr or/and" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "test_req_local or test_req_sig").
+      get should be (
+        new BinaryExpr("or", new Ident("test_req_local"), new Ident("test_req_sig"))
+      )
+    obj.parse(obj.expression, "test_req_flag and tmp_0006").
+      get should be (
+        new BinaryExpr("and", new Ident("test_req_flag"), new Ident("tmp_0006"))
+      )
+  }
+
+  "expr not" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "not test_req_flag_d").
+      get should be (
+        new UnaryExpr("not", new Ident("test_req_flag_d"))
+      )
+  }
+
+  "expr +/-" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "test_ia_0004 + test_ib_0005").
+      get should be (
+        new BinaryExpr("+", new Ident("test_ia_0004"), new Ident("test_ib_0005"))
+      )
+    obj.parse(obj.expression, "test_ia_0004 - test_ib_0005").
+      get should be (
+        new BinaryExpr("-", new Ident("test_ia_0004"), new Ident("test_ib_0005"))
+      )
+  }
+
+  "expr hex-value" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "X\"00000000\"").
+      get should be (
+        new BasedValue("\"00000000\"", 16)
+      )
+  }
+
+  "expr concast" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "a & b").
+      get should be (
+        new BinaryExpr("&", new Ident("a"), new Ident("b"))
+      )
+  }
+
+  "expr bit-padding" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.bit_padding_expression, "(32-1 downto 30 => '0')").
+      get should be (
+        new BitPaddingExpr("downto",
+          new Constant("32-1"), // TODO : new BinaryExpr("-", new Constant("32"), new Constant("1")),
+          new Constant("30"),
+          new Constant("'0'"))
+      )
+  }
+
+  "expr bit-vector-select" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.bit_vector_select, "unary_expr_00017(31 downto 2)").
+      get should be (
+        new BitVectorSelect(
+          new Ident("unary_expr_00017"),
+          "downto",
+          new Constant("31"),
+          new Constant("2"))
+      )
+  }
+
+  "expr bit-select" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parse(obj.expression, "unary_expr_00017(2)").
+      get should be (
+        new BitSelect(new Ident("unary_expr_00017"), new Constant("2"))
+      )
+  }
 
   "if \"if clk'event and clk = '1' then...end if;\"" should " be parsed" in
   {
