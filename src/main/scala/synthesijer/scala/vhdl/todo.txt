@@ -1,0 +1,1 @@
+both of long_name and selected_name are required?

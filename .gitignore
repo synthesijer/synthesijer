@@ -2,8 +2,12 @@
 /synthesijer.jar
 /synthesijer-stream.jar
 *~
+*.o
 *.vcd
 a.out
 *.iml
 .idea
 /target
+/snap/.snapcraft
+/stage
+/parts
