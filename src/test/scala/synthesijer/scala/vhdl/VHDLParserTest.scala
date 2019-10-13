@@ -31,30 +31,35 @@ class VHDLParserTest extends FlatSpec with Matchers {
     obj.parseAll(obj.use_clause, "use ieee.std_logic_1164.all;").get should be (List(new Use("ieee.std_logic_1164.all")))
   }
 
-  "a library (with lower-case)" should "be parsed" in {
+  "defined a library (with lower-case)" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.library_clause, "library ieee;").get should be (List(new Library("ieee")))
   }
 
-  "a library (with capital)" should "be parsed" in {
+  "defined a library (with capital)" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.library_clause, "LIBRARY ieee;").get should be (List(new Library("ieee")))
   }
 
-  "a library (with mixed-case)" should "be parsed" in {
+  "defined a library (with mixed-case)" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.library_clause, "lIBRary ieee;").get should be (List(new Library("ieee")))
   }
 
-  "2 libraries" should "be parsed" in {
+  "defined 2 libraries" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.library_clause, "LIBRARY ieee, Work;").get should be (List(new Library("ieee"), new Library("Work")))
   }
 
-  "3 libraries" should "be parsed" in {
+  "defined 3 libraries" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.library_clause, "LIBRARY ieee, work, test0123;").get should be (List(new Library("ieee"), new Library("work"), new Library("test0123")))
   }
+
+
+
+
+
 
   "simple entity decl" should "be parsed" in {
     val obj = new VHDLParser()
@@ -109,19 +114,19 @@ class VHDLParserTest extends FlatSpec with Matchers {
   "kind (std_logic_vector)" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.kind, "std_logic_vector(3 downto 0)")
-      .get should be (new VectorKind("std_logic_vector", "downto", "3", "0"))
+      .get should be (new VectorKind("std_logic_vector", "downto", new Constant("3"), new Constant("0")))
   }
 
   "kind (signed)" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.kind, "signed(3 downto 0)")
-      .get should be (new VectorKind("signed", "downto", "3", "0"))
+      .get should be (new VectorKind("signed", "downto", new Constant("3"), new Constant("0")))
   }
 
   "kind (unsigned)" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.kind, "unsigned(3 downto 0)")
-      .get should be (new VectorKind("unsigned", "downto", "3", "0"))
+      .get should be (new VectorKind("unsigned", "downto", new Constant("3"), new Constant("0")))
   }
 
   "port item" should "be parsed" in {
@@ -129,7 +134,7 @@ class VHDLParserTest extends FlatSpec with Matchers {
     obj.parseAll(obj.port_item, "clk : in std_logic")
       .get should be (new PortItem("clk", "in", new StdLogic()))
     obj.parseAll(obj.port_item, "q : out std_logic_vector(3 downto 0)")
-      .get should be (new PortItem("q", "out", new VectorKind("std_logic_vector", "downto", "3", "0")))
+      .get should be (new PortItem("q", "out", new VectorKind("std_logic_vector", "downto", new Constant("3"), new Constant("0"))))
   }
 
   "port item list" should "be parsed" in {
@@ -147,7 +152,7 @@ q     : out std_logic
         List(
           new PortItem("clk",   "in",  new StdLogic()),
           new PortItem("reset", "in",  new StdLogic()),
-          new PortItem("sw",    "in",  new VectorKind("std_logic_vector", "downto", "3", "0")),
+          new PortItem("sw",    "in",  new VectorKind("std_logic_vector", "downto", new Constant("3"), new Constant("0"))),
           new PortItem("q",     "out", new StdLogic())
         )
       )
@@ -187,22 +192,22 @@ end Test000;
           Some(List(
             new PortItem("clk",    "in",  new StdLogic()),
             new PortItem("reset",  "in",  new StdLogic()),
-            new PortItem("ic_in",  "in",  new VectorKind("signed", "downto", "32-1", "0")),
+            new PortItem("ic_in",  "in",  new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
             new PortItem("ic_we",  "in",  new StdLogic()),
-            new PortItem("ic_out", "out", new VectorKind("signed", "downto", "32-1", "0")),
-            new PortItem("lc_in",  "in",  new VectorKind("signed", "downto", "64-1", "0")),
+            new PortItem("ic_out", "out", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
+            new PortItem("lc_in",  "in",  new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0"))),
             new PortItem("lc_we",  "in",  new StdLogic()),
-            new PortItem("lc_out", "out", new VectorKind("signed", "downto", "64-1", "0")),
-            new PortItem("x_in",  "in",  new VectorKind("signed", "downto", "32-1", "0")),
+            new PortItem("lc_out", "out", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0"))),
+            new PortItem("x_in",  "in",  new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
             new PortItem("x_we",  "in",  new StdLogic()),
-            new PortItem("x_out", "out", new VectorKind("signed", "downto", "32-1", "0")),
-            new PortItem("y_in",  "in",  new VectorKind("signed", "downto", "64-1", "0")),
+            new PortItem("x_out", "out", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
+            new PortItem("y_in",  "in",  new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0"))),
             new PortItem("y_we",  "in",  new StdLogic()),
-            new PortItem("y_out", "out", new VectorKind("signed", "downto", "64-1", "0")),
-            new PortItem("test_ia", "in", new VectorKind("signed", "downto", "32-1", "0")),
-            new PortItem("test_ib", "in", new VectorKind("signed", "downto", "32-1", "0")),
-            new PortItem("test_la", "in", new VectorKind("signed", "downto", "64-1", "0")),
-            new PortItem("test_lb", "in", new VectorKind("signed", "downto", "64-1", "0")),
+            new PortItem("y_out", "out", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0"))),
+            new PortItem("test_ia", "in", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
+            new PortItem("test_ib", "in", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
+            new PortItem("test_la", "in", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0"))),
+            new PortItem("test_lb", "in", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0"))),
             new PortItem("test_busy", "out", new StdLogic()),
             new PortItem("test_req", "in", new StdLogic())
           )
@@ -255,10 +260,10 @@ end component synthesijer_mul32;
         Some(List(
           new PortItem("clk", "in", new StdLogic()),
           new PortItem("reset", "in", new StdLogic()),
-          new PortItem("a", "in", new VectorKind("signed", "downto", "32-1", "0")),
-          new PortItem("b", "in", new VectorKind("signed", "downto", "32-1", "0")),
+          new PortItem("a", "in", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
+          new PortItem("b", "in", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
           new PortItem("nd", "in", new StdLogic()),
-          new PortItem("result", "out", new VectorKind("signed", "downto", "32-1", "0")),
+          new PortItem("result", "out", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
           new PortItem("valid", "out", new StdLogic())
         ))
       )
@@ -301,14 +306,30 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, "signal ic_in_sig : signed(32-1 downto 0) := (others => '0');").
-      get should be ( new Signal("ic_in_sig", new VectorKind("signed", "downto", "32-1", "0"), Some("(others=>'0')")) )
+      get should be (
+        new Signal("ic_in_sig",
+          new VectorKind(
+            "signed",
+            "downto",
+            new BinaryExpr("-", new Constant("32"), new Constant("1")),
+            new Constant("0")),
+          Some("(others=>'0')"))
+      )
   }
 
   "signal decl (std_logic_vector with init)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, "signal test_fc_0064 : std_logic_vector(32-1 downto 0) := (others => '0');").
-      get should be ( new Signal("test_fc_0064", new VectorKind("std_logic_vector", "downto", "32-1", "0"), Some("(others=>'0')")) )
+      get should be (
+        new Signal("test_fc_0064",
+          new VectorKind(
+            "std_logic_vector",
+            "downto",
+            new BinaryExpr("-", new Constant("32"), new Constant("1")),
+            new Constant("0")),
+          Some("(others=>'0')"))
+      )
   }
 
   "symbol list" should " be parsed" in
@@ -973,16 +994,43 @@ end RTL;
             Some(List(
               new PortItem("clk", "in", new StdLogic()),
               new PortItem("reset", "in", new StdLogic()),
-              new PortItem("a", "in", new VectorKind("signed", "downto", "32-1", "0")),
-              new PortItem("b", "in", new VectorKind("signed", "downto", "32-1", "0")),
+              new PortItem("a", "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("b", "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
               new PortItem("nd", "in", new StdLogic()),
-              new PortItem("result", "out", new VectorKind("signed", "downto", "32-1", "0")),
+              new PortItem("result", "out",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
               new PortItem("valid", "out", new StdLogic())
             ))
           ),
           new Signal("y_we_sig", new StdLogic(), Some("'0'")),
-          new Signal("binary_expr_00031", new VectorKind("signed", "downto", "32-1", "0"), Some("(others=>'0')")),
-          new Signal("test_dc_0079", new VectorKind("std_logic_vector", "downto", "64-1", "0"), Some("(others=>'0')")),
+          new Signal("binary_expr_00031",
+            new VectorKind(
+              "signed",
+              "downto",
+              new BinaryExpr("-", new Constant("32"), new Constant("1")),
+              new Constant("0")),
+            Some("(others=>'0')")),
+          new Signal("test_dc_0079",
+            new VectorKind(
+              "std_logic_vector",
+              "downto",
+              new BinaryExpr("-", new Constant("64"), new Constant("1")),
+              new Constant("0")),
+            Some("(others=>'0')")),
           new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")),
           new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE"))
         ),
@@ -1157,22 +1205,82 @@ end RTL;
             Some(List(
               new PortItem("clk",    "in",  new StdLogic()),
               new PortItem("reset",  "in",  new StdLogic()),
-              new PortItem("ic_in",  "in",  new VectorKind("signed", "downto", "32-1", "0")),
+              new PortItem("ic_in",  "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
               new PortItem("ic_we",  "in",  new StdLogic()),
-              new PortItem("ic_out", "out", new VectorKind("signed", "downto", "32-1", "0")),
-              new PortItem("lc_in",  "in",  new VectorKind("signed", "downto", "64-1", "0")),
+              new PortItem("ic_out",  "out",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("lc_in",  "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("64"), new Constant("1")),
+                  new Constant("0"))),
               new PortItem("lc_we",  "in",  new StdLogic()),
-              new PortItem("lc_out", "out", new VectorKind("signed", "downto", "64-1", "0")),
-              new PortItem("x_in",  "in",  new VectorKind("signed", "downto", "32-1", "0")),
+              new PortItem("lc_out",  "out",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("64"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("x_in",  "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
               new PortItem("x_we",  "in",  new StdLogic()),
-              new PortItem("x_out", "out", new VectorKind("signed", "downto", "32-1", "0")),
-              new PortItem("y_in",  "in",  new VectorKind("signed", "downto", "64-1", "0")),
+              new PortItem("x_out", "out",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("y_in",  "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("64"), new Constant("1")),
+                  new Constant("0"))),
               new PortItem("y_we",  "in",  new StdLogic()),
-              new PortItem("y_out", "out", new VectorKind("signed", "downto", "64-1", "0")),
-              new PortItem("test_ia", "in", new VectorKind("signed", "downto", "32-1", "0")),
-              new PortItem("test_ib", "in", new VectorKind("signed", "downto", "32-1", "0")),
-              new PortItem("test_la", "in", new VectorKind("signed", "downto", "64-1", "0")),
-              new PortItem("test_lb", "in", new VectorKind("signed", "downto", "64-1", "0")),
+              new PortItem("y_out", "out",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("64"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("test_ia", "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("test_ib", "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("test_la", "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("64"), new Constant("1")),
+                  new Constant("0"))),
+              new PortItem("test_lb", "in",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("64"), new Constant("1")),
+                  new Constant("0"))),
               new PortItem("test_busy", "out", new StdLogic()),
               new PortItem("test_req", "in", new StdLogic()))
             )
@@ -1184,16 +1292,43 @@ end RTL;
                 Some(List(
                   new PortItem("clk", "in", new StdLogic()),
                   new PortItem("reset", "in", new StdLogic()),
-                  new PortItem("a", "in", new VectorKind("signed", "downto", "32-1", "0")),
-                  new PortItem("b", "in", new VectorKind("signed", "downto", "32-1", "0")),
+                  new PortItem("a", "in",
+                    new VectorKind(
+                      "signed",
+                      "downto",
+                      new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                      new Constant("0"))),
+                  new PortItem("b", "in",
+                    new VectorKind(
+                      "signed",
+                      "downto",
+                      new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                      new Constant("0"))),
                   new PortItem("nd", "in", new StdLogic()),
-                  new PortItem("result", "out", new VectorKind("signed", "downto", "32-1", "0")),
+                  new PortItem("result", "out",
+                    new VectorKind(
+                      "signed",
+                      "downto",
+                      new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                      new Constant("0"))),
                   new PortItem("valid", "out", new StdLogic())
                 ))
               ),
               new Signal("y_we_sig", new StdLogic(), Some("'0'")),
-              new Signal("binary_expr_00031", new VectorKind("signed", "downto", "32-1", "0"), Some("(others=>'0')")),
-              new Signal("test_dc_0079", new VectorKind("std_logic_vector", "downto", "64-1", "0"), Some("(others=>'0')")),
+              new Signal("binary_expr_00031",
+                new VectorKind(
+                  "signed",
+                  "downto",
+                  new BinaryExpr("-", new Constant("32"), new Constant("1")),
+                  new Constant("0")),
+                Some("(others=>'0')")),
+              new Signal("test_dc_0079",
+                new VectorKind(
+                  "std_logic_vector",
+                  "downto",
+                  new BinaryExpr("-", new Constant("64"), new Constant("1")),
+                  new Constant("0")),
+                Some("(others=>'0')")),
               new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")),
               new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE"))
             ),

@@ -19,7 +19,7 @@ case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Archi
 case class LibraryUnit(entity:Entity, arch:Option[Architecture])
 
 case class StdLogic() extends Kind
-case class VectorKind(name:String, step:String, b:String, e:String) extends Kind
+case class VectorKind(name:String, step:String, b:Expr, e:Expr) extends Kind
 case class UserTypeKind(name:String) extends Kind
 
 case class Library(s : String) extends Node
@@ -55,10 +55,48 @@ case class WhenExpr(cond:Expr, thenExpr:Expr, elseExpr:Expr) extends Expr
 case class BitPaddingExpr(step:String, b:Expr, e:Expr, value:Expr) extends Expr
 case class BitVectorSelect(ident:Ident, step:String, b:Expr, e:Expr) extends Expr
 case class BitSelect(ident:Ident, idx:Expr) extends Expr
+case class IndexedName(prefix:Expr, index:List[String]) extends Expr
+case class SliceName(prefix:Expr, index:String) extends Expr
 
-
-//class VHDLParser extends RegexParsers {
 class VHDLParser extends JavaTokenParsers {
+
+  def digit = "[0-9]+".r
+  def upper_case_letter = "[A-Z]+".r
+  def lower_case_letter = "[a-z]+".r
+  def space_character = " " | "\t" | "\r" | "\n"
+
+  def letter = upper_case_letter | lower_case_letter
+
+  def letter_or_digit = letter | digit
+
+  def identifier = ident // defined in JavaTokenParsers
+
+  def logical_name = identifier
+
+  def suffix = identifier | "ALL"
+
+  def selected_name = identifier ~ "." ~ (identifier ~ ".").* ~ suffix ^^ {
+    case x~"."~y~z =>
+      x + "." + (for(yy <- y) yield { yy._1 + "."}).mkString("") + z
+  }
+
+  def logical_name_list = logical_name ~ ("," ~ logical_name).* ^^ {
+    case x~y => x :: ( for(yy <- y) yield { yy._2 } )
+  }
+
+  def library_clause = "LIBRARY" ~> logical_name_list <~ ";" ^^ {
+    case x => for(xx <- x) yield { new Library(xx) }
+  }
+
+  def use_clause = "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
+    case x~y => {
+      new Use(x) :: ( for(yy <- y) yield { new Use(yy._2) } )
+    }
+  }
+
+  def long_name = identifier ~ ("." ~ identifier).* ^^ {
+    case x~y => x + (for(yy <- y) yield { "." + yy._2 }).mkString("")
+  }
 
   def design_file = design_unit ~ design_unit.* ^^ {
     case x~y => x :: y
@@ -76,52 +114,12 @@ class VHDLParser extends JavaTokenParsers {
     case x~y => new LibraryUnit(x, y)
   }
 
-  def library_clause = "LIBRARY" ~ logical_name_list <~ ";" ^^ { case x~y => y }
+  def function_name = long_name
 
-  def use_clause = "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
-    case x~y => {
-      new Use(x) :: ( for(yy <- y) yield { new Use(yy._2) } )
-    }
-  }
+  def function_call : Parser[Expr] = function_name ~ sensitivity_list ^^ {case x~y => new CallExpr(x, y) }
 
-  def logical_name2 = identifier ~ identifier
+  def kind_std_logic = "STD_LOGIC" ^^ {_ => new StdLogic() }
 
-  def logical_name = identifier
-
-  def logical_name_list = logical_name ~ ("," ~ logical_name).* ^^ {
-    case x~y => {
-      new Library(x) :: ( for(yy <- y) yield { new Library(yy._2) } )
-    }
-  }
-
-  //def identifier = basic_identifier ^^ {res => res}
-  def identifier = ident
-
-  def basic_identifier = letter ~ ( "_" | letter_or_digit ).* ^^ {
-    case x~y => {
-      (x :: (for(yy <- y) yield { yy })).mkString("")
-    }
-  }
-
-  def letter_or_digit = letter | digit
-
-  def letter = upper_case_letter | lower_case_letter
-
-  def upper_case_letter = "[A-Z]+".r
-  def lower_case_letter = "[a-z]+".r
-  def space_character = " " | "\t" | "\r" | "\n"
-  def digit = "[0-9]+".r
-
-  def selected_name = identifier ~ "." ~ (identifier ~ ".").* ~ suffix ^^ {
-    case x~"."~y~z =>
-      x + "." + (for(yy <- y) yield { yy._1 + "."}).mkString("") + z
-  }
-  def suffix = identifier | "ALL"
-
-  def long_name = identifier ~ ("." ~ identifier).* ^^ {
-    case x~y =>
-      x + (for(yy <- y) yield { "." + yy._2 }).mkString("")
-  }
 
   def entity_decl =
     "ENTITY" ~> long_name ~ "IS" ~ port_item_list.? <~ "END" ~ "ENTITY".? ~ long_name.? ~ ";" ^^ {
@@ -130,7 +128,6 @@ class VHDLParser extends JavaTokenParsers {
       }
     }
 
-  def kind_std_logic = "STD_LOGIC" ^^ {_ => new StdLogic() }
 
   def simple_expression : Parser[String] = (decimalNumber | identifier) ~ (("+"|"-") ~ simple_expression).* ^^ {
     case x~y => x + ( for(yy <- y) yield { yy._1 + yy._2 } ).mkString("")
@@ -151,7 +148,7 @@ class VHDLParser extends JavaTokenParsers {
   def vector_type = "STD_LOGIC_VECTOR" | "SIGNED" | "UNSIGNED"
 
   def kind_std_logic_vector =
-    vector_type ~ "(" ~ index_value ~ step_dir ~ index_value <~ ")" ^^ {
+    vector_type ~ "(" ~ prime_expression ~ step_dir ~ prime_expression <~ ")" ^^ {
       case name~_~b~step~e => new VectorKind(name, step, b, e)
     }
 
@@ -247,7 +244,8 @@ class VHDLParser extends JavaTokenParsers {
     bit_value   ^^ { case x => new Constant(x) } |
     others_decl ^^ { case x => new Constant(x) } |
     identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"$x'$y") } |
-    identifier  ^^ { case x => new Ident(x) }
+    identifier  ^^ { case x => new Ident(x) } |
+    decimalNumber ^^ { case x => new Constant(x) }
 
   def when_expression : Parser[Expr] = value_expression ~ "WHEN" ~ binary_expression ~ "ELSE" ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
@@ -263,13 +261,16 @@ class VHDLParser extends JavaTokenParsers {
 
   def binary_expression = value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
 
+  def prime_expression : Parser[Expr] =
+    unary_expression | binary_expression | value_expression
+
   def expression : Parser[Expr] =
     unary_expression |
     bit_vector_select | 
     bit_select |
     when_expression |
     "(" ~> expression <~ ")" ^^ {case x => x } | 
-    identifier ~ sensitivity_list ^^ {case x~y => new CallExpr(x, y) } |
+    function_call |
     binary_expression ^^ {case x => x } |
     value_expression
 
@@ -336,11 +337,6 @@ class VHDLParser extends JavaTokenParsers {
   }
 
   def parse( input: String ) = parseAll(design_file, input) match {
-    case Success( result, _ ) => Option(result)
-    case _                    => None
-  }
-
-  def parseSelectedName( input: String ) = parseAll(selected_name, input) match {
     case Success( result, _ ) => Option(result)
     case _                    => None
   }
