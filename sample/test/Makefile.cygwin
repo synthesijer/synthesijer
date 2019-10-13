@@ -136,7 +136,7 @@ clean:
 	-rm -f *.vcd
 	-rm -f *.ghw
 	-rm -f work-obj93.cf
-	-rm -f *.txt
+	-rm -f *.tmp_info
 	-rm -f *~
 	-rm -f sim???
 	-rm -f sim_test*

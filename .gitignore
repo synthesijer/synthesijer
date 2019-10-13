@@ -11,3 +11,4 @@ a.out
 /snap/.snapcraft
 /stage
 /parts
+*.tmp_info

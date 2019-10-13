@@ -216,7 +216,7 @@ public enum Manager {
 
 	private void dumpSchedulerInfo(SchedulerInfo si, String postfix){
 		try(
-				PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".txt")));
+				PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".tmp_info")));
 				PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")));
 		){
 			(new IRWriter(si.getName() + "_scheduler_board_" + postfix)).generate(si);

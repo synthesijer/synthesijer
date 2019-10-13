@@ -22,7 +22,7 @@ clean:
 	-rm -f sim
 	-rm -f *.vcd
 	-rm -f *.ir
-	-rm -f *.txt
+	-rm -f *.tmp_info
 	-rm -f work-obj93.cf
 	-rm -f led_top.vhd
 	-rm -f led_top.v

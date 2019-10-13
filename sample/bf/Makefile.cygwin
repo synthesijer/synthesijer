@@ -21,6 +21,6 @@ clean:
 	-rm -f *.vcd
 	-rm -f work-obj93.cf
 	-rm -f *.svg
-	-rm -f *.txt
+	-rm -f *.tmp_info
 	-rm -rf HW_v1_0
 

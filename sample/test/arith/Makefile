@@ -7,7 +7,7 @@ all:
 
 clean:
 	-rm -f *.ir
-	-rm -f *.txt
+	-rm -f *.tmp_info
 	-rm -f *.dot
 	-rm -f *.class
 	-rm -f arith.v

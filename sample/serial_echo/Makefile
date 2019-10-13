@@ -28,7 +28,7 @@ clean:
 	-rm -f sim
 	-rm -f *.vcd
 	-rm -f *.ir
-	-rm -f *.txt
+	-rm -f *.tmp_info
 	-rm -f work-obj93.cf
 	-rm -f top.vhd top.v
 	-rm -f microboard_top.vhd, microboard_top.v

@@ -20,7 +20,7 @@ clean:
 	-rm -f sim
 	-rm -f *.vcd
 	-rm -f *.ir
-	-rm -f *.txt
+	-rm -f *.tmp_info
 	-rm -f work-obj93.cf
 	-rm -f SC1602TestKC705.vhd
 	-rm -f SC1602TestKC705.v
