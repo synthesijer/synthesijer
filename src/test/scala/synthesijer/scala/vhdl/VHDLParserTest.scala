@@ -56,6 +56,18 @@ class VHDLParserTest extends FlatSpec with Matchers {
     obj.parseAll(obj.library_clause, "LIBRARY ieee, work, test0123;").get should be (List(new Library("ieee"), new Library("work"), new Library("test0123")))
   }
 
+  "package (simple)" should "be parsed" in {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.package_decl, """
+  package my_command is
+  end package my_command;
+""").get should be (
+      new PackageDecl("my_command", List())
+    )
+
+  }
+
+
   "simple entity decl" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.entity_decl, "entity Test000 is end;")

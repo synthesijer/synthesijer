@@ -15,7 +15,8 @@ trait Node {
 trait Kind extends Node
 trait Expr extends Node
 
-case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Architecture])
+case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Architecture]) extends Node
+case class PackageUnit(context:List[List[Node]], pkg:PackageDecl) extends Node
 case class LibraryUnit(entity:Entity, arch:Option[Architecture])
 
 case class StdLogic() extends Kind
@@ -26,7 +27,12 @@ case class IntegerKind() extends Kind
 case class Library(s : String) extends Node
 case class Use(s : String) extends Node
 case class Entity(s:String, ports:Option[List[PortItem]], params:Option[List[ParamItem]] = None) extends Node
-case class PortItem(name:String, dir:String, kind:Node, init:Option[Expr] = None) extends Node
+case class PackageDecl(s:String, decl:List[Node]) extends Node
+case class PortItem(name:String, dir:Option[String], kind:Node, init:Option[Expr]) extends Node{
+  def this(name:String, dir:String, kind:Node, init:Option[Expr] = None) = {
+    this(name, Some(dir), kind, init)
+  }
+}
 case class ParamItem(name:String, kind:Kind, value:Expr) extends Node
 
 case class Architecture(kind:String, name:String, decls:List[Node], body:List[Node]) extends Node
@@ -114,9 +120,11 @@ class VHDLParser extends JavaTokenParsers {
     case x~y => x :: y
   } )
 
-  def design_unit = ( context_clause ~ library_unit ^^ {
-    case x~y => new DesignUnit(x, y.entity, y.arch)
-  } )
+  def design_unit = (
+     context_clause ~ library_unit ^^ { case x~y => new DesignUnit(x, y.entity, y.arch) }
+   | context_clause ~ package_decl ^^ { case x~y => new PackageUnit(x, y) }
+
+  )
 
   def context_clause = ( context_item.* )
 
@@ -125,6 +133,11 @@ class VHDLParser extends JavaTokenParsers {
   def library_unit = ( entity_decl ~ architecture_decl.? ^^ {
     case x~y => new LibraryUnit(x, y)
   } )
+
+  def package_decl = "PACKAGE" ~> long_name ~ "IS" ~ declarations.* ~ "END" ~ "PACKAGE" ~ long_name.? <~ ";" ^^ {
+    case name~_~decls~_~_~name2 => new PackageDecl(name, decls)
+  }
+
 
   def function_name = ( long_name )
 
@@ -170,9 +183,15 @@ class VHDLParser extends JavaTokenParsers {
 
   def kind = ( kind_std_logic_vector | kind_std_logic | kind_integer | user_defined_type_kind )
 
-  def port_item = ( long_name ~ ":" ~ identifier ~ kind ~ init_value.? ^^ {
-    case name~_~dir~kind~init => new PortItem(name, dir, kind, init)
-  } )
+  def port_item = (
+    long_name ~ ":" ~ identifier.? ~ kind ~ init_value.? ^^ {
+      case name~_~dir~kind~init => new PortItem(name, dir, kind, init)
+    }
+  |
+    long_name ~ ":" ~ kind ~ init_value.? ^^ {
+      case name~_~kind~init => new PortItem(name, None, kind, init)
+    }
+  )
 
   def param_item = ( long_name ~ ":" ~ kind ~ init_value ^^ {
     case name~_~kind~value => new ParamItem(name, kind, value)
