@@ -143,7 +143,7 @@ class VHDLParser extends JavaTokenParsers {
 
   def signal_value = value_expression
 
-  def init_value = ":=" ~> signal_value
+  def init_value = ":=" ~> prime_expression
 
   def step_dir = "DOWNTO" | "UPTO"
 
