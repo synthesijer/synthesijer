@@ -110,6 +110,8 @@ class VHDLParserTest extends FlatSpec with Matchers {
       .get should be (new PortItem("clk", "in", new StdLogic()))
     obj.parseAll(obj.port_item, "q : out std_logic_vector(3 downto 0)")
       .get should be (new PortItem("q", "out", new VectorKind("std_logic_vector", "downto", new Constant("3"), new Constant("0"))))
+    obj.parseAll(obj.port_item, "gamma_signal : in std_logic_vector(31 downto 0) := (others => '0')")
+      .get should be (new PortItem("gamma_signal", "in", new VectorKind("std_logic_vector", "downto", new Constant("31"), new Constant("0")), Some(new Others(new Constant("'0'")))))
   }
 
   "port item list" should "be parsed" in {
@@ -187,6 +189,38 @@ end Test000;
             new PortItem("test_req", "in", new StdLogic())
           )
           )
+        )
+      )
+  }
+
+  "entity with generic" should "be parsed" in {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.entity_decl, """
+entity Test000 is
+  generic(
+    LOOP_NUM_MAX     : integer          := 1024;
+    CALC_NUM_MAX     : integer          := 1024;
+    FRAME_TYPE_VALUE : std_logic_vector(15 downto 0) := X"0003"
+    );
+  port (
+    clk : in std_logic;
+    reset : in std_logic
+  );
+end Test000;
+"""
+    )
+      .get should be (
+        new Entity("Test000",
+          Some(List(
+            new PortItem("clk",    "in",  new StdLogic()),
+            new PortItem("reset",  "in",  new StdLogic()),
+          )),
+          Some(List(
+            new ParamItem("LOOP_NUM_MAX", new IntegerKind(), new Constant("1024")),
+            new ParamItem("CALC_NUM_MAX", new IntegerKind(), new Constant("1024")),
+            new ParamItem("FRAME_TYPE_VALUE",
+              new VectorKind("std_logic_vector", "downto", new Constant("15"), new Constant("0")),
+              new BasedValue("\"0003\"", 16))))
         )
       )
   }
@@ -303,14 +337,14 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, """signal clk_sig : std_logic;""").
-      get should be ( new Signal("clk_sig", new StdLogic(), None) )
+      get should be ( new Signal("clk_sig", new StdLogic()) )
   }
 
   "multiple signal decl (such as, \"clk, reset\")" should " be parsed as combined named signal (such as, \"clk,signal\")" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, """signal clk, reset : std_logic;""").
-      get should be ( new Signal("clk,reset", new StdLogic(), None) )
+      get should be ( new Signal("clk,reset", new StdLogic()) )
   }
 
   "bit value" should " be parsed" in
@@ -328,7 +362,7 @@ end component synthesijer_mul32;
   "init value (others => '0')" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.init_value, ":= (others => '0')").get should be (new Constant("(others=>'0')"))
+    obj.parseAll(obj.init_value, ":= (others => '0')").get should be (new Others(new Constant("'0'")))
   }
   
   "signal decl (std_logic with init)" should " be parsed" in
@@ -349,7 +383,7 @@ end component synthesijer_mul32;
             "downto",
             new BinaryExpr("-", new Constant("32"), new Constant("1")),
             new Constant("0")),
-          Some(new Constant("(others=>'0')")))
+          Some(new Others(new Constant("'0'"))))
       )
   }
 
@@ -364,9 +398,36 @@ end component synthesijer_mul32;
             "downto",
             new BinaryExpr("-", new Constant("32"), new Constant("1")),
             new Constant("0")),
-          Some(new Constant("(others=>'0')")))
+          Some(new Others(new Constant("'0'"))))
       )
   }
+
+  "attribute keep of addr : signal is \"true\";" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.declarations, """
+  attribute keep of addr : signal is "true";
+""").get should be (
+      new SetAttribute("keep", "addr", new Constant("\"true\"")))
+  }
+
+  "variable tmp : unsigned(15 downto 0);" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.variable_decl, "variable tmp : unsigned(15 downto 0);").
+      get should be (
+        new Variable("tmp",
+          new VectorKind(
+            "unsigned",
+            "downto",
+            new Constant("15"),
+            new Constant("0")),
+          None
+        )
+      )
+  }
+  
+
 
   "symbol list" should " be parsed" in
   {
@@ -388,7 +449,7 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, "signal test_method : Type_test_method;").
-      get should be ( new Signal("test_method", new UserTypeKind("Type_test_method"), None))
+      get should be ( new Signal("test_method", new UserTypeKind("Type_test_method")))
   }
 
   "signal decl (user defined type with init)" should " be parsed" in
@@ -446,6 +507,14 @@ end component synthesijer_mul32;
       get should be ( new AssignStatement("clk_sig", new Ident("clk")) )
   }
 
+  "id := counter;" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.statement_in_process, "id := counter;").
+      get should be ( new BlockingAssignStatement("id", new Ident("counter")) )
+  }
+  
+
   "process, \"process begin end process;\"" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -476,6 +545,34 @@ end component synthesijer_mul32;
     val obj = new VHDLParser()
     obj.parseAll(obj.process_statement, "process() begin end process;").
       get should be ( new ProcessStatement(Some(List()), None, List()) )
+  }
+
+  "process \"process() begin end process;\" with variable" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.process_statement, """
+process()
+  variable tmp : unsigned(15 downto 0);
+begin
+end process;
+""").
+      get should be (
+        new ProcessStatement(
+          Some(List()),
+          None,
+          List(),
+          List(
+            new Variable("tmp",
+              new VectorKind(
+                "unsigned",
+                "downto",
+                new Constant("15"),
+                new Constant("0")),
+              None
+            )
+          )
+        )
+      )
   }
 
   "process (empty, with label)" should " be parsed" in
@@ -515,7 +612,14 @@ end component synthesijer_mul32;
       get should be (
         new CallExpr(new Ident("rising_edge"), List(new Ident("clk"))))
   }
-  
+
+  "(ohters => test)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.value_expression, "(others => test)").
+      get should be (new Others(new Ident("test")))
+  }
+
 
   "process (with clk and body)" should " be parsed" in
   {
@@ -1233,14 +1337,14 @@ end RTL;
               "downto",
               new BinaryExpr("-", new Constant("32"), new Constant("1")),
               new Constant("0")),
-            Some(new Constant("(others=>'0')"))),
+            Some(new Others(new Constant("'0'")))),
           new Signal("test_dc_0079",
             new VectorKind(
               "std_logic_vector",
               "downto",
               new BinaryExpr("-", new Constant("64"), new Constant("1")),
               new Constant("0")),
-            Some(new Constant("(others=>'0')"))),
+            Some(new Others(new Constant("'0'")))),
           new UserType("Type_test_method", List(new Ident("test_method_IDLE"), new Ident("test_method_S_0000"), new Ident("test_method_S_0001"))),
           new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
         ),
@@ -1533,14 +1637,14 @@ end RTL;
                   "downto",
                   new BinaryExpr("-", new Constant("32"), new Constant("1")),
                   new Constant("0")),
-                Some(new Constant("(others=>'0')"))),
+                Some(new Others(new Constant("'0'")))),
               new Signal("test_dc_0079",
                 new VectorKind(
                   "std_logic_vector",
                   "downto",
                   new BinaryExpr("-", new Constant("64"), new Constant("1")),
                   new Constant("0")),
-                Some(new Constant("(others=>'0')"))),
+                Some(new Others(new Constant("'0'")))),
               new UserType("Type_test_method", List(new Ident("test_method_IDLE"), new Ident("test_method_S_0000"), new Ident("test_method_S_0001"))),
               new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
             ),
