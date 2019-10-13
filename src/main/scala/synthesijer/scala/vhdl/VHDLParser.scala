@@ -17,6 +17,9 @@ trait Kind extends Node {
 trait Expr extends Node {
 }
 
+case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Architecture])
+case class LibraryUnit(entity:Entity, arch:Option[Architecture])
+
 case class StdLogic() extends Kind
 case class VectorKind(name:String, step:String, b:String, e:String) extends Kind
 case class UserTypeKind(name:String) extends Kind
@@ -59,14 +62,21 @@ case class BitSelect(ident:Ident, idx:Expr) extends Expr
 //class VHDLParser extends RegexParsers {
 class VHDLParser extends JavaTokenParsers {
 
-  def design_file = design_unit ~ design_unit.*
+  def design_file = design_unit ~ design_unit.* ^^ {
+    case x~y => x :: y
+  }
 
-  //TODO def design_unit = context_clause ~ library_unit
-  def design_unit = context_clause
+  def design_unit = context_clause ~ library_unit ^^ {
+    case x~y => new DesignUnit(x, y.entity, y.arch)
+  }
 
   def context_clause = context_item.*
 
   def context_item = library_clause | use_clause
+
+  def library_unit = entity_decl ~ architecture_decl.? ^^ {
+    case x~y => new LibraryUnit(x, y)
+  }
 
   def library_clause = "LIBRARY" ~ logical_name_list <~ ";" ^^ { case x~y => y }
 
@@ -327,7 +337,7 @@ class VHDLParser extends JavaTokenParsers {
     }
   }
 
-  def parse( input: String ) = parseAll(design_unit, input) match {
+  def parse( input: String ) = parseAll(design_file, input) match {
     case Success( result, _ ) => Option(result)
     case _                    => None
   }
