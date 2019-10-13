@@ -128,13 +128,6 @@ class VHDLParser extends JavaTokenParsers {
       }
     }
 
-
-  def simple_expression : Parser[String] = (decimalNumber | identifier) ~ (("+"|"-") ~ simple_expression).* ^^ {
-    case x~y => x + ( for(yy <- y) yield { yy._1 + yy._2 } ).mkString("")
-  }
-
-  def index_value = simple_expression | identifier | decimalNumber
-
   def bit_value = "'" ~> letter_or_digit <~ "'" ^^ { case x => s"'$x'"}
 
   def others_decl = "(" ~ "OTHERS" ~ "=>" ~> bit_value <~ ")" ^^ {case x => s"(others=>$x)" }
@@ -234,10 +227,9 @@ class VHDLParser extends JavaTokenParsers {
   def hex_value = ("X"|"x") ~> stringLiteral ^^ { case x => new BasedValue(x, 16) }
 
   def bit_padding_expression =
-    "(" ~ simple_expression ~ ("downto"|"upto") ~ simple_expression ~ "=>" ~ bit_value ~ ")" ^^ {
-      case _~b~step~e~_~v~_ => new BitPaddingExpr(step, new Constant(b), new Constant(e), new Constant(v))
+    "(" ~ prime_expression ~ ("downto"|"upto") ~ prime_expression ~ "=>" ~ bit_value ~ ")" ^^ {
+      case _~b~step~e~_~v~_ => new BitPaddingExpr(step, b, e, new Constant(v))
     }
-
 
   def value_expression : Parser[Expr] =
     hex_value   ^^ { case x => x } |
@@ -247,12 +239,12 @@ class VHDLParser extends JavaTokenParsers {
     identifier  ^^ { case x => new Ident(x) } |
     decimalNumber ^^ { case x => new Constant(x) }
 
-  def when_expression : Parser[Expr] = value_expression ~ "WHEN" ~ binary_expression ~ "ELSE" ~ expression ^^ {
+  def when_expression : Parser[Expr] = prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
   }
 
-  def bit_vector_select = long_name ~ "(" ~ simple_expression ~ ("downto"|"upto") ~ simple_expression ~ ")" ^^ {
-    case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n), step, new Constant(b), new Constant(e))
+  def bit_vector_select = long_name ~ "(" ~ prime_expression ~ ("downto"|"upto") ~ prime_expression ~ ")" ^^ {
+    case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n), step, b, e)
   }
 
   def bit_select = long_name ~ "(" ~ decimalNumber ~ ")" ^^ {

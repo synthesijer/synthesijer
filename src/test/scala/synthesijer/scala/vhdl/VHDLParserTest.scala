@@ -85,26 +85,6 @@ class VHDLParserTest extends FlatSpec with Matchers {
       )
   }
 
-  "index_value" should "parses 3 as String(3)" in {
-    val obj = new VHDLParser()
-    obj.parseAll(obj.index_value, "3").get should be ("3")
-  }
-
-  "index_value" should "parses WIDTH as String(WIDTH)" in {
-    val obj = new VHDLParser()
-    obj.parseAll(obj.index_value, "WIDTH").get should be ("WIDTH")
-  }
-
-  "index_value" should "parses 3+5 as String(3+5)" in {
-    val obj = new VHDLParser()
-    obj.parseAll(obj.index_value, "3+5").get should be ("3+5")
-  }
-
-  "index_value" should "parses 32-1 as String(32-1)" in {
-    val obj = new VHDLParser()
-    obj.parseAll(obj.index_value, "32-1").get should be ("32-1")
-  }
-
   "kind (std_logic)" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.kind, "std_logic")
@@ -360,13 +340,6 @@ end component synthesijer_mul32;
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, "signal test_method : Type_test_method := test_method_IDLE;").
       get should be ( new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE")) )
-  }
-
-  "simple_expression signal" should " be parsed" in
-  {
-    val obj = new VHDLParser()
-    obj.parseAll(obj.simple_expression, "clk").
-      get should be ( "clk" )
   }
 
   "clk_sig <= clk;" should " be parsed" in
@@ -631,7 +604,7 @@ end process;
     obj.parseAll(obj.bit_padding_expression, "(32-1 downto 30 => '0')").
       get should be (
         new BitPaddingExpr("downto",
-          new Constant("32-1"), // TODO : new BinaryExpr("-", new Constant("32"), new Constant("1")),
+          new BinaryExpr("-", new Constant("32"), new Constant("1")),
           new Constant("30"),
           new Constant("'0'"))
       )
