@@ -20,35 +20,29 @@ In addition to that, we can build hardware logic by using HDL building block in 
 
     % ./target/synthesijer sample/test/Test000.java
 
+or 
+
+    % java -jar ./target/synthesijer sample/test/Test000.java
+
+Some options are printed by the following
+
+    % java -jar ./target/synthesijer --help
+
+
 ## Getting started in Synthesijer.scala
-Three steps are required.
 
-+ prepare project
-+ edit projectfile to get synthesijer.scala
-+ write and run program
+### Prerequirements
 
++ Java (11 and later)
++ Sbt (1.2.10 and later)
 
 ### Prepare the project directory
 
-    % sbt new sbt/scala-seed.g8 --name=sjr-scala-test
-    % cd sjr-scala-test
+    % sbt new synthesijer/sjr-scala.g8 --name=sjr-scala-test
+	% cd sjr-scala-test
+    % sbt run
 
-Edit build.sbt as the following.
-
-    import Dependencies._
-    
-    ThisBuild / scalaVersion     := "2.12.8"
-    ThisBuild / version          := "0.1.0-SNAPSHOT"
-    ThisBuild / organization     := "com.example"
-    ThisBuild / organizationName := "example"
-    
-    lazy val root = (project in file("."))
-      .settings(
-        name := "sjr-scala-test",
-        libraryDependencies += scalaTest % Test,
-        resolvers += "Github Repository" at "https://synthesijer.github.io/web/pub/",
-       libraryDependencies += "synthesijer" % "synthesijer" % "3.0.1"
-     )
+By executing this command, Hello.scala is compiled and executed. And then, you can get VHDL, Verilog and some constriants files.
 
 ### Write and run program
 For example, modify src/main/scala/example/Hello.scala as the following.
@@ -102,7 +96,3 @@ For example, modify src/main/scala/example/Hello.scala as the following.
     }
 
 After writing program, run it.
-
-    % sbt run
-
-By executing this command, Hello.scala is compiled and executed. And then, you can get VHDL, Verilog and some constriants files.
