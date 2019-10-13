@@ -3,7 +3,7 @@ package net.wasamon.mjlib.util;
 import java.util.ArrayList;
 
 /**
- * 名前付きのアレイリストクラス
+ * ArrayList for Named Object
  *
  * @version $Id: NamedArrayList.java,v 1.1.1.1 2003/12/29 11:46:16 miyo Exp $
  * @author Takefumi MIYOSHI
@@ -12,17 +12,17 @@ import java.util.ArrayList;
 public class NamedArrayList extends ArrayList<NamedObject>{
 
   /**
-   * コンストラクタ
+   * Constructor
    */
   public NamedArrayList(){
     super();
   }
 
   /**
-   * 名前をキーにしてArrayListよりオブジェクトを検索し見つけたものを返す。
-   * @param name キーとなる名前
-   * @return その名前のオブジェクト
-   * @throws NoSuchException みつからなかった場合に発生する例外
+   * search an object with the name from ArrayList
+   * @param name name of the object to search
+   * @return found object
+   * @throws NoSuchException There is no such object in the storage
    */
   public NamedObject search(String name) throws NoSuchException{
     NamedObject obj = null;

@@ -2,7 +2,7 @@ package net.wasamon.mjlib.util;
 
 
 /**
- * GetOptで発生した例外をカプセル化した例外
+ * Execption in GetOpt
  *
  * @version $Id: GetOptException.java,v 1.1.1.1 2003/12/29 11:46:15 miyo Exp $
  * @author Takefumi MIYOSHI
