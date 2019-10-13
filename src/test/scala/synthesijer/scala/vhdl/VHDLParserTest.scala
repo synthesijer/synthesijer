@@ -266,20 +266,20 @@ end component synthesijer_mul32;
   "init value" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.init_value, ":= '0'").get should be ( "'0'" )
+    obj.parseAll(obj.init_value, ":= '0'").get should be ( new Constant("'0'") )
   }
 
   "init value (others => '0')" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.init_value, ":= (others => '0')").get should be ( "(others=>'0')" )
+    obj.parseAll(obj.init_value, ":= (others => '0')").get should be (new Constant("(others=>'0')"))
   }
   
   "signal decl (std_logic with init)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, "signal clk_sig : std_logic := '0';").
-      get should be ( new Signal("clk_sig", new StdLogic(), Some("'0'")) )
+      get should be ( new Signal("clk_sig", new StdLogic(), Some(new Constant("'0'"))) )
   }
 
   "signal decl (signed with init)" should " be parsed" in
@@ -293,7 +293,7 @@ end component synthesijer_mul32;
             "downto",
             new BinaryExpr("-", new Constant("32"), new Constant("1")),
             new Constant("0")),
-          Some("(others=>'0')"))
+          Some(new Constant("(others=>'0')")))
       )
   }
 
@@ -308,7 +308,7 @@ end component synthesijer_mul32;
             "downto",
             new BinaryExpr("-", new Constant("32"), new Constant("1")),
             new Constant("0")),
-          Some("(others=>'0')"))
+          Some(new Constant("(others=>'0')")))
       )
   }
 
@@ -339,7 +339,20 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, "signal test_method : Type_test_method := test_method_IDLE;").
-      get should be ( new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE")) )
+      get should be ( new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE"))) )
+  }
+
+  "signal decl (with init by hex value)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.signal_decl, """
+    signal u_synthesijer_div64_test_b : signed(64-1 downto 0) := X"0000000000000001";
+""").
+      get should be (
+        new Signal("u_synthesijer_div64_test_b",
+          new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0")),
+          Some(new BasedValue("\"0000000000000001\"", 16)))
+      )
   }
 
   "clk_sig <= clk;" should " be parsed" in
@@ -524,7 +537,24 @@ end process;
       )
   }
 
-  /*
+  "expression concat and bit-padding" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.binary_expression, """
+    (32-1 downto 30 => test_ia_0004(31)) & test_ia_0004(31 downto 2)
+""").get should be(
+      new BinaryExpr("&",
+        new BitPaddingExpr("downto",
+          new BinaryExpr("-", new Constant("32"), new Constant("1")),
+          new Constant("30"),
+          new BitSelect(new Ident("test_ia_0004"), new Constant("31"))),
+        new BitVectorSelect(
+          new Ident("test_ia_0004"),
+          "downto",
+          new Constant("31"),
+          new Constant("2"))))
+  }
+
   "assignement with bit-padding" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -534,7 +564,7 @@ end process;
       new AssignStatement("tmp_0021",
         new BinaryExpr("&",
           new BitPaddingExpr("downto",
-            new Constant("32-1"), // TODO : new BinaryExpr("-", new Constant("32"), new Constant("1")),
+            new BinaryExpr("-", new Constant("32"), new Constant("1")),
             new Constant("30"),
             new BitSelect(new Ident("test_ia_0004"), new Constant("31"))),
           new BitVectorSelect(
@@ -543,7 +573,6 @@ end process;
             new Constant("31"),
             new Constant("2")))))
   }
-   */
 
   "expr or/and" should " be parsed" in
   {
@@ -598,16 +627,60 @@ end process;
       )
   }
 
+  "unary " should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "(not test_da_0077(64-1))").
+      get should be (
+        new UnaryExpr("not", new BitSelect(new Ident("test_da_0077"), new BinaryExpr("-", new Constant("64"), new Constant("1")))))
+  }
+
+  "expr complex concat" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "(not test_da_0077(64-1)) & test_da_0077(64-2 downto 0)").
+      get should be (
+        new BinaryExpr("&",
+          new UnaryExpr("not",
+            new BitSelect(new Ident("test_da_0077"), new BinaryExpr("-", new Constant("64"), new Constant("1")))),
+          new BitVectorSelect(
+            new Ident("test_da_0077"),
+            "downto",
+            new BinaryExpr("-", new Constant("64"), new Constant("2")),
+            new Constant("0"))))
+  }
+
   "expr bit-padding" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.bit_padding_expression, "(32-1 downto 30 => '0')").
+    obj.parseAll(obj.expression, "(32-1 downto 30 => '0')").
       get should be (
         new BitPaddingExpr("downto",
           new BinaryExpr("-", new Constant("32"), new Constant("1")),
           new Constant("30"),
           new Constant("'0'"))
       )
+  }
+
+  "prime_expression" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.prime_expression, """
+    test_ia_0004(31)
+""").get should be(
+      new BitSelect(new Ident("test_ia_0004"), new Constant("31")))
+  }
+
+  "complex bit-padding" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.bit_padding_expression, """
+    (32-1 downto 30 => test_ia_0004(31))
+""").get should be(
+      new BitPaddingExpr("downto",
+        new BinaryExpr("-", new Constant("32"), new Constant("1")),
+        new Constant("30"),
+        new BitSelect(new Ident("test_ia_0004"), new Constant("31"))))
   }
 
   "expr bit-vector-select" should " be parsed" in
@@ -629,6 +702,15 @@ end process;
     obj.parseAll(obj.expression, "unary_expr_00017(2)").
       get should be (
         new BitSelect(new Ident("unary_expr_00017"), new Constant("2"))
+      )
+  }
+
+  "expr bit-select with binary-expression" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "unary_expr_00017(32-4)").
+      get should be (
+        new BitSelect(new Ident("unary_expr_00017"), new BinaryExpr("-", new Constant("32"), new Constant("4")))
       )
   }
 
@@ -791,7 +873,7 @@ end if;
   "case statements minimal" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.case_statement, """
+    obj.parseAll(obj.statement_in_process, """
         case (test_method) is
         end case;
 """).get should be (
@@ -804,7 +886,7 @@ end if;
   "case statements with a when-clause" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.case_statement, """
+    obj.parseAll(obj.statement_in_process, """
         case (test_method) is
           when others => null;
         end case;
@@ -818,7 +900,7 @@ end if;
   "case statements" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.case_statement, """
+    obj.parseAll(obj.statement_in_process, """
         case (test_method) is
           when test_method_IDLE => 
             test_method <= test_method_S_0000;
@@ -989,23 +1071,23 @@ end RTL;
               new PortItem("valid", "out", new StdLogic())
             ))
           ),
-          new Signal("y_we_sig", new StdLogic(), Some("'0'")),
+          new Signal("y_we_sig", new StdLogic(), Some(new Constant("'0'"))),
           new Signal("binary_expr_00031",
             new VectorKind(
               "signed",
               "downto",
               new BinaryExpr("-", new Constant("32"), new Constant("1")),
               new Constant("0")),
-            Some("(others=>'0')")),
+            Some(new Constant("(others=>'0')"))),
           new Signal("test_dc_0079",
             new VectorKind(
               "std_logic_vector",
               "downto",
               new BinaryExpr("-", new Constant("64"), new Constant("1")),
               new Constant("0")),
-            Some("(others=>'0')")),
+            Some(new Constant("(others=>'0')"))),
           new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")),
-          new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE"))
+          new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
         ),
         List(
           new AssignStatement("clk_sig", new Ident("clk")),
@@ -1287,23 +1369,23 @@ end RTL;
                   new PortItem("valid", "out", new StdLogic())
                 ))
               ),
-              new Signal("y_we_sig", new StdLogic(), Some("'0'")),
+              new Signal("y_we_sig", new StdLogic(), Some(new Constant("'0'"))),
               new Signal("binary_expr_00031",
                 new VectorKind(
                   "signed",
                   "downto",
                   new BinaryExpr("-", new Constant("32"), new Constant("1")),
                   new Constant("0")),
-                Some("(others=>'0')")),
+                Some(new Constant("(others=>'0')"))),
               new Signal("test_dc_0079",
                 new VectorKind(
                   "std_logic_vector",
                   "downto",
                   new BinaryExpr("-", new Constant("64"), new Constant("1")),
                   new Constant("0")),
-                Some("(others=>'0')")),
+                Some(new Constant("(others=>'0')"))),
               new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")),
-              new Signal("test_method", new UserTypeKind("Type_test_method"), Some("test_method_IDLE"))
+              new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
             ),
             List(
               new AssignStatement("clk_sig", new Ident("clk")),
