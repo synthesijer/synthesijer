@@ -458,6 +458,24 @@ end component synthesijer_mul32;
       get should be ( new UserType("Type_test_method", List(new Ident("test_method_IDLE"), new Ident("test_method_S_0000"), new Ident("test_method_S_0001"))))
   }
 
+  "type decl (array)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.type_decl, """
+    type ram_type is array (WORDS-1 downto 0) of std_logic_vector (WIDTH-1 downto 0);
+""").get should be (
+      new ArrayType("ram_type",
+        "downto",
+        new BinaryExpr("-", new Ident("WORDS"), new Constant("1")),
+        new Constant("0"),
+        new VectorKind(
+          "std_logic_vector",
+          "downto",
+          new BinaryExpr("-", new Ident("WIDTH"), new Constant("1")),
+          new Constant("0"))))
+  }
+
+
   "signal decl (user defined type without init)" should " be parsed" in
   {
     val obj = new VHDLParser()

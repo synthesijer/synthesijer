@@ -5,20 +5,31 @@ import java.nio.*;
 import java.nio.file.*;
 import synthesijer.scala.vhdl.*;
 
+import net.wasamon.mjlib.util.GetOpt;
+
 public class VHDLLoader{
 
 	public static void main(String... args) throws IOException{
-		VHDLParser obj = new VHDLParser();
-
-		Path path = Paths.get(args[0]);
+		GetOpt opt = new GetOpt("",	"check,error-only", args);
+		
+		Path path = Paths.get(opt.getArgs()[0]);
 		String content = Files.readString(path);
 
+		VHDLParser obj = new VHDLParser();
 		var result = obj.parse(content);
-
-		if(result.isEmpty()){
-			System.out.println(path);
+		
+		if (opt.flag("check")){
+			if(result.isEmpty()){
+				System.out.println(path);
+				System.out.println("..." + result);
+			}else if(opt.flag("error-only") == false){
+				System.out.println(path);
+				System.out.println("..." + "OK");
+			}
+		}else{
 			System.out.println(result);
 		}
+
 	}
 
 }

@@ -34,6 +34,7 @@ case class Attribute(name:String, kind:String) extends Node
 case class ComponentDecl(name:String, ports:Option[List[PortItem]], params:Option[List[ParamItem]]) extends Node
 case class Signal(name:String, kind:Kind, init:Option[Expr] = None) extends Node
 case class UserType(name:String, items:List[Ident]) extends Node
+case class ArrayType(name:String, step:String, b:Expr, e:Expr, kind:Kind) extends Node
 case class SetAttribute(key:String, target:String, value:Expr) extends Node
 case class Variable(name:String, kind:Kind, init:Option[Expr] = None) extends Node
 case class FileDecl(name:String, kind:String, io:String, src:String) extends Node
@@ -70,89 +71,90 @@ class VHDLParser extends JavaTokenParsers {
 
   override protected val whiteSpace = """(\s|--.*)+""".r
 
-  def digit = "[0-9]+".r
-  def upper_case_letter = "[A-Z]+".r
-  def lower_case_letter = "[a-z]+".r
-  def space_character = " " | "\t" | "\r" | "\n"
+  def digit = ( "[0-9]+".r )
+  def upper_case_letter = ( "[A-Z]+".r )
+  def lower_case_letter = ( "[a-z]+".r )
+  def space_character = ( " " | "\t" | "\r" | "\n" )
 
-  def letter = upper_case_letter | lower_case_letter
+  def letter = ( upper_case_letter | lower_case_letter )
 
-  def letter_or_digit = letter | digit
+  def letter_or_digit = ( letter | digit )
 
-  def identifier = ident // defined in JavaTokenParsers
+  def identifier = ( ident ) // defined in JavaTokenParsers
 
-  def logical_name = identifier
+  def logical_name = ( identifier )
 
-  def suffix = identifier | "ALL"
+  def suffix = ( identifier | "ALL" )
 
-  def selected_name = identifier ~ "." ~ (identifier ~ ".").* ~ suffix ^^ {
+  def selected_name = ( identifier ~ "." ~ (identifier ~ ".").* ~ suffix ^^ {
     case x~"."~y~z =>
       x + "." + (for(yy <- y) yield { yy._1 + "."}).mkString("") + z
-  }
+  } )
 
-  def logical_name_list = logical_name ~ ("," ~ logical_name).* ^^ {
+  def logical_name_list = ( logical_name ~ ("," ~ logical_name).* ^^ {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
-  }
+  } )
 
-  def library_clause = "LIBRARY" ~> logical_name_list <~ ";" ^^ {
+  def library_clause = ( "LIBRARY" ~> logical_name_list <~ ";" ^^ {
     case x => for(xx <- x) yield { new Library(xx) }
-  }
+  } )
 
-  def use_clause = "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
+  def use_clause = ( "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
     case x~y => {
       new Use(x) :: ( for(yy <- y) yield { new Use(yy._2) } )
     }
-  }
+  } )
 
-  def long_name = identifier ~ ("." ~ identifier).* ^^ {
+  def long_name = ( identifier ~ ("." ~ identifier).* ^^ {
     case x~y => x + (for(yy <- y) yield { "." + yy._2 }).mkString("")
-  }
+  } )
 
-  def design_file = design_unit ~ design_unit.* ^^ {
+  def design_file = ( design_unit ~ design_unit.* ^^ {
     case x~y => x :: y
-  }
+  } )
 
-  def design_unit = context_clause ~ library_unit ^^ {
+  def design_unit = ( context_clause ~ library_unit ^^ {
     case x~y => new DesignUnit(x, y.entity, y.arch)
-  }
+  } )
 
-  def context_clause = context_item.*
+  def context_clause = ( context_item.* )
 
-  def context_item = library_clause | use_clause
+  def context_item = ( library_clause | use_clause )
 
-  def library_unit = entity_decl ~ architecture_decl.? ^^ {
+  def library_unit = ( entity_decl ~ architecture_decl.? ^^ {
     case x~y => new LibraryUnit(x, y)
-  }
+  } )
 
-  def function_name = long_name
+  def function_name = ( long_name )
 
-  def function_call : Parser[CallExpr] = function_name ~ function_argument_list ^^ {
+  def function_call : Parser[CallExpr] = ( function_name ~ function_argument_list ^^ {
     case x~y => new CallExpr(new Ident(x), y)
-  }
+  } )
 
-  def kind_std_logic = "STD_LOGIC" ^^ {_ => new StdLogic() }
+  def kind_std_logic = ( "STD_LOGIC" ^^ {_ => new StdLogic() } )
 
 
-  def entity_decl =
+  def entity_decl = (
     "ENTITY" ~> long_name ~ "IS" ~ param_item_list.? ~ port_item_list.? <~ "END" ~ "ENTITY".? ~ long_name.? ~ ";" ^^ {
       case x~_~params~ports => {
         new Entity(x, ports, params)
       }
     }
+  )
 
-  def bit_value = "'" ~> letter_or_digit <~ "'" ^^ { case x => s"'$x'"}
+  def bit_value = ( "'" ~> letter_or_digit <~ "'" ^^ { case x => s"'$x'"} )
 
-  def others_decl = "(" ~ "OTHERS" ~ "=>" ~> bit_value <~ ")" ^^ {case x => s"(others=>$x)" }
+  def others_decl = ( "(" ~ "OTHERS" ~ "=>" ~> bit_value <~ ")" ^^ {case x => s"(others=>$x)" } )
 
-  def signal_value = value_expression
+  def signal_value = ( value_expression )
 
-  def init_value = ":=" ~> prime_expression
+  def init_value = ":=" ~> ( prime_expression )
 
-  def step_dir = "DOWNTO" | "UPTO"
+  def step_dir = ( "DOWNTO" | "UPTO" )
 
-  def vector_type = "STD_LOGIC_VECTOR" | "SIGNED" | "UNSIGNED"
+  def vector_type = ( "STD_LOGIC_VECTOR" | "SIGNED" | "UNSIGNED" )
 
-  def kind_integer = "INTEGER" ^^ { _ => new IntegerKind()}
+  def kind_integer = ( "INTEGER" ^^ { _ => new IntegerKind()} )
 
   def kind_std_logic_vector = (
       vector_type ~ "(" ~ prime_expression ~ step_dir ~ prime_expression <~ ")" ^^ {
@@ -163,30 +165,31 @@ class VHDLParser extends JavaTokenParsers {
       }
   )
 
-  def user_defined_type_kind = identifier ^^ {case x => new UserTypeKind(x) }
+  def user_defined_type_kind = ( identifier ^^ {case x => new UserTypeKind(x) } )
 
-  def kind = kind_std_logic_vector | kind_std_logic | kind_integer | user_defined_type_kind
+  def kind = ( kind_std_logic_vector | kind_std_logic | kind_integer | user_defined_type_kind )
 
-  def port_item = long_name ~ ":" ~ identifier ~ kind ~ init_value.? ^^ {
+  def port_item = ( long_name ~ ":" ~ identifier ~ kind ~ init_value.? ^^ {
     case name~_~dir~kind~init => new PortItem(name, dir, kind, init)
-  }
+  } )
 
-  def param_item = long_name ~ ":" ~ kind ~ init_value ^^ {
+  def param_item = ( long_name ~ ":" ~ kind ~ init_value ^^ {
     case name~_~kind~value => new ParamItem(name, kind, value)
-  }
+  } )
 
-  def port_item_list = "PORT" ~ "(" ~> port_item ~ ( ";" ~ port_item ).* <~ ")" ~ ";" ^^ {
+  def port_item_list = ( "PORT" ~ "(" ~> port_item ~ ( ";" ~ port_item ).* <~ ")" ~ ";" ^^ {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
-  }
+  } )
 
-  def param_item_list = "GENERIC" ~ "(" ~> param_item ~ ( ";" ~ param_item ).* <~ ")" ~ ";" ^^ {
+  def param_item_list = ( "GENERIC" ~ "(" ~> param_item ~ ( ";" ~ param_item ).* <~ ")" ~ ";" ^^ {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
-  }
+  } )
 
-  def declarations : Parser[Node] =
+  def declarations : Parser[Node] = (
     attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl
+  )
 
-  def architecture_decl =
+  def architecture_decl = (
     "ARCHITECTURE" ~> identifier ~ "OF" ~ long_name ~ "IS" ~
     declarations.* ~
     "BEGIN" ~
@@ -196,71 +199,95 @@ class VHDLParser extends JavaTokenParsers {
         new Architecture(kind, name, decls, body)
       }
     }
+  )
 
-  def attribute_decl = "ATTRIBUTE" ~> identifier ~ ":" ~ identifier <~ ";" ^^{
+  def attribute_decl = ( "ATTRIBUTE" ~> identifier ~ ":" ~ identifier <~ ";" ^^{
     case x~_~y => new Attribute(x, y)
-  }
+  } )
 
-  def component_decl =
-    "COMPONENT" ~> long_name ~ param_item_list.? ~ port_item_list.? ~ "END" ~ "COMPONENT" ~ long_name.? <~ ";" ^^ {
-      case name~params~ports~_~_~name2 => new ComponentDecl(name, ports, params)
-  }
+  def component_decl = (
+    "COMPONENT" ~> long_name ~ "IS".? ~ param_item_list.? ~ port_item_list.? ~ "END" ~ "COMPONENT" ~ long_name.? <~ ";" ^^ {
+      case name~_~params~ports~_~_~name2 => new ComponentDecl(name, ports, params)
+    }
+  )
 
-  def long_name_list = long_name ~ ("," ~ long_name).* ^^ {
-    case x~y => ( x + ( for(yy <- y) yield { "," + yy._2 } ).mkString("") )
-  }
+  def long_name_list = (
+    long_name ~ ("," ~ long_name).* ^^ {
+      case x~y => ( x + ( for(yy <- y) yield { "," + yy._2 } ).mkString("") )
+    }
+  )
 
-  def signal_decl =
+  def signal_decl = (
     "SIGNAL" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Signal(name, kind, init)
     }
+  )
 
-  def constant_decl =
+  def constant_decl = (
     "CONSTANT" ~> long_name_list ~ ":" ~ kind ~ init_value <~ ";" ^^ {
       case name~_~kind~init => new ConstantDecl(name, kind, init)
     }
+  )
 
-  def variable_decl =
+  def variable_decl = (
     "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Variable(name, kind, init)
     }
+  )
 
-  def direction = "OUT" | "IN" | "INOUT"
-  def filepath = stringLiteral
+  def direction = ( "OUT" | "IN" | "INOUT" )
+  def filepath = ( stringLiteral )
 
-  def file_decl =
+  def file_decl = (
     "FILE" ~> long_name_list ~ ":" ~ identifier ~ "IS" ~ direction ~ filepath <~ ";" ^^ {
       case x~_~y~_~d~s => new FileDecl(x, y, d, s)
     }
+  )
 
-  def symbol_list = identifier ~ ("," ~ identifier).* ^^ {
-    case x~y => new Ident(x) :: (for (yy <- y) yield { new Ident(yy._2) })
-  }
+  def symbol_list = (
+    identifier ~ ("," ~ identifier).* ^^ {
+      case x~y => new Ident(x) :: (for (yy <- y) yield { new Ident(yy._2) })
+    }
+  )
 
-  def type_decl = "TYPE" ~> identifier ~ "IS" ~ "(" ~ symbol_list ~ ")" <~ ";" ^^ {
-    case x~_~_~l~_ => new UserType(x, l)
-  }
+  def type_decl = (
+      "TYPE" ~> identifier ~ "IS" ~ "(" ~ symbol_list ~ ")" <~ ";" ^^ {
+        case x~_~_~l~_ => new UserType(x, l)
+      }
+    | "TYPE" ~> identifier ~ "IS" ~ "ARRAY" ~
+      "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ~ "OF" ~ kind <~ ";" ^^ {
+        case x~_~_~_~y~z~w~_~_~v => new ArrayType(x, z, y, w, v)
+      }
+  )
 
-  def call_statement = function_call <~ ";" ^^ {
-    case x => new CallStatement(x)
-  }
+  def call_statement = (
+    function_call <~ ";" ^^ {
+      case x => new CallStatement(x)
+    }
+  )
 
-  def assign_statement = extended_value_expression ~ "<=" ~ expression <~ ";" ^^ {
-    case lhs~_~rhs => new AssignStatement(lhs, rhs)
-  }
+  def assign_statement = (
+    extended_value_expression ~ "<=" ~ expression <~ ";" ^^ {
+      case lhs~_~rhs => new AssignStatement(lhs, rhs)
+    }
+  )
 
-  def blocking_assign_statement = extended_value_expression ~ ":=" ~ expression <~ ";" ^^ {
-    case lhs~_~rhs => new BlockingAssignStatement(lhs, rhs)
-  }
+  def blocking_assign_statement = (
+    extended_value_expression ~ ":=" ~ expression <~ ";" ^^ {
+      case lhs~_~rhs => new BlockingAssignStatement(lhs, rhs)
+    }
+  )
 
   def sensitivity_list = (
       "(" ~> symbol_list <~ ")" ^^ { case x => x }
     | "(" ~ ")" ^^ { case _ => List() }
   )
 
-  def expression_list = prime_expression ~ ("," ~ prime_expression).* ^^ {
-    case x~y => x :: (for (yy <- y) yield { yy._2 })
-  }
+  def expression_list = (
+    prime_expression ~ ("," ~ prime_expression).* ^^ {
+      case x~y => x :: (for (yy <- y) yield { yy._2 })
+    }
+  )
 
   def function_argument_list = (
       "(" ~> expression_list <~ ")" ^^ { case x => x }
