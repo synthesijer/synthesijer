@@ -55,8 +55,6 @@ case class WhenExpr(cond:Expr, thenExpr:Expr, elseExpr:Expr) extends Expr
 case class BitPaddingExpr(step:String, b:Expr, e:Expr, value:Expr) extends Expr
 case class BitVectorSelect(ident:Ident, step:String, b:Expr, e:Expr) extends Expr
 case class BitSelect(ident:Ident, idx:Expr) extends Expr
-case class IndexedName(prefix:Expr, index:List[String]) extends Expr
-case class SliceName(prefix:Expr, index:String) extends Expr
 
 class VHDLParser extends JavaTokenParsers {
 
@@ -226,19 +224,21 @@ class VHDLParser extends JavaTokenParsers {
 
   def hex_value = ("X"|"x") ~> stringLiteral ^^ { case x => new BasedValue(x, 16) }
 
-  def bit_padding_expression =
+  def bit_padding_expression = (
     "(" ~ prime_expression ~ ("downto"|"upto") ~ prime_expression ~ "=>" ~ prime_expression ~ ")" ^^ {
       case _~b~step~e~_~v~_ => new BitPaddingExpr(step, b, e, v)
     }
+  )
 
-  def value_expression : Parser[Expr] =
-    "(" ~> expression <~ ")" ^^ {case x => x } | 
-    hex_value   ^^ { case x => x } |
-    bit_value   ^^ { case x => new Constant(x) } |
-    others_decl ^^ { case x => new Constant(x) } |
-    identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"$x'$y") } |
-    identifier  ^^ { case x => new Ident(x) } |
-    decimalNumber ^^ { case x => new Constant(x) }
+  def value_expression : Parser[Expr] = (
+    "(" ~> expression <~ ")" ^^ {case x => x }
+    | hex_value   ^^ { case x => x }
+    | bit_value   ^^ { case x => new Constant(x) }
+    | others_decl ^^ { case x => new Constant(x) }
+    | identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"$x'$y") }
+    | identifier  ^^ { case x => new Ident(x) }
+    | decimalNumber ^^ { case x => new Constant(x) }
+  )
 
   def extended_value_expression : Parser[Expr] = bit_padding_expression | bit_vector_select | bit_select | value_expression
 
@@ -259,10 +259,7 @@ class VHDLParser extends JavaTokenParsers {
   def prime_expression : Parser[Expr] =
     unary_expression | binary_expression | extended_value_expression
 
-  def expression : Parser[Expr] =
-    when_expression |
-    function_call |
-    prime_expression
+  def expression : Parser[Expr] = when_expression | function_call | prime_expression
 
   def null_statement = "NULL" ~ ";" ^^ { _ => new NullStatement() }
 
