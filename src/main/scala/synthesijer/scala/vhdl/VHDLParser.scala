@@ -12,10 +12,8 @@ trait Node {
     visitor.visit(this)
   }
 }
-trait Kind extends Node {
-}
-trait Expr extends Node {
-}
+trait Kind extends Node
+trait Expr extends Node
 
 case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Architecture])
 case class LibraryUnit(entity:Entity, arch:Option[Architecture])

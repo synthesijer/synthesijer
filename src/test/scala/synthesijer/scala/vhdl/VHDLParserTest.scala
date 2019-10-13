@@ -530,6 +530,27 @@ end process;
       )
   }
 
+  /*
+  "assignement with bit-padding" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.assign_statement, """
+    tmp_0021 <= (32-1 downto 30 => test_ia_0004(31)) & test_ia_0004(31 downto 2);
+""").get should be(
+      new AssignStatement("tmp_0021",
+        new BinaryExpr("&",
+          new BitPaddingExpr("downto",
+            new Constant("32-1"), // TODO : new BinaryExpr("-", new Constant("32"), new Constant("1")),
+            new Constant("30"),
+            new BitSelect(new Ident("test_ia_0004"), new Constant("31"))),
+          new BitVectorSelect(
+            new Ident("test_ia_0004"),
+            "downto",
+            new Constant("31"),
+            new Constant("2")))))
+  }
+   */
+
   "expr or/and" should " be parsed" in
   {
     val obj = new VHDLParser()
