@@ -414,7 +414,7 @@ end component synthesijer_mul32;
   "variable tmp : unsigned(15 downto 0);" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.variable_decl, "variable tmp : unsigned(15 downto 0);").
+    obj.parseAll(obj.process_decl, "variable tmp : unsigned(15 downto 0);").
       get should be (
         new Variable("tmp",
           new VectorKind(
@@ -427,6 +427,19 @@ end component synthesijer_mul32;
       )
   }
   
+  "file output_file : text is out \"out2.vec\";" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.process_decl, "file output_file : text is out \"out2.vec\";").
+      get should be (
+        new FileDecl(
+          "output_file",
+          "text",
+          "out",
+          "\"out2.vec\""
+        )
+      )
+  }
 
 
   "symbol list" should " be parsed" in
@@ -472,6 +485,17 @@ end component synthesijer_mul32;
       )
   }
 
+  "constant LOOP_NUM_MAX : integer := 1024;" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.declarations, """
+constant LOOP_NUM_MAX : integer := 1024;
+""").
+      get should be (
+        new ConstantDecl("LOOP_NUM_MAX", new IntegerKind(), new Constant("1024"))
+      )
+  }
+
   "wait;" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -497,23 +521,40 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.assign_statement, "clk_sig <= clk;").
-      get should be ( new AssignStatement("clk_sig", new Ident("clk")) )
+      get should be ( new AssignStatement(new Ident("clk_sig"), new Ident("clk")) )
   }
 
   "clk_sig <= clk; -- with comment" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.assign_statement, "clk_sig <= clk;  -- with comment").
-      get should be ( new AssignStatement("clk_sig", new Ident("clk")) )
+      get should be ( new AssignStatement(new Ident("clk_sig"), new Ident("clk")) )
   }
 
   "id := counter;" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.statement_in_process, "id := counter;").
-      get should be ( new BlockingAssignStatement("id", new Ident("counter")) )
+      get should be ( new BlockingAssignStatement(new Ident("id"), new Ident("counter")) )
   }
-  
+
+  "dest(0)  <= src(0);" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.statement_in_process, "dest(0)  <= src(0);").
+      get should be (
+        new AssignStatement(
+          new CallExpr(new Ident("dest"), List(new Constant("0"))),
+          new CallExpr(new Ident("src"), List(new Constant("0")))))
+  }
+
+  "write(a);" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.call_statement, "write(a);").get should be(
+      new CallStatement(new CallExpr(new Ident("write"), List(new Ident("a")))),
+    )
+  }
 
   "process, \"process begin end process;\"" should " be parsed" in
   {
@@ -726,7 +767,8 @@ end process;
     val obj = new VHDLParser()
     obj.parseAll(obj.assign_statement, "tmp_0001 <= ic_in_sig when ic_we_sig = '1' else class_ic_0000;").
       get should be (
-        new AssignStatement("tmp_0001",
+        new AssignStatement(
+          new Ident("tmp_0001"),
           new WhenExpr(
             new BinaryExpr("=", new Ident("ic_we_sig"), new Constant("'1'")), // cond
             new Ident("ic_in_sig"),    // then-expr
@@ -760,7 +802,8 @@ end process;
     obj.parseAll(obj.assign_statement, """
     tmp_0021 <= (32-1 downto 30 => test_ia_0004(31)) & test_ia_0004(31 downto 2);
 """).get should be(
-      new AssignStatement("tmp_0021",
+      new AssignStatement(
+        new Ident("tmp_0021"),
         new BinaryExpr("&",
           new BitPaddingExpr("downto",
             new BinaryExpr("-", new Constant("32"), new Constant("1")),
@@ -981,7 +1024,7 @@ end if;
 """).get should be (
       new IfStatement(
         new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
-        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
         List(),
         None
       )
@@ -1000,9 +1043,9 @@ end if;
 """).get should be (
       new IfStatement(
         new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
-        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
         List(),
-        Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+        Some(List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'")))),
       )
     )
   }
@@ -1021,15 +1064,15 @@ end if;
 """).get should be (
       new IfStatement(
         new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
-        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
         List(
           new IfStatement(
             new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
-            List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+            List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'"))),
             List(),
             None
           )),
-        Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+        Some(List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'")))),
       )
     )
   }
@@ -1050,22 +1093,22 @@ end if;
 """).get should be (
       new IfStatement(
         new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
-        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
         List(
           new IfStatement(
             new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
-            List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+            List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'"))),
             List(),
             None
           ),
           new IfStatement(
             new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0002")),
-            List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+            List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
             List(),
             None
           )
         ),
-        Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+        Some(List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'")))),
       )
     )
   }
@@ -1082,11 +1125,11 @@ end if;
 """).get should be (
       new IfStatement(
         new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
-        List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+        List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
         List(
           new IfStatement(
             new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
-            List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+            List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'"))),
             List(),
             None
           )),
@@ -1142,15 +1185,15 @@ end if;
         List(
           new CaseWhenClause(
             new Ident("test_method_IDLE"),
-            List(new AssignStatement("test_method", new Ident("test_method_S_0000")))),
+            List(new AssignStatement(new Ident("test_method"), new Ident("test_method_S_0000")))),
           new CaseWhenClause(
             new Ident("test_method_S_0000"),
-            List(new AssignStatement("test_method", new Ident("test_method_S_0001")))),
+            List(new AssignStatement(new Ident("test_method"), new Ident("test_method_S_0001")))),
           new CaseWhenClause(
             new Ident("test_method_S_0001"),
             List(
               new IfStatement(new BinaryExpr("=", new Ident("tmp_0008"), new Constant("'1'")),
-                List(new AssignStatement("test_method", new Ident("test_method_S_0002"))),
+                List(new AssignStatement(new Ident("test_method"), new Ident("test_method_S_0002"))),
                 List(),
                 None))),
           new CaseWhenClause(new Ident("others"), List(new NullStatement()))
@@ -1185,7 +1228,7 @@ end if;
     clk => clk,
     reset => reset,
     a => u_synthesijer_fsub64_test_a,
-    b => u_synthesijer_fsub64_test_b,
+    b(0) => u_synthesijer_fsub64_test_b(0),
     nd => u_synthesijer_fsub64_test_nd,
     result => u_synthesijer_fsub64_test_result,
     valid => u_synthesijer_fsub64_test_valid
@@ -1198,7 +1241,9 @@ end if;
           new PortMapItem(new Ident("clk"),    new Ident("clk")),
           new PortMapItem(new Ident("reset"),  new Ident("reset")),
           new PortMapItem(new Ident("a"),      new Ident("u_synthesijer_fsub64_test_a")),
-          new PortMapItem(new Ident("b"),      new Ident("u_synthesijer_fsub64_test_b")),
+          new PortMapItem(
+            new CallExpr(new Ident("b"), List(new Constant("0"))),
+            new CallExpr(new Ident("u_synthesijer_fsub64_test_b"), List(new Constant("0")))),
           new PortMapItem(new Ident("nd"),     new Ident("u_synthesijer_fsub64_test_nd")),
           new PortMapItem(new Ident("result"), new Ident("u_synthesijer_fsub64_test_result")),
           new PortMapItem(new Ident("valid"),  new Ident("u_synthesijer_fsub64_test_valid"))
@@ -1349,7 +1394,7 @@ end RTL;
           new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
         ),
         List(
-          new AssignStatement("clk_sig", new Ident("clk")),
+          new AssignStatement(new Ident("clk_sig"), new Ident("clk")),
           new ProcessStatement(None, None, List()),
           new ProcessStatement(
             Some(List(new Ident("clk"))),
@@ -1359,15 +1404,15 @@ end RTL;
               List(
                 new IfStatement(
                   new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
-                  List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+                  List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
                   List(
                     new IfStatement(
                       new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
-                      List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+                      List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'"))),
                       List(),
                       None
                     )),
-                  Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+                  Some(List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'")))),
                 )
               ),
               List(),
@@ -1649,7 +1694,7 @@ end RTL;
               new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
             ),
             List(
-              new AssignStatement("clk_sig", new Ident("clk")),
+              new AssignStatement(new Ident("clk_sig"), new Ident("clk")),
               new ProcessStatement(None, None, List()),
               new ProcessStatement(
                 Some(List(new Ident("clk"))),
@@ -1659,15 +1704,15 @@ end RTL;
                   List(
                     new IfStatement(
                       new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
-                      List(new AssignStatement("test_busy_sig", new Constant("'0'"))),
+                      List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'0'"))),
                       List(
                         new IfStatement(
                           new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0001")),
-                          List(new AssignStatement("test_busy_sig", new Constant("'1'"))),
+                          List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'"))),
                           List(),
                           None
                         )),
-                      Some(List(new AssignStatement("test_busy_sig", new Constant("'1'")))),
+                      Some(List(new AssignStatement(new Ident("test_busy_sig"), new Constant("'1'")))),
                     )
                   ),
                   List(),

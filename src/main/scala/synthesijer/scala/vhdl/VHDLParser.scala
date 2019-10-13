@@ -36,14 +36,17 @@ case class Signal(name:String, kind:Kind, init:Option[Expr] = None) extends Node
 case class UserType(name:String, items:List[Ident]) extends Node
 case class SetAttribute(key:String, target:String, value:Expr) extends Node
 case class Variable(name:String, kind:Kind, init:Option[Expr] = None) extends Node
+case class FileDecl(name:String, kind:String, io:String, src:String) extends Node
+case class ConstantDecl(name:String, kind:Kind, init:Expr) extends Node
 
-case class ProcessStatement(sensitivities:Option[List[Ident]], label:Option[String], body:List[Node], variables:List[Variable] = List()) extends Node
+case class ProcessStatement(sensitivities:Option[List[Ident]], label:Option[String], body:List[Node], variables:List[Node] = List()) extends Node
 
 case class InstanceStatement(name:Ident, module:Ident, ports:List[PortMapItem], params:Option[List[PortMapItem]]) extends Node
 case class PortMapItem(name:Expr, expr:Expr) extends Node
 
-case class AssignStatement(dest:String, src:Expr) extends Node
-case class BlockingAssignStatement(dest:String, src:Expr) extends Node
+case class AssignStatement(dest:Expr, src:Expr) extends Node
+case class CallStatement(expr:CallExpr) extends Node
+case class BlockingAssignStatement(dest:Expr, src:Expr) extends Node
 case class IfStatement(cond:Expr, thenPart:List[Node], elifPart:List[IfStatement], elsePart:Option[List[Node]]) extends Node
 case class CaseStatement(cond:Expr, whenPart:List[CaseWhenClause]) extends Node
 case class CaseWhenClause(label:Expr, stmts:List[Node]) extends Node
@@ -123,7 +126,7 @@ class VHDLParser extends JavaTokenParsers {
 
   def function_name = long_name
 
-  def function_call : Parser[Expr] = function_name ~ function_argument_list ^^ {
+  def function_call : Parser[CallExpr] = function_name ~ function_argument_list ^^ {
     case x~y => new CallExpr(new Ident(x), y)
   }
 
@@ -151,10 +154,14 @@ class VHDLParser extends JavaTokenParsers {
 
   def kind_integer = "INTEGER" ^^ { _ => new IntegerKind()}
 
-  def kind_std_logic_vector =
-    vector_type ~ "(" ~ prime_expression ~ step_dir ~ prime_expression <~ ")" ^^ {
-      case name~_~b~step~e => new VectorKind(name, step, b, e)
-    }
+  def kind_std_logic_vector = (
+      vector_type ~ "(" ~ prime_expression ~ step_dir ~ prime_expression <~ ")" ^^ {
+        case name~_~b~step~e => new VectorKind(name, step, b, e)
+      }
+    | vector_type ^^ {
+      case name => new VectorKind(name, "", null, null)
+      }
+  )
 
   def user_defined_type_kind = identifier ^^ {case x => new UserTypeKind(x) }
 
@@ -176,7 +183,8 @@ class VHDLParser extends JavaTokenParsers {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
   }
 
-  def declarations : Parser[Node] = attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl
+  def declarations : Parser[Node] =
+    attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl
 
   def architecture_decl =
     "ARCHITECTURE" ~> identifier ~ "OF" ~ long_name ~ "IS" ~
@@ -207,9 +215,22 @@ class VHDLParser extends JavaTokenParsers {
       case name~_~kind~init => new Signal(name, kind, init)
     }
 
+  def constant_decl =
+    "CONSTANT" ~> long_name_list ~ ":" ~ kind ~ init_value <~ ";" ^^ {
+      case name~_~kind~init => new ConstantDecl(name, kind, init)
+    }
+
   def variable_decl =
     "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Variable(name, kind, init)
+    }
+
+  def direction = "OUT" | "IN" | "INOUT"
+  def filepath = stringLiteral
+
+  def file_decl =
+    "FILE" ~> long_name_list ~ ":" ~ identifier ~ "IS" ~ direction ~ filepath <~ ";" ^^ {
+      case x~_~y~_~d~s => new FileDecl(x, y, d, s)
     }
 
   def symbol_list = identifier ~ ("," ~ identifier).* ^^ {
@@ -220,11 +241,15 @@ class VHDLParser extends JavaTokenParsers {
     case x~_~_~l~_ => new UserType(x, l)
   }
 
-  def assign_statement = identifier ~ "<=" ~ expression <~ ";" ^^ {
+  def call_statement = function_call <~ ";" ^^ {
+    case x => new CallStatement(x)
+  }
+
+  def assign_statement = extended_value_expression ~ "<=" ~ expression <~ ";" ^^ {
     case lhs~_~rhs => new AssignStatement(lhs, rhs)
   }
 
-  def blocking_assign_statement = identifier ~ ":=" ~ expression <~ ";" ^^ {
+  def blocking_assign_statement = extended_value_expression ~ ":=" ~ expression <~ ";" ^^ {
     case lhs~_~rhs => new BlockingAssignStatement(lhs, rhs)
   }
 
@@ -244,9 +269,11 @@ class VHDLParser extends JavaTokenParsers {
 
   def statement_label = long_name <~ ":" ^^ { case x => x }
 
+  def process_decl = file_decl | variable_decl
+
   def process_statement =
     statement_label.? ~ "PROCESS" ~ sensitivity_list.? ~
-    variable_decl.* ~
+    process_decl.* ~
     "BEGIN" ~
     statement_in_process.* ~
     "END" ~ "PROCESS" ~ long_name.? <~ ";" ^^ {
@@ -324,6 +351,7 @@ class VHDLParser extends JavaTokenParsers {
         if_statement
       | assign_statement
       | blocking_assign_statement
+      | call_statement
       | null_statement
       | case_statement
       | wait_statement
@@ -355,10 +383,11 @@ class VHDLParser extends JavaTokenParsers {
       case cond~_~whenList => new CaseStatement(cond, whenList)
     }
 
-  def portmap_list_item  = long_name ~ "=>" ~ expression ~ ("," ~ long_name ~ "=>" ~ expression).* ^^ {
-    case x~_~y~z =>
-      new PortMapItem(new Ident(x), y) :: ( for(zz <- z) yield { new PortMapItem(new Ident(zz._1._1._2), zz._2) } )
-  }
+  def portmap_list_item  =
+    extended_value_expression ~ "=>" ~ expression ~ ("," ~ extended_value_expression ~ "=>" ~ expression).* ^^ {
+      case x~_~y~z =>
+        new PortMapItem(x, y) :: ( for(zz <- z) yield { new PortMapItem(zz._1._1._2, zz._2) } )
+    }
 
   def portmap_list = "(" ~> portmap_list_item <~ ")" ^^ { case x => x } |
                      "(" ~ ")" ^^ { case _ => List() }
