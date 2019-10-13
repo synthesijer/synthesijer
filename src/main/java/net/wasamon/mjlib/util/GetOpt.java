@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
- * 引数の解析を行い、その結果を保持するクラス。<br>
- * GetOpt("hvf:", "prefix:", args)などとして利用<br>
- * 最初の引数で一文字のオプションを、第二引数ではロングオプションを設定。<br>
- * ":"を末尾につけることで、そのオプションは引数をとることができる。<br>
- * この引数は空白または"="で識別される。<br>
- * また、オプションに"::"をつけると、その後の文字列すべてを、そのオプションの引数として処理する。<br>
- * - や -- の次、また、-ではじまらない文字列からを引数として保持する。<br>
+ * This class analyzes options of arguments and manages the result.<br>
+ * usage: GetOpt("hvf:", "prefix:", args)<br>
+ * The 1st argument makes short options, and the 2nd arguments makes long-options.<br>
+ * Each Option with ":" treats an argument for the option. The argument is recognized with space or '='.<br>
+ * In addition to that, the option with "::" treats all of the following strings as the argument.<br>
+ * The next arguments after '-', '--', or the string which does not start with '-' are treated as arguments not related with options<br>
  *
  * @version $Id: GetOpt.java,v 1.3 2004/05/24 05:24:35 miyo Exp $
  * @author Takefumi MIYOSHI
@@ -22,13 +21,13 @@ public class GetOpt {
 
 	private NamedArrayList opts;
 
-	/** 引数つきのオプションを保持するのリスト */
+	/** options with an argument */
 	private NamedArrayList opt_with_arg;
 
-	/** 引数つきではないオプションフラグのリスト */
+	/** options with no argument */
 	private NamedArrayList opt_flag;
 
-	/** 解析の結果不明だったリスト */
+	/** unknown string */
 	private ArrayList unknown;
 
 	private NamedObject opt_with_arg_rest = new NamedObject("");
@@ -36,30 +35,30 @@ public class GetOpt {
 	private boolean result = true;
 
 	/**
-	 * コンストラクタ
+	 * Constructor
 	 *
 	 * @param sp
-	 *            解析したい一文字オプションの連続(-vとか)
+	 *            short options(such as '-v')
 	 * @param lps
-	 *            解析したいロングオプションのcommma separate羅列
+	 *            long options(specified as a commma separated string)
 	 * @param ptn
-	 *            解析すべき文字列の配列
+	 *            target string
 	 */
 	public GetOpt(String sp, String lps, String ptn[]) {
 		this(sp, lps, ptn, 0);
 	}
 
 	/**
-	 * コンストラクタ
+	 * Constructor
 	 *
 	 * @param sp
-	 *            解析したい一文字オプションの連続(-vとか)
+	 *            short options(such as '-v')
 	 * @param lps
-	 *            解析したいロングオプションのcommma separate羅列
+	 *            long options(specified as a commma separated string)
 	 * @param ptn
-	 *            解析すべき文字列の配列
+	 *            target string
 	 * @param offset
-	 *            解析すべき文字のオフセット
+	 *            offset for target string to analyze
 	 */
 	public GetOpt(String sp, String lps, String ptn[], int offset) {
 		args = new String[0];
@@ -81,7 +80,7 @@ public class GetOpt {
 	}
 
 	/**
-	 * デバッグ用コンストラクタ
+	 * Constructor for debug
 	 *
 	 */
 	public GetOpt(String sp, String lps, String ptn[], boolean flag) {
@@ -107,14 +106,14 @@ public class GetOpt {
 	}
 
 	/**
-	 * 引数すべてに対し指定したパターンがあるかどうか判定する
+	 * Check the given options in all arguments
 	 *
 	 * @param ptn
-	 *            引数の配列
+	 *            array of arguments
 	 * @param offset
-	 *            解析する引数のオフセット
+	 *            offset of analysis options
 	 *
-	 * @TODO もっといいアルゴリズムに
+	 * @TODO should be brush-up
 	 */
 	private void analyze(String[] ptn, int offset) {
 		int i = offset;
@@ -155,13 +154,13 @@ public class GetOpt {
 	}
 
 	/**
-	 * 与えられたショートオプションとロングオプションから 引数解析のためのリストを生成する
+	 * generate a list to analyze options from the given patterns of short-options and long-options
 	 */
 	private boolean makeOptList(String sp, String[] lp) {
 		int i = 0;
 		while (i < sp.length()) {
-			if (sp.length() > (i + 1) && sp.charAt(i + 1) == ':') { /* もし文字の後に':'が続いていた場合引数を伴う */
-				if (sp.length() > (i + 2) && sp.charAt(i + 2) == ':') { /* もう一つ続いていたらラスト */
+			if (sp.length() > (i + 1) && sp.charAt(i + 1) == ':') { /* with ':', required an argument */
+				if (sp.length() > (i + 2) && sp.charAt(i + 2) == ':') { /* with additional ':', end of arguments */
 					opt_with_arg_rest = new NamedObject(sp.substring(i, i + 1));
 					i += 3;
 				} else {
@@ -175,7 +174,7 @@ public class GetOpt {
 		}
 		i = 0;
 		while (i < lp.length) {
-			if (lp[i].charAt(lp[i].length() - 1) == ':') { /* 最終の文字が':'なら引数を伴う */
+			if (lp[i].charAt(lp[i].length() - 1) == ':') { /* with ':', required an argument */
 				opt_with_arg.add(new NamedObject(lp[i].substring(0,
 						lp[i].length() - 1)));
 			} else {
@@ -187,11 +186,11 @@ public class GetOpt {
 	}
 
 	/**
-	 * パターンに該当するフラグオプションがるかどうか
+	 * check flag options
 	 *
 	 * @param ptn
-	 *            パターン文字列
-	 * @return 該当オプションがあるかどうか
+	 *            pattern string
+	 * @return checking result
 	 */
 	private int analy_shortopt(String ptn, String arg[], int offset) {
 		int add = 0;
@@ -214,22 +213,22 @@ public class GetOpt {
 	}
 
 	/**
-	 * 引数つきオプションの解析 hoge=fefe または hoge fefe をオプション hoge と、その引数 fefe と解析
+	 * analyze options with arguments. (ex. "hoge=fefe" or "hoge fefe" will be analyzed "hoge" option and "fefe" argument
 	 *
 	 * @param ptn
-	 *            ためすパターン
+	 *            pattern
 	 * @param arg
-	 *            オプション字列の配列(引数かもしれないから)
+	 *            arguments candidate
 	 * @param offset
-	 *            現在のパタンの配列中のオフセット
-	 * @return 該当するオプションがあったかどうか
+	 *            offset for current pattern
+	 * @return result
 	 */
 	private int analy_longopt(String ptn, String arg[], int offset) {
 		int add = 0;
 		if (opt_flag.has(ptn)) {
 			opts.add(new NamedObject(ptn));
 			add = 0;
-		} else if (ptn.matches(".*=.*")) { /* hogehoge=*みたいな形 */
+		} else if (ptn.matches(".*=.*")) { /* like hogehoge=* */
 			int index = ptn.indexOf("=");
 			String ptn2 = ptn.substring(0, index);
 			if (opt_with_arg.has(ptn2)) {
@@ -259,24 +258,24 @@ public class GetOpt {
 	}
 
 	/**
-	 * オプションが指定されていたかどうかを判定する
+	 * check whether the option is specified or not
 	 *
 	 * @param key
-	 *            検索するオプション名
-	 * @return 指定されていた/いなかった
+	 *            option name to search
+	 * @return result
 	 */
 	public boolean flag(String key) {
 		return opts.has(key);
 	}
 
 	/**
-	 * オプションで指定されていた値を取得する。
+	 * get values for the given option
 	 *
 	 * @param key
-	 *            検索するオプション名
-	 * @return 指定されていた値(文字列)
+	 *            option name to search
+	 * @return the value for the key (String)
 	 * @throws GetOptException
-	 *             与えられた文字列のオプションがない場合
+	 *            no such option has been given
 	 */
 	public String getValue(String key) throws GetOptException {
 		Object obj = null;
@@ -295,9 +294,9 @@ public class GetOpt {
 	}
 
 	/**
-	 * すべてのオプションを配列で得る。
+	 * get all options
 	 *
-	 * @return オプションの配列
+	 * @return the array of all options
 	 */
 	private String[] getAllOpt() {
 		String[] o = new String[opts.size()];
@@ -308,22 +307,22 @@ public class GetOpt {
 	}
 
 	/**
-	 * すべての引数を配列にして返す
+	 * get all arguments
 	 *
-	 * @return 引数の配列
+	 * @return the array of all arguments (without strings related analyzed options)
 	 */
 	public String[] getArgs() {
 		return args;
 	}
 
 	/**
-	 * パタンのうちoffset以降を配列に格納して返す
+	 * rest pattenrs after the offset
 	 *
 	 * @param ptn
-	 *            パタン
+	 *            patter
 	 * @param offset
-	 *            オフセット
-	 * @return 文字列の配列
+	 *            offset to skip
+	 * @return result array of string
 	 */
 	private String[] setArgs(String[] ptn, int offset) {
 		int argc = ptn.length - offset;
@@ -335,19 +334,19 @@ public class GetOpt {
 	}
 
 	/**
-	 * 名前と値の組を表わすオブジェクト
+	 * associative pair of Object and its name
 	 */
 	class AssocPair extends NamedObject {
-		/** フラグ */
+		/** flag */
 		String value;
 
 		/**
-		 * コンストラクタ
+		 * Constructor
 		 *
 		 * @param name
-		 *            名前
+		 *            name
 		 * @param value
-		 *            フラグ
+		 *            flag
 		 */
 		private AssocPair(String name, String value) {
 			super(name);
