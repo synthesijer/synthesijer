@@ -1237,6 +1237,25 @@ end if;
     )
   }
 
+  "generate" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.architecture_statement, """
+  U_GEN : for i in 0 to NUM_OF_UNITS-1 generate
+  begin
+  end generate;
+""").get should be (
+      new GenerateFor(
+        new Ident("U_GEN"),
+        new Ident("i"),
+        "to",
+        new Constant("0"),
+        new BinaryExpr("-", new Ident("NUM_OF_UNITS"), new Constant("1")),
+        List()
+      )
+    )
+  }
+
   "module instantiation" should " be parsed" in
   {
     val obj = new VHDLParser()

@@ -41,6 +41,7 @@ case class FileDecl(name:String, kind:String, io:String, src:String) extends Nod
 case class ConstantDecl(name:String, kind:Kind, init:Expr) extends Node
 
 case class ProcessStatement(sensitivities:Option[List[Ident]], label:Option[String], body:List[Node], variables:List[Node] = List()) extends Node
+case class GenerateFor(label:Ident, index:Ident, step:String, b:Expr, e:Expr, body:List[Node]) extends Node
 
 case class InstanceStatement(name:Ident, module:Ident, ports:List[PortMapItem], params:Option[List[PortMapItem]]) extends Node
 case class PortMapItem(name:Expr, expr:Expr) extends Node
@@ -150,7 +151,7 @@ class VHDLParser extends JavaTokenParsers {
 
   def init_value = ":=" ~> ( prime_expression )
 
-  def step_dir = ( "DOWNTO" | "UPTO" )
+  def step_dir = ( "DOWNTO" | "TO" )
 
   def vector_type = ( "STD_LOGIC_VECTOR" | "SIGNED" | "UNSIGNED" )
 
@@ -189,11 +190,14 @@ class VHDLParser extends JavaTokenParsers {
     attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl
   )
 
+  def architecture_statement : Parser[Node] =
+    process_statement | instantiation_statement | assign_statement | generate_statement
+
   def architecture_decl = (
     "ARCHITECTURE" ~> identifier ~ "OF" ~ long_name ~ "IS" ~
     declarations.* ~
     "BEGIN" ~
-    (process_statement | instantiation_statement | assign_statement).* <~
+    architecture_statement.* <~
     "END" ~ "ARCHITECTURE".? ~ long_name.? ~ ";" ^^ {
       case kind~_~name~_~decls~_~body => {
         new Architecture(kind, name, decls, body)
@@ -307,6 +311,14 @@ class VHDLParser extends JavaTokenParsers {
       case name~_~sensitivities~variables~_~stmts~_~_~name2 => new ProcessStatement(sensitivities, name, stmts, variables)
     }
 
+  def generate_statement = generate_for_statement
+
+  def generate_for_statement =
+    identifier ~ ":" ~ "FOR" ~ identifier ~ "IN" ~ prime_expression ~ step_dir ~ prime_expression ~ "GENERATE" ~
+    "BEGIN" ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
+      case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name), new Ident(i), s, b, e, lst)
+    }
+
   def unary_expression = ("-"|"NOT") ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
 
   def binary_operation = compare_operation | mul_div_operation | add_sub_operation | logic_operation | concat_operation
@@ -325,7 +337,7 @@ class VHDLParser extends JavaTokenParsers {
   def hex_value = ("X"|"x") ~> stringLiteral ^^ { case x => new BasedValue(x, 16) }
 
   def bit_padding_expression = (
-    "(" ~ prime_expression ~ ("downto"|"upto") ~ prime_expression ~ "=>" ~ prime_expression ~ ")" ^^ {
+    "(" ~ prime_expression ~ step_dir ~ prime_expression ~ "=>" ~ prime_expression ~ ")" ^^ {
       case _~b~step~e~_~v~_ => new BitPaddingExpr(step, b, e, v)
     }
   )
@@ -351,7 +363,7 @@ class VHDLParser extends JavaTokenParsers {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
   }
 
-  def bit_vector_select = long_name ~ "(" ~ prime_expression ~ ("downto"|"upto") ~ prime_expression ~ ")" ^^ {
+  def bit_vector_select = long_name ~ "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ^^ {
     case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n), step, b, e)
   }
 
