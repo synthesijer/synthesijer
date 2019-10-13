@@ -362,6 +362,13 @@ end component synthesijer_mul32;
       get should be ( new AssignStatement("clk_sig", new Ident("clk")) )
   }
 
+  "clk_sig <= clk; -- with comment" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.assign_statement, "clk_sig <= clk;  -- with comment").
+      get should be ( new AssignStatement("clk_sig", new Ident("clk")) )
+  }
+
   "process, \"process begin end process;\"" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -1451,7 +1458,7 @@ LIBRARY ieee, work, test0123;
 use ieee.std_logic_1164.all;
 entity Test is end;
 architecture RTL of Test is begin end RTL;
-
+-- hoge hoge
 LIBRARY ieee, work, test0123;
 use ieee.std_logic_1164.all;
 entity Test is end;

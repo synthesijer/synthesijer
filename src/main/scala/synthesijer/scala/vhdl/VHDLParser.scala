@@ -57,6 +57,8 @@ case class BitVectorSelect(ident:Ident, step:String, b:Expr, e:Expr) extends Exp
 
 class VHDLParser extends JavaTokenParsers {
 
+  override protected val whiteSpace = """(\s|--.*)+""".r
+
   def digit = "[0-9]+".r
   def upper_case_letter = "[A-Z]+".r
   def lower_case_letter = "[a-z]+".r

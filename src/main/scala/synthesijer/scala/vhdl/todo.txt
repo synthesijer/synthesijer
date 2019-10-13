@@ -9,4 +9,4 @@ replace strings into exprssion(ident or constant) apropreately
 -- replace strings of spicifiying index into expressions
  -- bit_vector_select
  -- vector_kind
-
+-- skip comment
