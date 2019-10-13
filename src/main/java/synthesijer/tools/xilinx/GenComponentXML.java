@@ -424,7 +424,7 @@ public class GenComponentXML {
 
 	public boolean write(File file) {
 
-		// Transformerインスタンスの生成
+		// generate Transformer intance
 		Transformer transformer = null;
 		try {
 			TransformerFactory transformerFactory = TransformerFactory
@@ -435,11 +435,11 @@ public class GenComponentXML {
 			return false;
 		}
 
-		// Transformerの設定
-		transformer.setOutputProperty("indent", "yes"); // 改行指定
-		transformer.setOutputProperty("encoding", "UTF-8"); // エンコーディング
+		// Transformer configuration
+		transformer.setOutputProperty("indent", "yes"); // new line
+		transformer.setOutputProperty("encoding", "UTF-8"); // encoding
 
-		// XMLファイルの作成
+		// generate XML file
 		try {
 			transformer.transform(new DOMSource(document), new StreamResult(
 					file));
@@ -459,7 +459,7 @@ public class GenComponentXML {
 		String[] files = new String[]{"test.vhd", "top.vhd"};
 
 		GenComponentXML o = new GenComponentXML("vendor", "user", "test", 1, 0, ports, files, new HDLSignalBinding[0]);
-		// XMLファイルの作成
+		// generate XML file
 		File file = new File("component.xml");
 		o.write(file);
 
