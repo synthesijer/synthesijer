@@ -1,6 +1,6 @@
 both of long_name and selected_name are required?
 consideration of left-, right-associative operations
-replace strings into exprssion(ident or constant) apropreately
+-- replace strings into exprssion(ident or constant) apropreately
 -- remove simple_expression
 -- modify sensitivity_list into apropreate name
 -- use expressions in sensitivity_list
@@ -10,3 +10,6 @@ replace strings into exprssion(ident or constant) apropreately
  -- bit_vector_select
  -- vector_kind
 -- skip comment
+component generic
+use positioned
+

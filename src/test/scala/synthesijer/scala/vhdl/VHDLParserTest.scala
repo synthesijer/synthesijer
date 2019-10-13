@@ -56,11 +56,6 @@ class VHDLParserTest extends FlatSpec with Matchers {
     obj.parseAll(obj.library_clause, "LIBRARY ieee, work, test0123;").get should be (List(new Library("ieee"), new Library("work"), new Library("test0123")))
   }
 
-
-
-
-
-
   "simple entity decl" should "be parsed" in {
     val obj = new VHDLParser()
     obj.parseAll(obj.entity_decl, "entity Test000 is end;")
@@ -217,7 +212,7 @@ end RTL;
 component null_component
 end component null_component;
 """
-    ).get should be(new ComponentDecl("null_component", None))
+    ).get should be(new ComponentDecl("null_component", None, None))
   }
 
   "component_decl" should " be parsed" in {
@@ -245,9 +240,63 @@ end component synthesijer_mul32;
           new PortItem("nd", "in", new StdLogic()),
           new PortItem("result", "out", new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("32"), new Constant("1")), new Constant("0"))),
           new PortItem("valid", "out", new StdLogic())
-        ))
+        )),
+        None
       )
     )
+  }
+
+  "component_decl with generic" should " be parsed" in {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.component_decl, """
+  component dualportram
+    generic (
+      WIDTH : integer := 32;
+      DEPTH : integer := 10;
+      WORDS : integer := 1024
+    );
+    port (
+      clk : in std_logic;
+      reset : in std_logic;
+      length : out signed(31 downto 0);
+      address : in signed(31 downto 0);
+      din : in signed(WIDTH-1 downto 0);
+      dout : out signed(WIDTH-1 downto 0);
+      we : in std_logic;
+      oe : in std_logic;
+      address_b : in signed(31 downto 0);
+      din_b : in signed(WIDTH-1 downto 0);
+      dout_b : out signed(WIDTH-1 downto 0);
+      we_b : in std_logic;
+      oe_b : in std_logic
+    );
+  end component dualportram;
+"""
+    ).get should be(
+      new ComponentDecl("dualportram",
+        Some(List(
+          new PortItem("clk", "in", new StdLogic()),
+          new PortItem("reset", "in", new StdLogic()),
+          new PortItem("length", "out", new VectorKind("signed", "downto", new Constant("31"), new Constant("0"))),
+          new PortItem("address", "in", new VectorKind("signed", "downto", new Constant("31"), new Constant("0"))),
+          new PortItem("din", "in",
+            new VectorKind("signed", "downto", new BinaryExpr("-", new Ident("WIDTH"), new Constant("1")), new Constant("0"))),
+          new PortItem("dout", "out",
+            new VectorKind("signed", "downto", new BinaryExpr("-", new Ident("WIDTH"), new Constant("1")), new Constant("0"))),
+          new PortItem("we", "in", new StdLogic()),
+          new PortItem("oe", "in", new StdLogic()),
+          new PortItem("address_b", "in", new VectorKind("signed", "downto", new Constant("31"), new Constant("0"))),
+          new PortItem("din_b", "in",
+            new VectorKind("signed", "downto", new BinaryExpr("-", new Ident("WIDTH"), new Constant("1")), new Constant("0"))),
+          new PortItem("dout_b", "out",
+            new VectorKind("signed", "downto", new BinaryExpr("-", new Ident("WIDTH"), new Constant("1")), new Constant("0"))),
+          new PortItem("we_b", "in", new StdLogic()),
+          new PortItem("oe_b", "in", new StdLogic())
+        )),
+        Some(List(
+          new ParamItem("WIDTH", new IntegerKind(), new Constant("32")),
+          new ParamItem("DEPTH", new IntegerKind(), new Constant("10")),
+          new ParamItem("WORDS", new IntegerKind(), new Constant("1024"))))))
   }
 
   "signal decl (std_logic without init)" should " be parsed" in
@@ -255,6 +304,13 @@ end component synthesijer_mul32;
     val obj = new VHDLParser()
     obj.parseAll(obj.signal_decl, """signal clk_sig : std_logic;""").
       get should be ( new Signal("clk_sig", new StdLogic(), None) )
+  }
+
+  "multiple signal decl (such as, \"clk, reset\")" should " be parsed as combined named signal (such as, \"clk,signal\")" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.signal_decl, """signal clk, reset : std_logic;""").
+      get should be ( new Signal("clk,reset", new StdLogic(), None) )
   }
 
   "bit value" should " be parsed" in
@@ -353,6 +409,27 @@ end component synthesijer_mul32;
           new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0")),
           Some(new BasedValue("\"0000000000000001\"", 16)))
       )
+  }
+
+  "wait;" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.statement_in_process, "wait;").
+      get should be ( new WaitStatement("", null ))
+  }
+
+  "wait for 10 ns;" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.statement_in_process, "wait for 10 ns;").
+      get should be ( new WaitStatement("for", new TimeUnit(Constant("10"), "ns") ))
+  }
+
+  "report \"Test_ArithInt: TEST *** FAILURE ***\";" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.statement_in_process, """report "Test_ArithInt: TEST *** FAILURE ***";""").
+      get should be ( new ReportStatement("\"Test_ArithInt: TEST *** FAILURE ***\""))
   }
 
   "clk_sig <= clk;" should " be parsed" in
@@ -748,6 +825,31 @@ end if;
     )
   }
 
+  "signed(class_char_value_0003)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, """
+signed(class_char_value_0003)
+""").get should be (
+      new CallExpr(new Ident("signed"), List(new Ident("class_char_value_0003"))))
+  }
+
+  "tmp_0060 <= '1' when signed(class_char_value_0003) /= X\"0064\" else '0'" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, """
+'1' when signed(class_char_value_0003) /= X"0064" else '0'
+""").get should be (
+      new WhenExpr(
+        new BinaryExpr("/=",
+          new CallExpr(new Ident("signed"), List(new Ident("class_char_value_0003"))),
+          new BasedValue("\"0064\"", 16)),
+        new Constant("'1'"),    // then-expr
+        new Constant("'0'") // else-expr
+      )
+    )
+  }
+
   "if \"if rising_edge(clk) then...end if;\"" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -763,6 +865,7 @@ end if;
       )
     )
   }
+
 
   "if if-then" should " be parsed" in
   {
@@ -963,7 +1066,8 @@ end if;
       new InstanceStatement(
         new Ident("inst_u_synthesijer_fsub64_test"),
         new Ident("synthesijer_fsub64"),
-        List()
+        List(),
+        None
       )
     )
   }
@@ -994,7 +1098,39 @@ end if;
           new PortMapItem(new Ident("nd"),     new Ident("u_synthesijer_fsub64_test_nd")),
           new PortMapItem(new Ident("result"), new Ident("u_synthesijer_fsub64_test_result")),
           new PortMapItem(new Ident("valid"),  new Ident("u_synthesijer_fsub64_test_valid"))
-        )
+        ),
+        None
+      )
+    )
+  }
+
+  "module instantiation with generic map" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.instantiation_statement, """
+  inst_class_a_0002 : dualportram
+  generic map(
+    WIDTH => 32,
+    DEPTH => 7,
+    WORDS => 128
+  )
+  port map(
+    clk => clk,
+    reset => reset
+  );
+""").get should be (
+      new InstanceStatement(
+        new Ident("inst_class_a_0002"),
+        new Ident("dualportram"),
+        List(
+          new PortMapItem(new Ident("clk"),   new Ident("clk")),
+          new PortMapItem(new Ident("reset"), new Ident("reset"))
+        ),
+        Some(List(
+          new PortMapItem(new Ident("WIDTH"), new Constant("32")),
+          new PortMapItem(new Ident("DEPTH"), new Constant("7")),
+          new PortMapItem(new Ident("WORDS"), new Constant("128"))
+        ))
       )
     )
   }
@@ -1087,7 +1223,8 @@ end RTL;
                   new BinaryExpr("-", new Constant("32"), new Constant("1")),
                   new Constant("0"))),
               new PortItem("valid", "out", new StdLogic())
-            ))
+            )),
+            None
           ),
           new Signal("y_we_sig", new StdLogic(), Some(new Constant("'0'"))),
           new Signal("binary_expr_00031",
@@ -1145,7 +1282,8 @@ end RTL;
               new PortMapItem(new Ident("nd"),     new Ident("u_synthesijer_fsub64_test_nd")),
               new PortMapItem(new Ident("result"), new Ident("u_synthesijer_fsub64_test_result")),
               new PortMapItem(new Ident("valid"),  new Ident("u_synthesijer_fsub64_test_valid"))
-            )
+            ),
+            None
           )
         )
       )
@@ -1385,7 +1523,8 @@ end RTL;
                       new BinaryExpr("-", new Constant("32"), new Constant("1")),
                       new Constant("0"))),
                   new PortItem("valid", "out", new StdLogic())
-                ))
+                )),
+                None
               ),
               new Signal("y_we_sig", new StdLogic(), Some(new Constant("'0'"))),
               new Signal("binary_expr_00031",
@@ -1443,7 +1582,8 @@ end RTL;
                   new PortMapItem(new Ident("nd"),     new Ident("u_synthesijer_fsub64_test_nd")),
                   new PortMapItem(new Ident("result"), new Ident("u_synthesijer_fsub64_test_result")),
                   new PortMapItem(new Ident("valid"),  new Ident("u_synthesijer_fsub64_test_valid"))
-                )
+                ),
+                None
               )
             )
           ))
