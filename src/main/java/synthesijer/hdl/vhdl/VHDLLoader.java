@@ -12,8 +12,13 @@ public class VHDLLoader{
 
 		Path path = Paths.get(args[0]);
 		String content = Files.readString(path);
-		
-		System.out.println(obj.parse(content));
+
+		var result = obj.parse(content);
+
+		if(result.isEmpty()){
+			System.out.println(path);
+			System.out.println(result);
+		}
 	}
-	
+
 }
