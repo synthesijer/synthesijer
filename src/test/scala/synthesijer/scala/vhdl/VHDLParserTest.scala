@@ -317,7 +317,7 @@ end component synthesijer_mul32;
     val obj = new VHDLParser()
     obj.parseAll(obj.symbol_list,
       "test_method_IDLE, test_method_S_0000, test_method_S_0001").
-      get should be ( List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001"))
+      get should be ( List(new Ident("test_method_IDLE"), new Ident("test_method_S_0000"), new Ident("test_method_S_0001")))
   }
 
   "type decl" should " be parsed" in
@@ -325,7 +325,7 @@ end component synthesijer_mul32;
     val obj = new VHDLParser()
     obj.parseAll(obj.type_decl,
       "type Type_test_method is (test_method_IDLE, test_method_S_0000, test_method_S_0001);").
-      get should be ( new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")))
+      get should be ( new UserType("Type_test_method", List(new Ident("test_method_IDLE"), new Ident("test_method_S_0000"), new Ident("test_method_S_0001"))))
   }
 
   "signal decl (user defined type without init)" should " be parsed" in
@@ -378,13 +378,13 @@ end component synthesijer_mul32;
   "sensitivity_list \"(clk)\"" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.sensitivity_list, "(clk)").get should be (List("clk"))
+    obj.parseAll(obj.sensitivity_list, "(clk)").get should be (List(new Ident("clk")))
   }
 
   "sensitivity_list \"(clk, reset)\"" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.sensitivity_list, "(clk, reset)").get should be (List("clk", "reset"))
+    obj.parseAll(obj.sensitivity_list, "(clk, reset)").get should be (List(new Ident("clk"), new Ident("reset")))
   }
 
   "process \"process() begin end process;\"" should " be parsed" in
@@ -405,22 +405,33 @@ end component synthesijer_mul32;
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.process_statement, "process(clk) begin end process;").
-      get should be ( new ProcessStatement(Some(List("clk")), None, List()) )
+      get should be ( new ProcessStatement(Some(List(new Ident("clk"))), None, List()) )
   }
 
   "process (with clk and reset)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.process_statement, "process(clk, reset) begin end process;").
-      get should be ( new ProcessStatement(Some(List("clk", "reset")), None, List()) )
+      get should be ( new ProcessStatement(Some(List(new Ident("clk"), new Ident("reset"))), None, List()) )
   }
 
   "process (with multiple)" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.process_statement, "process(a, b, c) begin end process;").
-      get should be ( new ProcessStatement(Some(List("a","b","c")), None, List()) )
+      get should be ( new ProcessStatement(Some(List(new Ident("a"),new Ident("b"),new Ident("c"))), None, List()) )
   }
+
+  "function call rising_edge(clk)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.prime_expression, """
+  rising_edge(clk)
+""").
+      get should be (
+        new CallExpr(new Ident("rising_edge"), List(new Ident("clk"))))
+  }
+  
 
   "process (with clk and body)" should " be parsed" in
   {
@@ -434,10 +445,10 @@ end process;
 """).
       get should be (
         new ProcessStatement(
-          Some(List("clk")),
+          Some(List(new Ident("clk"))),
           None,
           List(new IfStatement(
-            new CallExpr("rising_edge", List("clk")),
+            new CallExpr(new Ident("rising_edge"), List(new Ident("clk"))),
             List(),
             List(),
             None
@@ -481,7 +492,7 @@ end process;
   "expr rising_edge(clk)" should " be parsed" in
   {
     val obj = new VHDLParser()
-    obj.parseAll(obj.expression, "rising_edge(clk)").get should be (new CallExpr("rising_edge", List("clk")))
+    obj.parseAll(obj.expression, "rising_edge(clk)").get should be (new CallExpr(new Ident("rising_edge"), List(new Ident("clk"))))
   }
 
   "compare =" should " be parsed" in
@@ -547,7 +558,7 @@ end process;
         new BitPaddingExpr("downto",
           new BinaryExpr("-", new Constant("32"), new Constant("1")),
           new Constant("30"),
-          new BitSelect(new Ident("test_ia_0004"), new Constant("31"))),
+          new CallExpr(new Ident("test_ia_0004"), List(new Constant("31")))),
         new BitVectorSelect(
           new Ident("test_ia_0004"),
           "downto",
@@ -566,7 +577,7 @@ end process;
           new BitPaddingExpr("downto",
             new BinaryExpr("-", new Constant("32"), new Constant("1")),
             new Constant("30"),
-            new BitSelect(new Ident("test_ia_0004"), new Constant("31"))),
+            new CallExpr(new Ident("test_ia_0004"), List(new Constant("31")))),
           new BitVectorSelect(
             new Ident("test_ia_0004"),
             "downto",
@@ -632,7 +643,7 @@ end process;
     val obj = new VHDLParser()
     obj.parseAll(obj.expression, "(not test_da_0077(64-1))").
       get should be (
-        new UnaryExpr("not", new BitSelect(new Ident("test_da_0077"), new BinaryExpr("-", new Constant("64"), new Constant("1")))))
+        new UnaryExpr("not", new CallExpr(new Ident("test_da_0077"), List(new BinaryExpr("-", new Constant("64"), new Constant("1"))))))
   }
 
   "expr complex concat" should " be parsed" in
@@ -642,7 +653,7 @@ end process;
       get should be (
         new BinaryExpr("&",
           new UnaryExpr("not",
-            new BitSelect(new Ident("test_da_0077"), new BinaryExpr("-", new Constant("64"), new Constant("1")))),
+            new CallExpr(new Ident("test_da_0077"), List(new BinaryExpr("-", new Constant("64"), new Constant("1"))))),
           new BitVectorSelect(
             new Ident("test_da_0077"),
             "downto",
@@ -668,7 +679,7 @@ end process;
     obj.parseAll(obj.prime_expression, """
     test_ia_0004(31)
 """).get should be(
-      new BitSelect(new Ident("test_ia_0004"), new Constant("31")))
+      new CallExpr(new Ident("test_ia_0004"), List(new Constant("31"))))
   }
 
   "complex bit-padding" should " be parsed" in
@@ -680,7 +691,7 @@ end process;
       new BitPaddingExpr("downto",
         new BinaryExpr("-", new Constant("32"), new Constant("1")),
         new Constant("30"),
-        new BitSelect(new Ident("test_ia_0004"), new Constant("31"))))
+        new CallExpr(new Ident("test_ia_0004"), List(new Constant("31")))))
   }
 
   "expr bit-vector-select" should " be parsed" in
@@ -701,7 +712,7 @@ end process;
     val obj = new VHDLParser()
     obj.parseAll(obj.expression, "unary_expr_00017(2)").
       get should be (
-        new BitSelect(new Ident("unary_expr_00017"), new Constant("2"))
+        new CallExpr(new Ident("unary_expr_00017"), List(new Constant("2")))
       )
   }
 
@@ -710,7 +721,7 @@ end process;
     val obj = new VHDLParser()
     obj.parseAll(obj.expression, "unary_expr_00017(32-4)").
       get should be (
-        new BitSelect(new Ident("unary_expr_00017"), new BinaryExpr("-", new Constant("32"), new Constant("4")))
+        new CallExpr(new Ident("unary_expr_00017"), List(new BinaryExpr("-", new Constant("32"), new Constant("4"))))
       )
   }
 
@@ -738,7 +749,7 @@ if rising_edge(clk) then
 end if;
 """).get should be (
       new IfStatement(
-        new CallExpr("rising_edge", List("clk")),
+        new CallExpr(new Ident("rising_edge"), List(new Ident("clk"))),
         List(),
         List(),
         None
@@ -1086,17 +1097,17 @@ end RTL;
               new BinaryExpr("-", new Constant("64"), new Constant("1")),
               new Constant("0")),
             Some(new Constant("(others=>'0')"))),
-          new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")),
+          new UserType("Type_test_method", List(new Ident("test_method_IDLE"), new Ident("test_method_S_0000"), new Ident("test_method_S_0001"))),
           new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
         ),
         List(
           new AssignStatement("clk_sig", new Ident("clk")),
           new ProcessStatement(None, None, List()),
           new ProcessStatement(
-            Some(List("clk")),
+            Some(List(new Ident("clk"))),
             None,
             List(new IfStatement(
-              new CallExpr("rising_edge", List("clk")),
+              new CallExpr(new Ident("rising_edge"), List(new Ident("clk"))),
               List(
                 new IfStatement(
                   new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),
@@ -1384,17 +1395,17 @@ end RTL;
                   new BinaryExpr("-", new Constant("64"), new Constant("1")),
                   new Constant("0")),
                 Some(new Constant("(others=>'0')"))),
-              new UserType("Type_test_method", List("test_method_IDLE", "test_method_S_0000", "test_method_S_0001")),
+              new UserType("Type_test_method", List(new Ident("test_method_IDLE"), new Ident("test_method_S_0000"), new Ident("test_method_S_0001"))),
               new Signal("test_method", new UserTypeKind("Type_test_method"), Some(new Ident("test_method_IDLE")))
             ),
             List(
               new AssignStatement("clk_sig", new Ident("clk")),
               new ProcessStatement(None, None, List()),
               new ProcessStatement(
-                Some(List("clk")),
+                Some(List(new Ident("clk"))),
                 None,
                 List(new IfStatement(
-                  new CallExpr("rising_edge", List("clk")),
+                  new CallExpr(new Ident("rising_edge"), List(new Ident("clk"))),
                   List(
                     new IfStatement(
                       new BinaryExpr("=", new Ident("test_method"), new Ident("test_method_S_0000")),

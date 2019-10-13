@@ -31,10 +31,10 @@ case class Architecture(kind:String, name:String, decls:List[Node], body:List[No
 case class Attribute(name:String, kind:String) extends Node
 case class ComponentDecl(name:String, ports:Option[List[PortItem]]) extends Node
 case class Signal(name:String, kind:Kind, init:Option[Expr]) extends Node
-case class UserType(name:String, items:List[String]) extends Node
+case class UserType(name:String, items:List[Ident]) extends Node
 
 
-case class ProcessStatement(sensitivities:Option[List[String]], label:Option[String], body:List[Node]) extends Node
+case class ProcessStatement(sensitivities:Option[List[Ident]], label:Option[String], body:List[Node]) extends Node
 
 case class InstanceStatement(name:Ident, module:Ident, ports:List[PortMapItem]) extends Node
 case class PortMapItem(name:Expr, expr:Expr) extends Node
@@ -50,11 +50,10 @@ case class Constant(value:String) extends Expr
 case class Ident(name:String) extends Expr
 case class BinaryExpr(op:String, lhs:Expr, rhs:Expr) extends Expr
 case class UnaryExpr(op:String, expr:Expr) extends Expr
-case class CallExpr(name:String, args:List[String]) extends Expr // TODO args should be List of Exprs
+case class CallExpr(name:Ident, args:List[Expr]) extends Expr
 case class WhenExpr(cond:Expr, thenExpr:Expr, elseExpr:Expr) extends Expr
 case class BitPaddingExpr(step:String, b:Expr, e:Expr, value:Expr) extends Expr
 case class BitVectorSelect(ident:Ident, step:String, b:Expr, e:Expr) extends Expr
-case class BitSelect(ident:Ident, idx:Expr) extends Expr
 
 class VHDLParser extends JavaTokenParsers {
 
@@ -114,7 +113,9 @@ class VHDLParser extends JavaTokenParsers {
 
   def function_name = long_name
 
-  def function_call : Parser[Expr] = function_name ~ sensitivity_list ^^ {case x~y => new CallExpr(x, y) }
+  def function_call : Parser[Expr] = function_name ~ function_argument_list ^^ {
+    case x~y => new CallExpr(new Ident(x), y)
+  }
 
   def kind_std_logic = "STD_LOGIC" ^^ {_ => new StdLogic() }
 
@@ -183,7 +184,7 @@ class VHDLParser extends JavaTokenParsers {
     }
 
   def symbol_list = identifier ~ ("," ~ identifier).* ^^ {
-    case x~y => x :: (for (yy <- y) yield { yy._2 })
+    case x~y => new Ident(x) :: (for (yy <- y) yield { new Ident(yy._2) })
   }
 
   def type_decl = "TYPE" ~> identifier ~ "IS" ~ "(" ~ symbol_list ~ ")" <~ ";" ^^ {
@@ -194,8 +195,19 @@ class VHDLParser extends JavaTokenParsers {
     case lhs~_~rhs => new AssignStatement(lhs, rhs)
   }
 
-  def sensitivity_list = "(" ~> symbol_list <~ ")" ^^ { case x => x } |
-                         "(" ~ ")" ^^ { case _ => List() }
+  def sensitivity_list = (
+      "(" ~> symbol_list <~ ")" ^^ { case x => x }
+    | "(" ~ ")" ^^ { case _ => List() }
+  )
+
+  def expression_list = prime_expression ~ ("," ~ prime_expression).* ^^ {
+    case x~y => x :: (for (yy <- y) yield { yy._2 })
+  }
+
+  def function_argument_list = (
+      "(" ~> expression_list <~ ")" ^^ { case x => x }
+    | "(" ~ ")" ^^ { case _ => List() }
+  )
 
   def statement_label = long_name <~ ":" ^^ { case x => x }
 
@@ -240,7 +252,7 @@ class VHDLParser extends JavaTokenParsers {
     | decimalNumber ^^ { case x => new Constant(x) }
   )
 
-  def extended_value_expression : Parser[Expr] = bit_padding_expression | bit_vector_select | bit_select | value_expression
+  def extended_value_expression : Parser[Expr] = bit_padding_expression | bit_vector_select | value_expression
 
   def when_expression : Parser[Expr] = prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
@@ -250,16 +262,12 @@ class VHDLParser extends JavaTokenParsers {
     case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n), step, b, e)
   }
 
-  def bit_select = long_name ~ "(" ~ prime_expression ~ ")" ^^ {
-    case n~_~idx~_ => new BitSelect(new Ident(n), idx)
-  }
-
   def binary_expression = extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
 
   def prime_expression : Parser[Expr] =
-    unary_expression | binary_expression | extended_value_expression
+    function_call | unary_expression | binary_expression | extended_value_expression
 
-  def expression : Parser[Expr] = when_expression | function_call | prime_expression
+  def expression : Parser[Expr] = when_expression | prime_expression
 
   def null_statement = "NULL" ~ ";" ^^ { _ => new NullStatement() }
 
@@ -268,12 +276,12 @@ class VHDLParser extends JavaTokenParsers {
   def else_clause_in_if_statement : Parser[List[Node]] = "ELSE" ~> statement_in_process.* ^^ { case x => x }
 
   def elsif_clause_in_if_statement : Parser[IfStatement] =
-    "ELSIF" ~> expression ~ "THEN" ~ statement_in_process.* ^^ {
+    "ELSIF" ~> prime_expression ~ "THEN" ~ statement_in_process.* ^^ {
       case x~_~y => new IfStatement(x, y, List(), None)
     }
 
   def if_statement =
-    "IF" ~> expression ~ "THEN" ~
+    "IF" ~> prime_expression ~ "THEN" ~
     statement_in_process.* ~
     elsif_clause_in_if_statement.* ~
     else_clause_in_if_statement.? ~
