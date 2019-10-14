@@ -1268,6 +1268,31 @@ end if;
     )
   }
 
+  "generate if" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.architecture_statement, """
+  UNIT_NUM_10 : if(NUM_OF_UNITS=10) generate
+    BUF0 : module
+      port map(
+        clk  => clk,
+        q    => q
+        );
+  end generate;
+""").get should be (
+      new GenerateIf(
+        new Ident("UNIT_NUM_10"),
+        new BinaryExpr("=", new Ident("NUM_OF_UNITS"), new Constant("10")),
+        List(
+          new InstanceStatement(
+            new Ident("BUF0"),
+            new Ident("module"),
+            List(
+              new PortMapItem(new Ident("clk"),    new Ident("clk")),
+              new PortMapItem(new Ident("q"),  new Ident("q"))),
+            None))))
+  }
+
   "module instantiation" should " be parsed" in
   {
     val obj = new VHDLParser()

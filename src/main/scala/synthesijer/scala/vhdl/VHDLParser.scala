@@ -49,6 +49,7 @@ case class ConstantDecl(name:String, kind:Kind, init:Expr) extends Node
 
 case class ProcessStatement(sensitivities:Option[List[Ident]], label:Option[String], body:List[Node], variables:List[Node] = List()) extends Node
 case class GenerateFor(label:Ident, index:Ident, step:String, b:Expr, e:Expr, body:List[Node]) extends Node
+case class GenerateIf(label:Ident, expr:Expr, body:List[Node]) extends Node
 
 case class InstanceStatement(name:Ident, module:Ident, ports:List[PortMapItem], params:Option[List[PortMapItem]]) extends Node
 case class PortMapItem(name:Expr, expr:Expr) extends Node
@@ -340,12 +341,18 @@ class VHDLParser extends JavaTokenParsers {
       case name~_~sensitivities~variables~_~stmts~_~_~name2 => new ProcessStatement(sensitivities, name, stmts, variables)
     }
 
-  def generate_statement = generate_for_statement | generate_for_loop
+  def generate_statement = generate_for_statement | generate_for_loop | generate_if_statement
 
   def generate_for_statement =
     identifier ~ ":" ~ "FOR" ~ identifier ~ "IN" ~ prime_expression ~ step_dir ~ prime_expression ~ "GENERATE" ~
     "BEGIN" ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
       case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name), new Ident(i), s, b, e, lst)
+    }
+
+  def generate_if_statement =
+    identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
+    "BEGIN".? ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
+      case name~_~_~expr~_~_~lst~_~_~name2 => new GenerateIf(new Ident(name), expr, lst)
     }
 
   def unary_expression = ("-"|"NOT") ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
