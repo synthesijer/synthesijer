@@ -1821,4 +1821,77 @@ architecture RTL of Test is begin end RTL;
     )
   }
 
+
+  "for loop" should "be parsed" in {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.architecture_statement, """
+    for i in slv'range loop
+      res_v := res_v and slv(i);
+    end loop;
+""").get should be (
+      new ForLoop(
+        None,
+        new Ident("i"),
+        new SymbolRange(new Ident("slv'range")),
+        List(
+          new BlockingAssignStatement(
+            new Ident("res_v"),
+            new BinaryExpr("and", new Ident("res_v"), new CallExpr(new Ident("slv"), List(new Ident("i"))))
+          ))))
+  }
+
+  "for loop with 'for i in 0 to (NUM_OF_PRIMS-1) loop'" should "be parsed" in {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.architecture_statement, """
+    for i in 0 to (NUM_OF_PRIMS-1) loop
+      if tmp(i) = '1' then
+        result := '1';
+      end if;
+    end loop;
+""").get should be (
+      new ForLoop(
+        None,
+        new Ident("i"),
+        new RegionRange("to", new Constant("0"), new BinaryExpr("-", new Ident("NUM_OF_PRIMS"), new Constant("1"))),
+        List(
+          new IfStatement(
+            new BinaryExpr("=", new CallExpr(new Ident("tmp"), List(new Ident("i"))), new Constant("'1'")),
+            List(new BlockingAssignStatement(new Ident("result"), new Constant("'1'"))),
+            List(),
+            None
+          ))))
+  }
+
+  "function " should "be parsed" in {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.declarations, """
+  function and_reduct(slv : in std_logic_vector) return std_logic is
+    variable res_v : std_logic := '1';  -- Null slv vector will also return '1'
+  begin
+    for i in slv'range loop
+      res_v := res_v and slv(i);
+    end loop;
+    return res_v;
+  end function;
+""").get should be (
+      new FunctionDecl(
+        "and_reduct", // name
+        List(new PortItem("slv", "in", new VectorKind("std_logic_vector", "", new NoExpr(), new NoExpr()))), // arguments
+        new StdLogic(), // return
+        List(new Variable("res_v", new StdLogic(), Some(new Constant("'1'")))), // var decl
+        List(
+          new ForLoop(
+            None,
+            new Ident("i"),
+            new SymbolRange(new Ident("slv'range")),
+            List(
+              new BlockingAssignStatement(
+                new Ident("res_v"),
+                new BinaryExpr("and", new Ident("res_v"), new CallExpr(new Ident("slv"), List(new Ident("i"))))
+              ))),
+          new ReturnStatement(new Ident("res_v"))
+        )))
+  }
+
+
 }

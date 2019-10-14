@@ -14,6 +14,7 @@ trait Node {
 }
 trait Kind extends Node
 trait Expr extends Node
+trait Range extends Node
 
 case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Architecture]) extends Node
 case class PackageUnit(context:List[List[Node]], pkg:PackageDecl) extends Node
@@ -73,6 +74,13 @@ case class CallExpr(name:Ident, args:List[Expr]) extends Expr
 case class WhenExpr(cond:Expr, thenExpr:Expr, elseExpr:Expr) extends Expr
 case class BitPaddingExpr(step:String, b:Expr, e:Expr, value:Expr) extends Expr
 case class BitVectorSelect(ident:Ident, step:String, b:Expr, e:Expr) extends Expr
+case class NoExpr() extends Expr
+
+case class ForLoop(name:Option[String], idx:Ident, range:Range, body:List[Node]) extends Expr
+case class SymbolRange(value:Expr) extends Range
+case class RegionRange(step:String, b:Expr, e:Expr) extends Range
+case class FunctionDecl(name:String, args:List[PortItem], retKind:Kind, vars:List[Node], body:List[Node]) extends Node
+case class ReturnStatement(vale:Expr) extends Node
 
 class VHDLParser extends JavaTokenParsers {
 
@@ -175,7 +183,7 @@ class VHDLParser extends JavaTokenParsers {
         case name~_~b~step~e => new VectorKind(name, step, b, e)
       }
     | vector_type ^^ {
-      case name => new VectorKind(name, "", null, null)
+      case name => new VectorKind(name, "", new NoExpr(), new NoExpr())
       }
   )
 
@@ -197,16 +205,18 @@ class VHDLParser extends JavaTokenParsers {
     case name~_~kind~value => new ParamItem(name, kind, value)
   } )
 
-  def port_item_list = ( "PORT" ~ "(" ~> port_item ~ ( ";" ~ port_item ).* <~ ")" ~ ";" ^^ {
+  def port_item_list_body = "(" ~> port_item ~ ( ";" ~ port_item ).* <~ ")" ^^ {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
-  } )
+  }
+
+  def port_item_list = ( "PORT" ~> port_item_list_body <~ ";" )
 
   def param_item_list = ( "GENERIC" ~ "(" ~> param_item ~ ( ";" ~ param_item ).* <~ ")" ~ ";" ^^ {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
   } )
 
   def declarations : Parser[Node] = (
-    attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl
+    attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl | function_decl
   )
 
   def architecture_statement : Parser[Node] =
@@ -330,7 +340,7 @@ class VHDLParser extends JavaTokenParsers {
       case name~_~sensitivities~variables~_~stmts~_~_~name2 => new ProcessStatement(sensitivities, name, stmts, variables)
     }
 
-  def generate_statement = generate_for_statement
+  def generate_statement = generate_for_statement | generate_for_loop
 
   def generate_for_statement =
     identifier ~ ":" ~ "FOR" ~ identifier ~ "IN" ~ prime_expression ~ step_dir ~ prime_expression ~ "GENERATE" ~
@@ -347,7 +357,7 @@ class VHDLParser extends JavaTokenParsers {
 
   def logic_operation = "AND" | "OR" | "XOR"
 
-  def mul_div_operation = "*" | "/"
+  def mul_div_operation = "*" | "/" | "MOD"
 
   def add_sub_operation = "+" | "-"
 
@@ -414,6 +424,7 @@ class VHDLParser extends JavaTokenParsers {
       | case_statement
       | wait_statement
       | report_statement
+      | generate_for_loop
   )
 
   def else_clause_in_if_statement : Parser[List[Node]] = "ELSE" ~> statement_in_process.* ^^ { case x => x }
@@ -460,6 +471,28 @@ class VHDLParser extends JavaTokenParsers {
   def set_attribute_decl =
     "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name ~ ":" ~ "SIGNAL" ~ "IS" ~ value_expression <~ ";" ^^ {
       case x~_~y~_~_~_~z => new SetAttribute(x, y, z)
+    }
+
+  def range = (
+      prime_expression ~ step_dir ~ prime_expression ^^ { case x~y~z => new RegionRange(y, x, z) }
+    | prime_expression ^^ { x => new SymbolRange(x) }
+  )
+
+  def generate_for_loop = (
+    "FOR" ~> identifier ~ "IN" ~ range ~ "LOOP" ~ statement_in_process.* <~ "END" ~ "LOOP" ~ ";" ^^ {
+      case x~_~y~_~z => new ForLoop(None, new Ident(x), y, z)
+    }
+  )
+
+  def return_statement = "RETURN" ~> prime_expression <~ ";" ^^ { case x => new ReturnStatement(x) }
+
+  def function_body_statement = statement_in_process | generate_statement | return_statement
+
+  def function_decl = 
+    "FUNCTION" ~ long_name ~ port_item_list_body ~ "RETURN" ~ kind ~ "IS" ~ variable_decl.* ~
+    "BEGIN" ~ function_body_statement.* ~ "END" ~ "FUNCTION" ~ ";" ^^{
+      case _~x~y~_~k~_~v~_~s~_~_~_ =>
+        new FunctionDecl(x, y, k, v, s)
     }
 
   implicit override def literal(s: String): Parser[String] = new Parser[String] {
