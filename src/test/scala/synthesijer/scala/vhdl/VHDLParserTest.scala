@@ -124,6 +124,8 @@ class VHDLParserTest extends FlatSpec with Matchers {
       .get should be (new PortItem("q", "out", new VectorKind("std_logic_vector", "downto", new Constant("3"), new Constant("0"))))
     obj.parseAll(obj.port_item, "gamma_signal : in std_logic_vector(31 downto 0) := (others => '0')")
       .get should be (new PortItem("gamma_signal", "in", new VectorKind("std_logic_vector", "downto", new Constant("31"), new Constant("0")), Some(new Others(new Constant("'0'")))))
+    obj.parseAll(obj.port_item, "clk : std_logic")
+      .get should be (new PortItem("clk", None, new StdLogic(), None))
   }
 
   "port item list" should "be parsed" in {
@@ -513,6 +515,18 @@ end component synthesijer_mul32;
           new VectorKind("signed", "downto", new BinaryExpr("-", new Constant("64"), new Constant("1")), new Constant("0")),
           Some(new BasedValue("\"0000000000000001\"", 16)))
       )
+  }
+
+  "shared variale decl" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.declarations, """
+    shared variable mem : MEM_TYPE := (others => (others => '0'));
+""").
+      get should be (
+        new SharedVariable("mem",
+          new UserTypeKind("MEM_TYPE"),
+          Some(new Others(new Others(new Constant("'0'"))))))
   }
 
   "constant LOOP_NUM_MAX : integer := 1024;" should " be parsed" in
@@ -1916,6 +1930,37 @@ architecture RTL of Test is begin end RTL;
               ))),
           new ReturnStatement(new Ident("res_v"))
         )))
+  }
+
+
+  "block structure" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.block_decl, """
+    -- generate bus status controller
+    bus_status_ctrl: block
+      signal cSCL, cSDA    : std_logic_vector( 1 downto 0); -- capture SDA and SCL
+    begin
+    end block bus_status_ctrl;
+""").get should be (
+      new Block(
+        Some("bus_status_ctrl"),
+        List(
+          new Signal("cSCL,cSDA", new VectorKind("std_logic_vector", "downto", new Constant("1"), new Constant("0")))
+        ),
+        List()))
+  }
+
+  "port declation (with multiple)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.port_item, """
+		start,
+		stop,
+		read,
+		write,
+                ack_in : std_logic
+""").get should be ( new PortItem("start,stop,read,write,ack_in", None, new StdLogic(), None) )
   }
 
 

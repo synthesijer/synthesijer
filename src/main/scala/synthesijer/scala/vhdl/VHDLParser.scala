@@ -44,9 +44,11 @@ case class UserType(name:String, items:List[Ident]) extends Node
 case class ArrayType(name:String, step:String, b:Expr, e:Expr, kind:Kind) extends Node
 case class SetAttribute(key:String, target:String, value:Expr) extends Node
 case class Variable(name:String, kind:Kind, init:Option[Expr] = None) extends Node
+case class SharedVariable(name:String, kind:Kind, init:Option[Expr] = None) extends Node
 case class FileDecl(name:String, kind:String, io:String, src:String) extends Node
 case class ConstantDecl(name:String, kind:Kind, init:Expr) extends Node
 
+case class Block(label:Option[String], decls:List[Node], body:List[Node]) extends Node
 case class ProcessStatement(sensitivities:Option[List[Ident]], label:Option[String], body:List[Node], variables:List[Node] = List()) extends Node
 case class GenerateFor(label:Ident, index:Ident, step:String, b:Expr, e:Expr, body:List[Node]) extends Node
 case class GenerateIf(label:Ident, expr:Expr, body:List[Node]) extends Node
@@ -193,11 +195,11 @@ class VHDLParser extends JavaTokenParsers {
   def kind = ( kind_std_logic_vector | kind_std_logic | kind_integer | user_defined_type_kind )
 
   def port_item = (
-    long_name ~ ":" ~ identifier.? ~ kind ~ init_value.? ^^ {
+    long_name_list ~ ":" ~ identifier.? ~ kind ~ init_value.? ^^ {
       case name~_~dir~kind~init => new PortItem(name, dir, kind, init)
     }
   |
-    long_name ~ ":" ~ kind ~ init_value.? ^^ {
+    long_name_list ~ ":" ~ kind ~ init_value.? ^^ {
       case name~_~kind~init => new PortItem(name, None, kind, init)
     }
   )
@@ -217,11 +219,11 @@ class VHDLParser extends JavaTokenParsers {
   } )
 
   def declarations : Parser[Node] = (
-    attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl | function_decl
+    attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl | function_decl | shared_variable_decl
   )
 
   def architecture_statement : Parser[Node] =
-    process_statement | instantiation_statement | assign_statement | generate_statement
+    process_statement | instantiation_statement | assign_statement | generate_statement | block_decl
 
   def architecture_decl = (
     "ARCHITECTURE" ~> identifier ~ "OF" ~ long_name ~ "IS" ~
@@ -232,6 +234,12 @@ class VHDLParser extends JavaTokenParsers {
       case kind~_~name~_~decls~_~body => {
         new Architecture(kind, name, decls, body)
       }
+    }
+  )
+
+  def block_decl = (
+    statement_label.? ~ "BLOCK" ~ declarations.* ~ "BEGIN" ~ architecture_statement.* ~ "END" ~ "BLOCK" ~ long_name.? <~ ";" ^^ {
+      case label~_~decls~_~body~_~_~name2 => new Block(label, decls, body)
     }
   )
 
@@ -254,6 +262,12 @@ class VHDLParser extends JavaTokenParsers {
   def signal_decl = (
     "SIGNAL" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Signal(name, kind, init)
+    }
+  )
+
+  def shared_variable_decl = (
+    "SHARED" ~ "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
+      case name~_~kind~init => new SharedVariable(name, kind, init)
     }
   )
 
@@ -476,7 +490,7 @@ class VHDLParser extends JavaTokenParsers {
     }
 
   def set_attribute_decl =
-    "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name ~ ":" ~ "SIGNAL" ~ "IS" ~ value_expression <~ ";" ^^ {
+    "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name ~ ":" ~ ("SIGNAL"|"VARIABLE") ~ "IS" ~ value_expression <~ ";" ^^ {
       case x~_~y~_~_~_~z => new SetAttribute(x, y, z)
     }
 
