@@ -1372,6 +1372,55 @@ end if;
     )
   }
 
+  "simple port map list" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.simple_portmap_list, """
+	(clk, nReset, clk_cnt, core_cmd, core_ack, core_busy, core_txd, core_rxd, SCL, SDA)
+""").get should be (
+      List(
+        new PortMapItem(new NoExpr(), new Ident("clk")),
+        new PortMapItem(new NoExpr(), new Ident("nReset")),
+        new PortMapItem(new NoExpr(), new Ident("clk_cnt")),
+        new PortMapItem(new NoExpr(), new Ident("core_cmd")),
+        new PortMapItem(new NoExpr(), new Ident("core_ack")),
+        new PortMapItem(new NoExpr(), new Ident("core_busy")),
+        new PortMapItem(new NoExpr(), new Ident("core_txd")),
+        new PortMapItem(new NoExpr(), new Ident("core_rxd")),
+        new PortMapItem(new NoExpr(), new Ident("SCL")),
+        new PortMapItem(new NoExpr(), new Ident("SDA"))
+      ),
+    )
+  }
+
+
+  "instantiatin with simple port map" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.architecture_statement, """
+	u1: i2c_core port map (clk, nReset, clk_cnt, core_cmd, core_ack, core_busy, core_txd, core_rxd, SCL, SDA);
+""").get should be (
+      new InstanceStatement(
+        new Ident("u1"),
+        new Ident("i2c_core"),
+        List(
+          new PortMapItem(new NoExpr(), new Ident("clk")),
+          new PortMapItem(new NoExpr(), new Ident("nReset")),
+          new PortMapItem(new NoExpr(), new Ident("clk_cnt")),
+          new PortMapItem(new NoExpr(), new Ident("core_cmd")),
+          new PortMapItem(new NoExpr(), new Ident("core_ack")),
+          new PortMapItem(new NoExpr(), new Ident("core_busy")),
+          new PortMapItem(new NoExpr(), new Ident("core_txd")),
+          new PortMapItem(new NoExpr(), new Ident("core_rxd")),
+          new PortMapItem(new NoExpr(), new Ident("SCL")),
+          new PortMapItem(new NoExpr(), new Ident("SDA"))
+        ),
+        None
+      )
+    )
+  }
+
+
   "architecture" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -1833,6 +1882,12 @@ end RTL;
     obj.parse("""
 LIBRARY ieee, work, test0123;
 use ieee.std_logic_1164.all;
+  package my_command is
+  end package my_command;
+
+
+LIBRARY ieee, work, test0123;
+use ieee.std_logic_1164.all;
 entity Test is end;
 architecture RTL of Test is begin end RTL;
 -- hoge hoge
@@ -1842,6 +1897,12 @@ entity Test is end;
 architecture RTL of Test is begin end RTL;
 """).get should be (
       List(
+        new PackageUnit(
+          List(
+            List(new Library("ieee"), new Library("work"), new Library("test0123")),
+            List(new Use("ieee.std_logic_1164.all"))),
+          new PackageDecl("my_command", List())
+        ),
         new DesignUnit(
           List(
             List(new Library("ieee"), new Library("work"), new Library("test0123")),

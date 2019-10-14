@@ -474,15 +474,20 @@ class VHDLParser extends JavaTokenParsers {
     }
 
   def portmap_list_item  =
-    extended_value_expression ~ "=>" ~ expression ~ ("," ~ extended_value_expression ~ "=>" ~ expression).* ^^ {
+    extended_value_expression ~ "=>" ~ prime_expression ~ ("," ~ extended_value_expression ~ "=>" ~ prime_expression).* ^^ {
       case x~_~y~z =>
         new PortMapItem(x, y) :: ( for(zz <- z) yield { new PortMapItem(zz._1._1._2, zz._2) } )
     }
 
   def portmap_list = "(" ~> portmap_list_item <~ ")" ^^ { case x => x } |
+                     simple_portmap_list ^^ {case x => x } |
                      "(" ~ ")" ^^ { case _ => List() }
 
   def genericmap = "GENERIC" ~ "MAP" ~> portmap_list ^^ { case x => x }
+
+  def simple_portmap_list = "(" ~> prime_expression ~ ("," ~> prime_expression).* <~ ")" ^^ {
+    case x~y => new PortMapItem(new NoExpr(), x) :: ( for(yy <- y) yield { new PortMapItem(new NoExpr(), yy) } )
+  }
 
   def instantiation_statement =
     long_name ~ ":" ~ long_name ~ genericmap.? ~ "PORT" ~ "MAP" ~ portmap_list <~ ";" ^^ {
