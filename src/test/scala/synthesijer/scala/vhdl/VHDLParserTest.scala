@@ -214,6 +214,7 @@ entity Test000 is
   generic(
     LOOP_NUM_MAX     : integer          := 1024;
     CALC_NUM_MAX     : integer          := 1024;
+    TARGETFPGA : string := "SPARTAN6";
     FRAME_TYPE_VALUE : std_logic_vector(15 downto 0) := X"0003"
     );
   port (
@@ -232,6 +233,7 @@ end Test000;
           Some(List(
             new ParamItem("LOOP_NUM_MAX", new IntegerKind(), new Constant("1024")),
             new ParamItem("CALC_NUM_MAX", new IntegerKind(), new Constant("1024")),
+            new ParamItem("TARGETFPGA", new UserTypeKind("string"), new Constant("\"SPARTAN6\"")),
             new ParamItem("FRAME_TYPE_VALUE",
               new VectorKind("std_logic_vector", "downto", new Constant("15"), new Constant("0")),
               new BasedValue("\"0003\"", 16))))
@@ -904,6 +906,15 @@ end process;
       )
   }
 
+  "expr bin-value" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "B\"00000000\"").
+      get should be (
+        new BasedValue("\"00000000\"", 2)
+      )
+  }
+
   "expr concast" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -1307,6 +1318,30 @@ end if;
             None))))
   }
 
+  "generate if (without end generate) " should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.architecture_statement, """
+  UNIT_NUM_10 : if(NUM_OF_UNITS=10) generate
+    BUF0 : module
+      port map(
+        clk  => clk,
+        q    => q
+        );
+""").get should be (
+      new GenerateIf(
+        new Ident("UNIT_NUM_10"),
+        new BinaryExpr("=", new Ident("NUM_OF_UNITS"), new Constant("10")),
+        List(
+          new InstanceStatement(
+            new Ident("BUF0"),
+            new Ident("module"),
+            List(
+              new PortMapItem(new Ident("clk"),    new Ident("clk")),
+              new PortMapItem(new Ident("q"),  new Ident("q"))),
+            None))))
+  }
+
   "module instantiation" should " be parsed" in
   {
     val obj = new VHDLParser()
@@ -1315,7 +1350,7 @@ end if;
   port map(
     clk => clk,
     reset => reset,
-    a => u_synthesijer_fsub64_test_a,
+    a => u_synthesijer_fsub64_test_a.value,
     b(0) => u_synthesijer_fsub64_test_b(0),
     nd => u_synthesijer_fsub64_test_nd,
     result => u_synthesijer_fsub64_test_result,
@@ -1328,7 +1363,7 @@ end if;
         List(
           new PortMapItem(new Ident("clk"),    new Ident("clk")),
           new PortMapItem(new Ident("reset"),  new Ident("reset")),
-          new PortMapItem(new Ident("a"),      new Ident("u_synthesijer_fsub64_test_a")),
+          new PortMapItem(new Ident("a"),      new Ident("u_synthesijer_fsub64_test_a.value")),
           new PortMapItem(
             new CallExpr(new Ident("b"), List(new Constant("0"))),
             new CallExpr(new Ident("u_synthesijer_fsub64_test_b"), List(new Constant("0")))),

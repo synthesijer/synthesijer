@@ -24,6 +24,7 @@ case class StdLogic() extends Kind
 case class VectorKind(name:String, step:String, b:Expr, e:Expr) extends Kind
 case class UserTypeKind(name:String) extends Kind
 case class IntegerKind() extends Kind
+case class StringKind() extends Kind
 
 case class Library(s : String) extends Node
 case class Use(s : String) extends Node
@@ -363,11 +364,17 @@ class VHDLParser extends JavaTokenParsers {
       case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name), new Ident(i), s, b, e, lst)
     }
 
-  def generate_if_statement =
+  def generate_if_statement = (
     identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
     "BEGIN".? ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
       case name~_~_~expr~_~_~lst~_~_~name2 => new GenerateIf(new Ident(name), expr, lst)
     }
+  |
+    identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
+    "BEGIN".? ~ architecture_statement ^^ {
+      case name~_~_~expr~_~_~stmt => new GenerateIf(new Ident(name), expr, List(stmt))
+    }
+  )
 
   def unary_expression = ("-"|"NOT") ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
 
@@ -385,6 +392,7 @@ class VHDLParser extends JavaTokenParsers {
   def concat_operation = "&"
 
   def hex_value = ("X"|"x") ~> stringLiteral ^^ { case x => new BasedValue(x, 16) }
+  def bin_value = ("B"|"b") ~> stringLiteral ^^ { case x => new BasedValue(x, 2) }
 
   def bit_padding_expression = (
     "(" ~ prime_expression ~ step_dir ~ prime_expression ~ "=>" ~ prime_expression ~ ")" ^^ {
@@ -399,9 +407,11 @@ class VHDLParser extends JavaTokenParsers {
   def value_expression : Parser[Expr] = (
     "(" ~> expression <~ ")" ^^ {case x => x }
     | hex_value   ^^ { case x => x }
+    | bin_value   ^^ { case x => x }
     | bit_value   ^^ { case x => new Constant(x) }
     | others_expr ^^ { case x => x }
     | identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"$x'$y") }
+    | long_name   ^^ { case x => new Ident(x) }
     | identifier  ^^ { case x => new Ident(x) }
     | decimalNumber ^^ { case x => new Constant(x) }
     | stringLiteral ^^ { case x => new Constant(x) }

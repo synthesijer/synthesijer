@@ -13,7 +13,8 @@ public class VHDLLoader{
 		GetOpt opt = new GetOpt("",	"check,error-only", args);
 		
 		Path path = Paths.get(opt.getArgs()[0]);
-		String content = Files.readString(path);
+		byte[] bcontent = Files.readAllBytes(path);
+		String content = new String(bcontent);
 
 		VHDLParser obj = new VHDLParser();
 		var result = obj.parse(content);
