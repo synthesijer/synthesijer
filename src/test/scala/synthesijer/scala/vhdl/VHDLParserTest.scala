@@ -6,24 +6,24 @@ class VHDLParserTest extends FlatSpec with Matchers {
 
   "identifiers" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.identifier, "ident").get should be ("ident")
-    obj.parseAll(obj.identifier, "iDENT").get should be ("iDENT")
-    obj.parseAll(obj.identifier, "ident0123").get should be ("ident0123")
-    obj.parseAll(obj.identifier, "ident ").get should be ("ident")
+    obj.parseAll(obj.identifier, "ident").get should be (new LiteralNode("ident"))
+    obj.parseAll(obj.identifier, "iDENT").get should be (new LiteralNode("iDENT"))
+    obj.parseAll(obj.identifier, "ident0123").get should be (new LiteralNode("ident0123"))
+    obj.parseAll(obj.identifier, "ident ").get should be (new LiteralNode("ident"))
   }
 
   "long names" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.long_name, "a").get should be ("a")
-    obj.parseAll(obj.long_name, "Test000").get should be ("Test000")
-    obj.parseAll(obj.long_name, "a.bb.cCcc").get should be ("a.bb.cCcc")
-    obj.parseAll(obj.long_name, "ieee.std_logic_1164").get should be ("ieee.std_logic_1164")
+    obj.parseAll(obj.long_name, "a").get should be (new LiteralNode("a"))
+    obj.parseAll(obj.long_name, "Test000").get should be (new LiteralNode("Test000"))
+    obj.parseAll(obj.long_name, "a.bb.cCcc").get should be (new LiteralNode("a.bb.cCcc"))
+    obj.parseAll(obj.long_name, "ieee.std_logic_1164").get should be (new LiteralNode("ieee.std_logic_1164"))
   }
 
   "selected names" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.selected_name, "a.bb.cCcc.all").get should be ("a.bb.cCcc.all")
-    obj.parseAll(obj.selected_name, "ieee.std_logic_1164.all").get should be ("ieee.std_logic_1164.all")
+    obj.parseAll(obj.selected_name, "a.bb.cCcc.all").get should be (new LiteralNode("a.bb.cCcc.all"))
+    obj.parseAll(obj.selected_name, "ieee.std_logic_1164.all").get should be (new LiteralNode("ieee.std_logic_1164.all"))
   }
 
   "use-statement" should "be parsed" in {
@@ -2058,6 +2058,20 @@ architecture RTL of Test is begin end RTL;
                 ack_in : std_logic
 """).get should be ( new PortItem("start,stop,read,write,ack_in", None, new StdLogic(), None) )
   }
-
-
+/*
+  "expr multiple bit-select" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "RecvBuffer(0)(7 downto 0)").
+      get should be (
+        new BitVectorSelect(new CallExpr(new Ident("RecvBuffer"), List(new Constant("0"))), "downto", new Constant("7"), new Constant("0")))
+  }
+  "expr multiple bit-select 2" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "RecvBuffer(0)(0)").
+      get should be (
+        new BitVectorSelect(new CallExpr(new Ident("RecvBuffer"), List(new Constant("0"))), "downto", new Constant("0"), new Constant("0")))
+  }
+ */
 }

@@ -1,13 +1,14 @@
 package synthesijer.scala.vhdl
 
 import scala.util.parsing.combinator._
+import scala.util.parsing.input._
 import scala.language.postfixOps
 
 trait NodeVisitor {
   def visit(e:Node) : Unit
 }
 
-trait Node {
+trait Node extends Positional{
   def accept(visitor : NodeVisitor) : Unit = {
     visitor.visit(this)
   }
@@ -15,6 +16,8 @@ trait Node {
 trait Kind extends Node
 trait Expr extends Node
 trait Range extends Node
+
+case class LiteralNode(str:String) extends Node
 
 case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Architecture]) extends Node
 case class PackageUnit(context:List[List[Node]], pkg:PackageDecl) extends Node
@@ -74,10 +77,10 @@ case class Others(value:Expr) extends Expr
 case class Ident(name:String) extends Expr
 case class BinaryExpr(op:String, lhs:Expr, rhs:Expr) extends Expr
 case class UnaryExpr(op:String, expr:Expr) extends Expr
-case class CallExpr(name:Ident, args:List[Expr]) extends Expr
+case class CallExpr(name:Expr, args:List[Expr]) extends Expr
 case class WhenExpr(cond:Expr, thenExpr:Expr, elseExpr:Expr) extends Expr
 case class BitPaddingExpr(step:String, b:Expr, e:Expr, value:Expr) extends Expr
-case class BitVectorSelect(ident:Ident, step:String, b:Expr, e:Expr) extends Expr
+case class BitVectorSelect(ident:Expr, step:String, b:Expr, e:Expr) extends Expr
 case class NoExpr() extends Expr
 
 case class ForLoop(name:Option[String], idx:Ident, range:Range, body:List[Node]) extends Expr
@@ -86,7 +89,7 @@ case class RegionRange(step:String, b:Expr, e:Expr) extends Range
 case class FunctionDecl(name:String, args:List[PortItem], retKind:Kind, vars:List[Node], body:List[Node]) extends Node
 case class ReturnStatement(vale:Expr) extends Node
 
-class VHDLParser extends JavaTokenParsers {
+class VHDLParser extends JavaTokenParsers{
 
   override protected val whiteSpace = """(\s|--.*)+""".r
 
@@ -99,40 +102,44 @@ class VHDLParser extends JavaTokenParsers {
 
   def letter_or_digit = ( letter | digit )
 
-  def identifier = ( ident ) // defined in JavaTokenParsers
+  def identifier = positioned( ident ^^ { case x => new LiteralNode(x) } ) // defined in JavaTokenParsers
 
-  def logical_name = ( identifier )
+  def logical_name : Parser[LiteralNode] = positioned ( identifier )
 
-  def suffix = ( identifier | "ALL" )
+  def suffix = positioned ( "ALL" ^^ {_ => new LiteralNode("all") } | identifier )
 
-  def selected_name = ( identifier ~ "." ~ (identifier ~ ".").* ~ suffix ^^ {
+  def selected_name = positioned ( identifier ~ "." ~ (identifier ~ ".").* ~ suffix ^^ {
     case x~"."~y~z =>
-      x + "." + (for(yy <- y) yield { yy._1 + "."}).mkString("") + z
+      new LiteralNode(x.str + "." + (for(yy <- y) yield { yy._1.str + "."}).mkString("") + z.str)
   } )
 
-  def logical_name_list = ( logical_name ~ ("," ~ logical_name).* ^^ {
-    case x~y => x :: ( for(yy <- y) yield { yy._2 } )
-  } )
+  def logical_name_list = (
+    logical_name ~ ("," ~ logical_name).* ^^ {
+      case x~y => x.str :: ( for(yy <- y) yield { yy._2.str } )
+    }
+  )
 
   def library_clause = ( "LIBRARY" ~> logical_name_list <~ ";" ^^ {
     case x => for(xx <- x) yield { new Library(xx) }
   } )
 
-  def use_clause = ( "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
-    case x~y => {
-      new Use(x) :: ( for(yy <- y) yield { new Use(yy._2) } )
+  def use_clause = (
+    "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
+      case x~y => {
+        new Use(x.str) :: ( for(yy <- y) yield { new Use(yy._2.str) } )
+      }
     }
-  } )
+  )
 
-  def long_name = ( identifier ~ ("." ~ identifier).* ^^ {
-    case x~y => x + (for(yy <- y) yield { "." + yy._2 }).mkString("")
+  def long_name = positioned ( identifier ~ ("." ~ identifier).* ^^ {
+    case x~y => new LiteralNode(x.str + (for(yy <- y) yield { "." + yy._2.str }).mkString(""))
   } )
 
   def design_file = ( design_unit ~ design_unit.* ^^ {
     case x~y => x :: y
   } )
 
-  def design_unit = (
+  def design_unit = positioned(
      context_clause ~ library_unit ^^ { case x~y => new DesignUnit(x, y.entity, y.arch) }
    | context_clause ~ package_decl ^^ { case x~y => new PackageUnit(x, y) }
 
@@ -146,15 +153,17 @@ class VHDLParser extends JavaTokenParsers {
     case x~y => new LibraryUnit(x, y)
   } )
 
-  def package_decl = "PACKAGE" ~> long_name ~ "IS" ~ declarations.* ~ "END" ~ "PACKAGE" ~ long_name.? <~ ";" ^^ {
-    case name~_~decls~_~_~name2 => new PackageDecl(name, decls)
-  }
+  def package_decl = positioned(
+    "PACKAGE" ~> long_name ~ "IS" ~ declarations.* ~ "END" ~ "PACKAGE" ~ long_name.? <~ ";" ^^ {
+      case name~_~decls~_~_~name2 => new PackageDecl(name.str, decls)
+    }
+  )
 
 
   def function_name = ( long_name )
 
   def function_call : Parser[CallExpr] = ( function_name ~ function_argument_list ^^ {
-    case x~y => new CallExpr(new Ident(x), y)
+    case x~y => new CallExpr(new Ident(x.str), y)
   } )
 
   def kind_std_logic = ( "STD_LOGIC" ^^ {_ => new StdLogic() } )
@@ -163,7 +172,7 @@ class VHDLParser extends JavaTokenParsers {
   def entity_decl = (
     "ENTITY" ~> long_name ~ "IS" ~ param_item_list.? ~ port_item_list.? <~ "END" ~ "ENTITY".? ~ long_name.? ~ ";" ^^ {
       case x~_~params~ports => {
-        new Entity(x, ports, params)
+        new Entity(x.str, ports, params)
       }
     }
   )
@@ -191,13 +200,18 @@ class VHDLParser extends JavaTokenParsers {
       }
   )
 
-  def user_defined_type_kind = ( identifier ^^ {case x => new UserTypeKind(x) } )
+  def user_defined_type_kind = ( identifier ^^ {case x => new UserTypeKind(x.str) } )
 
   def kind = ( kind_std_logic_vector | kind_std_logic | kind_integer | user_defined_type_kind )
 
   def port_item = (
     long_name_list ~ ":" ~ identifier.? ~ kind ~ init_value.? ^^ {
-      case name~_~dir~kind~init => new PortItem(name, dir, kind, init)
+      case name~_~dir~kind~init => {
+        dir match {
+          case Some(d) => new PortItem(name, d.str, kind, init)
+          case None => new PortItem(name, None, kind, init)
+        }
+      }
     }
   |
     long_name_list ~ ":" ~ kind ~ init_value.? ^^ {
@@ -206,7 +220,7 @@ class VHDLParser extends JavaTokenParsers {
   )
 
   def param_item = ( long_name ~ ":" ~ kind ~ init_value ^^ {
-    case name~_~kind~value => new ParamItem(name, kind, value)
+    case name~_~kind~value => new ParamItem(name.str, kind, value)
   } )
 
   def port_item_list_body = "(" ~> port_item ~ ( ";" ~ port_item ).* <~ ")" ^^ {
@@ -233,30 +247,36 @@ class VHDLParser extends JavaTokenParsers {
     architecture_statement.* <~
     "END" ~ "ARCHITECTURE".? ~ long_name.? ~ ";" ^^ {
       case kind~_~name~_~decls~_~body => {
-        new Architecture(kind, name, decls, body)
+        new Architecture(kind.str, name.str, decls, body)
       }
     }
   )
 
   def block_decl = (
     statement_label.? ~ "BLOCK" ~ declarations.* ~ "BEGIN" ~ architecture_statement.* ~ "END" ~ "BLOCK" ~ long_name.? <~ ";" ^^ {
-      case label~_~decls~_~body~_~_~name2 => new Block(label, decls, body)
+      case label~_~decls~_~body~_~_~name2 =>
+        {
+          label match{
+            case Some(l) => new Block(Some(l.str), decls, body)
+            case None => new Block(None, decls, body)
+          }
+        }
     }
   )
 
   def attribute_decl = ( "ATTRIBUTE" ~> identifier ~ ":" ~ identifier <~ ";" ^^{
-    case x~_~y => new Attribute(x, y)
+    case x~_~y => new Attribute(x.str, y.str)
   } )
 
   def component_decl = (
     "COMPONENT" ~> long_name ~ "IS".? ~ param_item_list.? ~ port_item_list.? ~ "END" ~ "COMPONENT" ~ long_name.? <~ ";" ^^ {
-      case name~_~params~ports~_~_~name2 => new ComponentDecl(name, ports, params)
+      case name~_~params~ports~_~_~name2 => new ComponentDecl(name.str, ports, params)
     }
   )
 
   def long_name_list = (
     long_name ~ ("," ~ long_name).* ^^ {
-      case x~y => ( x + ( for(yy <- y) yield { "," + yy._2 } ).mkString("") )
+      case x~y => ( x.str + ( for(yy <- y) yield { "," + yy._2.str } ).mkString("") )
     }
   )
 
@@ -289,23 +309,23 @@ class VHDLParser extends JavaTokenParsers {
 
   def file_decl = (
     "FILE" ~> long_name_list ~ ":" ~ identifier ~ "IS" ~ direction ~ filepath <~ ";" ^^ {
-      case x~_~y~_~d~s => new FileDecl(x, y, d, s)
+      case x~_~y~_~d~s => new FileDecl(x, y.str, d, s)
     }
   )
 
   def symbol_list = (
     identifier ~ ("," ~ identifier).* ^^ {
-      case x~y => new Ident(x) :: (for (yy <- y) yield { new Ident(yy._2) })
+      case x~y => new Ident(x.str) :: (for (yy <- y) yield { new Ident(yy._2.str) })
     }
   )
 
   def type_decl = (
       "TYPE" ~> identifier ~ "IS" ~ "(" ~ symbol_list ~ ")" <~ ";" ^^ {
-        case x~_~_~l~_ => new UserType(x, l)
+        case x~_~_~l~_ => new UserType(x.str, l)
       }
     | "TYPE" ~> identifier ~ "IS" ~ "ARRAY" ~
       "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ~ "OF" ~ kind <~ ";" ^^ {
-        case x~_~_~_~y~z~w~_~_~v => new ArrayType(x, z, y, w, v)
+        case x~_~_~_~y~z~w~_~_~v => new ArrayType(x.str, z, y, w, v)
       }
   )
 
@@ -353,7 +373,12 @@ class VHDLParser extends JavaTokenParsers {
     "BEGIN" ~
     statement_in_process.* ~
     "END" ~ "PROCESS" ~ long_name.? <~ ";" ^^ {
-      case name~_~sensitivities~variables~_~stmts~_~_~name2 => new ProcessStatement(sensitivities, name, stmts, variables)
+      case name~_~sensitivities~variables~_~stmts~_~_~name2 => {
+        name match {
+          case Some(n) => new ProcessStatement(sensitivities, Some(n.str), stmts, variables)
+          case None => new ProcessStatement(sensitivities, None, stmts, variables)
+        }
+      }
     }
 
   def generate_statement = generate_for_statement | generate_for_loop | generate_if_statement
@@ -361,18 +386,18 @@ class VHDLParser extends JavaTokenParsers {
   def generate_for_statement =
     identifier ~ ":" ~ "FOR" ~ identifier ~ "IN" ~ prime_expression ~ step_dir ~ prime_expression ~ "GENERATE" ~
     "BEGIN" ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
-      case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name), new Ident(i), s, b, e, lst)
+      case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name.str), new Ident(i.str), s, b, e, lst)
     }
 
   def generate_if_statement = (
     identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
     "BEGIN".? ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
-      case name~_~_~expr~_~_~lst~_~_~name2 => new GenerateIf(new Ident(name), expr, lst)
+      case name~_~_~expr~_~_~lst~_~_~name2 => new GenerateIf(new Ident(name.str), expr, lst)
     }
   |
     identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
     "BEGIN".? ~ architecture_statement ^^ {
-      case name~_~_~expr~_~_~stmt => new GenerateIf(new Ident(name), expr, List(stmt))
+      case name~_~_~expr~_~_~stmt => new GenerateIf(new Ident(name.str), expr, List(stmt))
     }
   )
 
@@ -410,22 +435,33 @@ class VHDLParser extends JavaTokenParsers {
     | bin_value   ^^ { case x => x }
     | bit_value   ^^ { case x => new Constant(x) }
     | others_expr ^^ { case x => x }
-    | identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"$x'$y") }
-    | long_name   ^^ { case x => new Ident(x) }
-    | identifier  ^^ { case x => new Ident(x) }
+    | identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"${x.str}'${y.str}") }
+    | long_name   ^^ { case x => new Ident(x.str) }
+    | identifier  ^^ { case x => new Ident(x.str) }
     | decimalNumber ^^ { case x => new Constant(x) }
     | stringLiteral ^^ { case x => new Constant(x) }
   )
 
-  def extended_value_expression : Parser[Expr] = function_call | bit_padding_expression | bit_vector_select | value_expression
+  def extended_value_expression : Parser[Expr] = bit_vector_select | function_call | bit_padding_expression | value_expression
 
   def when_expression : Parser[Expr] = prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
   }
 
-  def bit_vector_select = long_name ~ "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ^^ {
-    case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n), step, b, e)
-  }
+  // TODO: tooooo ad-hoc
+  def bit_vector_select = (
+    long_name ~ "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ^^ {
+      case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n.str), step, b, e)
+    }
+    // |
+    // function_call ~ "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ^^ {
+    //   case n~_~b~step~e~_ => new BitVectorSelect(n, step, b, e)
+    // }
+    // |
+    // function_call ~ "(" ~ prime_expression ~ ")" ^^ {
+    //   case n~_~b~_ => new BitVectorSelect(n, "downto", b, b)
+    // }
+  )
 
   def binary_expression = extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
 
@@ -501,12 +537,12 @@ class VHDLParser extends JavaTokenParsers {
 
   def instantiation_statement =
     long_name ~ ":" ~ long_name ~ genericmap.? ~ "PORT" ~ "MAP" ~ portmap_list <~ ";" ^^ {
-      case iname~_~mname~params~_~_~ports => new InstanceStatement(new Ident(iname), new Ident(mname), ports, params)
+      case iname~_~mname~params~_~_~ports => new InstanceStatement(new Ident(iname.str), new Ident(mname.str), ports, params)
     }
 
   def set_attribute_decl =
     "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name ~ ":" ~ ("SIGNAL"|"VARIABLE") ~ "IS" ~ value_expression <~ ";" ^^ {
-      case x~_~y~_~_~_~z => new SetAttribute(x, y, z)
+      case x~_~y~_~_~_~z => new SetAttribute(x.str, y.str, z)
     }
 
   def range = (
@@ -516,7 +552,7 @@ class VHDLParser extends JavaTokenParsers {
 
   def generate_for_loop = (
     "FOR" ~> identifier ~ "IN" ~ range ~ "LOOP" ~ statement_in_process.* <~ "END" ~ "LOOP" ~ ";" ^^ {
-      case x~_~y~_~z => new ForLoop(None, new Ident(x), y, z)
+      case x~_~y~_~z => new ForLoop(None, new Ident(x.str), y, z)
     }
   )
 
@@ -528,7 +564,7 @@ class VHDLParser extends JavaTokenParsers {
     "FUNCTION" ~ long_name ~ port_item_list_body ~ "RETURN" ~ kind ~ "IS" ~ variable_decl.* ~
     "BEGIN" ~ function_body_statement.* ~ "END" ~ "FUNCTION" ~ ";" ^^{
       case _~x~y~_~k~_~v~_~s~_~_~_ =>
-        new FunctionDecl(x, y, k, v, s)
+        new FunctionDecl(x.str, y, k, v, s)
     }
 
   implicit override def literal(s: String): Parser[String] = new Parser[String] {
@@ -552,8 +588,10 @@ class VHDLParser extends JavaTokenParsers {
   }
 
   def parse( input: String ) = parseAll(design_file, input) match {
-    case Success( result, _ ) => Option(result)
-    case _                    => None
+    case Success(result, _ ) => Option(result)
+    case NoSuccess(msg, next) => println(msg); println(next.pos.line); println(next.pos.column); None
+    case Failure(e, _)       => println(e); None
+    case _                   => None
   }
 
 }
