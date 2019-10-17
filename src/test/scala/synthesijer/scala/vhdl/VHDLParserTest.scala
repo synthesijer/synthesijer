@@ -28,32 +28,32 @@ class VHDLParserTest extends FlatSpec with Matchers {
 
   "use-statement" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.use_clause, "use ieee.std_logic_1164.all;").get should be (List(new Use("ieee.std_logic_1164.all")))
+    obj.parseAll(obj.use_clause, "use ieee.std_logic_1164.all;").get should be (new NodeList(List(new Use("ieee.std_logic_1164.all"))))
   }
 
   "defined a library (with lower-case)" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.library_clause, "library ieee;").get should be (List(new Library("ieee")))
+    obj.parseAll(obj.library_clause, "library ieee;").get should be (new NodeList(List(new Library("ieee"))))
   }
 
   "defined a library (with capital)" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.library_clause, "LIBRARY ieee;").get should be (List(new Library("ieee")))
+    obj.parseAll(obj.library_clause, "LIBRARY ieee;").get should be (new NodeList(List(new Library("ieee"))))
   }
 
   "defined a library (with mixed-case)" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.library_clause, "lIBRary ieee;").get should be (List(new Library("ieee")))
+    obj.parseAll(obj.library_clause, "lIBRary ieee;").get should be (new NodeList(List(Library("ieee"))))
   }
 
   "defined 2 libraries" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.library_clause, "LIBRARY ieee, Work;").get should be (List(new Library("ieee"), new Library("Work")))
+    obj.parseAll(obj.library_clause, "LIBRARY ieee, Work;").get should be (new NodeList(List(new Library("ieee"), new Library("Work"))))
   }
 
   "defined 3 libraries" should "be parsed" in {
     val obj = new VHDLParser()
-    obj.parseAll(obj.library_clause, "LIBRARY ieee, work, test0123;").get should be (List(new Library("ieee"), new Library("work"), new Library("test0123")))
+    obj.parseAll(obj.library_clause, "LIBRARY ieee, work, test0123;").get should be (new NodeList(List(new Library("ieee"), new Library("work"), new Library("test0123"))))
   }
 
   "package (simple)" should "be parsed" in {

@@ -89,6 +89,10 @@ case class RegionRange(step:String, b:Expr, e:Expr) extends Range
 case class FunctionDecl(name:String, args:List[PortItem], retKind:Kind, vars:List[Node], body:List[Node]) extends Node
 case class ReturnStatement(vale:Expr) extends Node
 
+case class NodeList(nodes:List[Node]) extends Positional
+case class LiteralNodeList(nodes:List[LiteralNode]) extends Positional
+case class ListNodeList(nodes:List[List[Node]]) extends Positional
+
 class VHDLParser extends JavaTokenParsers{
 
   override protected val whiteSpace = """(\s|--.*)+""".r
@@ -104,7 +108,7 @@ class VHDLParser extends JavaTokenParsers{
 
   def identifier = positioned( ident ^^ { case x => new LiteralNode(x) } ) // defined in JavaTokenParsers
 
-  def logical_name : Parser[LiteralNode] = positioned ( identifier )
+  def logical_name = positioned ( identifier )
 
   def suffix = positioned ( "ALL" ^^ {_ => new LiteralNode("all") } | identifier )
 
@@ -113,20 +117,20 @@ class VHDLParser extends JavaTokenParsers{
       new LiteralNode(x.str + "." + (for(yy <- y) yield { yy._1.str + "."}).mkString("") + z.str)
   } )
 
-  def logical_name_list = (
+  def logical_name_list = positioned(
     logical_name ~ ("," ~ logical_name).* ^^ {
-      case x~y => x.str :: ( for(yy <- y) yield { yy._2.str } )
+      case x~y => new LiteralNodeList(x :: ( for(yy <- y) yield { yy._2 } ))
     }
   )
 
-  def library_clause = ( "LIBRARY" ~> logical_name_list <~ ";" ^^ {
-    case x => for(xx <- x) yield { new Library(xx) }
+  def library_clause = positioned ( "LIBRARY" ~> logical_name_list <~ ";" ^^ {
+    case x => new NodeList(for(xx <- x.nodes) yield { new Library(xx.str) })
   } )
 
-  def use_clause = (
+  def use_clause = positioned (
     "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
       case x~y => {
-        new Use(x.str) :: ( for(yy <- y) yield { new Use(yy._2.str) } )
+        new NodeList (new Use(x.str) :: ( for(yy <- y) yield { new Use(yy._2.str) } ) )
       }
     }
   )
@@ -135,19 +139,19 @@ class VHDLParser extends JavaTokenParsers{
     case x~y => new LiteralNode(x.str + (for(yy <- y) yield { "." + yy._2.str }).mkString(""))
   } )
 
-  def design_file = ( design_unit ~ design_unit.* ^^ {
-    case x~y => x :: y
+  def design_file : Parser[NodeList] = positioned ( design_unit ~ design_unit.* ^^ {
+    case x~y => new NodeList(x :: y)
   } )
 
-  def design_unit = positioned(
-     context_clause ~ library_unit ^^ { case x~y => new DesignUnit(x, y.entity, y.arch) }
-   | context_clause ~ package_decl ^^ { case x~y => new PackageUnit(x, y) }
+  def design_unit : Parser[Node] = positioned(
+     context_clause ~ library_unit ^^ { case x~y => new DesignUnit(x.nodes, y.entity, y.arch) }
+   | context_clause ~ package_decl ^^ { case x~y => new PackageUnit(x.nodes, y) }
 
   )
 
-  def context_clause = ( context_item.* )
+  def context_clause = positioned ( context_item.* ^^ { x => new ListNodeList(for(xx <- x) yield { xx.nodes }) } )
 
-  def context_item = ( library_clause | use_clause )
+  def context_item = positioned ( library_clause | use_clause )
 
   def library_unit = ( entity_decl ~ architecture_decl.? ^^ {
     case x~y => new LibraryUnit(x, y)
@@ -588,7 +592,7 @@ class VHDLParser extends JavaTokenParsers{
   }
 
   def parse( input: String ) = parseAll(design_file, input) match {
-    case Success(result, _ ) => Option(result)
+    case Success(result, _ ) => Option(result.nodes)
     case NoSuccess(msg, next) => println(msg); println(next.pos.line); println(next.pos.column); None
     case Failure(e, _)       => println(e); None
     case _                   => None
