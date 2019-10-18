@@ -21,7 +21,7 @@ case class LiteralNode(str:String) extends Node
 
 case class DesignUnit(context:List[List[Node]], entity:Entity, arch:Option[Architecture]) extends Node
 case class PackageUnit(context:List[List[Node]], pkg:PackageDecl) extends Node
-case class LibraryUnit(entity:Entity, arch:Option[Architecture])
+case class LibraryUnit(entity:Entity, arch:Option[Architecture]) extends Node
 
 case class StdLogic() extends Kind
 case class VectorKind(name:String, step:String, b:Expr, e:Expr) extends Kind
@@ -117,7 +117,7 @@ class VHDLParser extends JavaTokenParsers{
       new LiteralNode(x.str + "." + (for(yy <- y) yield { yy._1.str + "."}).mkString("") + z.str)
   } )
 
-  def logical_name_list = positioned(
+  def logical_name_list = positioned (
     logical_name ~ ("," ~ logical_name).* ^^ {
       case x~y => new LiteralNodeList(x :: ( for(yy <- y) yield { yy._2 } ))
     }
@@ -153,9 +153,11 @@ class VHDLParser extends JavaTokenParsers{
 
   def context_item = positioned ( library_clause | use_clause )
 
-  def library_unit = ( entity_decl ~ architecture_decl.? ^^ {
-    case x~y => new LibraryUnit(x, y)
-  } )
+  def library_unit = positioned (
+    entity_decl ~ architecture_decl.? ^^ {
+      case x~y => new LibraryUnit(x, y)
+    }
+  )
 
   def package_decl = positioned(
     "PACKAGE" ~> long_name ~ "IS" ~ declarations.* ~ "END" ~ "PACKAGE" ~ long_name.? <~ ";" ^^ {
@@ -163,17 +165,16 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
+  def function_name = positioned( long_name )
 
-  def function_name = ( long_name )
-
-  def function_call : Parser[CallExpr] = ( function_name ~ function_argument_list ^^ {
+  def function_call : Parser[CallExpr] = positioned ( function_name ~ function_argument_list ^^ {
     case x~y => new CallExpr(new Ident(x.str), y)
   } )
 
   def kind_std_logic = ( "STD_LOGIC" ^^ {_ => new StdLogic() } )
 
 
-  def entity_decl = (
+  def entity_decl = positioned(
     "ENTITY" ~> long_name ~ "IS" ~ param_item_list.? ~ port_item_list.? <~ "END" ~ "ENTITY".? ~ long_name.? ~ ";" ^^ {
       case x~_~params~ports => {
         new Entity(x.str, ports, params)
@@ -241,10 +242,11 @@ class VHDLParser extends JavaTokenParsers{
     attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl | function_decl | shared_variable_decl
   )
 
-  def architecture_statement : Parser[Node] =
+  def architecture_statement : Parser[Node] = positioned (
     process_statement | instantiation_statement | assign_statement | generate_statement | block_decl
+  )
 
-  def architecture_decl = (
+  def architecture_decl = positioned (
     "ARCHITECTURE" ~> identifier ~ "OF" ~ long_name ~ "IS" ~
     declarations.* ~
     "BEGIN" ~
@@ -256,7 +258,7 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
-  def block_decl = (
+  def block_decl = positioned(
     statement_label.? ~ "BLOCK" ~ declarations.* ~ "BEGIN" ~ architecture_statement.* ~ "END" ~ "BLOCK" ~ long_name.? <~ ";" ^^ {
       case label~_~decls~_~body~_~_~name2 =>
         {
@@ -268,11 +270,11 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
-  def attribute_decl = ( "ATTRIBUTE" ~> identifier ~ ":" ~ identifier <~ ";" ^^{
+  def attribute_decl = positioned ( "ATTRIBUTE" ~> identifier ~ ":" ~ identifier <~ ";" ^^{
     case x~_~y => new Attribute(x.str, y.str)
   } )
 
-  def component_decl = (
+  def component_decl = positioned (
     "COMPONENT" ~> long_name ~ "IS".? ~ param_item_list.? ~ port_item_list.? ~ "END" ~ "COMPONENT" ~ long_name.? <~ ";" ^^ {
       case name~_~params~ports~_~_~name2 => new ComponentDecl(name.str, ports, params)
     }
@@ -284,25 +286,25 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
-  def signal_decl = (
+  def signal_decl = positioned (
     "SIGNAL" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Signal(name, kind, init)
     }
   )
 
-  def shared_variable_decl = (
+  def shared_variable_decl = positioned(
     "SHARED" ~ "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new SharedVariable(name, kind, init)
     }
   )
 
-  def constant_decl = (
+  def constant_decl = positioned (
     "CONSTANT" ~> long_name_list ~ ":" ~ kind ~ init_value <~ ";" ^^ {
       case name~_~kind~init => new ConstantDecl(name, kind, init)
     }
   )
 
-  def variable_decl = (
+  def variable_decl = positioned (
     "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Variable(name, kind, init)
     }
@@ -311,7 +313,7 @@ class VHDLParser extends JavaTokenParsers{
   def direction = ( "OUT" | "IN" | "INOUT" )
   def filepath = ( stringLiteral )
 
-  def file_decl = (
+  def file_decl = positioned (
     "FILE" ~> long_name_list ~ ":" ~ identifier ~ "IS" ~ direction ~ filepath <~ ";" ^^ {
       case x~_~y~_~d~s => new FileDecl(x, y.str, d, s)
     }
@@ -323,7 +325,7 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
-  def type_decl = (
+  def type_decl = positioned(
       "TYPE" ~> identifier ~ "IS" ~ "(" ~ symbol_list ~ ")" <~ ";" ^^ {
         case x~_~_~l~_ => new UserType(x.str, l)
       }
@@ -333,19 +335,19 @@ class VHDLParser extends JavaTokenParsers{
       }
   )
 
-  def call_statement = (
+  def call_statement = positioned(
     function_call <~ ";" ^^ {
       case x => new CallStatement(x)
     }
   )
 
-  def assign_statement = (
+  def assign_statement = positioned(
     extended_value_expression ~ "<=" ~ expression <~ ";" ^^ {
       case lhs~_~rhs => new AssignStatement(lhs, rhs)
     }
   )
 
-  def blocking_assign_statement = (
+  def blocking_assign_statement = positioned(
     extended_value_expression ~ ":=" ~ expression <~ ";" ^^ {
       case lhs~_~rhs => new BlockingAssignStatement(lhs, rhs)
     }
@@ -371,7 +373,7 @@ class VHDLParser extends JavaTokenParsers{
 
   def process_decl = file_decl | variable_decl
 
-  def process_statement =
+  def process_statement = positioned(
     statement_label.? ~ "PROCESS" ~ sensitivity_list.? ~
     process_decl.* ~
     "BEGIN" ~
@@ -384,6 +386,7 @@ class VHDLParser extends JavaTokenParsers{
         }
       }
     }
+  )
 
   def generate_statement = generate_for_statement | generate_for_loop | generate_if_statement
 
@@ -393,7 +396,7 @@ class VHDLParser extends JavaTokenParsers{
       case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name.str), new Ident(i.str), s, b, e, lst)
     }
 
-  def generate_if_statement = (
+  def generate_if_statement = positioned (
     identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
     "BEGIN".? ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
       case name~_~_~expr~_~_~lst~_~_~name2 => new GenerateIf(new Ident(name.str), expr, lst)
@@ -486,7 +489,7 @@ class VHDLParser extends JavaTokenParsers{
 
   def report_statement = "REPORT" ~> stringLiteral <~ ";" ^^ { case x =>  new ReportStatement(x) }
 
-  def statement_in_process : Parser[Node] = (
+  def statement_in_process : Parser[Node] = positioned (
         if_statement
       | assign_statement
       | blocking_assign_statement
@@ -539,10 +542,11 @@ class VHDLParser extends JavaTokenParsers{
     case x~y => new PortMapItem(new NoExpr(), x) :: ( for(yy <- y) yield { new PortMapItem(new NoExpr(), yy) } )
   }
 
-  def instantiation_statement =
+  def instantiation_statement = positioned (
     long_name ~ ":" ~ long_name ~ genericmap.? ~ "PORT" ~ "MAP" ~ portmap_list <~ ";" ^^ {
       case iname~_~mname~params~_~_~ports => new InstanceStatement(new Ident(iname.str), new Ident(mname.str), ports, params)
     }
+  )
 
   def set_attribute_decl =
     "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name ~ ":" ~ ("SIGNAL"|"VARIABLE") ~ "IS" ~ value_expression <~ ";" ^^ {
@@ -554,7 +558,7 @@ class VHDLParser extends JavaTokenParsers{
     | prime_expression ^^ { x => new SymbolRange(x) }
   )
 
-  def generate_for_loop = (
+  def generate_for_loop = positioned(
     "FOR" ~> identifier ~ "IN" ~ range ~ "LOOP" ~ statement_in_process.* <~ "END" ~ "LOOP" ~ ";" ^^ {
       case x~_~y~_~z => new ForLoop(None, new Ident(x.str), y, z)
     }
