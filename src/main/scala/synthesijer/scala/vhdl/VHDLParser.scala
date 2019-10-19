@@ -93,7 +93,7 @@ case class NodeList(nodes:List[Node]) extends Positional
 case class LiteralNodeList(nodes:List[LiteralNode]) extends Positional
 case class ListNodeList(nodes:List[List[Node]]) extends Positional
 
-class VHDLParser extends JavaTokenParsers{
+class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   override protected val whiteSpace = """(\s|--.*)+""".r
 
@@ -106,7 +106,7 @@ class VHDLParser extends JavaTokenParsers{
 
   def letter_or_digit = ( letter | digit )
 
-  def identifier = positioned( ident ^^ { case x => new LiteralNode(x) } ) // defined in JavaTokenParsers
+  def identifier : PackratParser[LiteralNode] = positioned( ident ^^ { case x => new LiteralNode(x) } ) // defined in JavaTokenParsers
 
   def logical_name = positioned ( identifier )
 
@@ -142,11 +142,11 @@ class VHDLParser extends JavaTokenParsers{
     case x~y => new LiteralNode(x.str + (for(yy <- y) yield { "." + yy._2.str }).mkString(""))
   } )
 
-  def design_file : Parser[NodeList] = positioned ( design_unit ~ design_unit.* ^^ {
+  def design_file : PackratParser[NodeList] = positioned ( design_unit ~ design_unit.* ^^ {
     case x~y => new NodeList(x :: y)
   } )
 
-  def design_unit : Parser[Node] = positioned(
+  def design_unit : PackratParser[Node] = positioned(
      context_clause ~ library_unit ^^ { case x~y => new DesignUnit(x.nodes, y.entity, y.arch) }
    | context_clause ~ package_decl ^^ { case x~y => new PackageUnit(x.nodes, y) }
 
@@ -156,7 +156,7 @@ class VHDLParser extends JavaTokenParsers{
 
   def context_item = positioned ( library_clause | use_clause )
 
-  def library_unit = positioned (
+  def library_unit : PackratParser[LibraryUnit] = positioned (
     entity_decl ~ architecture_decl.? ^^ {
       case x~y => new LibraryUnit(x, y)
     }
@@ -170,7 +170,7 @@ class VHDLParser extends JavaTokenParsers{
 
   def function_name = positioned( long_name )
 
-  def function_call : Parser[CallExpr] = positioned ( function_name ~ function_argument_list ^^ {
+  def function_call : PackratParser[CallExpr] = positioned ( function_name ~ function_argument_list ^^ {
     case x~y => new CallExpr(new Ident(x.str), y)
   } )
 
@@ -241,15 +241,15 @@ class VHDLParser extends JavaTokenParsers{
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
   } )
 
-  def declarations : Parser[Node] = (
+  def declarations : PackratParser[Node] = (
     attribute_decl | component_decl | signal_decl | type_decl | set_attribute_decl | constant_decl | function_decl | shared_variable_decl
   )
 
-  def architecture_statement : Parser[Node] = positioned (
+  def architecture_statement : PackratParser[Node] = positioned (
     process_statement | instantiation_statement | assign_statement | generate_statement | block_decl
   )
 
-  def architecture_decl = positioned (
+  def architecture_decl : PackratParser[Architecture] = positioned (
     "ARCHITECTURE" ~> identifier ~ "OF" ~ long_name ~ "IS" ~
     declarations.* ~
     "BEGIN" ~
@@ -414,8 +414,6 @@ class VHDLParser extends JavaTokenParsers{
 
   def unary_expression = ("-"|"NOT") ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
 
-  def binary_operation = compare_operation | mul_div_operation | add_sub_operation | logic_operation | concat_operation
-
   def compare_operation = ( "=" | ">=" | "<=" | ">" | "<" ) ^^ { case x => x } |
                           "/" ~ "=" ^^ { case x~y => x+y }
 
@@ -440,7 +438,7 @@ class VHDLParser extends JavaTokenParsers{
     case x => new Others(x)
   }
 
-  def value_expression : Parser[Expr] = positioned(
+  lazy val value_expression : PackratParser[Expr] = positioned(
     "(" ~> expression <~ ")" ^^ {case x => x }
     | hex_value   ^^ { case x => x }
     | bin_value   ^^ { case x => x }
@@ -453,25 +451,25 @@ class VHDLParser extends JavaTokenParsers{
     | stringLiteral ^^ { case x => new Constant(x) }
   )
 
-  def extended_value_expression : Parser[Expr] = positioned (
-    bit_vector_select | function_call | bit_padding_expression | value_expression
+  lazy val extended_value_expression : PackratParser[Expr] = positioned (
+    unary_expression | bit_vector_select | function_call | bit_padding_expression | value_expression
   )
 
-  def when_expression : Parser[Expr] = positioned ( prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
+  def when_expression : PackratParser[Expr] = positioned ( prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
   }
   )
 
-  def bit_vector_select_arg_range = positioned (
+  def bit_vector_select_arg_range : PackratParser[BitVectorSelect] = positioned (
      "(" ~> prime_expression ~ step_dir ~ prime_expression <~ ")" ^^ { case b~s~e => new BitVectorSelect(null, s, b, e) }
   )
 
-  def bit_vector_select_arg = positioned (
+  def bit_vector_select_arg : PackratParser[BitVectorSelect] = positioned (
         bit_vector_select_arg_range
       | "(" ~> prime_expression <~ ")" ^^ { case b => new BitVectorSelect(null, "at", b, b) }
   )
 
-  def bit_vector_select = positioned (
+  def bit_vector_select : PackratParser[BitVectorSelect] = positioned (
     long_name ~ bit_vector_select_arg ~ bit_vector_select_arg.+ ^^ {
       case n~bs~bss => {
         // TODO: should be written with foldl
@@ -488,11 +486,15 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
-  def binary_expression = positioned (extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) })
+  def binary_operation = concat_operation | compare_operation | mul_div_operation | add_sub_operation | logic_operation
 
-  def prime_expression : Parser[Expr] = positioned ( unary_expression | binary_expression | extended_value_expression )
+  lazy val binary_expression : PackratParser[Expr] = positioned (
+    extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+  )
 
-  def expression : Parser[Expr] = positioned ( when_expression | prime_expression )
+  lazy val prime_expression : PackratParser[Expr] = positioned ( binary_expression | extended_value_expression )
+
+  lazy val expression : PackratParser[Expr] = positioned ( when_expression | prime_expression )
 
   def null_statement = "NULL" ~ ";" ^^ { _ => new NullStatement() }
 
@@ -506,7 +508,7 @@ class VHDLParser extends JavaTokenParsers{
 
   def report_statement = "REPORT" ~> stringLiteral <~ ";" ^^ { case x =>  new ReportStatement(x) }
 
-  def statement_in_process : Parser[Node] = positioned (
+  lazy val statement_in_process : PackratParser[Node] = positioned (
         if_statement
       | assign_statement
       | blocking_assign_statement
@@ -518,9 +520,9 @@ class VHDLParser extends JavaTokenParsers{
       | generate_for_loop
   )
 
-  def else_clause_in_if_statement : Parser[List[Node]] = "ELSE" ~> statement_in_process.* ^^ { case x => x }
+  def else_clause_in_if_statement : PackratParser[List[Node]] = "ELSE" ~> statement_in_process.* ^^ { case x => x }
 
-  def elsif_clause_in_if_statement : Parser[IfStatement] =
+  def elsif_clause_in_if_statement : PackratParser[IfStatement] =
     "ELSIF" ~> prime_expression ~ "THEN" ~ statement_in_process.* ^^ {
       case x~_~y => new IfStatement(x, y, List(), None)
     }
@@ -575,7 +577,7 @@ class VHDLParser extends JavaTokenParsers{
     | prime_expression ^^ { x => new SymbolRange(x) }
   )
 
-  def generate_for_loop = positioned(
+  def generate_for_loop : PackratParser[ForLoop] = positioned(
     "FOR" ~> identifier ~ "IN" ~ range ~ "LOOP" ~ statement_in_process.* <~ "END" ~ "LOOP" ~ ";" ^^ {
       case x~_~y~_~z => new ForLoop(None, new Ident(x.str), y, z)
     }
@@ -592,7 +594,7 @@ class VHDLParser extends JavaTokenParsers{
         new FunctionDecl(x.str, y, k, v, s)
     }
 
-  implicit override def literal(s: String): Parser[String] = new Parser[String] {
+  implicit override def literal(s: String): PackratParser[String] = new Parser[String] {
     def apply(in: Input) = {
       val source = in.source
       val offset = in.offset
