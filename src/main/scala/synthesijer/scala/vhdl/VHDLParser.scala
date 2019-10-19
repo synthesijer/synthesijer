@@ -129,6 +129,8 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   lazy val MAP              = """(?i)\b\Qmap\E\b""".r
   lazy val MOD              = """(?i)\b\Qmod\E\b""".r
   lazy val NOT              = """(?i)\b\Qnot\E\b""".r
+  lazy val NAND             = """(?i)\b\Qnand\E\b""".r
+  lazy val NOR              = """(?i)\b\Qnor\E\b""".r
   lazy val NS               = """(?i)\b\Qns\E\b""".r
   lazy val NULL             = """(?i)\b\Qnull\E\b""".r
   lazy val OF               = """(?i)\b\Qof\E\b""".r
@@ -139,6 +141,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   lazy val PORT             = """(?i)\b\Qport\E\b""".r
   lazy val PROCESS          = """(?i)\b\Qprocess\E\b""".r
   lazy val PS               = """(?i)\b\Qps\E\b""".r
+  lazy val REM              = """(?i)\b\Qrem\E\b""".r
   lazy val REPORT           = """(?i)\b\Qreport\E\b""".r
   lazy val RETURN           = """(?i)\b\Qreturn\E\b""".r
   lazy val SHARED           = """(?i)\b\Qshared\E\b""".r
@@ -155,6 +158,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   lazy val VARIABLE         = """(?i)\b\Qvariable\E\b""".r
   lazy val WAIT             = """(?i)\b\Qwait\E\b""".r
   lazy val WHEN             = """(?i)\b\Qwhen\E\b""".r
+  lazy val XNOR             = """(?i)\b\Qxnor\E\b""".r
   lazy val XOR              = """(?i)\b\Qxor\E\b""".r
 
   def digit = ( "[0-9]+".r )
@@ -476,16 +480,14 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   def unary_expression = ("-"|NOT) ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
 
+  def mul_div_operation = "*" | "/" | MOD | REM
+  
+  def add_sub_concat_operation = "+" | "-" | "&"
+
   def compare_operation = ( "=" | ">=" | "<=" | ">" | "<" ) ^^ { case x => x } |
                           "/" ~ "=" ^^ { case x~y => x+y }
 
-  def logic_operation = AND | OR | XOR | "|"
-
-  def mul_div_operation = "*" | "/" | MOD
-
-  def add_sub_operation = "+" | "-"
-
-  def concat_operation = "&"
+  def logic_operation = AND | OR | XOR | "|" | NAND | NOR | XNOR
 
   def hex_value = ("X"|"x") ~> stringLiteral ^^ { case x => new BasedValue(x, 16) }
   def bin_value = ("B"|"b") ~> stringLiteral ^^ { case x => new BasedValue(x, 2) }
@@ -553,13 +555,27 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     }
   )
 
-  def binary_operation = concat_operation | compare_operation | mul_div_operation | add_sub_operation | logic_operation
-
-  lazy val binary_expression : PackratParser[Expr] = positioned (
-    extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+  lazy val binary_expression4 : PackratParser[Expr] = positioned (
+    extended_value_expression ~ mul_div_operation ~ binary_expression4 ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+  | extended_value_expression
   )
 
-  lazy val prime_expression : PackratParser[Expr] = positioned ( binary_expression | extended_value_expression )
+  lazy val binary_expression3 : PackratParser[Expr] = positioned (
+    binary_expression4 ~ add_sub_concat_operation ~ binary_expression3 ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+  | binary_expression4
+  )
+
+  lazy val binary_expression2 : PackratParser[Expr] = positioned (
+    binary_expression3 ~ compare_operation ~ binary_expression2 ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+  | binary_expression3
+  )
+
+  lazy val binary_expression : PackratParser[Expr] = positioned (
+     binary_expression2 ~ logic_operation ~ binary_expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+   | binary_expression2
+  )
+
+  lazy val prime_expression : PackratParser[Expr] = positioned ( binary_expression )
 
   lazy val expression : PackratParser[Expr] = positioned ( when_expression | prime_expression )
 

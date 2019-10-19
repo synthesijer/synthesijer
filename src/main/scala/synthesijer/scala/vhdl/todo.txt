@@ -1,4 +1,3 @@
 both of long_name and selected_name are required?
-consideration of left-, right-associative operations
 use positioned
 

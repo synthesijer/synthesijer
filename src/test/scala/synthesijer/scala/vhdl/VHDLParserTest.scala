@@ -2102,4 +2102,28 @@ architecture RTL of Test is begin end RTL;
         new BitVectorSelect(new BitVectorSelect(new Ident("RecvBuffer"), "at", new Constant("0"), new Constant("0")), "at", new Constant("0"), new Constant("0")))
   }
 
+  "calc-order: a + b + c" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "a + b + c").
+      get should be (
+        new BinaryExpr("+", new Ident("a"), new BinaryExpr("+", new Ident("b"), new Ident("c"))))
+  }
+
+  "calc-order: a + b * c" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "a + b * c").
+      get should be (
+        new BinaryExpr("+", new Ident("a"), new BinaryExpr("*", new Ident("b"), new Ident("c"))))
+  }
+
+  "calc-order: a * b + c" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.expression, "a * b + c").
+      get should be (
+        new BinaryExpr("+", new BinaryExpr("*", new Ident("a"), new Ident("b")), new Ident("c")))
+  }
+
 }
