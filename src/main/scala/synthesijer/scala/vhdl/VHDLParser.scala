@@ -475,7 +475,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   def compare_operation = ( "=" | ">=" | "<=" | ">" | "<" ) ^^ { case x => x } |
                           "/" ~ "=" ^^ { case x~y => x+y }
 
-  def logic_operation = AND | OR | XOR
+  def logic_operation = AND | OR | XOR | "|"
 
   def mul_div_operation = "*" | "/" | MOD
 
