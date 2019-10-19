@@ -16,15 +16,17 @@ public class VHDLLoader{
 		byte[] bcontent = Files.readAllBytes(path);
 		String content = new String(bcontent);
 
+		if (opt.flag("check")){
+			System.out.println(path);
+		}
+
 		VHDLParser obj = new VHDLParser();
 		var result = obj.parse(content);
 		
 		if (opt.flag("check")){
 			if(result.isEmpty()){
-				System.out.println(path);
 				System.out.println("..." + result);
 			}else if(opt.flag("error-only") == false){
-				System.out.println(path);
 				System.out.println("..." + "OK");
 			}
 		}else{
