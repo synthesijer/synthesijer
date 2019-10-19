@@ -88,6 +88,7 @@ case class SymbolRange(value:Expr) extends Range
 case class RegionRange(step:String, b:Expr, e:Expr) extends Range
 case class FunctionDecl(name:String, args:List[PortItem], retKind:Kind, vars:List[Node], body:List[Node]) extends Node
 case class ReturnStatement(vale:Expr) extends Node
+case class CommandStatement(str:String) extends Node
 
 case class NodeList(nodes:List[Node]) extends Positional
 case class LiteralNodeList(nodes:List[LiteralNode]) extends Positional
@@ -98,62 +99,63 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   override protected val whiteSpace = """(\s|--.*)+""".r
 
   // keywords
-  lazy val ALL              = """(?i)\Qall\E""".r
-  lazy val AND              = """(?i)\Qand\E""".r
-  lazy val ARCHITECTURE     = """(?i)\Qarchitecture\E""".r
-  lazy val ARRAY            = """(?i)\Qarray\E""".r
-  lazy val ATTRIBUTE        = """(?i)\Qattribute\E""".r
-  lazy val BEGIN            = """(?i)\Qbegin\E""".r
-  lazy val BLOCK            = """(?i)\Qblock\E""".r
-  lazy val CASE             = """(?i)\Qcase\E""".r
-  lazy val COMPONENT        = """(?i)\Qcomponent\E""".r
-  lazy val CONSTANT         = """(?i)\Qconstant\E""".r
-  lazy val DOWNTO           = """(?i)\Qdownto\E""".r
-  lazy val ELSIF            = """(?i)\Qelsif\E""".r
-  lazy val ELSE             = """(?i)\Qelse\E""".r
-  lazy val END              = """(?i)\Qend\E""".r
-  lazy val ENTITY           = """(?i)\Qentity\E""".r
-  lazy val FILE             = """(?i)\Qfile\E""".r
-  lazy val FOR              = """(?i)\Qfor\E""".r
-  lazy val FUNCTION         = """(?i)\Qfunction\E""".r
-  lazy val GENERIC          = """(?i)\Qgeneric\E""".r
-  lazy val GENERATE         = """(?i)\Qgenerate\E""".r
-  lazy val IF               = """(?i)\Qif\E""".r
-  lazy val IN               = """(?i)\Qin\E""".r
-  lazy val INOUT            = """(?i)\Qinout\E""".r
-  lazy val INTEGER          = """(?i)\Qinteger\E""".r
-  lazy val IS               = """(?i)\Qis\E""".r
-  lazy val LIBRARY          = """(?i)\Qlibrary\E""".r
-  lazy val LOOP             = """(?i)\Qloop\E""".r
-  lazy val MAP              = """(?i)\Qmap\E""".r
-  lazy val MOD              = """(?i)\Qmod\E""".r
-  lazy val NOT              = """(?i)\Qnot\E""".r
-  lazy val NS               = """(?i)\Qns\E""".r
-  lazy val NULL             = """(?i)\Qnull\E""".r
-  lazy val OF               = """(?i)\Qof\E""".r
-  lazy val OR               = """(?i)\Qor\E""".r
-  lazy val OTHERS           = """(?i)\Qothers\E""".r
-  lazy val OUT              = """(?i)\Qout\E""".r
-  lazy val PACKAGE          = """(?i)\Qpackage\E""".r
-  lazy val PORT             = """(?i)\Qport\E""".r
-  lazy val PROCESS          = """(?i)\Qprocess\E""".r
-  lazy val PS               = """(?i)\Qps\E""".r
-  lazy val REPORT           = """(?i)\Qreport\E""".r
-  lazy val RETURN           = """(?i)\Qreturn\E""".r
-  lazy val SHARED           = """(?i)\Qshared\E""".r
-  lazy val SIGNAL           = """(?i)\Qsignal\E""".r
-  lazy val STD_LOGIC        = """(?i)\Qstd_logic\E""".r
-  lazy val STD_LOGIC_VECTOR = """(?i)\Qstd_logic_vector\E""".r
-  lazy val SIGNED           = """(?i)\Qsigned\E""".r
-  lazy val THEN             = """(?i)\Qthen\E""".r
-  lazy val TYPE             = """(?i)\Qtype\E""".r
-  lazy val TO               = """(?i)\Qto\E""".r
-  lazy val UNSIGNED         = """(?i)\Qunsigned\E""".r
-  lazy val USE              = """(?i)\Quse\E""".r
-  lazy val VARIABLE         = """(?i)\Qvariable\E""".r
-  lazy val WAIT             = """(?i)\Qwait\E""".r
-  lazy val WHEN             = """(?i)\Qwhen\E""".r
-  lazy val XOR              = """(?i)\Qxor\E""".r
+  lazy val ALL              = """(?i)\b\Qall\E\b""".r
+  lazy val AND              = """(?i)\b\Qand\E\b""".r
+  lazy val ARCHITECTURE     = """(?i)\b\Qarchitecture\E\b""".r
+  lazy val ARRAY            = """(?i)\b\Qarray\E\b""".r
+  lazy val ATTRIBUTE        = """(?i)\b\Qattribute\E\b""".r
+  lazy val BEGIN            = """(?i)\b\Qbegin\E\b""".r
+  lazy val BLOCK            = """(?i)\b\Qblock\E\b""".r
+  lazy val CASE             = """(?i)\b\Qcase\E\b""".r
+  lazy val COMPONENT        = """(?i)\b\Qcomponent\E\b""".r
+  lazy val CONSTANT         = """(?i)\b\Qconstant\E\b""".r
+  lazy val DOWNTO           = """(?i)\b\Qdownto\E\b""".r
+  lazy val ELSIF            = """(?i)\b\Qelsif\E\b""".r
+  lazy val ELSE             = """(?i)\b\Qelse\E\b""".r
+  lazy val END              = """(?i)\b\Qend\E\b""".r
+  lazy val ENTITY           = """(?i)\b\Qentity\E\b""".r
+  lazy val FILE             = """(?i)\b\Qfile\E\b""".r
+  lazy val FOR              = """(?i)\b\Qfor\E\b""".r
+  lazy val FUNCTION         = """(?i)\b\Qfunction\E\b""".r
+  lazy val GENERIC          = """(?i)\b\Qgeneric\E\b""".r
+  lazy val GENERATE         = """(?i)\b\Qgenerate\E\b""".r
+  lazy val IF               = """(?i)\b\Qif\E\b""".r
+  lazy val IN               = """(?i)\b\Qin\E\b""".r
+  lazy val INOUT            = """(?i)\b\Qinout\E\b""".r
+  lazy val INTEGER          = """(?i)\b\Qinteger\E\b""".r
+  lazy val IS               = """(?i)\b\Qis\E\b""".r
+  lazy val LIBRARY          = """(?i)\b\Qlibrary\E\b""".r
+  lazy val LOOP             = """(?i)\b\Qloop\E\b""".r
+  lazy val MAP              = """(?i)\b\Qmap\E\b""".r
+  lazy val MOD              = """(?i)\b\Qmod\E\b""".r
+  lazy val NOT              = """(?i)\b\Qnot\E\b""".r
+  lazy val NS               = """(?i)\b\Qns\E\b""".r
+  lazy val NULL             = """(?i)\b\Qnull\E\b""".r
+  lazy val OF               = """(?i)\b\Qof\E\b""".r
+  lazy val OR               = """(?i)\b\Qor\E\b""".r
+  lazy val OTHERS           = """(?i)\b\Qothers\E\b""".r
+  lazy val OUT              = """(?i)\b\Qout\E\b""".r
+  lazy val PACKAGE          = """(?i)\b\Qpackage\E\b""".r
+  lazy val PORT             = """(?i)\b\Qport\E\b""".r
+  lazy val PROCESS          = """(?i)\b\Qprocess\E\b""".r
+  lazy val PS               = """(?i)\b\Qps\E\b""".r
+  lazy val REPORT           = """(?i)\b\Qreport\E\b""".r
+  lazy val RETURN           = """(?i)\b\Qreturn\E\b""".r
+  lazy val SHARED           = """(?i)\b\Qshared\E\b""".r
+  lazy val SIGNAL           = """(?i)\b\Qsignal\E\b""".r
+  lazy val STD_LOGIC        = """(?i)\b\Qstd_logic\E\b""".r
+  lazy val STD_LOGIC_VECTOR = """(?i)\b\Qstd_logic_vector\E\b""".r
+  lazy val SIGNED           = """(?i)\b\Qsigned\E\b""".r
+  lazy val STRING           = """(?i)\b\Qstring\E\b""".r
+  lazy val THEN             = """(?i)\b\Qthen\E\b""".r
+  lazy val TYPE             = """(?i)\b\Qtype\E\b""".r
+  lazy val TO               = """(?i)\b\Qto\E\b""".r
+  lazy val UNSIGNED         = """(?i)\b\Qunsigned\E\b""".r
+  lazy val USE              = """(?i)\b\Quse\E\b""".r
+  lazy val VARIABLE         = """(?i)\b\Qvariable\E\b""".r
+  lazy val WAIT             = """(?i)\b\Qwait\E\b""".r
+  lazy val WHEN             = """(?i)\b\Qwhen\E\b""".r
+  lazy val XOR              = """(?i)\b\Qxor\E\b""".r
 
   def digit = ( "[0-9]+".r )
   def upper_case_letter = ( "[A-Z]+".r )
@@ -285,9 +287,11 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     }
   )
 
-  def param_item = ( long_name ~ ":" ~ kind ~ init_value ^^ {
-    case name~_~kind~value => new ParamItem(name.str, kind, value)
-  } )
+  def param_item = positioned (
+    long_name ~ ":" ~ direction.? ~ kind ~ init_value ^^ {
+      case name~_~_~kind~value => new ParamItem(name.str, kind, value)
+    }
+  )
 
   def port_item_list_body = "(" ~> port_item ~ ( ";" ~ port_item ).* <~ ")" ^^ {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
@@ -371,7 +375,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     }
   )
 
-  def direction = ( OUT | IN | INOUT )
+  def direction = ( INOUT | OUT | IN )
   def filepath = ( stringLiteral )
 
   def file_decl = positioned (
@@ -496,11 +500,16 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     case x => new Others(x)
   }
 
+  def string_value = STRING ~ "'" ~ "(" ~ stringLiteral ~ ")" ^^ {
+    case a~b~c~d~e => List(a,b,c,d,e).mkString("")
+  }
+
   lazy val value_expression : PackratParser[Expr] = positioned(
     "(" ~> expression <~ ")" ^^ {case x => x }
     | hex_value   ^^ { case x => x }
     | bin_value   ^^ { case x => x }
     | bit_value   ^^ { case x => new Constant(x) }
+    | string_value ^^ { case x => new Constant(x) }
     | others_expr ^^ { case x => x }
     | identifier ~ "'" ~ identifier ^^ { case x~_~y => new Ident(s"${x.str}'${y.str}") }
     | long_name   ^^ { case x => new Ident(x.str) }
@@ -576,6 +585,11 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
       | wait_statement
       | report_statement
       | generate_for_loop
+      | command_statement
+  )
+
+  lazy val command_statement = positioned(
+    long_name <~ ";" ^^ { case x => new CommandStatement(x.str) }
   )
 
   def else_clause_in_if_statement : PackratParser[List[Node]] = ELSE ~> statement_in_process.* ^^ { case x => x }

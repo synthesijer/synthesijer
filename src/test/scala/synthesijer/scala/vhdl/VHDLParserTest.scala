@@ -707,6 +707,14 @@ end process;
       get should be (new Others(new Ident("test")))
   }
 
+  "String'(\"pio_writeReadBack_test0\")" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.value_expression, """
+String'("pio_writeReadBack_test0")
+""").get should be (new Constant("String'(\"pio_writeReadBack_test0\")"))
+  }
+
 
   "process (with clk and body)" should " be parsed" in
   {
