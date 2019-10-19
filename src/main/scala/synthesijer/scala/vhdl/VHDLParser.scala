@@ -655,7 +655,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   def parse( input: String ) = parseAll(design_file, input) match {
     case Success(result, _ ) => Option(result.nodes)
-    case NoSuccess(msg, next) => println(msg); println(next.pos.line); println(next.pos.column); None
+    case NoSuccess(msg, next) => println(msg); println("lines = " + next.pos.line + ", column = " + next.pos.column); None
     case Failure(e, _)       => println(e); None
     case _                   => None
   }

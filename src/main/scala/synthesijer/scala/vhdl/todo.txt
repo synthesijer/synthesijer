@@ -1,15 +1,4 @@
 both of long_name and selected_name are required?
 consideration of left-, right-associative operations
--- replace strings into exprssion(ident or constant) apropreately
--- remove simple_expression
--- modify sensitivity_list into apropreate name
--- use expressions in sensitivity_list
- -- use ident in sensitivity_list
- -- use expression in arguments list of function call
--- replace strings of spicifiying index into expressions
- -- bit_vector_select
- -- vector_kind
--- skip comment
-component generic
 use positioned
 
