@@ -2058,20 +2058,21 @@ architecture RTL of Test is begin end RTL;
                 ack_in : std_logic
 """).get should be ( new PortItem("start,stop,read,write,ack_in", None, new StdLogic(), None) )
   }
-/*
+
   "expr multiple bit-select" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.expression, "RecvBuffer(0)(7 downto 0)").
       get should be (
-        new BitVectorSelect(new CallExpr(new Ident("RecvBuffer"), List(new Constant("0"))), "downto", new Constant("7"), new Constant("0")))
+        new BitVectorSelect(new BitVectorSelect(new Ident("RecvBuffer"), "at", new Constant("0"), new Constant("0")), "downto", new Constant("7"), new Constant("0")))
   }
+
   "expr multiple bit-select 2" should " be parsed" in
   {
     val obj = new VHDLParser()
     obj.parseAll(obj.expression, "RecvBuffer(0)(0)").
       get should be (
-        new BitVectorSelect(new CallExpr(new Ident("RecvBuffer"), List(new Constant("0"))), "downto", new Constant("0"), new Constant("0")))
+        new BitVectorSelect(new BitVectorSelect(new Ident("RecvBuffer"), "at", new Constant("0"), new Constant("0")), "at", new Constant("0"), new Constant("0")))
   }
- */
+
 }

@@ -123,6 +123,9 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
+
+
+
   def library_clause = positioned ( "LIBRARY" ~> logical_name_list <~ ";" ^^ {
     case x => new NodeList(for(xx <- x.nodes) yield { new Library(xx.str) })
   } )
@@ -450,26 +453,39 @@ class VHDLParser extends JavaTokenParsers{
     | stringLiteral ^^ { case x => new Constant(x) }
   )
 
-  def extended_value_expression : Parser[Expr] = positioned ( bit_vector_select | function_call | bit_padding_expression | value_expression )
+  def extended_value_expression : Parser[Expr] = positioned (
+    bit_vector_select | function_call | bit_padding_expression | value_expression
+  )
 
   def when_expression : Parser[Expr] = positioned ( prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
   }
   )
 
-  // TODO: tooooo ad-hoc
+  def bit_vector_select_arg_range = positioned (
+     "(" ~> prime_expression ~ step_dir ~ prime_expression <~ ")" ^^ { case b~s~e => new BitVectorSelect(null, s, b, e) }
+  )
+
+  def bit_vector_select_arg = positioned (
+        bit_vector_select_arg_range
+      | "(" ~> prime_expression <~ ")" ^^ { case b => new BitVectorSelect(null, "at", b, b) }
+  )
+
   def bit_vector_select = positioned (
-    long_name ~ "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ^^ {
-      case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n.str), step, b, e)
+    long_name ~ bit_vector_select_arg ~ bit_vector_select_arg.+ ^^ {
+      case n~bs~bss => {
+        // TODO: should be written with foldl
+        var x = new BitVectorSelect(new Ident(n.str), bs.step, bs.b, bs.e)
+        for(bss_i <- bss) {
+          x = new BitVectorSelect(x, bss_i.step, bss_i.b, bss_i.e)
+        }
+        x
+      }
     }
-    // |
-    // function_call ~ "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ^^ {
-    //   case n~_~b~step~e~_ => new BitVectorSelect(n, step, b, e)
-    // }
-    // |
-    // function_call ~ "(" ~ prime_expression ~ ")" ^^ {
-    //   case n~_~b~_ => new BitVectorSelect(n, "downto", b, b)
-    // }
+    |
+    long_name ~ bit_vector_select_arg_range ^^ {
+      case n~bs => new BitVectorSelect(new Ident(n.str), bs.step, bs.b, bs.e)
+    }
   )
 
   def binary_expression = positioned (extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) })
