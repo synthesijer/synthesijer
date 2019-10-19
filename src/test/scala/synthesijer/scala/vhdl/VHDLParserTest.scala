@@ -1293,6 +1293,25 @@ end if;
     )
   }
 
+  "generate (without begin)" should " be parsed" in
+  {
+    val obj = new VHDLParser()
+    obj.parseAll(obj.architecture_statement, """
+    n : for i in 0 to 3 generate
+    end generate;
+""").get should be (
+      new GenerateFor(
+        new Ident("n"),
+        new Ident("i"),
+        "to",
+        new Constant("0"),
+        new Constant("3"),
+        List()
+      )
+    )
+  }
+
+
   "generate if" should " be parsed" in
   {
     val obj = new VHDLParser()

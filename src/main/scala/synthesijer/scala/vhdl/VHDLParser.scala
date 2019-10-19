@@ -97,6 +97,64 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   override protected val whiteSpace = """(\s|--.*)+""".r
 
+  // keywords
+  lazy val ALL              = """(?i)\Qall\E""".r
+  lazy val AND              = """(?i)\Qand\E""".r
+  lazy val ARCHITECTURE     = """(?i)\Qarchitecture\E""".r
+  lazy val ARRAY            = """(?i)\Qarray\E""".r
+  lazy val ATTRIBUTE        = """(?i)\Qattribute\E""".r
+  lazy val BEGIN            = """(?i)\Qbegin\E""".r
+  lazy val BLOCK            = """(?i)\Qblock\E""".r
+  lazy val CASE             = """(?i)\Qcase\E""".r
+  lazy val COMPONENT        = """(?i)\Qcomponent\E""".r
+  lazy val CONSTANT         = """(?i)\Qconstant\E""".r
+  lazy val DOWNTO           = """(?i)\Qdownto\E""".r
+  lazy val ELSIF            = """(?i)\Qelsif\E""".r
+  lazy val ELSE             = """(?i)\Qelse\E""".r
+  lazy val END              = """(?i)\Qend\E""".r
+  lazy val ENTITY           = """(?i)\Qentity\E""".r
+  lazy val FILE             = """(?i)\Qfile\E""".r
+  lazy val FOR              = """(?i)\Qfor\E""".r
+  lazy val FUNCTION         = """(?i)\Qfunction\E""".r
+  lazy val GENERIC          = """(?i)\Qgeneric\E""".r
+  lazy val GENERATE         = """(?i)\Qgenerate\E""".r
+  lazy val IF               = """(?i)\Qif\E""".r
+  lazy val IN               = """(?i)\Qin\E""".r
+  lazy val INOUT            = """(?i)\Qinout\E""".r
+  lazy val INTEGER          = """(?i)\Qinteger\E""".r
+  lazy val IS               = """(?i)\Qis\E""".r
+  lazy val LIBRARY          = """(?i)\Qlibrary\E""".r
+  lazy val LOOP             = """(?i)\Qloop\E""".r
+  lazy val MAP              = """(?i)\Qmap\E""".r
+  lazy val MOD              = """(?i)\Qmod\E""".r
+  lazy val NOT              = """(?i)\Qnot\E""".r
+  lazy val NS               = """(?i)\Qns\E""".r
+  lazy val NULL             = """(?i)\Qnull\E""".r
+  lazy val OF               = """(?i)\Qof\E""".r
+  lazy val OR               = """(?i)\Qor\E""".r
+  lazy val OTHERS           = """(?i)\Qothers\E""".r
+  lazy val OUT              = """(?i)\Qout\E""".r
+  lazy val PACKAGE          = """(?i)\Qpackage\E""".r
+  lazy val PORT             = """(?i)\Qport\E""".r
+  lazy val PROCESS          = """(?i)\Qprocess\E""".r
+  lazy val PS               = """(?i)\Qps\E""".r
+  lazy val REPORT           = """(?i)\Qreport\E""".r
+  lazy val RETURN           = """(?i)\Qreturn\E""".r
+  lazy val SHARED           = """(?i)\Qshared\E""".r
+  lazy val SIGNAL           = """(?i)\Qsignal\E""".r
+  lazy val STD_LOGIC        = """(?i)\Qstd_logic\E""".r
+  lazy val STD_LOGIC_VECTOR = """(?i)\Qstd_logic_vector\E""".r
+  lazy val SIGNED           = """(?i)\Qsigned\E""".r
+  lazy val THEN             = """(?i)\Qthen\E""".r
+  lazy val TYPE             = """(?i)\Qtype\E""".r
+  lazy val TO               = """(?i)\Qto\E""".r
+  lazy val UNSIGNED         = """(?i)\Qunsigned\E""".r
+  lazy val USE              = """(?i)\Quse\E""".r
+  lazy val VARIABLE         = """(?i)\Qvariable\E""".r
+  lazy val WAIT             = """(?i)\Qwait\E""".r
+  lazy val WHEN             = """(?i)\Qwhen\E""".r
+  lazy val XOR              = """(?i)\Qxor\E""".r
+
   def digit = ( "[0-9]+".r )
   def upper_case_letter = ( "[A-Z]+".r )
   def lower_case_letter = ( "[a-z]+".r )
@@ -110,7 +168,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   def logical_name = positioned ( identifier )
 
-  def suffix = positioned ( "ALL" ^^ {_ => new LiteralNode("all") } | identifier )
+  def suffix = positioned ( ALL ^^ {_ => new LiteralNode("all") } | identifier )
 
   def selected_name = positioned ( identifier ~ "." ~ (identifier ~ ".").* ~ suffix ^^ {
     case x~"."~y~z =>
@@ -126,12 +184,12 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
 
 
-  def library_clause = positioned ( "LIBRARY" ~> logical_name_list <~ ";" ^^ {
+  def library_clause = positioned ( LIBRARY ~> logical_name_list <~ ";" ^^ {
     case x => new NodeList(for(xx <- x.nodes) yield { new Library(xx.str) })
   } )
 
   def use_clause = positioned (
-    "USE" ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
+    USE ~> selected_name ~ ("," ~ selected_name).* <~ ";" ^^ {
       case x~y => {
         new NodeList (new Use(x.str) :: ( for(yy <- y) yield { new Use(yy._2.str) } ) )
       }
@@ -163,7 +221,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   )
 
   def package_decl = positioned(
-    "PACKAGE" ~> long_name ~ "IS" ~ declarations.* ~ "END" ~ "PACKAGE" ~ long_name.? <~ ";" ^^ {
+    PACKAGE ~> long_name ~ IS ~ declarations.* ~ END ~ PACKAGE ~ long_name.? <~ ";" ^^ {
       case name~_~decls~_~_~name2 => new PackageDecl(name.str, decls)
     }
   )
@@ -174,11 +232,11 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     case x~y => new CallExpr(new Ident(x.str), y)
   } )
 
-  def kind_std_logic = ( "STD_LOGIC" ^^ {_ => new StdLogic() } )
+  def kind_std_logic = ( STD_LOGIC ^^ {_ => new StdLogic() } )
 
 
   def entity_decl = positioned(
-    "ENTITY" ~> long_name ~ "IS" ~ param_item_list.? ~ port_item_list.? <~ "END" ~ "ENTITY".? ~ long_name.? ~ ";" ^^ {
+    ENTITY ~> long_name ~ IS ~ param_item_list.? ~ port_item_list.? <~ END ~ ENTITY.? ~ long_name.? ~ ";" ^^ {
       case x~_~params~ports => {
         new Entity(x.str, ports, params)
       }
@@ -187,17 +245,17 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   def bit_value = ( "'" ~> letter_or_digit <~ "'" ^^ { case x => s"'$x'"} )
 
-  def others_decl = ( "(" ~ "OTHERS" ~ "=>" ~> bit_value <~ ")" ^^ {case x => s"(others=>$x)" } )
+  def others_decl = ( "(" ~ OTHERS ~ "=>" ~> bit_value <~ ")" ^^ {case x => s"(others=>$x)" } )
 
   def signal_value = ( value_expression )
 
   def init_value = ":=" ~> ( prime_expression )
 
-  def step_dir = ( "DOWNTO" | "TO" )
+  def step_dir = ( DOWNTO | TO )
 
-  def vector_type = ( "STD_LOGIC_VECTOR" | "SIGNED" | "UNSIGNED" )
+  def vector_type = ( STD_LOGIC_VECTOR | SIGNED | UNSIGNED )
 
-  def kind_integer = ( "INTEGER" ^^ { _ => new IntegerKind()} )
+  def kind_integer = ( INTEGER ^^ { _ => new IntegerKind()} )
 
   def kind_std_logic_vector = (
       vector_type ~ "(" ~ prime_expression ~ step_dir ~ prime_expression <~ ")" ^^ {
@@ -235,9 +293,9 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
   }
 
-  def port_item_list = ( "PORT" ~> port_item_list_body <~ ";" )
+  def port_item_list = ( PORT ~> port_item_list_body <~ ";" )
 
-  def param_item_list = ( "GENERIC" ~ "(" ~> param_item ~ ( ";" ~ param_item ).* <~ ")" ~ ";" ^^ {
+  def param_item_list = ( GENERIC ~ "(" ~> param_item ~ ( ";" ~ param_item ).* <~ ")" ~ ";" ^^ {
     case x~y => x :: ( for(yy <- y) yield { yy._2 } )
   } )
 
@@ -250,11 +308,11 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   )
 
   def architecture_decl : PackratParser[Architecture] = positioned (
-    "ARCHITECTURE" ~> identifier ~ "OF" ~ long_name ~ "IS" ~
+    ARCHITECTURE ~> identifier ~ OF ~ long_name ~ IS ~
     declarations.* ~
-    "BEGIN" ~
+    BEGIN ~
     architecture_statement.* <~
-    "END" ~ "ARCHITECTURE".? ~ long_name.? ~ ";" ^^ {
+    END ~ ARCHITECTURE.? ~ long_name.? ~ ";" ^^ {
       case kind~_~name~_~decls~_~body => {
         new Architecture(kind.str, name.str, decls, body)
       }
@@ -262,7 +320,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   )
 
   def block_decl = positioned(
-    statement_label.? ~ "BLOCK" ~ declarations.* ~ "BEGIN" ~ architecture_statement.* ~ "END" ~ "BLOCK" ~ long_name.? <~ ";" ^^ {
+    statement_label.? ~ BLOCK ~ declarations.* ~ BEGIN ~ architecture_statement.* ~ END ~ BLOCK ~ long_name.? <~ ";" ^^ {
       case label~_~decls~_~body~_~_~name2 =>
         {
           label match{
@@ -273,12 +331,12 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     }
   )
 
-  def attribute_decl = positioned ( "ATTRIBUTE" ~> identifier ~ ":" ~ identifier <~ ";" ^^{
+  def attribute_decl = positioned ( ATTRIBUTE ~> identifier ~ ":" ~ identifier <~ ";" ^^{
     case x~_~y => new Attribute(x.str, y.str)
   } )
 
   def component_decl = positioned (
-    "COMPONENT" ~> long_name ~ "IS".? ~ param_item_list.? ~ port_item_list.? ~ "END" ~ "COMPONENT" ~ long_name.? <~ ";" ^^ {
+    COMPONENT ~> long_name ~ IS.? ~ param_item_list.? ~ port_item_list.? ~ END ~ COMPONENT ~ long_name.? <~ ";" ^^ {
       case name~_~params~ports~_~_~name2 => new ComponentDecl(name.str, ports, params)
     }
   )
@@ -290,34 +348,34 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   )
 
   def signal_decl = positioned (
-    "SIGNAL" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
+    SIGNAL ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Signal(name.str, kind, init)
     }
   )
 
   def shared_variable_decl = positioned(
-    "SHARED" ~ "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
+    SHARED ~ VARIABLE ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new SharedVariable(name.str, kind, init)
     }
   )
 
   def constant_decl = positioned (
-    "CONSTANT" ~> long_name_list ~ ":" ~ kind ~ init_value <~ ";" ^^ {
+    CONSTANT ~> long_name_list ~ ":" ~ kind ~ init_value <~ ";" ^^ {
       case name~_~kind~init => new ConstantDecl(name.str, kind, init)
     }
   )
 
   def variable_decl = positioned (
-    "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
+    VARIABLE ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
       case name~_~kind~init => new Variable(name.str, kind, init)
     }
   )
 
-  def direction = ( "OUT" | "IN" | "INOUT" )
+  def direction = ( OUT | IN | INOUT )
   def filepath = ( stringLiteral )
 
   def file_decl = positioned (
-    "FILE" ~> long_name_list ~ ":" ~ identifier ~ "IS" ~ direction ~ filepath <~ ";" ^^ {
+    FILE ~> long_name_list ~ ":" ~ identifier ~ IS ~ direction ~ filepath <~ ";" ^^ {
       case x~_~y~_~d~s => new FileDecl(x.str, y.str, d, s)
     }
   )
@@ -329,11 +387,11 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   )
 
   def type_decl = positioned(
-      "TYPE" ~> identifier ~ "IS" ~ "(" ~ symbol_list ~ ")" <~ ";" ^^ {
+      TYPE ~> identifier ~ IS ~ "(" ~ symbol_list ~ ")" <~ ";" ^^ {
         case x~_~_~l~_ => new UserType(x.str, l)
       }
-    | "TYPE" ~> identifier ~ "IS" ~ "ARRAY" ~
-      "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ~ "OF" ~ kind <~ ";" ^^ {
+    | TYPE ~> identifier ~ IS ~ ARRAY ~
+      "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ~ OF ~ kind <~ ";" ^^ {
         case x~_~_~_~y~z~w~_~_~v => new ArrayType(x.str, z, y, w, v)
       }
   )
@@ -377,11 +435,11 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   def process_decl = file_decl | variable_decl
 
   def process_statement = positioned(
-    statement_label.? ~ "PROCESS" ~ sensitivity_list.? ~
+    statement_label.? ~ PROCESS ~ sensitivity_list.? ~
     process_decl.* ~
-    "BEGIN" ~
+    BEGIN ~
     statement_in_process.* ~
-    "END" ~ "PROCESS" ~ long_name.? <~ ";" ^^ {
+    END ~ PROCESS ~ long_name.? <~ ";" ^^ {
       case name~_~sensitivities~variables~_~stmts~_~_~name2 => {
         name match {
           case Some(n) => new ProcessStatement(sensitivities, Some(n.str), stmts, variables)
@@ -394,32 +452,32 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   def generate_statement = positioned ( generate_for_statement | generate_for_loop | generate_if_statement )
 
   def generate_for_statement = positioned (
-    identifier ~ ":" ~ "FOR" ~ identifier ~ "IN" ~ prime_expression ~ step_dir ~ prime_expression ~ "GENERATE" ~
-    "BEGIN" ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
+    identifier ~ ":" ~ FOR ~ identifier ~ IN ~ prime_expression ~ step_dir ~ prime_expression ~ GENERATE ~
+    BEGIN.? ~ architecture_statement.* ~ END ~ GENERATE ~ identifier.? <~ ";" ^^ {
       case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name.str), new Ident(i.str), s, b, e, lst)
     }
   )
 
   def generate_if_statement = positioned (
-    identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
-    "BEGIN".? ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
+    identifier ~ ":" ~ IF ~ prime_expression ~ GENERATE ~
+    BEGIN.? ~ architecture_statement.* ~ END ~ GENERATE ~ identifier.? <~ ";" ^^ {
       case name~_~_~expr~_~_~lst~_~_~name2 => new GenerateIf(new Ident(name.str), expr, lst)
     }
   |
-    identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
-    "BEGIN".? ~ architecture_statement ^^ {
+    identifier ~ ":" ~ IF ~ prime_expression ~ GENERATE ~
+    BEGIN.? ~ architecture_statement ^^ {
       case name~_~_~expr~_~_~stmt => new GenerateIf(new Ident(name.str), expr, List(stmt))
     }
   )
 
-  def unary_expression = ("-"|"NOT") ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
+  def unary_expression = ("-"|NOT) ~ expression ^^ { case x~y => new UnaryExpr(x, y) }
 
   def compare_operation = ( "=" | ">=" | "<=" | ">" | "<" ) ^^ { case x => x } |
                           "/" ~ "=" ^^ { case x~y => x+y }
 
-  def logic_operation = "AND" | "OR" | "XOR"
+  def logic_operation = AND | OR | XOR
 
-  def mul_div_operation = "*" | "/" | "MOD"
+  def mul_div_operation = "*" | "/" | MOD
 
   def add_sub_operation = "+" | "-"
 
@@ -434,7 +492,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     }
   )
 
-  def others_expr = "(" ~ "OTHERS" ~ "=>" ~> extended_value_expression <~ ")" ^^ {
+  def others_expr = "(" ~ OTHERS ~ "=>" ~> extended_value_expression <~ ")" ^^ {
     case x => new Others(x)
   }
 
@@ -455,7 +513,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     unary_expression | bit_vector_select | function_call | bit_padding_expression | value_expression
   )
 
-  def when_expression : PackratParser[Expr] = positioned ( prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
+  def when_expression : PackratParser[Expr] = positioned ( prime_expression ~ WHEN ~ prime_expression ~ ELSE ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
   }
   )
@@ -496,17 +554,17 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   lazy val expression : PackratParser[Expr] = positioned ( when_expression | prime_expression )
 
-  def null_statement = "NULL" ~ ";" ^^ { _ => new NullStatement() }
+  def null_statement = NULL ~ ";" ^^ { _ => new NullStatement() }
 
-  def trigger = "FOR"
-  def unit = "NS" | "PS"
+  def trigger = FOR
+  def unit = NS | PS
 
   def wait_statement = (
-       "WAIT" ~> trigger ~ prime_expression ~ unit <~ ";" ^^ { case x~y~z => new WaitStatement(x, new TimeUnit(y, z)) }
-     | "WAIT" ~ ";" ^^ { case _ => new WaitStatement("", null) }
+       WAIT ~> trigger ~ prime_expression ~ unit <~ ";" ^^ { case x~y~z => new WaitStatement(x, new TimeUnit(y, z)) }
+     | WAIT ~ ";" ^^ { case _ => new WaitStatement("", null) }
   )
 
-  def report_statement = "REPORT" ~> stringLiteral <~ ";" ^^ { case x =>  new ReportStatement(x) }
+  def report_statement = REPORT ~> stringLiteral <~ ";" ^^ { case x =>  new ReportStatement(x) }
 
   lazy val statement_in_process : PackratParser[Node] = positioned (
         if_statement
@@ -520,28 +578,28 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
       | generate_for_loop
   )
 
-  def else_clause_in_if_statement : PackratParser[List[Node]] = "ELSE" ~> statement_in_process.* ^^ { case x => x }
+  def else_clause_in_if_statement : PackratParser[List[Node]] = ELSE ~> statement_in_process.* ^^ { case x => x }
 
   def elsif_clause_in_if_statement : PackratParser[IfStatement] =
-    "ELSIF" ~> prime_expression ~ "THEN" ~ statement_in_process.* ^^ {
+    ELSIF ~> prime_expression ~ THEN ~ statement_in_process.* ^^ {
       case x~_~y => new IfStatement(x, y, List(), None)
     }
 
   def if_statement =
-    "IF" ~> prime_expression ~ "THEN" ~
+    IF ~> prime_expression ~ THEN ~
     statement_in_process.* ~
     elsif_clause_in_if_statement.* ~
     else_clause_in_if_statement.? ~
-    "END" <~ "IF" ~ ";" ^^ {
+    END <~ IF ~ ";" ^^ {
       case cond~_~thenPart~elifPart~elsePart~_ => new IfStatement(cond, thenPart, elifPart, elsePart)
     }
 
-  def case_when_clause = "WHEN" ~> expression ~ "=>" ~ statement_in_process.* ^^ {
+  def case_when_clause = WHEN ~> expression ~ "=>" ~ statement_in_process.* ^^ {
     case label~_~stmts => new CaseWhenClause(label, stmts)
   }
 
   def case_statement =
-    "CASE" ~> expression ~ "IS" ~ case_when_clause.* <~ "END" ~ "CASE" ~ ";" ^^ {
+    CASE ~> expression ~ IS ~ case_when_clause.* <~ END ~ CASE ~ ";" ^^ {
       case cond~_~whenList => new CaseStatement(cond, whenList)
     }
 
@@ -555,20 +613,20 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
                      simple_portmap_list ^^ {case x => x } |
                      "(" ~ ")" ^^ { case _ => List() }
 
-  def genericmap = "GENERIC" ~ "MAP" ~> portmap_list ^^ { case x => x }
+  def genericmap = GENERIC ~ MAP ~> portmap_list ^^ { case x => x }
 
   def simple_portmap_list = "(" ~> prime_expression ~ ("," ~> prime_expression).* <~ ")" ^^ {
     case x~y => new PortMapItem(new NoExpr(), x) :: ( for(yy <- y) yield { new PortMapItem(new NoExpr(), yy) } )
   }
 
   def instantiation_statement = positioned (
-    long_name ~ ":" ~ long_name ~ genericmap.? ~ "PORT" ~ "MAP" ~ portmap_list <~ ";" ^^ {
+    long_name ~ ":" ~ long_name ~ genericmap.? ~ PORT ~ MAP ~ portmap_list <~ ";" ^^ {
       case iname~_~mname~params~_~_~ports => new InstanceStatement(new Ident(iname.str), new Ident(mname.str), ports, params)
     }
   )
 
   def set_attribute_decl = positioned (
-    "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name_list ~ ":" ~ ("SIGNAL"|"VARIABLE") ~ "IS" ~ value_expression <~ ";" ^^ {
+    ATTRIBUTE ~> identifier ~ OF ~ long_name_list ~ ":" ~ (SIGNAL|VARIABLE) ~ IS ~ value_expression <~ ";" ^^ {
       case x~_~y~_~_~_~z => new SetAttribute(x.str, y.str, z)
     }
   )
@@ -579,41 +637,21 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
   )
 
   def generate_for_loop : PackratParser[ForLoop] = positioned(
-    "FOR" ~> identifier ~ "IN" ~ range ~ "LOOP" ~ statement_in_process.* <~ "END" ~ "LOOP" ~ ";" ^^ {
+    FOR ~> identifier ~ IN ~ range ~ LOOP ~ statement_in_process.* <~ END ~ LOOP ~ ";" ^^ {
       case x~_~y~_~z => new ForLoop(None, new Ident(x.str), y, z)
     }
   )
 
-  def return_statement = "RETURN" ~> prime_expression <~ ";" ^^ { case x => new ReturnStatement(x) }
+  def return_statement = RETURN ~> prime_expression <~ ";" ^^ { case x => new ReturnStatement(x) }
 
   def function_body_statement = statement_in_process | generate_statement | return_statement
 
   def function_decl = 
-    "FUNCTION" ~ long_name ~ port_item_list_body ~ "RETURN" ~ kind ~ "IS" ~ variable_decl.* ~
-    "BEGIN" ~ function_body_statement.* ~ "END" ~ "FUNCTION" ~ ";" ^^{
+    FUNCTION ~ long_name ~ port_item_list_body ~ RETURN ~ kind ~ IS ~ variable_decl.* ~
+    BEGIN ~ function_body_statement.* ~ END ~ FUNCTION ~ ";" ^^{
       case _~x~y~_~k~_~v~_~s~_~_~_ =>
         new FunctionDecl(x.str, y, k, v, s)
     }
-
-  implicit override def literal(s: String): PackratParser[String] = new Parser[String] {
-    def apply(in: Input) = {
-      val source = in.source
-      val offset = in.offset
-      val start = handleWhiteSpace(source, offset)
-      var i = 0
-      var j = start
-      while (i < s.length && j < source.length && s.charAt(i).toUpper == source.charAt(j).toUpper) {
-        i += 1
-        j += 1
-      }
-      if (i == s.length)
-        Success(source.subSequence(start, j).toString, in.drop(j - offset))
-      else  {
-        val found = if (start == source.length()) "end of source" else "`"+source.charAt(start)+"'"
-        Failure("`"+s+"' expected but "+found+" found", in.drop(start - offset))
-      }
-    }
-  }
 
   def parse( input: String ) = parseAll(design_file, input) match {
     case Success(result, _ ) => Option(result.nodes)
