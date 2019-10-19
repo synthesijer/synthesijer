@@ -16,7 +16,7 @@ public class VHDLLoader{
 		byte[] bcontent = Files.readAllBytes(path);
 		String content = new String(bcontent);
 
-		if (opt.flag("check")){
+		if (opt.flag("check") && (opt.flag("error-only") == false)){
 			System.out.println(path);
 		}
 
@@ -25,6 +25,7 @@ public class VHDLLoader{
 		
 		if (opt.flag("check")){
 			if(result.isEmpty()){
+				if (opt.flag("error-only")) System.out.println(path);
 				System.out.println("..." + result);
 			}else if(opt.flag("error-only") == false){
 				System.out.println("..." + "OK");

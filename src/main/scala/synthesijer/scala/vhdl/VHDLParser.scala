@@ -216,14 +216,14 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     long_name_list ~ ":" ~ identifier.? ~ kind ~ init_value.? ^^ {
       case name~_~dir~kind~init => {
         dir match {
-          case Some(d) => new PortItem(name, d.str, kind, init)
-          case None => new PortItem(name, None, kind, init)
+          case Some(d) => new PortItem(name.str, d.str, kind, init)
+          case None => new PortItem(name.str, None, kind, init)
         }
       }
     }
   |
     long_name_list ~ ":" ~ kind ~ init_value.? ^^ {
-      case name~_~kind~init => new PortItem(name, None, kind, init)
+      case name~_~kind~init => new PortItem(name.str, None, kind, init)
     }
   )
 
@@ -283,33 +283,33 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     }
   )
 
-  def long_name_list = (
+  def long_name_list = positioned (
     long_name ~ ("," ~ long_name).* ^^ {
-      case x~y => ( x.str + ( for(yy <- y) yield { "," + yy._2.str } ).mkString("") )
+      case x~y => new LiteralNode ( x.str + ( for(yy <- y) yield { "," + yy._2.str } ).mkString("") )
     }
   )
 
   def signal_decl = positioned (
     "SIGNAL" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
-      case name~_~kind~init => new Signal(name, kind, init)
+      case name~_~kind~init => new Signal(name.str, kind, init)
     }
   )
 
   def shared_variable_decl = positioned(
     "SHARED" ~ "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
-      case name~_~kind~init => new SharedVariable(name, kind, init)
+      case name~_~kind~init => new SharedVariable(name.str, kind, init)
     }
   )
 
   def constant_decl = positioned (
     "CONSTANT" ~> long_name_list ~ ":" ~ kind ~ init_value <~ ";" ^^ {
-      case name~_~kind~init => new ConstantDecl(name, kind, init)
+      case name~_~kind~init => new ConstantDecl(name.str, kind, init)
     }
   )
 
   def variable_decl = positioned (
     "VARIABLE" ~> long_name_list ~ ":" ~ kind ~ init_value.? <~ ";" ^^ {
-      case name~_~kind~init => new Variable(name, kind, init)
+      case name~_~kind~init => new Variable(name.str, kind, init)
     }
   )
 
@@ -318,7 +318,7 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
 
   def file_decl = positioned (
     "FILE" ~> long_name_list ~ ":" ~ identifier ~ "IS" ~ direction ~ filepath <~ ";" ^^ {
-      case x~_~y~_~d~s => new FileDecl(x, y.str, d, s)
+      case x~_~y~_~d~s => new FileDecl(x.str, y.str, d, s)
     }
   )
 
@@ -567,10 +567,11 @@ class VHDLParser extends JavaTokenParsers with PackratParsers{
     }
   )
 
-  def set_attribute_decl =
-    "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name ~ ":" ~ ("SIGNAL"|"VARIABLE") ~ "IS" ~ value_expression <~ ";" ^^ {
+  def set_attribute_decl = positioned (
+    "ATTRIBUTE" ~> identifier ~ "OF" ~ long_name_list ~ ":" ~ ("SIGNAL"|"VARIABLE") ~ "IS" ~ value_expression <~ ";" ^^ {
       case x~_~y~_~_~_~z => new SetAttribute(x.str, y.str, z)
     }
+  )
 
   def range = (
       prime_expression ~ step_dir ~ prime_expression ^^ { case x~y~z => new RegionRange(y, x, z) }
