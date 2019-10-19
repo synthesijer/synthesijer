@@ -388,13 +388,14 @@ class VHDLParser extends JavaTokenParsers{
     }
   )
 
-  def generate_statement = generate_for_statement | generate_for_loop | generate_if_statement
+  def generate_statement = positioned ( generate_for_statement | generate_for_loop | generate_if_statement )
 
-  def generate_for_statement =
+  def generate_for_statement = positioned (
     identifier ~ ":" ~ "FOR" ~ identifier ~ "IN" ~ prime_expression ~ step_dir ~ prime_expression ~ "GENERATE" ~
     "BEGIN" ~ architecture_statement.* ~ "END" ~ "GENERATE" ~ identifier.? <~ ";" ^^ {
       case name~_~_~i~_~b~s~e~_~_~lst~_~_~name2 => new GenerateFor(new Ident(name.str), new Ident(i.str), s, b, e, lst)
     }
+  )
 
   def generate_if_statement = positioned (
     identifier ~ ":" ~ "IF" ~ prime_expression ~ "GENERATE" ~
@@ -426,7 +427,7 @@ class VHDLParser extends JavaTokenParsers{
   def hex_value = ("X"|"x") ~> stringLiteral ^^ { case x => new BasedValue(x, 16) }
   def bin_value = ("B"|"b") ~> stringLiteral ^^ { case x => new BasedValue(x, 2) }
 
-  def bit_padding_expression = (
+  def bit_padding_expression = positioned (
     "(" ~ prime_expression ~ step_dir ~ prime_expression ~ "=>" ~ prime_expression ~ ")" ^^ {
       case _~b~step~e~_~v~_ => new BitPaddingExpr(step, b, e, v)
     }
@@ -436,7 +437,7 @@ class VHDLParser extends JavaTokenParsers{
     case x => new Others(x)
   }
 
-  def value_expression : Parser[Expr] = (
+  def value_expression : Parser[Expr] = positioned(
     "(" ~> expression <~ ")" ^^ {case x => x }
     | hex_value   ^^ { case x => x }
     | bin_value   ^^ { case x => x }
@@ -449,14 +450,15 @@ class VHDLParser extends JavaTokenParsers{
     | stringLiteral ^^ { case x => new Constant(x) }
   )
 
-  def extended_value_expression : Parser[Expr] = bit_vector_select | function_call | bit_padding_expression | value_expression
+  def extended_value_expression : Parser[Expr] = positioned ( bit_vector_select | function_call | bit_padding_expression | value_expression )
 
-  def when_expression : Parser[Expr] = prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
+  def when_expression : Parser[Expr] = positioned ( prime_expression ~ "WHEN" ~ prime_expression ~ "ELSE" ~ expression ^^ {
     case thenExpr~_~cond~_~elseExpr => new WhenExpr(cond, thenExpr, elseExpr)
   }
+  )
 
   // TODO: tooooo ad-hoc
-  def bit_vector_select = (
+  def bit_vector_select = positioned (
     long_name ~ "(" ~ prime_expression ~ step_dir ~ prime_expression ~ ")" ^^ {
       case n~_~b~step~e~_ => new BitVectorSelect(new Ident(n.str), step, b, e)
     }
@@ -470,12 +472,11 @@ class VHDLParser extends JavaTokenParsers{
     // }
   )
 
-  def binary_expression = extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) }
+  def binary_expression = positioned (extended_value_expression ~ binary_operation ~ expression ^^ {case x~op~y => new BinaryExpr(op, x, y) })
 
-  def prime_expression : Parser[Expr] =
-    unary_expression | binary_expression | extended_value_expression
+  def prime_expression : Parser[Expr] = positioned ( unary_expression | binary_expression | extended_value_expression )
 
-  def expression : Parser[Expr] = when_expression | prime_expression
+  def expression : Parser[Expr] = positioned ( when_expression | prime_expression )
 
   def null_statement = "NULL" ~ ";" ^^ { _ => new NullStatement() }
 
