@@ -80,6 +80,16 @@ public class SchedulerSlot {
 		}
 	}
 
+	public String toInfo(){
+		String s = "";
+		String sep = "";
+		for(SchedulerItem item: items){
+			s += sep + item.info();
+			sep = ",";
+		}
+		return s;
+	}
+
 	public Operand[] getSrcOperands(){
 		ArrayList<Operand> operand = new ArrayList<>();
 		for(SchedulerItem item: items){

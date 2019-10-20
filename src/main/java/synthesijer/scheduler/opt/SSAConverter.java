@@ -14,7 +14,10 @@ import synthesijer.scheduler.VariableOperand;
 
 public class SSAConverter implements SchedulerInfoOptimizer{
 
+	private SchedulerInfo info;
+
 	public SchedulerInfo opt(SchedulerInfo info){
+		this.info = info;
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
 			result.addBoard(conv(b));
@@ -27,7 +30,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 	}
 
 	public SchedulerBoard conv(SchedulerBoard src){
-		ControlFlowGraph g = new ControlFlowGraph(src);
+		ControlFlowGraph g = new ControlFlowGraph(src, info.getName() + "_scheduler_board_" + getKey());
 		g.getBasicBlocks();
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
