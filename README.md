@@ -4,6 +4,9 @@ https://synthesijer.github.io/web/
 Synthesijer is a compiler from Java to VHDL/Verilog-HDL.
 In addition to that, we can build hardware logic by using HDL building block in Synthesijer with Scala(Synthesijer.Scala).
 
+## Install from snap
+Please refer https://snapcraft.io/synthesijer .
+
 ## Build from source code
 ### Requirement
 
