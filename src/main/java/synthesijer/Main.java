@@ -36,13 +36,14 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		GetOpt opt = new GetOpt("h",
-				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa,verbose",
+				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa,verbose,debug",
 				args);
 		if (opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0) {
 			printHelp();
 			System.exit(0);
 		}
 		Options.INSTANCE.verbose = opt.flag("verbose");
+		Options.INSTANCE.debug = opt.flag("debug");
 
 		ArrayList<String> javaSrc = new ArrayList<>();
 		ArrayList<String> irSrc = new ArrayList<>();

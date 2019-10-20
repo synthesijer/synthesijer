@@ -103,6 +103,7 @@ clean:
 	-rm -f *.xml
 	-rm -f *.ir
 	-rm -f *.dot
+	-rm -f *.svg
 	-rm -f *.o
 	-rm -f sim
 	-rm -f *.vcd

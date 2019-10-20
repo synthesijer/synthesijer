@@ -29,7 +29,7 @@ public class ControlFlowGraph{
 		if(!(slots.length > 0)) return;
 		base = board.getName();
 		this.blocks = buildAll(slots);
-		if(synthesijer.Options.debug){
+		if(synthesijer.Options.INSTANCE.debug){
 			dumpAsDot(board.getName(), key);
 		}
 	}
@@ -119,7 +119,6 @@ public class ControlFlowGraph{
 
 		if(node.succ.size() == 1 && node.succ.get(0).pred.size() < 2){
 			// just trace the successor
-			System.out.println("same BB: " + node.succ.get(0).slot.toInfo());
 			genBasicBlocks(list, table, node.succ.get(0), bb);
 		}else{
 			// make new BB
