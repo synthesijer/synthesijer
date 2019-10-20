@@ -12,6 +12,7 @@ public class Variable {
     private boolean flagMethodParam = false;
     private String uniqName = null;
     private boolean flagDebug = false;
+	private boolean flagPipeline = false;
 
     public Variable(String n, Type t, Method method, Expr init) {
         this.name = n;
@@ -63,6 +64,14 @@ public class Variable {
 
     public boolean isDebug() {
         return flagDebug;
+    }
+
+	public void setPipeline(boolean f) {
+        flagPipeline = f;
+    }
+
+    public boolean isPipeline() {
+        return flagPipeline;
     }
 
     public void setMethodParam(boolean f) {

@@ -64,6 +64,14 @@ public class VariableDecl extends ExprContainStatement{
         return var.isDebug();
     }
 
+    public void setPipeline(boolean f){
+        var.setPipeline(f);
+    }
+
+    public boolean isPipeline(){
+        return var.isPipeline();
+    }
+
     public void setMethodParam(boolean f){
         flagMethodParam = f;
         var.setMethodParam(f);

@@ -360,10 +360,12 @@ public enum Manager {
 		if(opt.with_ssa){
 			optimize(new SSAConverter(), info);
 		}
-		if(opt.bb2){
-			optimize(new BasicParallelizer2(), info);
-		}else{
+		if(opt.bb){
+			// only when "--bb" is specified
 			optimize(new BasicParallelizer(), info);
+		}else{
+			// in default, BasicParallelizer2 is used.
+			optimize(new BasicParallelizer2(), info);
 		}
 		if(opt.chaining){
 			optimize(new SimpleChaining(), info);
