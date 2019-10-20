@@ -14,7 +14,7 @@ In addition to that, we can build hardware logic by using HDL building block in 
 
     % git clone https://github.com/synthesijer/synthesijer.git
     % cd synthesijer
-    % sbt assembly
+    % make
 
 ### Run
 
