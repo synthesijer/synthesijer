@@ -46,6 +46,7 @@ public class Main {
 
 		ArrayList<String> javaSrc = new ArrayList<>();
 		ArrayList<String> irSrc = new ArrayList<>();
+		ArrayList<String> vhdlSrc = new ArrayList<>();
 
 		ArrayList<String> classPath = new ArrayList<>();
 		ArrayList<String> javacPath = new ArrayList<>();
@@ -79,6 +80,8 @@ public class Main {
 				}
 			} else if (a.endsWith("ir")) {
 				irSrc.add(a);
+			} else if (a.endsWith("vhd") || a.endsWith("vhdl")) {
+				vhdlSrc.add(a);
 			}
 		}
 
@@ -165,6 +168,10 @@ public class Main {
 		for (String f : irSrc) {
 			System.out.println(f);
 			Manager.INSTANCE.loadIR(f, Options.INSTANCE);
+		}
+		for (String f : vhdlSrc) {
+			System.out.println(f);
+			Manager.INSTANCE.loadVHDL(f, Options.INSTANCE);
 		}
 		Manager.INSTANCE.generate();
 

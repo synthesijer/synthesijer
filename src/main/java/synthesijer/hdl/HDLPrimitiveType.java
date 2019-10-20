@@ -91,6 +91,14 @@ public class HDLPrimitiveType implements HDLTree, HDLType{
 		return new HDLPrimitiveType(KIND.SIGNED, width, begin, end);
 	}
 
+	public static HDLPrimitiveType genUnsignedType(int width){
+		return new HDLPrimitiveType(KIND.UNSIGNED, width);
+	}
+
+	public static HDLPrimitiveType genUnsignedType(int width, String begin, String end){
+		return new HDLPrimitiveType(KIND.UNSIGNED, width, begin, end);
+	}
+
 	public static HDLPrimitiveType genIntegerType(){
 		return new HDLPrimitiveType(KIND.INTEGER, 0);
 	}

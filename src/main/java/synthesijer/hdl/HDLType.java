@@ -10,7 +10,7 @@ public interface HDLType {
 	public boolean isEqual(HDLType t);
 
 	public enum KIND {
-		VECTOR, BIT, SIGNED, USERDEF, INTEGER, STRING, DIGIT, UNKNOWN;
+		VECTOR, BIT, SIGNED, UNSIGNED, USERDEF, INTEGER, STRING, DIGIT, UNKNOWN;
 
 		public boolean hasWidth(){
 			switch (this) {

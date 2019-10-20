@@ -31,10 +31,10 @@ case class StringKind() extends Kind
 
 case class Library(s : String) extends Node
 case class Use(s : String) extends Node
-case class Entity(s:String, ports:Option[List[PortItem]], params:Option[List[ParamItem]] = None) extends Node
+case class Entity(name:String, ports:Option[List[PortItem]], params:Option[List[ParamItem]] = None) extends Node
 case class PackageDecl(s:String, decl:List[Node]) extends Node
-case class PortItem(name:String, dir:Option[String], kind:Node, init:Option[Expr]) extends Node{
-  def this(name:String, dir:String, kind:Node, init:Option[Expr] = None) = {
+case class PortItem(name:String, dir:Option[String], kind:Kind, init:Option[Expr]) extends Node{
+  def this(name:String, dir:String, kind:Kind, init:Option[Expr] = None) = {
     this(name, Some(dir), kind, init)
   }
 }

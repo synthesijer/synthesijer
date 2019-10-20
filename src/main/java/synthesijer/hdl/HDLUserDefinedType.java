@@ -14,7 +14,7 @@ public class HDLUserDefinedType implements HDLTree, HDLType{
     private final Hashtable<String, HDLValue> itemTable = new Hashtable<>();
     private final KIND kind;
 
-    HDLUserDefinedType(String base, String[] items, int defaultIndex) {
+    public HDLUserDefinedType(String base, String[] items, int defaultIndex) {
         this.base = "Type_" + base;
         if(items != null){
             for(String s: items){

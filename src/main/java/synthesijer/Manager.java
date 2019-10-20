@@ -17,6 +17,7 @@ import synthesijer.ast.Module;
 import synthesijer.ast.opt.NullOptimizer;
 import synthesijer.ast.opt.StaticEvaluator;
 import synthesijer.hdl.HDLModule;
+import synthesijer.hdl.vhdl.VHDLLoader;
 import synthesijer.lib.ARITH_RSHIFT32;
 import synthesijer.lib.ARITH_RSHIFT64;
 import synthesijer.lib.BlockRAM;
@@ -441,6 +442,19 @@ public enum Manager {
 		modules.put(name, info);
 	}
 
+	public void loadVHDL(String path, Options opt){
+		try{
+			VHDLLoader reader = new VHDLLoader(path);
+			for(HDLModule hm : reader.modules){
+				SynthesijerModuleInfo info = new SynthesijerModuleInfo(null, hm, true);
+				info.setCompileState(CompileState.GENERATE_HDL);
+				modules.put(hm.getName(), info);
+			}
+		}catch(IOException e){
+			SynthesijerUtils.warn("cannot load VHDL file: " + path);
+		}
+	}
+
 	public class SynthesijerModuleInfo{
 		/**
 		 * A given module
@@ -482,8 +496,10 @@ public enum Manager {
 		public String getName(){
 			if(m != null){
 				return m.getName();
-			}else{
+			}else if(info != null){
 				return info.getName();
+			}else{
+				return hm.getName();
 			}
 		}
 
