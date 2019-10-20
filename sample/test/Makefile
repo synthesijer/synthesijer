@@ -11,7 +11,7 @@ OPT = --chaining --bb2 --ssa
 
 
 
-.PHONY: all synthesis ghdl64 ghdl test clean test_vhdl test_verilog iverilog
+.PHONY: all synthesis ghdl test clean test_vhdl test_verilog iverilog
 
 all: synthesis
 
@@ -24,38 +24,10 @@ all: synthesis
 synthesis: $(SOURCES)
 	java -cp $(SYNTHESIJER) synthesijer.Main --verilog --vhdl $(OPT) $(SOURCES)
 
-ghdl64: $(VHDL_SOURCES)
-	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) sim.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/singleportram.vhd ../../lib/vhdl/dualportram.vhd $(SIM_SOURCES)
-	ghdl -e -Wa,--32 -Wl,-m32 sim
-	ghdl -e -Wa,--32 -Wl,-m32 sim006
-	ghdl -e -Wa,--32 -Wl,-m32 sim011
-	ghdl -e -Wa,--32 -Wl,-m32 sim013
-
 ghdl: $(VHDL_SOURCES)
 	ghdl -a $(VHDL_SOURCES) sim.vhd ../../lib/vhdl/dualportram.vhd sim001.vhd sim006.vhd sim011.vhd sim013.vhd ../../lib/vhdl/*.vhd $(SIM_SOURCES)
-	ghdl -e sim
-	ghdl -e sim006
-	ghdl -e sim011
-	ghdl -e sim013
-	ghdl -e sim001
-	ghdl -e sim_test001
-	ghdl -e sim_test002
-	ghdl -e sim_test003
-	ghdl -e sim_test004
-	ghdl -e sim_test005
-	ghdl -e sim_test006
-	ghdl -e sim_test007
-	ghdl -e sim_test014
-	ghdl -e sim_test017
-	ghdl -e sim_test018
-	ghdl -e sim_test020
-	ghdl -e sim_test021
-	ghdl -e sim_test022
-	ghdl -e sim_test_arithint
-	ghdl -e sim_test023
 
-test_java: $(VHDL_SOURCES)
-	java -cp $(SYNTHESIJER):. Test000
+test_java: synthesis
 	java -cp $(SYNTHESIJER):. Test001
 	java -cp $(SYNTHESIJER):. Test002
 	java -cp $(SYNTHESIJER):. Test003
@@ -72,23 +44,23 @@ test_java: $(VHDL_SOURCES)
 	java -cp $(SYNTHESIJER):. Test023
 
 test_vhdl: ghdl
-	./sim_test001
-	./sim_test002
-	./sim_test003
-	./sim_test004
-	./sim_test005
-	./sim_test006
-	./sim_test007
-	./sim_test014
-	./sim_test017
-	./sim_test018
-	./sim_test020
-	./sim_test021
-	./sim_test022
-	./sim_test023
-	./sim_test_arithint
+	ghdl -r sim_test001
+	ghdl -r sim_test002
+	ghdl -r sim_test003
+	ghdl -r sim_test004
+	ghdl -r sim_test005
+	ghdl -r sim_test006
+	ghdl -r sim_test007
+	ghdl -r sim_test014
+	ghdl -r sim_test017
+	ghdl -r sim_test018
+	ghdl -r sim_test020
+	ghdl -r sim_test021
+	ghdl -r sim_test022
+	ghdl -r sim_test023
+	ghdl -r sim_test_arithint
 
-iverilog: $(VERILOG_SOURCES)
+iverilog: synthesis
 	iverilog $(IVERILOG_OPT) -o sim_verilog_Test001 sim_Test001.v Test001.v
 	iverilog $(IVERILOG_OPT) -o sim_verilog_Test002 sim_Test002.v Test002.v ../../lib/verilog/dualportram.v
 	iverilog $(IVERILOG_OPT) -o sim_verilog_Test003 sim_Test003.v Test002.v Test003.v ../../lib/verilog/dualportram.v

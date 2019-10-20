@@ -209,7 +209,7 @@ public class Main {
 		System.out.println("  --no-optimize: do not apply any optimizations");
 		// System.out.println(" --no-chaining: do not apply opeartion chain in greedy manner");
 		System.out.println("  --chaining: apply opeartion chain in greedy manner");
-		System.out.println("  --bb: to use (Legacy-)BasicParallelizer (in default, BasicParallelizer2 will be used)");
+		System.out.println("  --bb2: to use BasicParallelizer2 (in default, BasicParallelizer will be used)");
 		System.out.println("  --operation-strength-reduction: do opeartion strength reduction");
 		System.out.println("  --legacy-instance-variable-name: to use legacy variable name for instance variables, such as class_*_0000");
 		System.out.println("  --ip-exact=TOP: generates a IP package template for \"TOP\" module");

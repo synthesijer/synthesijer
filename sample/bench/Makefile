@@ -6,26 +6,24 @@ OPT = --chaining --bb2
 
 all: build
 
-
 build: $(SOURCES)
 	java -cp $(SYNTHESIJER) synthesijer.Main --vhdl --verilog $(OPT) $(SOURCES)
 
-ghdl64: build primesim_top.vhd bubblesortsim_top.vhd mergesortsim_top.vhd
-	ghdl -a -Wc,-m32 -Wa,--32 -Wl,--32 $(VHDL_SOURCES) primesim_top.vhd bubblesortsim_top.vhd mergesortsim_top.vhd ../../lib/vhdl/dualportram.vhd ../../lib/vhdl/singleportram.vhd
-	ghdl -e -Wa,--32 -Wl,-m32 primesim_top
-	ghdl -e -Wa,--32 -Wl,-m32 bubblesortsim_top
-	ghdl -e -Wa,--32 -Wl,-m32 mergesortsim_top
-
-ghdl32: build primesim_top.vhd bubblesortsim_top.vhd mergesortsim_top.vhd
+ghdl: build primesim_top.vhd bubblesortsim_top.vhd mergesortsim_top.vhd
 	ghdl -a --std=93c --workdir=. $(VHDL_SOURCES) bubblesortsim_top.vhd primesim_top.vhd mergesortsim_top.vhd ../../lib/vhdl/dualportram.vhd ../../lib/vhdl/singleportram.vhd
-	ghdl -e primesim_top
-	ghdl -e bubblesortsim_top
-	ghdl -e mergesortsim_top
 
 iverilog : build primesim_top.v bubblesortsim_top.v mergesortsim_top.v
 	iverilog -DDUMP_ENABLE -o primesim_top primesim_top.v PrimeSim.v Prime.v ../../lib/verilog/dualportram.v ../../lib/verilog/singleportram.v
 	iverilog -DDUMP_ENABLE -o bubblesortsim_top bubblesortsim_top.v BubbleSortSim.v BubbleSort.v ../../lib/verilog/dualportram.v ../../lib/verilog/singleportram.v
 	iverilog -DDUMP_ENABLE -o mergesortsim_top mergesortsim_top.v MergeSortSim.v MergeSort.v ../../lib/verilog/dualportram.v ../../lib/verilog/singleportram.v
+
+test: ghdl iverilog
+	./primesim_top
+	./bubblesortsim_top
+	./iverilog -DDUMP_ENABLE 
+	ghdl -r primesim_top
+	ghdl -r bubblesortsim_top
+	ghdl -r mergesortsim_top
 
 clean:
 	-rm -f *.class
