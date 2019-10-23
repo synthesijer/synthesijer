@@ -16,11 +16,10 @@ import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
-import javax.management.RuntimeErrorException;
-
 public class ControlFlowGraph{
 
 	private ControlFlowGraphBB[] blocks;
+	private ControlFlowGraphBB entry;
 
 	private String base;
 
@@ -48,7 +47,7 @@ public class ControlFlowGraph{
 			}
 			for(ControlFlowGraphBB bb: blocks) {
 				for(ControlFlowGraphBB succ: bb.succ){
-					out.write(bb.label + " -> " + succ.label + ";");
+					out.write(bb.label + " -> " + succ.label + "[headport=n, tailport=s];");
 					out.newLine();
 				}
 			}
@@ -113,13 +112,18 @@ public class ControlFlowGraph{
 		n.bb = entry_bb;
 		entry_bb.nodes.add(n);
 
-		ControlFlowGraphBB bb = new ControlFlowGraphBB(id());
-		list.add(bb);
-		entry_bb.succ.add(bb);
-		bb.pred.add(entry_bb);
-		n = nodes.get(2);
-		genBasicBlocks(list, n, bb);
-		
+		if(nodes.size() > 2){
+			ControlFlowGraphBB bb = new ControlFlowGraphBB(id());
+			list.add(bb);
+			entry_bb.succ.add(bb);
+			bb.pred.add(entry_bb);
+			n = nodes.get(2);
+			genBasicBlocks(list, n, bb);
+		}else{
+			entry_bb.succ.add(exit_bb);
+			exit_bb.pred.add(entry_bb);
+		}
+		this.entry = entry_bb;
 		return list.toArray(new ControlFlowGraphBB[]{});
 	}
 
@@ -127,7 +131,7 @@ public class ControlFlowGraph{
 								ControlFlowGraphNode node,
 								ControlFlowGraphBB bb){
 		if(node.bb != null){
-			if(node.bb != bb){
+			if(node.bb != bb || node.isBranchSlot()){
 				bb.succ.add(node.bb);
 				node.bb.pred.add(bb);
 			}
@@ -145,7 +149,7 @@ public class ControlFlowGraph{
 			// make new BB
 			for(ControlFlowGraphNode n : node.succ){
 				if(n.bb != null){ // already registrated
-					if(n.bb != bb){
+					if(n.bb != bb || node.isBranchSlot()){
 						n.bb.pred.add(bb);
 						bb.succ.add(n.bb);
 					}
@@ -185,6 +189,9 @@ class ControlFlowGraphNode{
 		return slot.getItems()[0].getOp() == Op.METHOD_ENTRY;
 	}
 
+	public boolean isBranchSlot() {
+		return slot.hasBranchOp();
+	}
 }
 
 class ControlFlowGraphBB{
