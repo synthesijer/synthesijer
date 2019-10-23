@@ -6,8 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
@@ -90,21 +90,43 @@ public class ControlFlowGraph{
 
 	private ControlFlowGraphBB[] genBasicBlocks(ArrayList<ControlFlowGraphNode> nodes){
 		ArrayList<ControlFlowGraphBB> list = new ArrayList<>();
-		Hashtable<ControlFlowGraphNode,Boolean> table = new Hashtable<>();
+
+		ControlFlowGraphNode n;
+
+		ControlFlowGraphBB exit_bb;
+		exit_bb = new ControlFlowGraphBB(id());
+		list.add(exit_bb);
+		n = nodes.get(0);
+		if(n.isMethodExit() == false){
+			SynthesijerUtils.error("expected METHOD_EXIT, but " + n);
+		}
+		n.bb = exit_bb;
+		exit_bb.nodes.add(n);
+
+		ControlFlowGraphBB entry_bb;
+		entry_bb = new ControlFlowGraphBB(id());
+		list.add(entry_bb);
+		n = nodes.get(1);
+		if(n.isMethodEntry() == false){
+			SynthesijerUtils.error("expected METHOD_ENTRY, but " + n);
+		}
+		n.bb = entry_bb;
+		entry_bb.nodes.add(n);
 
 		ControlFlowGraphBB bb = new ControlFlowGraphBB(id());
 		list.add(bb);
-
-		ControlFlowGraphNode n = nodes.get(0);
-		genBasicBlocks(list, table, n, bb);
+		entry_bb.succ.add(bb);
+		bb.pred.add(entry_bb);
+		n = nodes.get(2);
+		genBasicBlocks(list, n, bb);
+		
 		return list.toArray(new ControlFlowGraphBB[]{});
 	}
 
 	private void genBasicBlocks(ArrayList<ControlFlowGraphBB> list,
-								Hashtable<ControlFlowGraphNode, Boolean> table,
 								ControlFlowGraphNode node,
 								ControlFlowGraphBB bb){
-		if(table.get(node) != null){
+		if(node.bb != null){
 			if(node.bb != bb){
 				bb.succ.add(node.bb);
 				node.bb.pred.add(bb);
@@ -113,17 +135,16 @@ public class ControlFlowGraph{
 		}
 
 		// registration
-		table.put(node, true);
 		bb.nodes.add(node);
 		node.bb = bb;
 
 		if(node.succ.size() == 1 && node.succ.get(0).pred.size() < 2){
 			// just trace the successor
-			genBasicBlocks(list, table, node.succ.get(0), bb);
+			genBasicBlocks(list, node.succ.get(0), bb);
 		}else{
 			// make new BB
 			for(ControlFlowGraphNode n : node.succ){
-				if(table.get(n) != null){ // already registrated
+				if(n.bb != null){ // already registrated
 					if(n.bb != bb){
 						n.bb.pred.add(bb);
 						bb.succ.add(n.bb);
@@ -133,7 +154,7 @@ public class ControlFlowGraph{
 					list.add(bb0);
 					bb0.pred.add(bb);
 					bb.succ.add(bb0);
-					genBasicBlocks(list, table, n, bb0);
+					genBasicBlocks(list, n, bb0);
 				}
 			}
 		}
@@ -154,6 +175,14 @@ class ControlFlowGraphNode{
 
 	public ControlFlowGraphNode(SchedulerSlot slot){
 		this.slot = slot;
+	}
+
+	public boolean isMethodExit(){
+		return slot.getItems()[0].getOp() == Op.METHOD_EXIT;
+	}
+	
+	public boolean isMethodEntry(){
+		return slot.getItems()[0].getOp() == Op.METHOD_ENTRY;
 	}
 
 }

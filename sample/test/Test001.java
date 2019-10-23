@@ -103,6 +103,9 @@ public class Test001{
 		return true;
 	}
 
+	public void null_func(){
+	}
+
 	@unsynthesizable
 	public static void main(String[] args){
 		Test001 obj = new Test001();
