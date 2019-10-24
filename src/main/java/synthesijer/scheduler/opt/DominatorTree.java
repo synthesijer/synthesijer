@@ -20,28 +20,34 @@ public class DominatorTree{
 
 	private String base;
 
-	DominatorTreeNode<ControlFlowGraphBB> root;
-	ArrayList<DominatorTreeNode<ControlFlowGraphBB>> nodes;
-
+	private DominatorTreeNode<ControlFlowGraphBB> root;
+	private ArrayList<DominatorTreeNode<ControlFlowGraphBB>> nodes = new ArrayList<>();
+	private DominatorTreeGenerator<ControlFlowGraphBB> dtg;
+	private Hashtable<ControlFlowGraphBB, DominatorTreeNode<ControlFlowGraphBB>> T = new Hashtable<>();
+		
 	public DominatorTree(ControlFlowGraph cfg, String base){
-		this.base = base;
-		this.root = new DominatorTreeNode<ControlFlowGraphBB>(cfg.root, cfg.root.label);
-		this.nodes = genDominatorTree(root);
+		for(ControlFlowGraphBB bb: cfg.getBasicBlocks()){
+			var n = new DominatorTreeNode<ControlFlowGraphBB>(bb, bb.label);
+			nodes.add(n);
+			T.put(bb, n);
+			if(bb == cfg.root){
+				root = n;
+			}
+		}
+		for(ControlFlowGraphBB bb: cfg.getBasicBlocks()){
+			var n = T.get(bb);
+			for(ControlFlowGraphBB succ: bb.succ){
+				n.addSucc(T.get(succ));
+			}
+		}
+		this.dtg = new DominatorTreeGenerator<ControlFlowGraphBB>(root);
 		if(synthesijer.Options.INSTANCE.debug){
 			dumpAsDot(base);
 		}
 	}
 
-	private ArrayList<DominatorTreeNode<ControlFlowGraphBB>> genDominatorTree(DominatorTreeNode<ControlFlowGraphBB> root){
-		ArrayList<DominatorTreeNode<ControlFlowGraphBB>> nodes = new ArrayList<>();
-		Hashtable<ControlFlowGraphBB, Boolean> table = new Hashtable<>();
-		nodes.add(root);
-		genDominatorTree(root, nodes, table);
-		return nodes;
-	}
-
-	private void genDominatorTree(DominatorTreeNode<ControlFlowGraphBB> n, ArrayList<DominatorTreeNode<ControlFlowGraphBB>> nodes, Hashtable<ControlFlowGraphBB, Boolean> table){
-		return;
+	public ControlFlowGraphBB dominatorOf(ControlFlowGraphBB v){
+		return dtg.dominatorOf(T.get(v)).get();
 	}
 
 	private void dumpAsDot(String key){
@@ -53,8 +59,8 @@ public class DominatorTree{
 				out.newLine();
 			}
 			for(DominatorTreeNode<ControlFlowGraphBB> n: nodes) {
-				for(DominatorTreeNode<ControlFlowGraphBB> succ: n.succ){
-					out.write(n.label + " -> " + succ.label + ";");
+				if(n.idom != null){
+					out.write(n.idom.label + " -> " + n.label + ";");
 					out.newLine();
 				}
 			}
@@ -75,25 +81,62 @@ class DominatorTreeGenerator<T>{
 	int df = 0;
 	
 	public DominatorTreeGenerator(DominatorTreeNode<T> r){
-		this.V = V;
 		this.r = r;
 		df = 0;
+		
+		// Step 1.
 		traceDfs(r);
+		
+		int n = V.size();
+		
+		for(int i = n - 1; i > 0; i--){
+			// Step 2.
+			DominatorTreeNode<T> w = V.get(i);
+			for(DominatorTreeNode<T> v : w.pred){
+				DominatorTreeNode<T> u = eval(v);
+				if(u.sdom.dfsId < w.sdom.dfsId){
+					w.sdom = u.sdom;
+				}
+			}
+			w.sdom.bucket.add(w);
+          
+			link(w.parent, w);
+          
+			// Step 3.
+			for(DominatorTreeNode<T> v: w.parent.bucket){
+				//w.parent.bucket.remove(v);
+				DominatorTreeNode<T> u = eval(v);
+				if(u.sdom.dfsId < v.sdom.dfsId){
+					v.idom = u;
+				}else{
+					v.idom = w.parent;
+				}
+			}
+		}
+
+		for(int i = 1; i < n; i++){
+			DominatorTreeNode<T> w = V.get(i);
+			if(w.idom != w.sdom){
+				w.idom = w.idom.idom;
+			}
+		}
+
+		r.idom = null;
 	}
 
 	public int getDfsNum(DominatorTreeNode<T> v){
 		return v.dfsId;
 	}
 
-	public ArrayList<DominatorTreeGenerator<T>> dominantsOf(DominatorTreeNode<T> v){
-		return null;
+	public DominatorTreeNode<T> dominatorOf(DominatorTreeNode<T> v){
+		return v.idom;
 	}
       
 	private void traceDfs(DominatorTreeNode<T> v){
         v.dfsId = df;
         V.add(df, v);
         v.sdom = v;
-        v.ancestor = new ArrayList<DominatorTreeNode<T>>();
+        v.ancestor = null;
         df = df + 1;
         
         for(DominatorTreeNode<T> w: v.succ){
@@ -104,81 +147,22 @@ class DominatorTreeGenerator<T>{
 		}
 	}
 
-	/*
-	  int df // depth-first search number
-      
-	  procedure dfs(v, vertex[])
-        dfnum(v) <- df
-        vertex[df] <- v
-        sdom(v) <- v
-        ancestor(v) <- null
-        df <- df + 1
-        
-        for each w in succ(v) do
-          if(sdom(w) = null){
-            parent(w) <- v
-            dfs(w)
-          }
-      
-      function eval(v)
-        vertex u
+	private DominatorTreeNode<T> eval(DominatorTreeNode<T> v){
+        DominatorTreeNode<T> u;
         // Find ancestor with least sdom
-        u <- v
-        while(ancestor(v != nil) do
-          if(dfnum(sdom(v)) < dfnum(sdom(u)))
-            u <- v
-          v <- ancestor(v)
-        return u
-      
-      procedure link(v, w)
-        ancestor(w) <- v
-      
-      procedure dominators(V, s)
-        int i
-        int n = |V|
-        vertex vertex[n]
-        
-        // Step 1.
-        for each w in V do
-          sdom(w) <- nil
-          bucket(w) <- {}
-        
-        df <- 0
-        dfs(s)
-        
-        for(i <- n - 1; i > 0; i <- i - 1) do {
-          // Step 2.
-          w <- vertex[i]
-          for each v in pred(w) do {
-            u <- eval(v)
-            if(dfnum(sdom(u)) < dfnum(sdom(w)))
-              sdom(w) <- sdom(u)
-          }
-          add w to bucket(sdom(w))
-          
-          link(parent(w), w)
-          
-          // Step 3.
-          for each v in bucket(parent(w)) do {
-            remove v from bucket(parent(w))
-            u <- eval(v)
-            if(dfnum(sdom(u)) < dfnum(sdom(v)))
-              idom(v) <- u
-            else
-              idom(v) <- prent(w)
-          }
-        }
+        u = v;
+		while(v.ancestor != null){
+			if(v.sdom.dfsId < u.sdom.dfsId){
+				u = v;
+			}
+			v = v.ancestor;
+		}
+        return u;
+	}
 
-        // Step 4.
-        for(i <- 1; i < n; i <- i + 1){
-          w <- vertex[i]
-          if(idom(w) != sdom(w))
-            idom(w) <- idom(idom(w))
-        }
-        
-        idom(s) <- -1
-
-	 */
+	private void link(DominatorTreeNode<T> v, DominatorTreeNode<T> w){
+        w.ancestor = v;
+	}
 
 }
 
@@ -193,9 +177,11 @@ class DominatorTreeNode<T>{
 
 	int dfsId = -1;
 	
+	DominatorTreeNode<T> idom = null;
 	DominatorTreeNode<T> sdom = null;
 	DominatorTreeNode<T> parent = null;
-	ArrayList<DominatorTreeNode<T>> ancestor;
+	DominatorTreeNode<T> ancestor = null;
+	ArrayList<DominatorTreeNode<T>> bucket = new ArrayList<>();
 		
 	public DominatorTreeNode(T node, String label){
 		this.node = node;
@@ -207,5 +193,8 @@ class DominatorTreeNode<T>{
 		obj.pred.add(this);
 	}
 
-
+	public T get(){
+		return node;
+	}
+		
 }
