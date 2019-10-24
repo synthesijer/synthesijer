@@ -68,8 +68,17 @@ public class DominatorTree{
 
 class DominatorTreeGenerator<T>{
 
-	public DominatorTreeGenerator(ArrayList<DominatorTreeNode<T>> V, DominatorTreeNode<T> r){
-		
+	ArrayList<DominatorTreeNode<T>> V = new ArrayList<>();
+	DominatorTreeNode<T> r;
+
+	/** depth-first search number */
+	int df = 0;
+	
+	public DominatorTreeGenerator(DominatorTreeNode<T> r){
+		this.V = V;
+		this.r = r;
+		df = 0;
+		traceDfs(r);
 	}
 
 	public int getDfsNum(DominatorTreeNode<T> v){
@@ -78,6 +87,21 @@ class DominatorTreeGenerator<T>{
 
 	public ArrayList<DominatorTreeGenerator<T>> dominantsOf(DominatorTreeNode<T> v){
 		return null;
+	}
+      
+	private void traceDfs(DominatorTreeNode<T> v){
+        v.dfsId = df;
+        V.add(df, v);
+        v.sdom = v;
+        v.ancestor = new ArrayList<DominatorTreeNode<T>>();
+        df = df + 1;
+        
+        for(DominatorTreeNode<T> w: v.succ){
+			if(w.sdom == null){
+				w.parent = v;
+				traceDfs(w);
+			}
+		}
 	}
 
 	/*
@@ -168,6 +192,10 @@ class DominatorTreeNode<T>{
 	final String label;
 
 	int dfsId = -1;
+	
+	DominatorTreeNode<T> sdom = null;
+	DominatorTreeNode<T> parent = null;
+	ArrayList<DominatorTreeNode<T>> ancestor;
 		
 	public DominatorTreeNode(T node, String label){
 		this.node = node;

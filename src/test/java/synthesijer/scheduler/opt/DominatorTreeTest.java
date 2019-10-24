@@ -35,7 +35,7 @@ public class DominatorTreeTest{
     @Test
     public void dfsTest1(){
 		var nodes = genTestPattern();
-		var dtg = new DominatorTreeGenerator<String>(nodes, nodes.get(0));
+		var dtg = new DominatorTreeGenerator<String>(nodes.get(0));
 		
         org.junit.Assert.assertEquals(0, dtg.getDfsNum(nodes.get(0)));
         org.junit.Assert.assertEquals(1, dtg.getDfsNum(nodes.get(1)));
@@ -50,7 +50,7 @@ public class DominatorTreeTest{
     @Test
     public void dominantsTest1(){
 		var nodes = genTestPattern();
-		var dtg = new DominatorTreeGenerator<String>(nodes, nodes.get(0));
+		var dtg = new DominatorTreeGenerator<String>(nodes.get(0));
 		
         org.junit.Assert.assertEquals(nodes.get(1), dtg.dominantsOf(nodes.get(0)).get(0));
         org.junit.Assert.assertEquals(nodes.get(2), dtg.dominantsOf(nodes.get(1)).get(0));
