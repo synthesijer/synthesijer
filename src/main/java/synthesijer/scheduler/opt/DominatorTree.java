@@ -20,27 +20,27 @@ public class DominatorTree{
 
 	private String base;
 
-	DominatorTreeNode root;
-	DominatorTreeNode[] nodes;
+	DominatorTreeNode<ControlFlowGraphBB> root;
+	ArrayList<DominatorTreeNode<ControlFlowGraphBB>> nodes;
 
 	public DominatorTree(ControlFlowGraph cfg, String base){
 		this.base = base;
-		this.root = new DominatorTreeNode(cfg.root);
+		this.root = new DominatorTreeNode<ControlFlowGraphBB>(cfg.root, cfg.root.label);
 		this.nodes = genDominatorTree(root);
 		if(synthesijer.Options.INSTANCE.debug){
 			dumpAsDot(base);
 		}
 	}
 
-	private DominatorTreeNode[] genDominatorTree(DominatorTreeNode root){
-		ArrayList<DominatorTreeNode> nodes = new ArrayList<>();
+	private ArrayList<DominatorTreeNode<ControlFlowGraphBB>> genDominatorTree(DominatorTreeNode<ControlFlowGraphBB> root){
+		ArrayList<DominatorTreeNode<ControlFlowGraphBB>> nodes = new ArrayList<>();
 		Hashtable<ControlFlowGraphBB, Boolean> table = new Hashtable<>();
 		nodes.add(root);
 		genDominatorTree(root, nodes, table);
-		return nodes.toArray(new DominatorTreeNode[]{});
+		return nodes;
 	}
 
-	private void genDominatorTree(DominatorTreeNode n, ArrayList<DominatorTreeNode> nodes, Hashtable<ControlFlowGraphBB, Boolean> table){
+	private void genDominatorTree(DominatorTreeNode<ControlFlowGraphBB> n, ArrayList<DominatorTreeNode<ControlFlowGraphBB>> nodes, Hashtable<ControlFlowGraphBB, Boolean> table){
 		return;
 	}
 
@@ -48,12 +48,12 @@ public class DominatorTree{
 		try (BufferedWriter out =
 			 Files.newBufferedWriter(Paths.get(key + "_dom.dot"), StandardCharsets.UTF_8)) {
 			out.write("digraph{"); out.newLine();
-			for(DominatorTreeNode n: nodes) {
+			for(DominatorTreeNode<ControlFlowGraphBB> n: nodes) {
 				out.write(n.label);
 				out.newLine();
 			}
-			for(DominatorTreeNode n: nodes) {
-				for(DominatorTreeNode succ: n.succ){
+			for(DominatorTreeNode<ControlFlowGraphBB> n: nodes) {
+				for(DominatorTreeNode<ControlFlowGraphBB> succ: n.succ){
 					out.write(n.label + " -> " + succ.label + ";");
 					out.newLine();
 				}
@@ -62,6 +62,22 @@ public class DominatorTree{
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+}
+
+class DominatorTreeGenerator<T>{
+
+	public DominatorTreeGenerator(ArrayList<DominatorTreeNode<T>> V, DominatorTreeNode<T> r){
+		
+	}
+
+	public int getDfsNum(DominatorTreeNode<T> v){
+		return v.dfsId;
+	}
+
+	public ArrayList<DominatorTreeGenerator<T>> dominantsOf(DominatorTreeNode<T> v){
+		return null;
 	}
 
 	/*
@@ -139,22 +155,28 @@ public class DominatorTree{
         idom(s) <- -1
 
 	 */
-	
+
 }
 
-class DominatorTreeNode{
+class DominatorTreeNode<T>{
 
-	DominatorTreeNode pred = null;
-	
-	final ArrayList<DominatorTreeNode> succ = new ArrayList<>();
+	final ArrayList<DominatorTreeNode<T>> pred = new ArrayList<>();
+	final ArrayList<DominatorTreeNode<T>> succ = new ArrayList<>();
 
-	final ControlFlowGraphBB node;
+	final T node;
 
 	final String label;
+
+	int dfsId = -1;
 		
-	public DominatorTreeNode(ControlFlowGraphBB node){
+	public DominatorTreeNode(T node, String label){
 		this.node = node;
-		this.label = node.label;
+		this.label = label;
+	}
+
+	public void addSucc(DominatorTreeNode<T> obj){
+		this.succ.add(obj);
+		obj.pred.add(this);
 	}
 
 
