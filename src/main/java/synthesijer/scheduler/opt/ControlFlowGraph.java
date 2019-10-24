@@ -29,7 +29,7 @@ public class ControlFlowGraph{
 		if(!(slots.length > 0)) return;
 		base = board.getName();
 		this.blocks = buildAll(slots);
-		DominatorTree dominatorTree = new DominatorTree(this, key + "_" + board.getName());
+		ControlFlowDominatorTree dominatorTree = new ControlFlowDominatorTree(this, key + "_" + board.getName());
 		if(synthesijer.Options.INSTANCE.debug){
 			dumpAsDot(base, key);
 		}
