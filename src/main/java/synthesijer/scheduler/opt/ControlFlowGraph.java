@@ -19,7 +19,8 @@ import synthesijer.scheduler.VariableOperand;
 public class ControlFlowGraph{
 
 	private ControlFlowGraphBB[] blocks;
-	private ControlFlowGraphBB entry;
+	
+	ControlFlowGraphBB root;
 
 	private String base;
 
@@ -28,8 +29,9 @@ public class ControlFlowGraph{
 		if(!(slots.length > 0)) return;
 		base = board.getName();
 		this.blocks = buildAll(slots);
+		DominatorTree dominatorTree = new DominatorTree(this, key + "_" + board.getName());
 		if(synthesijer.Options.INSTANCE.debug){
-			dumpAsDot(board.getName(), key);
+			dumpAsDot(base, key);
 		}
 	}
 
@@ -123,7 +125,7 @@ public class ControlFlowGraph{
 			entry_bb.succ.add(exit_bb);
 			exit_bb.pred.add(entry_bb);
 		}
-		this.entry = entry_bb;
+		this.root = entry_bb;
 		return list.toArray(new ControlFlowGraphBB[]{});
 	}
 
