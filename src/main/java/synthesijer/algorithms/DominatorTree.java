@@ -22,6 +22,23 @@ public class DominatorTree<T>{
 	
 	public DominatorTree(DominatorTreeNode<T> r){
 		this.r = r;
+		buildTree(r);
+		buildDominanceFrontier(r);
+	}
+
+	public int getDfsNum(DominatorTreeNode<T> v){
+		return v.dfsId;
+	}
+
+	public Optional<DominatorTreeNode<T>> dominatorOf(DominatorTreeNode<T> v){
+		return Optional.ofNullable(v.idom);
+	}
+      
+	public ArrayList<DominatorTreeNode<T>> dominanceFrontierOf(DominatorTreeNode<T> v){
+		return v.df;
+	}
+
+	private void buildTree(DominatorTreeNode<T> r){
 		df = 0;
 		
 		// Step 1.
@@ -62,16 +79,35 @@ public class DominatorTree<T>{
 		}
 
 		r.idom = null;
+
+		for(int i = 1; i < n; i++){
+			DominatorTreeNode<T> w = V.get(i);
+			w.idom.children.add(w);
+		}
 	}
 
-	public int getDfsNum(DominatorTreeNode<T> v){
-		return v.dfsId;
+	private void buildDominanceFrontier(DominatorTreeNode<T> x){
+		// depth first
+		for(DominatorTreeNode<T> c: x.children){
+			buildDominanceFrontier(c);
+		}
+		if(x == this.r) return;
+		// after building Dominance-Frontier of all children
+		x.df.clear();
+		for(DominatorTreeNode<T> y : x.succ){
+			if(y.idom != x){
+				x.df.add(y);
+			}
+		}
+		for(DominatorTreeNode<T> z : x.children){
+			for(DominatorTreeNode<T> y : z.df){
+                if(y.idom != x){
+					x.df.add(y);
+				}
+			}
+		}
 	}
 
-	public Optional<DominatorTreeNode<T>> dominatorOf(DominatorTreeNode<T> v){
-		return Optional.ofNullable(v.idom);
-	}
-      
 	private void traceDfs(DominatorTreeNode<T> v){
         v.dfsId = df;
         V.add(df, v);
@@ -103,5 +139,5 @@ public class DominatorTree<T>{
 	private void link(DominatorTreeNode<T> v, DominatorTreeNode<T> w){
         w.ancestor = v;
 	}
-
+		
 }

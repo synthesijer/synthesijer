@@ -12,6 +12,9 @@ public class DominatorTreeNode<T>{
 	int dfsId = -1;
 	
 	DominatorTreeNode<T> idom = null;
+	ArrayList<DominatorTreeNode<T>> children = new ArrayList<>();
+	ArrayList<DominatorTreeNode<T>> df = new ArrayList<>();
+	
 	DominatorTreeNode<T> sdom = null;
 	DominatorTreeNode<T> parent = null;
 	DominatorTreeNode<T> ancestor = null;

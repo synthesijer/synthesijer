@@ -119,4 +119,45 @@ public class DominatorTreeTest{
 		org.junit.Assert.assertEquals(T.get("D"), dt.dominatorOf(T.get("L")).get());
     }
 
+	@Test
+    public void dfTest1(){
+		String[] s = {"1", "2", "3", "4", "5", "6", "7"};
+		Hashtable<String, DominatorTreeNode<String>> T = new Hashtable<>();
+		for(int i = 0; i < s.length; i++){
+			var n = new DominatorTreeNode<String>(s[i]);
+			T.put(s[i], n);
+		}
+		T.get("1").addSucc(T.get("2"));
+		T.get("2").addSucc(T.get("3"));
+		T.get("2").addSucc(T.get("7"));
+		T.get("3").addSucc(T.get("4"));
+		T.get("3").addSucc(T.get("5"));
+		T.get("4").addSucc(T.get("6"));
+		T.get("5").addSucc(T.get("6"));
+		T.get("6").addSucc(T.get("2"));
+
+		var dt = new DominatorTree<String>(T.get("1"));
+
+		org.junit.Assert.assertEquals(T.get("1"), dt.dominatorOf(T.get("2")).get());
+		org.junit.Assert.assertEquals(T.get("2"), dt.dominatorOf(T.get("7")).get());
+		org.junit.Assert.assertEquals(T.get("2"), dt.dominatorOf(T.get("3")).get());
+		org.junit.Assert.assertEquals(T.get("3"), dt.dominatorOf(T.get("4")).get());
+		org.junit.Assert.assertEquals(T.get("3"), dt.dominatorOf(T.get("5")).get());
+		org.junit.Assert.assertEquals(T.get("3"), dt.dominatorOf(T.get("6")).get());
+
+		org.junit.Assert.assertEquals(0, dt.dominanceFrontierOf(T.get("7")).size());
+		org.junit.Assert.assertEquals(1, dt.dominanceFrontierOf(T.get("6")).size());
+		org.junit.Assert.assertEquals(1, dt.dominanceFrontierOf(T.get("5")).size());
+		org.junit.Assert.assertEquals(1, dt.dominanceFrontierOf(T.get("4")).size());
+		org.junit.Assert.assertEquals(1, dt.dominanceFrontierOf(T.get("3")).size());
+		org.junit.Assert.assertEquals(1, dt.dominanceFrontierOf(T.get("2")).size());
+		org.junit.Assert.assertEquals(0, dt.dominanceFrontierOf(T.get("1")).size());
+		
+		org.junit.Assert.assertEquals(T.get("2"), dt.dominanceFrontierOf(T.get("6")).get(0));
+		org.junit.Assert.assertEquals(T.get("6"), dt.dominanceFrontierOf(T.get("5")).get(0));
+		org.junit.Assert.assertEquals(T.get("6"), dt.dominanceFrontierOf(T.get("4")).get(0));
+		org.junit.Assert.assertEquals(T.get("2"), dt.dominanceFrontierOf(T.get("3")).get(0));
+		org.junit.Assert.assertEquals(T.get("2"), dt.dominanceFrontierOf(T.get("2")).get(0));
+	}
+
 }
