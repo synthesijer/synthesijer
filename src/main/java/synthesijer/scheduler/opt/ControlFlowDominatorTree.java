@@ -58,6 +58,20 @@ public class ControlFlowDominatorTree{
 		return Optional.of(n.get().get());
 	}
 
+	public ArrayList<ControlFlowGraphBB> dominanceFrontierOf(ControlFlowGraphBB v){
+		ArrayList<ControlFlowGraphBB> ret = new ArrayList<>();
+		var n = T.get(v);
+		if(n == null){
+			return ret;
+		}
+		var l = dt.dominanceFrontierOf(n);
+		for(var i: l){
+			ret.add(i.get());
+		}
+		return ret;
+	}
+
+
 	private void dumpAsDot(String key){
 		try (BufferedWriter out =
 			 Files.newBufferedWriter(Paths.get(key + "_dom.dot"), StandardCharsets.UTF_8)) {

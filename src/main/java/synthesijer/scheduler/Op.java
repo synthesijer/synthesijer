@@ -86,6 +86,7 @@ public enum Op {
 	FGEQ64(false, 1, PrimitiveTypeKind.BOOLEAN),
 	FCOMPEQ64(false, 1, PrimitiveTypeKind.BOOLEAN),
 	FNEQ64(false, 1, PrimitiveTypeKind.BOOLEAN),
+	PHI,
 	UNDEFINED;
 
 	public final boolean isBranch;
@@ -375,6 +376,7 @@ public enum Op {
 			case "FCOMPEQ64" : return FCOMPEQ64;
 			case "FNEQ64" : return FNEQ64;
 			case "FIFO_WRITE" : return FIFO_WRITE;
+			case "PHI" : return PHI;
 			case "UNDEFINED" : return UNDEFINED;
 			default:
 				throw new Exception("Undefined operation : " + k);

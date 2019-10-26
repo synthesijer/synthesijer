@@ -30,16 +30,61 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 	}
 
 	public SchedulerBoard conv(SchedulerBoard src){
-		ControlFlowGraph g = new ControlFlowGraph(src, info.getName() + "_scheduler_board_" + getKey());
-		g.getBasicBlocks();
+
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
 
 		for(SchedulerSlot s: slots){
-			ret.addSlot(s);
+			ret.addSlot(s.sameSchedulerSlot());
 		}
 
+		ControlFlowGraph g = new ControlFlowGraph(ret, info.getName() + "_scheduler_board_" + getKey());
+		insertPhiFuncAll(ret, g);
+
 		return ret;
+	}
+
+	private void insertPhiFuncAll(SchedulerBoard board, ControlFlowGraph g){
+
+		ControlFlowGraphBB[] blocks = g.getBasicBlocks();
+
+		Hashtable<ControlFlowGraphBB, Operand> inserted = new Hashtable<>();
+		Hashtable<ControlFlowGraphBB, Operand> work = new Hashtable<>();
+		
+		ArrayList<ControlFlowGraphBB> W = new ArrayList<>();
+		
+		var destinations = board.getDestinationVariables();
+			
+		for(var v: destinations){
+			for(int i = 2; i < blocks.length; i++){
+				var bb = blocks[i];
+				if(bb.hasDefinitionOf(v)){
+					W.add(bb);
+					work.put(bb, v);
+				}
+			}
+			
+			while(W.size() > 0){
+				var x = W.get(0); W.remove(x);
+				for(var y : g.dominanceFrontierOf(x)){
+					if(inserted.get(y) == null || inserted.get(y) != v){
+						insertPhiFunc(board, y, v);
+						inserted.put(y, v);
+						if(work.get(y) == null || work.get(y) != v){
+							W.add(y);
+							work.put(y, v);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void insertPhiFunc(SchedulerBoard board, ControlFlowGraphBB bb, VariableOperand v){
+		var slot = bb.nodes.get(0).slot;
+		var phi = new SchedulerItem(board, Op.PHI, new Operand[]{}, v);
+		phi.setBranchIds(slot.getNextStep());
+		bb.nodes.get(0).slot.insertItemInTop(phi);
 	}
 
 }

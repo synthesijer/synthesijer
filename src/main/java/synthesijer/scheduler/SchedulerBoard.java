@@ -140,6 +140,18 @@ public class SchedulerBoard {
 		return varList;
 	}
 
+	public ArrayList<VariableOperand> getDestinationVariables(){
+		ArrayList<VariableOperand> list = new ArrayList<>();
+		for(var s: slots){
+			for(var d: s.getDestOperands()){
+				if(d != null && d instanceof VariableOperand){
+					list.add((VariableOperand)d);
+				}
+			}
+		}
+		return list;
+	}
+
 	/**
 	 * adds an item into the container with a new slot, and set stepId into the item.
 	 * @param item
@@ -198,9 +210,10 @@ public class SchedulerBoard {
 	}
 
 	public void dumpDot(PrintStream out){
-		for(SchedulerSlot slot: slots){
-			slot.dumpDot(out);
+		for(int i = 1; i < slots.size(); i++){
+			slots.get(i).dumpDot(out);
 		}
+		slots.get(0).dumpDot(out);
 	}
 
 

@@ -7,15 +7,23 @@ public class SchedulerSlot {
 
 	private final int stepId;
 
-	public SchedulerSlot(int id){
-		this.stepId = id;
-	}
-
 	/**
 	 * container of items.
 	 * the index in this array corresponds to computation step. 
 	 */
 	private ArrayList<SchedulerItem> items = new ArrayList<>();
+
+	public SchedulerSlot(int id){
+		this.stepId = id;
+	}
+
+	public SchedulerSlot sameSchedulerSlot(){
+		SchedulerSlot s = new SchedulerSlot(stepId);
+		for(SchedulerItem i: items){
+			s.items.add(i);
+		}
+		return s;
+	}
 
 	public SchedulerItem[] getItems(){
 		return items.toArray(new SchedulerItem[]{});
@@ -30,7 +38,13 @@ public class SchedulerSlot {
 		items.add(item);
 		return item;
 	}
-
+	
+	public SchedulerItem insertItemInTop(SchedulerItem item){
+		items.add(0, item);
+		item.setSlot(this);
+		return item;
+	}
+	
 	public int getStepId(){
 		return this.stepId;
 	}
@@ -59,6 +73,20 @@ public class SchedulerSlot {
 		return false;
 	}
 
+	public boolean hasMethodExit(){
+		for(SchedulerItem item: items){
+			if(item.getOp() == Op.METHOD_EXIT) return true;
+		}
+		return false;
+	}
+	
+	public boolean hasMethodEntry(){
+		for(SchedulerItem item: items){
+			if(item.getOp() == Op.METHOD_ENTRY) return true;
+		}
+		return false;
+	}
+
 	public void dump(PrintStream out){
 		dump(out, "");
 	}
@@ -70,13 +98,18 @@ public class SchedulerSlot {
 	}
 
 	public void dumpDot(PrintStream out){
+		if(items.size() == 0) return;
+		String base = items.get(0).getBoardName();
+		String s = "";
 		for(SchedulerItem item: items){
-			for(int n: item.getBranchId()){
-				out.printf("%s_%d [shape = box, label = \"%s\"];", item.getBoardName(), getStepId(), item.info());
-				out.println();
-				out.printf("%s_%d -> %s_%d;", item.getBoardName(), getStepId(), item.getBoardName(), n);
-				out.println();
-			}
+			s += item.info() + "\\l";
+		}
+		out.printf("%s_%d [shape = box, label =\"%s\"];", base, getStepId(), s);
+		out.println();
+		if(hasMethodExit()) return;
+		for(int n: items.get(0).getBranchId()){
+			out.printf("%s_%d -> %s_%d [headport=n, tailport=s];", base, getStepId(), base, n);
+			out.println();
 		}
 	}
 
@@ -109,6 +142,15 @@ public class SchedulerSlot {
 			operand.add(d);
 		}
 		return operand.toArray(new Operand[]{});
+	}
+
+	public boolean hasDefinitionOf(Operand v){
+		for(Operand o: getDestOperands()){
+			if(v == o){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

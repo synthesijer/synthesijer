@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Enumeration;
 
 import synthesijer.SynthesijerUtils;
@@ -21,7 +22,8 @@ public class ControlFlowGraph{
 	private ControlFlowGraphBB[] blocks;
 	
 	ControlFlowGraphBB root;
-
+	ControlFlowDominatorTree dominatorTree;
+	
 	private String base;
 
 	public ControlFlowGraph(SchedulerBoard board, String key){
@@ -29,7 +31,7 @@ public class ControlFlowGraph{
 		if(!(slots.length > 0)) return;
 		base = board.getName();
 		this.blocks = buildAll(slots);
-		ControlFlowDominatorTree dominatorTree = new ControlFlowDominatorTree(this, key + "_" + board.getName());
+		this.dominatorTree = new ControlFlowDominatorTree(this, key + "_" + board.getName());
 		if(synthesijer.Options.INSTANCE.debug){
 			dumpAsDot(base, key);
 		}
@@ -37,6 +39,14 @@ public class ControlFlowGraph{
 
 	public ControlFlowGraphBB[] getBasicBlocks(){
 		return blocks;
+	}
+
+	public Optional<ControlFlowGraphBB> dominatorOf(ControlFlowGraphBB v){
+		return dominatorTree.dominatorOf(v);
+	}
+	
+	public ArrayList<ControlFlowGraphBB> dominanceFrontierOf(ControlFlowGraphBB v){
+		return dominatorTree.dominanceFrontierOf(v);
 	}
 
 	private void dumpAsDot(String name, String key){
@@ -184,16 +194,21 @@ class ControlFlowGraphNode{
 	}
 
 	public boolean isMethodExit(){
-		return slot.getItems()[0].getOp() == Op.METHOD_EXIT;
+		return slot.hasMethodExit();
 	}
 	
 	public boolean isMethodEntry(){
-		return slot.getItems()[0].getOp() == Op.METHOD_ENTRY;
+		return slot.hasMethodEntry();
 	}
 
 	public boolean isBranchSlot() {
 		return slot.hasBranchOp();
 	}
+
+	public boolean hasDefinitionOf(Operand v){
+		return slot.hasDefinitionOf(v);
+	}
+
 }
 
 class ControlFlowGraphBB{
@@ -229,4 +244,14 @@ class ControlFlowGraphBB{
 		s += "];";
 		return s;
 	}
+
+	public boolean hasDefinitionOf(Operand v){
+		for(ControlFlowGraphNode n: nodes){
+			if(n.hasDefinitionOf(v)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }
