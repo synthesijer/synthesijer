@@ -65,6 +65,23 @@ public class VariableOperand implements Operand{
 		this.memberFlag = memberFlag;
 	}
 
+	/**
+	 * copy constructor with new name
+	 */
+	public VariableOperand(VariableOperand v, String name){
+		this.name = name;
+		this.type = v.type;
+		this.initSrc = v.initSrc;
+		this.publicFlag = v.publicFlag;
+		this.globalConstantFlag = v.globalConstantFlag;
+		this.methodParamFlag = v.methodParamFlag;
+		this.origName = v.origName;
+		this.methodName = v.methodName;
+		this.privateMethodFlag = v.privateMethodFlag;
+		this.volatileFlag = v.volatileFlag;
+		this.memberFlag = v.memberFlag;
+	}
+
 	public String getName(){
 		return name;
 	}

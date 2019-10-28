@@ -38,6 +38,10 @@ public class DominatorTree<T>{
 		return v.df;
 	}
 
+	public ArrayList<DominatorTreeNode<T>> getChildren(DominatorTreeNode<T> n){
+		return n.children;
+	}
+
 	private void buildTree(DominatorTreeNode<T> r){
 		df = 0;
 		

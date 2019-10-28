@@ -17,14 +17,6 @@ public class SchedulerSlot {
 		this.stepId = id;
 	}
 
-	public SchedulerSlot sameSchedulerSlot(){
-		SchedulerSlot s = new SchedulerSlot(stepId);
-		for(SchedulerItem i: items){
-			s.items.add(i);
-		}
-		return s;
-	}
-
 	public SchedulerItem[] getItems(){
 		return items.toArray(new SchedulerItem[]{});
 	}

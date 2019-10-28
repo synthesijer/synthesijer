@@ -85,7 +85,10 @@ public class SchedulerBoard {
 	private SchedulerBoard(SchedulerBoard b){
 		this.name = b.name;
 		this.slots = new ArrayList<SchedulerSlot>();
-		this.varList = b.varList;
+		this.varList = new ArrayList<>();
+		for(var v: b.varList){
+			this.varList.add(v);
+		}
 		this.returnType = b.returnType;
 		this.privateFlag = b.privateFlag;
 		this.autoFlag = b.autoFlag;

@@ -3,6 +3,7 @@ package synthesijer.scheduler.opt;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashMap;
 
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
@@ -11,6 +12,7 @@ import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
+import synthesijer.scheduler.VariableRefOperand;
 
 public class SSAConverter implements SchedulerInfoOptimizer{
 
@@ -35,11 +37,16 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		SchedulerSlot[] slots = src.getSlots();
 
 		for(SchedulerSlot s: slots){
-			ret.addSlot(s.sameSchedulerSlot());
+			SchedulerSlot slot = new SchedulerSlot(s.getStepId());
+			for(var i: s.getItems()){
+				slot.addItem(i.copy(ret, slot));
+			}
+			ret.addSlot(slot);
 		}
 
 		ControlFlowGraph g = new ControlFlowGraph(ret, info.getName() + "_scheduler_board_" + getKey());
 		insertPhiFuncAll(ret, g);
+		setPhiFuncValuesAll(ret, g);
 
 		return ret;
 	}
@@ -56,6 +63,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		var destinations = board.getDestinationVariables();
 			
 		for(var v: destinations){
+			if(isExcludeFromSSA(v)) continue;
 			for(int i = 2; i < blocks.length; i++){
 				var bb = blocks[i];
 				if(bb.hasDefinitionOf(v)){
@@ -80,11 +88,121 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		}
 	}
 
+	private boolean isExcludeFromSSA(VariableOperand v){
+		if(v instanceof VariableRefOperand) return true;
+		if(v.isMember()) return true;
+		if(v.isMethodParam()) return true;
+		return false;
+	}
+
 	private void insertPhiFunc(SchedulerBoard board, ControlFlowGraphBB bb, VariableOperand v){
 		var slot = bb.nodes.get(0).slot;
-		var phi = new SchedulerItem(board, Op.PHI, new Operand[]{}, v);
+		Operand[] operands = new Operand[bb.pred.size()];
+		for(int i = 0; i < bb.pred.size(); i++){
+			operands[i] = v;
+		}
+		var phi = new SchedulerItem(board, Op.PHI, operands, v);
 		phi.setBranchIds(slot.getNextStep());
 		bb.nodes.get(0).slot.insertItemInTop(phi);
 	}
 
+	private void setPhiFuncValuesAll(SchedulerBoard board, ControlFlowGraph g){
+		SSAIDManager S = new SSAIDManager(0);
+		HashMap<VariableOperand, Integer> C = new HashMap<>();
+		ControlFlowGraphBB root = g.root;
+		setPhiFuncValues(board, g, S, C, root);
+	}
+	
+	private void setPhiFuncValues(SchedulerBoard board, ControlFlowGraph g, SSAIDManager S, HashMap<VariableOperand, Integer> C, ControlFlowGraphBB x){
+		for(var a : x.getItems()){
+			if(a.getOp() != Op.PHI){
+				Operand[] operands = a.getSrcOperand();
+				if(operands == null) continue;
+				for(int id = 0; id < operands.length; id++){
+					if((operands[id] instanceof VariableOperand) == false) continue;
+					VariableOperand v = (VariableOperand)operands[id];
+					if(isExcludeFromSSA(v)) continue;
+					int i = S.top(v);
+					VariableOperand vv = new VariableOperand(v, getSSAName(v.getName(), i)); // copy
+					//board.getVarList().add(vv);
+					a.overwriteSrc(id, vv);
+				}
+			}
+			var v = a.getDestOperand();
+			if(v != null && isExcludeFromSSA(v) == false){
+				int i = C.getOrDefault(v, new Integer(1)); // C's default value is 1
+				VariableOperand vv = new VariableOperand(v, getSSAName(v.getName(), i));
+				board.getVarList().add(vv);
+				a.setDestOperand(vv);
+				S.push(v, i);
+				C.put(v, i+1);
+			}
+		}
+		for(var y : x.succ){
+			int j = y.getPredIndex(x);
+			for(var item : y.getItems()){
+				if(item.getOp() != Op.PHI) continue;
+				VariableOperand v = (VariableOperand)(item.getSrcOperand()[j]);
+				if(isExcludeFromSSA(v)) continue;
+				int i = S.top(v);
+				item.overwriteSrc(j, new VariableOperand(v, getSSAName(v.getName(), i)));
+			}
+		}
+		for(var y : g.getChildren(x)){
+			setPhiFuncValues(board, g, S, C, y);
+		}
+		for(var a : x.getItems()){
+			var v = a.getDestOperand();
+			if(v != null && isExcludeFromSSA(v) == false){
+				S.pop(v);
+			}
+		}
+	}
+
+	private String getSSAName(String base, int i){
+		return base + "_" + i;
+	}
+
+}
+
+class SSAIDManager{
+
+	HashMap<VariableOperand, ArrayList<Integer>> T = new HashMap<>();
+
+	final int defaultValue;
+
+	SSAIDManager(int defaultValue){
+		this.defaultValue = defaultValue;
+	}
+
+	public int top(VariableOperand v){
+		if(T.get(v) == null){
+			ArrayList<Integer> a = new ArrayList<>();
+			a.add(0, defaultValue);
+			T.put(v, a);
+		}
+		return T.get(v).get(0);
+	}
+	
+	public void push(VariableOperand v, int i){
+		if(T.get(v) == null){
+			ArrayList<Integer> a = new ArrayList<>();
+			a.add(0, defaultValue);
+			T.put(v, a);
+		}
+		T.get(v).add(0, i); // insert 'i' at index 0
+	}
+	
+	public void pop(VariableOperand v){
+		if(T.get(v) == null){
+			ArrayList<Integer> a = new ArrayList<>();
+			a.add(0, defaultValue);
+			T.put(v, a);
+		}else{
+			if(T.get(v).size() > 1){
+				T.get(v).remove(0);
+			}
+		}
+	}
+	
 }

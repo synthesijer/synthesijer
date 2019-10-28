@@ -58,6 +58,24 @@ public class SchedulerItem {
 		this.src = src;
 		this.dest = dest;
 	}
+	
+	public SchedulerItem copy(SchedulerBoard board, SchedulerSlot slot) {
+		Operand[] src = null;
+		if(this.src != null){
+			src = new Operand[this.src.length];
+			for(int i = 0; i < this.src.length; i++){
+				src[i] = this.src[i];
+			}
+		}
+		int[] branchIDs = new int[this.branchIDs.length];
+		for(int i = 0; i < this.branchIDs.length; i++){
+			branchIDs[i] = this.branchIDs[i];
+		}
+		SchedulerItem i = new SchedulerItem(board, this.op, src, this.dest);
+		i.branchIDs = branchIDs;
+		i.slot = slot;
+		return i;
+	}
 
 	public void setSlot(SchedulerSlot slot) {
 		this.slot = slot;
@@ -119,13 +137,17 @@ public class SchedulerItem {
 	public Operand[] getSrcOperand() {
 		return src;
 	}
-
+	
 	public boolean hasSrcOperand() {
 		return src != null && src.length > 0;
 	}
 
 	public VariableOperand getDestOperand() {
 		return dest;
+	}
+	
+	public void setDestOperand(VariableOperand v) {
+		this.dest = v;
 	}
 
 	private String srcInfo() {

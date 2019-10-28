@@ -49,6 +49,10 @@ public class ControlFlowGraph{
 		return dominatorTree.dominanceFrontierOf(v);
 	}
 
+	public ArrayList<ControlFlowGraphBB> getChildren(ControlFlowGraphBB n){
+		return dominatorTree.getChildren(n);
+	}
+
 	private void dumpAsDot(String name, String key){
 		try (BufferedWriter out =
 			 Files.newBufferedWriter(Paths.get(key + "_" + name + "_cfg.dot"), StandardCharsets.UTF_8)) {
@@ -252,6 +256,23 @@ class ControlFlowGraphBB{
 			}
 		}
 		return false;
+	}
+
+	public ArrayList<SchedulerItem> getItems(){
+		ArrayList<SchedulerItem> items = new ArrayList<>();
+		for(var n: nodes){
+			for(var i: n.slot.getItems()){
+				items.add(i);
+			}
+		}
+		return items;
+	}
+
+	public int getPredIndex(ControlFlowGraphBB bb){
+		for(int i = 0; i < pred.size(); i++){
+			if(pred.get(i) == bb) return i;
+		}
+		return -1;
 	}
 	
 }

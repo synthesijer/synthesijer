@@ -71,6 +71,18 @@ public class ControlFlowDominatorTree{
 		return ret;
 	}
 
+	public ArrayList<ControlFlowGraphBB> getChildren(ControlFlowGraphBB v){
+		ArrayList<ControlFlowGraphBB> ret = new ArrayList<>();
+		var n = T.get(v);
+		if(n == null){
+			return ret;
+		}
+		var l = dt.getChildren(n);
+		for(var i: l){
+			ret.add(i.get());
+		}
+		return ret;
+	}
 
 	private void dumpAsDot(String key){
 		try (BufferedWriter out =
