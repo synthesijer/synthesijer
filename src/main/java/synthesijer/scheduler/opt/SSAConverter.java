@@ -109,11 +109,24 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 	private void setPhiFuncValuesAll(SchedulerBoard board, ControlFlowGraph g){
 		SSAIDManager S = new SSAIDManager(0);
 		HashMap<VariableOperand, Integer> C = new HashMap<>();
+		HashMap<String, VariableOperand> V = new HashMap<>();
 		ControlFlowGraphBB root = g.root;
-		setPhiFuncValues(board, g, S, C, root);
+		setPhiFuncValues(board, g, S, C, V, root);
+	}
+
+	private VariableOperand getSSAVariable(SchedulerBoard board, HashMap<String, VariableOperand> V, VariableOperand orig, String newName){
+		VariableOperand v;
+		if(V.containsKey(newName)){
+			v = V.get(newName);
+		}else{
+			v = new VariableOperand(orig, newName); // copy
+			V.put(newName, v);
+			board.getVarList().add(v);
+		}
+		return v;
 	}
 	
-	private void setPhiFuncValues(SchedulerBoard board, ControlFlowGraph g, SSAIDManager S, HashMap<VariableOperand, Integer> C, ControlFlowGraphBB x){
+	private void setPhiFuncValues(SchedulerBoard board, ControlFlowGraph g, SSAIDManager S, HashMap<VariableOperand, Integer> C, HashMap<String, VariableOperand> V, ControlFlowGraphBB x){
 		for(var a : x.getItems()){
 			if(a.getOp() != Op.PHI){
 				Operand[] operands = a.getSrcOperand();
@@ -123,16 +136,14 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 					VariableOperand v = (VariableOperand)operands[id];
 					if(isExcludeFromSSA(v)) continue;
 					int i = S.top(v);
-					VariableOperand vv = new VariableOperand(v, getSSAName(v.getName(), i)); // copy
-					//board.getVarList().add(vv);
+					VariableOperand vv = getSSAVariable(board, V, v, getSSAName(v.getName(), i));
 					a.overwriteSrc(id, vv);
 				}
 			}
 			var v = a.getDestOperand();
 			if(v != null && isExcludeFromSSA(v) == false){
 				int i = C.getOrDefault(v, new Integer(1)); // C's default value is 1
-				VariableOperand vv = new VariableOperand(v, getSSAName(v.getName(), i));
-				board.getVarList().add(vv);
+				VariableOperand vv = getSSAVariable(board, V, v, getSSAName(v.getName(), i));
 				a.setDestOperand(vv);
 				S.push(v, i);
 				C.put(v, i+1);
@@ -145,11 +156,11 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 				VariableOperand v = (VariableOperand)(item.getSrcOperand()[j]);
 				if(isExcludeFromSSA(v)) continue;
 				int i = S.top(v);
-				item.overwriteSrc(j, new VariableOperand(v, getSSAName(v.getName(), i)));
+				item.overwriteSrc(j, getSSAVariable(board, V, v, getSSAName(v.getName(), i)));
 			}
 		}
 		for(var y : g.getChildren(x)){
-			setPhiFuncValues(board, g, S, C, y);
+			setPhiFuncValues(board, g, S, C, V, y);
 		}
 		for(var a : x.getItems()){
 			var v = a.getDestOperand();

@@ -358,10 +358,10 @@ public enum Manager {
 		optimize(new ConvArrayAccessToArrayIndex(), info);
 		optimize(new PackArrayWriteAccess(), info);
 		if(opt.with_ssa){
-			//optimize(new SSAConverter(), info);
-			SchedulerInfoOptimizer obj = new SSAConverter();
-			SchedulerInfo ret = obj.opt(info.getSchedulerInfo());
-			dumpSchedulerInfo(ret, obj.getKey());
+			optimize(new SSAConverter(), info);
+			//SchedulerInfoOptimizer obj = new SSAConverter();
+			//SchedulerInfo ret = obj.opt(info.getSchedulerInfo());
+			//dumpSchedulerInfo(ret, obj.getKey());
 		}
 		if(opt.bb2){
 			// Only when "--bb2" is specified, BasicParallelizer2 is used.

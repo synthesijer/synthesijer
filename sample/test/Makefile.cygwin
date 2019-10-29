@@ -7,7 +7,7 @@ SIM_SOURCES = sim_Test001.VHD sim_Test002.VHD sim_Test003.VHD sim_Test004.VHD si
 
 IVERILOG_OPT = -DDUMP_ENABLE
 
-OPT = --chaining --bb2 --ssa
+OPT ?= --chaining --bb2
 
 
 

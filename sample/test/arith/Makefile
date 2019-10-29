@@ -1,6 +1,6 @@
 SYNTHESIJER ?= ../../../target/synthesijer
 
-OPT = --chaining --bb2 --ssa
+OPT ?= --chaining --bb2
 
 all:
 	java -cp $(SYNTHESIJER) synthesijer.Main $(OPT) arith.java

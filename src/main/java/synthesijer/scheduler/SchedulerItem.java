@@ -67,15 +67,20 @@ public class SchedulerItem {
 				src[i] = this.src[i];
 			}
 		}
-		int[] branchIDs = new int[this.branchIDs.length];
-		for(int i = 0; i < this.branchIDs.length; i++){
-			branchIDs[i] = this.branchIDs[i];
-		}
-		SchedulerItem i = new SchedulerItem(board, this.op, src, this.dest);
-		i.branchIDs = branchIDs;
-		i.slot = slot;
-		return i;
+		SchedulerItem item = new SchedulerItem(board, this.op, src, this.dest);
+		item.copyEnvFrom(this);
+		return item;
 	}
+
+	protected void copyEnvFrom(SchedulerItem orig){
+		int[] ids = new int[orig.getBranchId().length];
+		for(int i = 0; i < orig.getBranchId().length; i++){
+			ids[i] = orig.getBranchId()[i];
+		}
+		this.setBranchIds(ids);
+		this.setSlot(orig.slot);
+	}
+
 
 	public void setSlot(SchedulerSlot slot) {
 		this.slot = slot;
@@ -303,6 +308,12 @@ class MethodEntryItem extends SchedulerItem {
 		return s;
 	}
 
+	public MethodEntryItem copy(SchedulerBoard board, SchedulerSlot slot) {
+		MethodEntryItem item = new MethodEntryItem(board, this.name);
+		item.copyEnvFrom(this);
+		return item;
+	}
+
 }
 
 class MethodInvokeItem extends SchedulerItem {
@@ -313,19 +324,34 @@ class MethodInvokeItem extends SchedulerItem {
 
 	private boolean noWaitFlag = false;
 
-	public MethodInvokeItem(SchedulerBoard board, String name, Operand[] src, VariableOperand dest, String[] args) {
-		super(board, Op.CALL, src, dest);
+	public MethodInvokeItem(SchedulerBoard board, Op op, VariableOperand obj, String name, Operand[] src, VariableOperand dest, String[] args) {
+		super(board, op, src, dest);
 		this.name = name;
-		this.obj = null;
+		this.obj = obj;
 		this.args = args;
+	}
+
+	public MethodInvokeItem(SchedulerBoard board, String name, Operand[] src, VariableOperand dest, String[] args) {
+		this(board, Op.CALL, null, name, src, dest, args);
 	}
 
 	public MethodInvokeItem(SchedulerBoard board, VariableOperand obj, String name, Operand[] src, VariableOperand dest,
 							String[] args) {
-		super(board, Op.EXT_CALL, src, dest);
-		this.name = name;
-		this.obj = obj;
-		this.args = args;
+		this(board, Op.EXT_CALL, obj, name, src, dest, args);
+	}
+
+	public MethodInvokeItem copy(SchedulerBoard board, SchedulerSlot slot) {
+		Operand[] src = null;
+		Operand[] orig = this.getSrcOperand();
+		if(orig != null){
+			src = new Operand[orig.length];
+			for(int i = 0; i < this.getSrcOperand().length; i++){
+				src[i] = this.getSrcOperand()[i];
+			}
+		}
+		MethodInvokeItem item = new MethodInvokeItem(board, this.getOp(), this.obj, this.name, src, this.getDestOperand(), this.args);
+		item.copyEnvFrom(this);
+		return item;
 	}
 
 	public String info() {
@@ -378,6 +404,20 @@ class FieldAccessItem extends SchedulerItem {
 		this.obj = obj;
 	}
 
+	public FieldAccessItem copy(SchedulerBoard board, SchedulerSlot slot) {
+		Operand[] src = null;
+		Operand[] orig = this.getSrcOperand();
+		if(orig != null){
+			src = new Operand[orig.length];
+			for(int i = 0; i < this.getSrcOperand().length; i++){
+				src[i] = this.getSrcOperand()[i];
+			}
+		}
+		FieldAccessItem item = new FieldAccessItem(board, this.obj, this.name, src, this.getDestOperand());
+		item.copyEnvFrom(this);
+		return item;
+	}
+
 	public String info() {
 		String s = super.info();
 		if (obj == null) {
@@ -405,6 +445,20 @@ class TypeCastItem extends SchedulerItem {
 		super(board, op, new Operand[] { src }, dest);
 		this.orig = orig;
 		this.target = target;
+	}
+
+	public TypeCastItem copy(SchedulerBoard board, SchedulerSlot slot) {
+		Operand[] src = null;
+		Operand[] origSrc = this.getSrcOperand();
+		if(origSrc != null){
+			src = new Operand[origSrc.length];
+			for(int i = 0; i < this.getSrcOperand().length; i++){
+				src[i] = this.getSrcOperand()[i];
+			}
+		}
+		TypeCastItem item = new TypeCastItem(board, this.getOp(), src[0], this.getDestOperand(), this.orig, this.target);
+		item.copyEnvFrom(this);
+		return item;
 	}
 
 	public String info() {
@@ -464,6 +518,21 @@ class SelectItem extends SchedulerItem {
 		this.target = target;
 		this.pat = pat;
 	}
+
+	public SelectItem copy(SchedulerBoard board, SchedulerSlot slot) {
+		Operand[] newPat = null;
+		Operand[] origPat = this.pat;
+		if(origPat != null){
+			newPat = new Operand[origPat.length];
+			for(int i = 0; i < origPat.length; i++){
+				newPat[i] = origPat[i];
+			}
+		}
+		SelectItem item = new SelectItem(board, this.target, newPat);
+		item.copyEnvFrom(this);
+		return item;
+	}
+
 
 	public String info() {
 		String s = super.info();

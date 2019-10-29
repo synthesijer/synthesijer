@@ -620,6 +620,9 @@ public class SchedulerInfoCompiler {
 			//tmp.setAssign(null, new HDLValue(c.getValue(), type));
 			ret = new HDLValue(c.getValue(), type);
 		}
+		if(ret == null){
+			SynthesijerUtils.error("Internal error: cannot find the following variable in VarTable; " + o.dump());
+		}
 		return ret;
 	}
 
@@ -693,7 +696,9 @@ public class SchedulerInfoCompiler {
 			case CONTINUE : break;
 			case CAST : break;
 			case UNDEFINED : break;
-			default:
+		    default: {
+				SynthesijerUtils.warn("Using undefined Op in SchedulerInfoCompiler::convOp2HDLOp: " + op);
+			}
 		}
 		return ret;
 	}
@@ -1179,7 +1184,6 @@ public class SchedulerInfoCompiler {
 				HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
 				Operand[] src = item.getSrcOperand();
 				int nums = op.getArgNums();
-
 				HDLExpr expr = (nums == 1) ?
 						hm.newExpr(op, convOperandToHDLExpr(item, src[0])) :
 						hm.newExpr(op, convOperandToHDLExpr(item, src[0]), convOperandToHDLExpr(item, src[1]));

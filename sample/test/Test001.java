@@ -73,6 +73,19 @@ public class Test001{
 		return value;
 	}
 
+	public void null_func(){
+	}
+
+	public int if_test(int c, int a, int b){
+		int x = 0;
+		if(c > 0){
+			x = a;
+		}else{
+			x = b;
+		}
+		return x;
+	}
+
 	public boolean test(){
 		int v;
 		v = add(100, 200);
@@ -100,10 +113,11 @@ public class Test001{
 		if(x != 200) return false;
 		x = switch_test(5);
 		if(x != 200) return false;
+		x = if_test(10, 10, 20);
+		if(x != 10) return false;
+		x = if_test(-10, 10, 20);
+		if(x != 20) return false;
 		return true;
-	}
-
-	public void null_func(){
 	}
 
 	@unsynthesizable

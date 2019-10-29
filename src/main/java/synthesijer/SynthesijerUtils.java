@@ -4,6 +4,7 @@ public class SynthesijerUtils {
 
 	public static void error(String s){
 		System.err.println("Error: "+ s);
+		throw new RuntimeException(s);
 	}
 
 	public static void warn(String s){
