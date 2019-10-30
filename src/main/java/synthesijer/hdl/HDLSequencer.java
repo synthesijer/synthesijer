@@ -11,6 +11,7 @@ public class HDLSequencer implements HDLTree{
 	private final HDLModule module;
 
 	private final HDLSignal stateKey;
+	private final HDLSignal prevStateKey;
 	private final HDLUserDefinedType stateType;
 	private ArrayList<SequencerState> states;
 	private ArrayList<Pair> seqExprList = new ArrayList<>();
@@ -24,6 +25,7 @@ public class HDLSequencer implements HDLTree{
 		this.module = module;
 		this.stateType = module.newUserDefinedType(key, null, 0);
 		this.stateKey = module.newSignal(key, stateType);
+		this.prevStateKey = module.newSignal(key + "_prev", stateType);
 		HDLValue idleId = stateType.addItem(stateKey.getName() + "_IDLE");
 		this.idle = new SequencerState(this, stateKey, idleId);
 		states = new ArrayList<>();
@@ -71,6 +73,10 @@ public class HDLSequencer implements HDLTree{
 
 	public HDLSignal getStateKey(){
 		return stateKey;
+	}
+	
+	public HDLSignal getPrevStateKey(){
+		return prevStateKey;
 	}
 
 	public ArrayList<SequencerState> getStates(){

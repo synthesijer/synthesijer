@@ -1,6 +1,7 @@
 package synthesijer.hdl.verilog;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLInstance;
@@ -19,7 +20,8 @@ import synthesijer.hdl.HDLUtils;
 public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 
     private final PrintWriter dest;
-    private final int offset;
+    private int offset;
+	private HashMap<HDLUserDefinedType, Boolean> definedType = new HashMap<>();
 
     public GenerateVerilogDefVisitor(PrintWriter dest, int offset){
         this.dest = dest;
@@ -45,12 +47,12 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
         for(HDLPort p: o.getPorts()){
             if(p.isSet(HDLPort.OPTION.NO_SIG)) continue; // nothing to do
             if(p.getSignal() == null) continue; // nothing to do
-            p.getSignal().accept(new GenerateVerilogDefVisitor(dest, offset));
+            p.getSignal().accept(this);
         }
         HDLUtils.nl(dest);
-        for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVerilogDefVisitor(dest, offset)); }
+        for(HDLSignal s: o.getSignals()){ s.accept(this); }
         HDLUtils.nl(dest);
-        for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVerilogDefVisitor(dest, offset)); }
+        for(HDLSequencer m: o.getSequencers()){ m.accept(this); }
         HDLUtils.nl(dest);
     }
 
@@ -95,6 +97,8 @@ public class GenerateVerilogDefVisitor implements HDLTreeVisitor{
 
     @Override
     public void visitHDLUserDefinedType(HDLUserDefinedType o) {
+		if(definedType.containsKey(o)) return;
+		definedType.put(o, true);
         for(int i = 0; i < o.getItems().length; i++){
             //			HDLUtils.println(dest, offset, String.format("parameter %s = 32'd%d;", o.getItems()[i].getVerilogHDL(), i));
             HDLUtils.println(dest, offset, String.format("localparam %s = 32'd%d;", o.getItems()[i].getVerilogHDL(), i));

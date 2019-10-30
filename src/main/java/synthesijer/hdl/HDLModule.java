@@ -6,7 +6,9 @@ import java.util.EnumSet;
 import java.util.Hashtable;
 
 import synthesijer.SynthesijerComponent;
+import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.expr.HDLCombinationExpr;
+import synthesijer.hdl.expr.HDLPhiExpr;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.verilog.GenerateVerilogVisitor;
 import synthesijer.hdl.vhdl.GenerateVHDLVisitor;
@@ -498,6 +500,23 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 		return tmp;
 	}
 
+	/**
+	 * add a new expression
+	 * @param op operator
+	 * @param args arguments
+	 * @return created new expression.
+	 */
+	public HDLExpr newExpr(HDLOp op, HDLExpr[] args){
+		HDLExpr expr = null;
+		if(op == HDLOp.PHI){
+			expr = new HDLPhiExpr(this, getExprUniqueId(), op, args);
+			exprs.add(expr);
+		}else{
+			SynthesijerUtils.error("HDLModule::newExpr with args[] are not supported for " + op);
+		}
+		return expr;
+	}
+	
 	/**
 	 * add a new expression
 	 * @param op operator

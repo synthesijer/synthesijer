@@ -204,20 +204,13 @@ public class SchedulerItem {
 			}
 		}
 
-		if (this instanceof MethodInvokeItem) {
-			s += ((MethodInvokeItem) this).addInfo();
-		}
-		if (this instanceof SelectItem) {
-			s += ((SelectItem) this).addInfo();
-		}
-		if (this instanceof FieldAccessItem) {
-			s += ((FieldAccessItem) this).addInfo();
-		}
-		if (this instanceof TypeCastItem) {
-			s += ((TypeCastItem) this).addInfo();
-		}
+		s += addInfo();
 
 		return s;
+	}
+
+	public String addInfo(){
+		return "";
 	}
 
 	public String nextList() {

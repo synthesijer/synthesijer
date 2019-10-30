@@ -23,7 +23,7 @@ import synthesijer.hdl.sequencer.StateTransitCondition;
 public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
 	private final PrintWriter dest;
-	private final int offset;
+	private int offset;
 
 	public GenerateVerilogVisitor(PrintWriter dest, int offset){
 		this.dest = dest;
@@ -135,18 +135,39 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 		HDLUtils.nl(dest);
 
 		// definitions
-		o.accept(new GenerateVerilogDefVisitor(dest, offset+2));
+		GenerateVerilogDefVisitor defVisitor = new GenerateVerilogDefVisitor(dest, offset+2);
+		o.accept(defVisitor);
 
 		// body
-		for(HDLPort p: o.getPorts()){ p.accept(new GenerateVerilogVisitor(dest, offset+2)); }
+		for(HDLPort p: o.getPorts()){
+			offset += 2;
+			p.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
-		for(HDLExpr expr : o.getExprs()){ expr.accept(new GenerateVerilogVisitor(dest, offset+2)); }
+		for(HDLExpr expr : o.getExprs()){
+			offset += 2;
+			expr.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
-		for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVerilogVisitor(dest, offset+2)); }
+		for(HDLSequencer m: o.getSequencers()){
+			offset += 2;
+			m.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
-		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVerilogVisitor(dest, offset+2)); }
+		for(HDLSignal s: o.getSignals()){
+			offset += 2;
+			s.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
-		for(HDLInstance i: o.getModuleInstances()){ i.accept(new GenerateVerilogVisitor(dest, offset+2)); }
+		for(HDLInstance i: o.getModuleInstances()){
+			offset += 2;
+			i.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
 		HDLUtils.println(dest, offset, "endmodule");
 	}
@@ -210,6 +231,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
 		// reset
+		HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getPrevStateKey().getName(), o.getStateKey().getName()));
 		if(o.getModule().isNegativeReset()){
 			HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b0) begin", o.getModule().getSysResetName()));
 		}else{

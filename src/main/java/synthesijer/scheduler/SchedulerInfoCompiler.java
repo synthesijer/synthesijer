@@ -36,6 +36,7 @@ import synthesijer.hdl.HDLUtils;
 import synthesijer.hdl.HDLVariable;
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
+import synthesijer.hdl.expr.HDLPhiExpr;
 import synthesijer.hdl.sequencer.SequencerState;
 import synthesijer.lib.FCOMP32;
 import synthesijer.lib.FCOMP64;
@@ -633,7 +634,7 @@ public class SchedulerInfoCompiler {
 		for(SchedulerSlot slot: board.getSlots()){
 			int id = slot.getStepId();
 			for(SchedulerItem item: slot.getItems()){
-				genExpr(board, resource, item, states.get(id), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap, predExprMap, returnTable);
+				genExpr(board, states, resource, item, states.get(id), return_sig, paramListMap.get(board.getName()), fieldAccessChainMap, predExprMap, returnTable);
 			}
 		}
 
@@ -695,6 +696,7 @@ public class SchedulerInfoCompiler {
 			case BREAK : break;
 			case CONTINUE : break;
 			case CAST : break;
+		    case PHI : ret = HDLOp.PHI; break;
 			case UNDEFINED : break;
 		    default: {
 				SynthesijerUtils.warn("Using undefined Op in SchedulerInfoCompiler::convOp2HDLOp: " + op);
@@ -718,7 +720,7 @@ public class SchedulerInfoCompiler {
 		}
 	}
 
-	private void genExpr(SchedulerBoard board, HardwareResource resource, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap, Hashtable<SchedulerItem, HDLExpr> predExprMap, Hashtable<Integer, SequencerState> returnTable){
+	private void genExpr(SchedulerBoard board, Hashtable<Integer, SequencerState> states, HardwareResource resource, SchedulerItem item, SequencerState state, HDLSignal return_sig, ArrayList<Pair> paramList, Hashtable<String, FieldAccessItem> fieldAccessChainMap, Hashtable<SchedulerItem, HDLExpr> predExprMap, Hashtable<Integer, SequencerState> returnTable){
 		switch(item.getOp()){
 			case METHOD_ENTRY:{
 				if(paramList != null){
@@ -1177,10 +1179,39 @@ public class SchedulerInfoCompiler {
 				predExprMap.put(item, expr);
 				break;
 			}
-			default: {
-				//			System.out.println(item.info());
+		    case PHI : {
+				SynthesijerUtils.check(item instanceof PhiSchedulerItem, "expected PhiSchedulerItem, but actual " + item.getClass());
+				PhiSchedulerItem phi = (PhiSchedulerItem)item;
+				
 				HDLOp op = convOp2HDLOp(item.getOp());
-				//			if(op == HDLOp.UNDEFINED) return;
+				HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
+				Operand[] src = item.getSrcOperand();
+				int nums = op.getArgNums();
+				HDLExpr[] args = new HDLExpr[src.length];
+				for(int i = 0; i < args.length; i++){
+					args[i] = convOperandToHDLExpr(item, src[i]);
+				}
+				HDLExpr expr = hm.newExpr(op, args);
+				SynthesijerUtils.check(expr instanceof HDLPhiExpr, "expected HDLPhiExpr, but actual " + expr);
+				HDLPhiExpr hdlPhi = (HDLPhiExpr)expr;
+
+				SequencerState[] ss = new SequencerState[phi.pat.length];
+				for(int i = 0; i < phi.pat.length; i++){
+					ss[i] = states.get(phi.pat[i].getStepId());
+					if(ss[i] == null){
+						System.out.println("undefiend slot id=" + phi.pat[i].getStepId() + " in " + item.info());
+					}
+				}
+				hdlPhi.setStatePatterns(ss);
+				
+				dest.setAssign(state, expr);
+				predExprMap.put(item, expr);
+				break;
+			}
+			default: {
+				//System.out.println(item.info());
+				HDLOp op = convOp2HDLOp(item.getOp());
+				//if(op == HDLOp.UNDEFINED) return;
 				HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
 				Operand[] src = item.getSrcOperand();
 				int nums = op.getArgNums();

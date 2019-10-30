@@ -147,6 +147,8 @@ public class HDLCombinationExpr implements HDLExpr {
                     int w1 = ((HDLPrimitiveType) (args[0].getType())).getWidth();
                     return HDLPrimitiveType.genSignedType(w0 + w1);
                 }
+                case PHI:
+                    return args[0].getType();
                 default:
 					SynthesijerUtils.warn("Using undefined HDLOp in HDLCombinationExpr: " + op);
                     return HDLPrimitiveType.genUnknowType();

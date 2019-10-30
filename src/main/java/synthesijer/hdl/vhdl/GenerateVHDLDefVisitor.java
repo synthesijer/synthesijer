@@ -2,6 +2,7 @@ package synthesijer.hdl.vhdl;
 
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.HashMap;
 
 import synthesijer.Constant;
 import synthesijer.hdl.HDLExpr;
@@ -24,6 +25,8 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	private PrintWriter dest;
 	private int offset;
+	
+	private HashMap<HDLUserDefinedType, Boolean> definedType = new HashMap<>();
 
 	public GenerateVHDLDefVisitor(PrintWriter dest, int offset){
 		this.dest = dest;
@@ -58,7 +61,9 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		String sep = "";
 		for(HDLParameter p: params){
 			dest.print(sep);
-			p.accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			offset += 2;
+			p.accept(this);
+			offset -= 2;
 			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
@@ -117,8 +122,10 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 		Hashtable<String, Boolean> componentFlags = new Hashtable<>();
 		for(HDLInstance i: o.getModuleInstances()){
-			if(componentFlags.containsKey(i.getSubModule().getName())) continue; // already			
-			i.accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			if(componentFlags.containsKey(i.getSubModule().getName())) continue; // already
+			offset += 2;
+			i.accept(this);
+			offset -= 2;
 			//System.out.println(i.getSubModule().getName());
 			componentFlags.put(i.getSubModule().getName(), true);
 		}
@@ -127,10 +134,14 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		for(HDLPort p: o.getPorts()){
 			if(p.isSet(OPTION.NO_SIG)) continue;
 			if(p.getSignal() == null) continue;
-			p.getSignal().accept(new GenerateVHDLDefVisitor(dest, offset+2));
+			offset += 2;
+			p.getSignal().accept(this);
+			offset -= 2;
 		}
 		HDLUtils.nl(dest);
-		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLDefVisitor(dest, offset+2)); }
+		offset += 2;
+		for(HDLSignal s: o.getSignals()){ s.accept(this); }
+		offset -= 2;
 		HDLUtils.nl(dest);
 
 	}
@@ -178,6 +189,8 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLUserDefinedType(HDLUserDefinedType o) {
+		if(definedType.containsKey(o) == true) return;
+		definedType.put(o, true);
 		HDLUtils.println(dest, offset, String.format("type %s is (", o.getName()));
 		String sep = "";
 		for(HDLValue s: o.getItems()){

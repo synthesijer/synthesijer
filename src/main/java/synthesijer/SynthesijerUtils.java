@@ -6,6 +6,13 @@ public class SynthesijerUtils {
 		System.err.println("Error: "+ s);
 		throw new RuntimeException(s);
 	}
+	
+	public static void check(boolean flag, String s){
+		if(flag == false){
+			System.err.println("Error: "+ s);
+			throw new RuntimeException(s);
+		}
+	}
 
 	public static void warn(String s){
 		System.err.println("Warning: " + s);

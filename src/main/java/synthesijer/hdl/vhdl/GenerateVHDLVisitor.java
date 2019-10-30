@@ -25,7 +25,7 @@ import synthesijer.hdl.sequencer.StateTransitCondition;
 public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
 	private final PrintWriter dest;
-	private final int offset;
+	private int offset;
 
 	public GenerateVHDLVisitor(PrintWriter dest, int offset){
 		this.dest = dest;
@@ -124,17 +124,37 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		// architecture body
 		HDLUtils.println(dest, offset, String.format("begin"));
 		HDLUtils.nl(dest);
-		for(HDLPort p: o.getPorts()){ p.accept(new GenerateVHDLVisitor(dest, offset+2)); }
+		for(HDLPort p: o.getPorts()){
+			offset += 2;
+			p.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
 		HDLUtils.println(dest, offset+2, "-- expressions");
-		for(HDLExpr expr : o.getExprs()){ expr.accept(new GenerateVHDLVisitor(dest, offset+2)); }
+		for(HDLExpr expr : o.getExprs()){
+			offset += 2;
+			expr.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
 		HDLUtils.println(dest, offset+2, "-- sequencers");
-		for(HDLSequencer m: o.getSequencers()){ m.accept(new GenerateVHDLVisitor(dest, offset+2)); }
+		for(HDLSequencer m: o.getSequencers()){
+			offset += 2;
+			m.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
-		for(HDLSignal s: o.getSignals()){ s.accept(new GenerateVHDLVisitor(dest, offset+2)); }
+		for(HDLSignal s: o.getSignals()){
+			offset += 2;
+			s.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
-		for(HDLInstance i: o.getModuleInstances()){ i.accept(new GenerateVHDLVisitor(dest, offset+2)); }
+		for(HDLInstance i: o.getModuleInstances()){
+			offset += 2;
+			i.accept(this);
+			offset -= 2;
+		}
 		HDLUtils.nl(dest);
 		HDLUtils.println(dest, offset, String.format("end RTL;"));
 	}
@@ -195,7 +215,8 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	}
 
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
-		HDLUtils.println(dest, offset, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
+		HDLUtils.println(dest, offset, String.format("if rising_edge(%s) then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
+		HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getPrevStateKey().getName(), o.getStateKey().getName()));
 		// reset
 		if(o.getModule().isNegativeReset()){
 			HDLUtils.println(dest, offset+2, String.format("if %s = '0' then", o.getModule().getSysResetName()));
@@ -275,7 +296,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	}
 
 	private void genSyncProcess(HDLSignal o, int offset){
-		HDLUtils.println(dest, offset, String.format("if %s'event and %s = '1' then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
+		HDLUtils.println(dest, offset, String.format("if rising_edge(%s) then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
 		if(o.getModule().isNegativeReset()){
 			HDLUtils.println(dest, offset+2, String.format("if %s = '0' then", o.getModule().getSysResetName()));
 		}else{
@@ -419,7 +440,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		if(o.isRegister() && o.isAssignSignalEvent()){
 			HDLUtils.println(dest, offset, String.format("process(%s)", o.getAssignSignalEventSignal().getName()));
 			HDLUtils.println(dest, offset, "begin");
-			HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getAssignSignalEventSignal().getName(), o.getAssignSignalEventSignal().getName()));
+			HDLUtils.println(dest, offset+2, String.format("if rising_edge(%s) then", o.getAssignSignalEventSignal().getName(), o.getAssignSignalEventSignal().getName()));
 			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignSignalEventExpr().getResultExpr())));
 			HDLUtils.println(dest, offset+2, "end if;");
 			HDLUtils.println(dest, offset, "end process;");
@@ -427,7 +448,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 		}else if(o.isRegister() && o.isAssignPortEvent()){
 			HDLUtils.println(dest, offset, String.format("process(%s)", o.getAssignPortEventPort().getName()));
 			HDLUtils.println(dest, offset, "begin");
-			HDLUtils.println(dest, offset+2, String.format("if %s'event and %s = '1' then", o.getAssignPortEventPort().getName(), o.getAssignPortEventPort().getName()));
+			HDLUtils.println(dest, offset+2, String.format("if rising_edge(%s) then", o.getAssignPortEventPort().getName(), o.getAssignPortEventPort().getName()));
 			HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), adjustTypeFor(o, o.getAssignPortEventExpr().getResultExpr())));
 			HDLUtils.println(dest, offset+2, "end if;");
 			HDLUtils.println(dest, offset, "end process;");

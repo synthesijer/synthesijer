@@ -5,11 +5,15 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.HashMap;
 
+import synthesijer.ast.type.PrimitiveTypeKind;
+import synthesijer.ast.Type;
+
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerItem;
+import synthesijer.scheduler.PhiSchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 import synthesijer.scheduler.VariableRefOperand;
@@ -92,6 +96,17 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		if(v instanceof VariableRefOperand) return true;
 		if(v.isMember()) return true;
 		if(v.isMethodParam()) return true;
+		Type t = v.getType();
+		if(t != PrimitiveTypeKind.BOOLEAN ||
+		   t != PrimitiveTypeKind.BYTE ||
+		   t != PrimitiveTypeKind.CHAR ||
+		   t != PrimitiveTypeKind.INT ||
+		   t != PrimitiveTypeKind.LONG ||
+		   t != PrimitiveTypeKind.SHORT || 
+		   t != PrimitiveTypeKind.DOUBLE ||
+		   t != PrimitiveTypeKind.FLOAT){
+			return true;
+		}
 		return false;
 	}
 
@@ -101,7 +116,11 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		for(int i = 0; i < bb.pred.size(); i++){
 			operands[i] = v;
 		}
-		var phi = new SchedulerItem(board, Op.PHI, operands, v);
+		SchedulerSlot[] slots = new SchedulerSlot[bb.pred.size()];
+		for(int i = 0; i < bb.pred.size(); i++){
+			slots[i] = bb.pred.get(i).getLastNode().slot;
+		}
+		var phi = new PhiSchedulerItem(board, slots, operands, v);
 		phi.setBranchIds(slot.getNextStep());
 		bb.nodes.get(0).slot.insertItemInTop(phi);
 	}

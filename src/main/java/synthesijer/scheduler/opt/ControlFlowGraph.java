@@ -274,5 +274,9 @@ class ControlFlowGraphBB{
 		}
 		return -1;
 	}
+
+	public ControlFlowGraphNode getLastNode(){
+		return nodes.get(nodes.size()-1);
+	}
 	
 }
