@@ -97,13 +97,13 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		if(v.isMember()) return true;
 		if(v.isMethodParam()) return true;
 		Type t = v.getType();
-		if(t != PrimitiveTypeKind.BOOLEAN ||
-		   t != PrimitiveTypeKind.BYTE ||
-		   t != PrimitiveTypeKind.CHAR ||
-		   t != PrimitiveTypeKind.INT ||
-		   t != PrimitiveTypeKind.LONG ||
-		   t != PrimitiveTypeKind.SHORT || 
-		   t != PrimitiveTypeKind.DOUBLE ||
+		if(t != PrimitiveTypeKind.BOOLEAN &&
+		   t != PrimitiveTypeKind.BYTE &&
+		   t != PrimitiveTypeKind.CHAR &&
+		   t != PrimitiveTypeKind.INT &&
+		   t != PrimitiveTypeKind.LONG &&
+		   t != PrimitiveTypeKind.SHORT &&
+		   t != PrimitiveTypeKind.DOUBLE &&
 		   t != PrimitiveTypeKind.FLOAT){
 			return true;
 		}
