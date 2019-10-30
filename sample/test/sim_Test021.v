@@ -38,7 +38,7 @@ module sim_Test021;
       
       if(counter > 100)
 	run_req <= 1'b1;
-      if(counter > 100000 || (run_busy == 0 && counter > 105)) begin
+      if(counter > 10000 || (run_busy == 0 && counter > 105)) begin
 	 if(test_return == 1) begin
             $display("Test021: TEST SUCCESS");
 	 end else begin

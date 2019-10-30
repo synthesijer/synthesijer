@@ -146,6 +146,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 	}
 	
 	private void setPhiFuncValues(SchedulerBoard board, ControlFlowGraph g, SSAIDManager S, HashMap<VariableOperand, Integer> C, HashMap<String, VariableOperand> V, ControlFlowGraphBB x){
+		
 		for(var a : x.getItems()){
 			if(a.getOp() != Op.PHI){
 				Operand[] operands = a.getSrcOperand();
@@ -168,6 +169,22 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 				C.put(v, i+1);
 			}
 		}
+		
+		HashMap<String, SchedulerItem> chainingSrcMap = new HashMap<>();
+		for(var a : x.getItems()){
+			Operand o = a.getDestOperand();
+			if(o == null) continue;
+			chainingSrcMap.put(o.getName(), a);
+			Operand[] src = a.getSrcOperand();
+			if(src == null) continue;
+			for(var s : src){
+				if(s instanceof VariableOperand && chainingSrcMap.containsKey(s.getName())){
+					VariableOperand v = (VariableOperand)s;
+					v.setChaining(a, chainingSrcMap.get(s.getName()));
+				}
+			}
+		}
+		
 		for(var y : x.succ){
 			int j = y.getPredIndex(x);
 			for(var item : y.getItems()){
@@ -178,6 +195,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 				item.overwriteSrc(j, getSSAVariable(board, V, v, getSSAName(v.getName(), i)));
 			}
 		}
+		
 		for(var y : g.getChildren(x)){
 			setPhiFuncValues(board, g, S, C, V, y);
 		}

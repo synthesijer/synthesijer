@@ -178,7 +178,7 @@ begin
       test_req           => run_req
       );
 
-  finish_flag <= '1' when counter > 1000000 else
+  finish_flag <= '1' when counter > 10000 else
                  '1' when run_busy = '0' and counter > 105 else
                  '0';
   process(clk)
