@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import synthesijer.Constant;
 import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
+import synthesijer.hdl.expr.HDLPhiExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLInstanceRef;
 import synthesijer.hdl.HDLLiteral;
@@ -32,7 +33,12 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLExpr(HDLExpr o) {
-		String str = String.format("assign %s = %s;", o.getResultExpr().getVerilogHDL(), o.getVerilogHDL());
+		String str = "";
+		if(o instanceof HDLPhiExpr){
+			str = String.format("assign %s = %s %s;", o.getResultExpr().getVerilogHDL(), o.getVerilogHDL(), o.getResultExpr().getVerilogHDL());
+		}else{
+			str = String.format("assign %s = %s;", o.getResultExpr().getVerilogHDL(), o.getVerilogHDL());
+		}
 		HDLUtils.println(dest, offset, str);
 	}
 
