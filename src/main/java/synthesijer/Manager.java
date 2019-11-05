@@ -359,7 +359,6 @@ public enum Manager {
 		optimize(new PackArrayWriteAccess(), info);
 		if(opt.with_ssa){
 			optimize(new SSAConverter(), info);
-			return;
 		}
 		if(opt.bb2){
 			// Only when "--bb2" is specified, BasicParallelizer2 is used.
