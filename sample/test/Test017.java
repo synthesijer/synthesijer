@@ -26,12 +26,13 @@ public class Test017{
 
 	@unsynthesizable
 	public static void main(String[] args){
+		System.out.println("Test017");
 		Test017 o = new Test017();
-		System.out.println(o.test(3));
-		System.out.println(o.test0);
-		System.out.println(o.test1);
-		System.out.println(o.test2);
-		System.out.println(o.test3);
+		System.out.println("o.test(3) = " + o.test(3));
+		System.out.println("o.test0 = " + o.test0);
+		System.out.println("o.test1 = " + o.test1);
+		System.out.println("o.test2 = " + o.test2);
+		System.out.println("o.test3 = " + o.test3);
 	}
 
 

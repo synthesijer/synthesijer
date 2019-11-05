@@ -205,8 +205,6 @@ public class SchedulerInfoCompiler {
 
 	private HDLExpr convConstantToHDLExpr(ConstantOperand c){
 		HDLPrimitiveType type = (HDLPrimitiveType)getHDLType(c.getType());
-		//HDLSignal tmp = hm.newSignal(String.format("constant_%04d", constIdGen.id()), type);
-		//tmp.setAssign(null, new HDLValue(c.getValue(), type));
 		return new HDLValue(c.getValue(), type);
 	}
 
@@ -420,17 +418,6 @@ public class SchedulerInfoCompiler {
 				hm.rmSignal(inst.getSignalForPort(p.getName()));
 				inst.rmPortPair(inst.getPortPair(p));
 				inst.addPortPair(export, p);
-				/*
-				  if(p.getDir() == HDLPort.DIR.INOUT || p.isSet(HDLPort.OPTION.NO_SIG)){
-				  hm.rmSignal(inst.getSignalForPort(p.getName()));
-				  inst.rmPortPair(inst.getPortPair(p));
-				  inst.addPortPair(export, p);
-				  }else if(p.getDir() == HDLPort.DIR.OUT){
-				  export.getSignal().setAssign(null, inst.getSignalForPort(p.getName()));
-				  }else{
-				  inst.getSignalForPort(p.getName()).setAssign(null, export.getSignal());
-				  }
-				*/
 				if(p.isBinded()){
 					HDLSignalBinding b = p.getSignalBinding();
 					HDLSignalBinding e = null;
@@ -617,8 +604,6 @@ public class SchedulerInfoCompiler {
 		}else{ // instanceof ConstantOperand
 			ConstantOperand c = (ConstantOperand)o;
 			HDLPrimitiveType type = (HDLPrimitiveType)getHDLType(c.getType());
-			//HDLSignal tmp = hm.newSignal(String.format("constant_%04d", constIdGen.id()), type);
-			//tmp.setAssign(null, new HDLValue(c.getValue(), type));
 			ret = new HDLValue(c.getValue(), type);
 		}
 		if(ret == null){
@@ -806,7 +791,8 @@ public class SchedulerInfoCompiler {
 					if(addr == null){
 						// indirect memory access. in this case, destination address is already asserted...
 					}else{
-						addr.setAssign(state, convOperandToHDLExpr(item, d.getPtr()));
+						// it is assumed that address should be specified at ARRAY_INDEX
+						//addr.setAssign(state, convOperandToHDLExpr(item, d.getPtr()));
 					}
 					predExprMap.put(item, expr);
 				}else if(dest.getType() instanceof ChannelType){

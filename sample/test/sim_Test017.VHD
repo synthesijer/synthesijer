@@ -115,7 +115,7 @@ begin
       test3_in    => (others => '0'),
       test3_we    => '0',
       test3_out   => open,
-      test_idx    => (others => '0'),
+      test_idx    => to_signed(3, 32),
       test_return => test_return,
       test_busy   => run_busy,
       test_req    => run_req

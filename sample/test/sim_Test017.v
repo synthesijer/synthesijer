@@ -25,7 +25,7 @@ module sim_Test017;
 	     .test3_in(32'h0),
 	     .test3_we(1'b0),
 	     .test3_out(),
-	     .test_idx(32'h0),
+	     .test_idx(32'h3),
 	     .test_return(test_return),
 	     .test_busy(run_busy),
 	     .test_req(run_req)

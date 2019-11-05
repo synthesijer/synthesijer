@@ -318,7 +318,7 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 			for(HDLSignal.AssignmentCondition c: o.getConditions()){
 				HDLUtils.println(dest, offset+2, String.format("%sif (%s) begin", sep, c.getCondExprAsVerilogHDL()));
 				if(c.getValue() != null){
-					HDLUtils.println(dest, offset+4, String.format("%s <= %s;", o.getName(), c.getValue().getVerilogHDL()));
+					HDLUtils.println(dest, offset+4, String.format("%s <= %s; // fefe", o.getName(), c.getValue().getVerilogHDL()));
 				}else{
 					SynthesijerUtils.warn("Assignment value is not found for " + o.getName());
 				}

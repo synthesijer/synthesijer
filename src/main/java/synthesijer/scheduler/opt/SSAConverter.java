@@ -139,7 +139,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		if(V.containsKey(newName)){
 			v = V.get(newName);
 		}else{
-			v = new VariableOperand(orig, newName); // copy
+			v = orig.copyWithNewName(newName); // copy
 			V.put(newName, v);
 			board.getVarList().add(v);
 		}
