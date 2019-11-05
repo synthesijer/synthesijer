@@ -1191,9 +1191,7 @@ public class SchedulerInfoCompiler {
 				for(int i = 0; i < args.length; i++){
 					args[i] = convOperandToHDLExpr(item, src[i]);
 				}
-				HDLExpr expr = hm.newExpr(op, args);
-				SynthesijerUtils.check(expr instanceof HDLPhiExpr, "expected HDLPhiExpr, but actual " + expr);
-				HDLPhiExpr hdlPhi = (HDLPhiExpr)expr;
+				HDLPhiExpr expr = hm.newPhiExpr(op, args, dest);
 
 				SequencerState[] ss = new SequencerState[phi.pat.length];
 				for(int i = 0; i < phi.pat.length; i++){
@@ -1202,7 +1200,7 @@ public class SchedulerInfoCompiler {
 						System.out.println("undefiend slot id=" + phi.pat[i].getStepId() + " in " + item.info());
 					}
 				}
-				hdlPhi.setStatePatterns(ss);
+				expr.setStatePatterns(ss);
 				
 				dest.setAssign(state, expr);
 				predExprMap.put(item, expr);

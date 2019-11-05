@@ -506,13 +506,13 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	 * @param args arguments
 	 * @return created new expression.
 	 */
-	public HDLExpr newExpr(HDLOp op, HDLExpr[] args){
-		HDLExpr expr = null;
+	public HDLPhiExpr newPhiExpr(HDLOp op, HDLExpr[] args, HDLExpr dest){
+		HDLPhiExpr expr = null;
 		if(op == HDLOp.PHI){
-			expr = new HDLPhiExpr(this, getExprUniqueId(), op, args);
+			expr = new HDLPhiExpr(this, getExprUniqueId(), op, dest, args);
 			exprs.add(expr);
 		}else{
-			SynthesijerUtils.error("HDLModule::newExpr with args[] are not supported for " + op);
+			SynthesijerUtils.error("HDLModule::newPhiExpr with args[] are not supported for " + op);
 		}
 		return expr;
 	}

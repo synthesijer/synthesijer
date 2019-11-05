@@ -3,6 +3,7 @@ package synthesijer.hdl.expr;
 import java.util.ArrayList;
 
 import synthesijer.SynthesijerUtils;
+import synthesijer.Constant;
 import synthesijer.hdl.HDLExpr;
 import synthesijer.hdl.HDLModule;
 import synthesijer.hdl.HDLOp;
@@ -16,14 +17,16 @@ public class HDLPhiExpr implements HDLExpr {
 
     private final int uid;
     private final HDLOp op;
+    private final HDLExpr dest;
     private final HDLExpr[] args;
 	private final SequencerState[] patterns;
 
     private final HDLSignal result;
 
-    public HDLPhiExpr(HDLModule m, int uid, HDLOp op, HDLExpr... args) {
+    public HDLPhiExpr(HDLModule m, int uid, HDLOp op, HDLExpr dest, HDLExpr[] args) {
         this.uid = uid;
         this.op = op;
+		this.dest = dest;
         this.args = args;
 		this.patterns = new SequencerState[args.length];
         for (HDLExpr expr : args) {
@@ -63,16 +66,19 @@ public class HDLPhiExpr implements HDLExpr {
 	 */
     @Override
 	public String getVHDL(){
-		String s = "";
+		String s = Constant.BR;
 		for(int i = 0; i < args.length; i++){
 			if(patterns[i] == null) continue;
+			s += "        ";
 			s += args[i].getVHDL();
 			s += " when ";
 			s += patterns[i].getSequencer().getPrevStateKey().getVHDL();
 			s += " = ";
 			s += patterns[i].getStateId().getVHDL();
-			s += " else ";
+			s += " else" + Constant.BR;
 		}
+		s += "        ";
+		s += dest.getVHDL();
 		return s;
 	}
 
@@ -82,16 +88,19 @@ public class HDLPhiExpr implements HDLExpr {
 	 */
     @Override
 	public String getVerilogHDL(){
-		String s = "";
+		String s = Constant.BR;
 		for(int i = 0; i < args.length; i++){
 			if(patterns[i] == null) continue;
+			s += "        ";
 			s += patterns[i].getSequencer().getPrevStateKey().getVerilogHDL();
 			s += " == ";
 			s += patterns[i].getStateId().getVHDL();
 			s += " ? ";
 			s += args[i].getVerilogHDL();
-			s += " : ";
+			s += " :" + Constant.BR;
 		}
+		s += "        ";
+		s += dest.getVerilogHDL();
 		return s;
 	}
 

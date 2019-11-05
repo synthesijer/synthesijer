@@ -756,7 +756,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			type = op.getType();
 		}
 
-		if(parent.constantPropMode && isConstant(lhs) && isConstant(rhs)){
+		if(parent.constantPropMode && isConstant(lhs) && isConstant(rhs)){ // TODO: unused not yet
 			//System.out.println("both lhs and rhs are constant: " + o);
 			ConstantOperand l = getConstant(lhs);
 			ConstantOperand r = getConstant(rhs);

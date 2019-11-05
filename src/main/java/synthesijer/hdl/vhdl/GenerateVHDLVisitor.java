@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import synthesijer.Constant;
 import synthesijer.SynthesijerUtils;
 import synthesijer.hdl.HDLExpr;
-import synthesijer.hdl.expr.HDLPhiExpr;
 import synthesijer.hdl.HDLInstance;
 import synthesijer.hdl.HDLInstanceRef;
 import synthesijer.hdl.HDLLiteral;
@@ -36,11 +35,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLExpr(HDLExpr o) {
 		String str = "";
-		if(o instanceof HDLPhiExpr){
-			str = String.format("%s <= %s %s;", o.getResultExpr().getVHDL(), adjustTypeFor((HDLSignal)o.getResultExpr(), o), o.getResultExpr().getVHDL());
-		}else{
-			str = String.format("%s <= %s;", o.getResultExpr().getVHDL(), adjustTypeFor((HDLSignal)o.getResultExpr(), o));
-		}
+		str = String.format("%s <= %s;", o.getResultExpr().getVHDL(), adjustTypeFor((HDLSignal)o.getResultExpr(), o));
 		HDLUtils.println(dest, offset, str);
 	}
 
