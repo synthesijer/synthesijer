@@ -22,6 +22,18 @@ public class SynthesijerUtils {
 		System.err.println("Info: " + s);
 	}
 
+	public static void debug(String s){
+		if(Options.INSTANCE.debug){
+			System.err.println("Debug: " + s);
+		}
+	}
+	
+	public static void devel(int level, String s){
+		if(Options.INSTANCE.develLevel >= level){
+			System.err.println("Devel: " + s);
+		}
+	}
+
 	public static String escapeXML(String s){
 		s = s.replaceAll("<", "&lt;");
 		s = s.replaceAll(">", "&gt;");

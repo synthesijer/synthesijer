@@ -165,7 +165,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 			}
 			var v = a.getDestOperand();
 			if(v != null && isExcludeFromSSA(v) == false){
-				int i = C.getOrDefault(v, new Integer(1)); // C's default value is 1
+				int i = C.getOrDefault(v, Integer.valueOf(1)); // C's default value is 1
 				VariableOperand vv = getSSAVariable(board, V, v, getSSAName(v.getName(), i));
 				a.setDestOperand(vv);
 				S.push(v, i);

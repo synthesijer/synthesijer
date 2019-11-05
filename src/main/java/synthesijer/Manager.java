@@ -215,12 +215,16 @@ public enum Manager {
 		}
 	}
 
+	private int dumpId = 0;
+	
 	private void dumpSchedulerInfo(SchedulerInfo si, String postfix){
+		String base = String.format("%s_sjr_scehduler_board_%03d_%s", si.getName(), dumpId, postfix);
+		dumpId++;
 		try(
-				PrintStream txt = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".tmp_info")));
-				PrintStream dot = new PrintStream(new FileOutputStream(new File(si.getName() + "_scheduler_board_" + postfix + ".dot")));
-		){
-			(new IRWriter(si.getName() + "_scheduler_board_" + postfix)).generate(si);
+			PrintStream txt = new PrintStream(new FileOutputStream(new File(base + ".tmp_info")));
+			PrintStream dot = new PrintStream(new FileOutputStream(new File(base + ".dot")));
+			){
+			(new IRWriter(base)).generate(si);
 			txt.println("Variables:");
 			//for(ArrayList<VariableOperand> va: si.getVarTableList()){
 			for(ArrayList<Operand> va: si.getVarTableList()){
@@ -348,6 +352,7 @@ public enum Manager {
 	}
 
 	private void optimize(SynthesijerModuleInfo info, Options opt){
+		dumpId = 0; // reset dump id for optimizing each module
 		if(info.sysnthesisFlag == false){
 			// skip, nothing to do
 			return;

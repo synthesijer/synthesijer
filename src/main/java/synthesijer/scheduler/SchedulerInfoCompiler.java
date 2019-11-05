@@ -1183,7 +1183,7 @@ public class SchedulerInfoCompiler {
 				for(int i = 0; i < phi.pat.length; i++){
 					ss[i] = states.get(phi.pat[i].getStepId());
 					if(ss[i] == null){
-						System.out.println("undefiend slot id=" + phi.pat[i].getStepId() + " in " + item.info());
+						System.out.println("undefined slot id=" + phi.pat[i].getStepId() + " in " + item.info());
 					}
 				}
 				expr.setStatePatterns(ss);

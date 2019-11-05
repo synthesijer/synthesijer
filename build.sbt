@@ -5,6 +5,8 @@ lazy val root = (project in file(".")).
       scalaVersion := "2.12.10",
       version      := "3.0.1",
       javacOptions ++= Seq("-source", "11", "-target", "11"),
+      javacOptions += "-Xlint:unchecked",
+      javacOptions += "-Xlint:deprecation",
       crossPaths := false,
     )),
     name := "synthesijer",

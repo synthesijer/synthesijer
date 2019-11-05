@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.HashMap;
 
 import synthesijer.ast.Method;
 import synthesijer.ast.Type;
@@ -183,8 +184,8 @@ public class SchedulerBoard {
 		return null;
 	}
 
-	public Hashtable<SchedulerSlot, Integer> getEntryDegrees(){
-		Hashtable<SchedulerSlot, Integer> degrees = new Hashtable<>();
+	public HashMap<SchedulerSlot, Integer> getEntryDegrees(){
+		HashMap<SchedulerSlot, Integer> degrees = new HashMap<>();
 		Hashtable<Integer, SchedulerSlot> map = new Hashtable<>();
 		for(SchedulerSlot s: slots){
 			map.put(s.getStepId(), s);
@@ -206,6 +207,27 @@ public class SchedulerBoard {
 		return degrees;
 	}
 
+	/**
+	 * convert Slot-ID for all PHI-op in this board
+	 * @param convTable slot-id conversion table (from the original id to the new id)
+	 * @TOOD : too ad-hoc
+	 */ 
+	public void convPhiSlotIdAll(HashMap<Integer, Integer> convTable){
+		for(var slot : slots){
+			for(var item: slot.getItems()){
+				if(item instanceof PhiSchedulerItem){
+					PhiSchedulerItem phi = (PhiSchedulerItem)item;
+					for(int i = 0; i < phi.pat.length; i++){
+						if(convTable.containsKey(phi.pat[i].getStepId())){
+							int v = convTable.get(phi.pat[i].getStepId());
+							phi.pat[i] = getSlot(v);
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public void dump(PrintStream out){
 		for(SchedulerSlot s: slots){
 			s.dump(out);

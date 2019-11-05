@@ -3,6 +3,7 @@ package synthesijer.scheduler.opt;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashMap;
 
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
@@ -103,7 +104,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		return true;
 	}
 
-	private SchedulerSlot parallelize(SchedulerBoard board, ArrayList<SchedulerSlot> bb, Hashtable<Integer, Integer> id_map){
+	private SchedulerSlot parallelize(SchedulerBoard board, ArrayList<SchedulerSlot> bb, HashMap<Integer, Integer> id_map){
 		SchedulerSlot target = null;
 		SchedulerSlot prev = null;
 		Hashtable<SchedulerSlot, ArrayList<SchedulerSlot>> dependents = analyze(bb);
@@ -241,11 +242,9 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		return flag;
 	}
 
-	private void dumpDegree(String name, Hashtable<SchedulerSlot, Integer> degrees){
+	private void dumpDegree(String name, HashMap<SchedulerSlot, Integer> degrees){
 		System.out.println("**** " + name);
-		Enumeration<SchedulerSlot> e = degrees.keys();
-		while(e.hasMoreElements()){
-			SchedulerSlot s = e.nextElement();
+		for(var s: degrees.keySet()){
 			System.out.println(s.getStepId() + " -> " + degrees.get(s));
 		}
 	}
@@ -253,12 +252,12 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 	public SchedulerBoard conv(SchedulerBoard src){
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
-		Hashtable<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
+		HashMap<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
 		if(DEBUG){
 			dumpDegree(src.getName(), degrees);
 		}
 		ArrayList<SchedulerSlot> bb = null;
-		Hashtable<Integer, Integer> id_map = new Hashtable<>();
+		HashMap<Integer, Integer> id_map = new HashMap<>();
 		SchedulerSlot prev = null;
 		for(int i = 0; i < slots.length; i++){
 			SchedulerSlot slot = slots[i];
@@ -295,6 +294,7 @@ public class BasicParallelizer2 implements SchedulerInfoOptimizer{
 		if(bb != null && bb.size() > 0){
 			parallelize(ret, bb, id_map);
 		}
+		ret.convPhiSlotIdAll(id_map);
 		return ret;
 	}
 

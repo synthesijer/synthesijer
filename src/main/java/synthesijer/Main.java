@@ -36,7 +36,7 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		GetOpt opt = new GetOpt("h",
-				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa,verbose,debug",
+				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa,verbose,debug,devel:",
 				args);
 		if (opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0) {
 			printHelp();
@@ -161,6 +161,14 @@ public class Main {
 
 		if (vhdlFlag == false && verilogFlag == false) {
 			vhdlFlag = true;
+		}
+		
+		if (opt.flag("devel")) {
+			try{
+				Options.INSTANCE.develLevel = Integer.valueOf(opt.getValue("devel"));
+			}catch(NumberFormatException e){
+				Options.INSTANCE.develLevel = 0;
+			}
 		}
 
 		Manager.INSTANCE.preprocess();

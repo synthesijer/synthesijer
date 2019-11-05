@@ -2,6 +2,7 @@ package synthesijer.scheduler.opt;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.HashMap;
 
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
@@ -155,7 +156,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 	}
 
 	public SchedulerBoard conv(SchedulerBoard src){
-		Hashtable<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
+		HashMap<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
 		ArrayList<SchedulerSlot> bb = null;

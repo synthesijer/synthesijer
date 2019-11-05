@@ -25,5 +25,7 @@ public enum Options {
 	public boolean verbose = false;
 
 	public boolean debug = false;
+	
+	public int develLevel = 0;
 
 }

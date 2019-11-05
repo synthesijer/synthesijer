@@ -2,6 +2,7 @@ package synthesijer.scheduler.opt;
 
 import java.util.HashMap;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
@@ -35,6 +36,7 @@ public class ReduceRedundantJump implements SchedulerInfoOptimizer{
 					int orig = slot.getNextStep()[i];
 					id[i] = getTargetState(src, orig);
 					if(orig != id[i]){
+						SynthesijerUtils.devel(2, "ReduceRedundantJump::convSlotId : " + orig + " -> " + slot.getStepId());
 						convSlotId.put(orig, slot.getStepId());
 					}
 				}
@@ -46,19 +48,26 @@ public class ReduceRedundantJump implements SchedulerInfoOptimizer{
 				ret.addSlot(newSlot);
 			}
 		}
-		for(SchedulerSlot slot: src.getSlots()){
-			for(SchedulerItem item: slot.getItems()){
-				if(item instanceof PhiSchedulerItem){
-					PhiSchedulerItem phi = (PhiSchedulerItem)item;
-					for(int i = 0; i < phi.pat.length; i++){
-						if(convSlotId.get(phi.pat[i].getStepId()) != null){
-							phi.pat[i] = ret.getSlot(convSlotId.get(phi.pat[i].getStepId()));
-						}
-					}
+		updateConvTable(convSlotId);
+		ret.convPhiSlotIdAll(convSlotId);
+		return ret;
+	}
+
+	private void updateConvTable(HashMap<Integer, Integer> convSlotId){
+		boolean flag = true;
+		while(flag){
+			flag = false;
+			for(var k : convSlotId.keySet()){
+				int v = convSlotId.get(k);
+				if(convSlotId.containsKey(v)){
+					convSlotId.put(k, convSlotId.get(v));
+					flag = (v != convSlotId.get(v)); // updated
 				}
 			}
 		}
-		return ret;
+		for(var k : convSlotId.keySet()){
+			SynthesijerUtils.devel(2, "ReduceRedundantJump::updateConvSlotId : " + k + " -> " + convSlotId.get(k));
+		}
 	}
 
 	public int getTargetState(SchedulerBoard b, int id){
