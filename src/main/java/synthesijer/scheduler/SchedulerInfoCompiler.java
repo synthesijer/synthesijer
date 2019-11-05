@@ -608,7 +608,7 @@ public class SchedulerInfoCompiler {
 					//ret = predExprMap.get(pred);
 					ret = predExprMap.get(pred).getResultExpr();
 				}else{
-					SynthesijerUtils.warn("detected chaining, but chained expression is not found.");
+					SynthesijerUtils.warn("detected chaining, but chained expression is not found for " + o.getName());
 					ret = varTable.get(((VariableOperand)o).getName());
 				}
 			}else{

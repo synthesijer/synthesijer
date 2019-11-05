@@ -146,18 +146,20 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 	}
 	
 	private void setPhiFuncValues(SchedulerBoard board, ControlFlowGraph g, SSAIDManager S, HashMap<VariableOperand, Integer> C, HashMap<String, VariableOperand> V, ControlFlowGraphBB x){
-		
 		for(var a : x.getItems()){
 			if(a.getOp() != Op.PHI){
 				Operand[] operands = a.getSrcOperand();
-				if(operands == null) continue;
-				for(int id = 0; id < operands.length; id++){
-					if((operands[id] instanceof VariableOperand) == false) continue;
-					VariableOperand v = (VariableOperand)operands[id];
-					if(isExcludeFromSSA(v)) continue;
-					int i = S.top(v);
-					VariableOperand vv = getSSAVariable(board, V, v, getSSAName(v.getName(), i));
-					a.overwriteSrc(id, vv);
+				if(operands != null){
+					for(int id = 0; id < operands.length; id++){
+						if(operands[id] instanceof VariableOperand){
+							VariableOperand v = (VariableOperand)operands[id];
+							if(isExcludeFromSSA(v) == false){
+								int i = S.top(v);
+								VariableOperand vv = getSSAVariable(board, V, v, getSSAName(v.getName(), i));
+								a.overwriteSrc(id, vv);
+							}
+						}
+					}
 				}
 			}
 			var v = a.getDestOperand();
@@ -169,18 +171,26 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 				C.put(v, i+1);
 			}
 		}
-		
-		HashMap<String, SchedulerItem> chainingSrcMap = new HashMap<>();
-		for(var a : x.getItems()){
-			Operand o = a.getDestOperand();
-			if(o == null) continue;
-			chainingSrcMap.put(o.getName(), a);
-			Operand[] src = a.getSrcOperand();
-			if(src == null) continue;
-			for(var s : src){
-				if(s instanceof VariableOperand && chainingSrcMap.containsKey(s.getName())){
-					VariableOperand v = (VariableOperand)s;
-					v.setChaining(a, chainingSrcMap.get(s.getName()));
+
+		// make write-after-read-chain in same ScheduleSlot
+		for(var node : x.nodes){
+			var slot = node.slot;
+			HashMap<String, SchedulerItem> chainingSrcMap = new HashMap<>();
+			for(var a : slot.getItems()){
+				Operand o = a.getDestOperand();
+				if(o != null){
+					chainingSrcMap.put(o.getName(), a);
+				}
+			}
+			for(var a : slot.getItems()){
+				Operand[] src = a.getSrcOperand();
+				if(src != null){
+					for(var s : src){
+						if(s instanceof VariableOperand && chainingSrcMap.containsKey(s.getName())){
+							VariableOperand v = (VariableOperand)s;
+							v.setChaining(a, chainingSrcMap.get(s.getName()));
+						}
+					}
 				}
 			}
 		}
@@ -188,11 +198,13 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		for(var y : x.succ){
 			int j = y.getPredIndex(x);
 			for(var item : y.getItems()){
-				if(item.getOp() != Op.PHI) continue;
-				VariableOperand v = (VariableOperand)(item.getSrcOperand()[j]);
-				if(isExcludeFromSSA(v)) continue;
-				int i = S.top(v);
-				item.overwriteSrc(j, getSSAVariable(board, V, v, getSSAName(v.getName(), i)));
+				if(item.getOp() == Op.PHI){
+					VariableOperand v = (VariableOperand)(item.getSrcOperand()[j]);
+					if(isExcludeFromSSA(v) == false){
+						int i = S.top(v);
+						item.overwriteSrc(j, getSSAVariable(board, V, v, getSSAName(v.getName(), i)));
+					}
+				}
 			}
 		}
 		
