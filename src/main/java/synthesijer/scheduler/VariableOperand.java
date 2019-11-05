@@ -33,6 +33,8 @@ public class VariableOperand implements Operand{
 
 	private boolean debugFlag = false;
 
+	private boolean fieldAccessFlag = false;
+
 	private Hashtable<SchedulerItem, SchedulerItem> predItemMap = new Hashtable<>(); // context -> predecessor
 
 	public VariableOperand(String name, Type type, boolean memberFlag){
@@ -147,6 +149,14 @@ public class VariableOperand implements Operand{
 
 	public boolean isDebug(){
 		return debugFlag;
+	}
+	
+	public void setFieldAccess(boolean flag){
+		fieldAccessFlag = flag;
+	}
+
+	public boolean isFieldAccess(){
+		return fieldAccessFlag;
 	}
 
 	public SchedulerItem getPredItem(SchedulerItem ctx){

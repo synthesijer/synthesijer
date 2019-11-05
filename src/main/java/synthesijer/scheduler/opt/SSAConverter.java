@@ -96,6 +96,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		if(v instanceof VariableRefOperand) return true;
 		if(v.isMember()) return true;
 		if(v.isMethodParam()) return true;
+		if(v.isFieldAccess()) return true;
 		Type t = v.getType();
 		if(t != PrimitiveTypeKind.BOOLEAN &&
 		   t != PrimitiveTypeKind.BYTE &&

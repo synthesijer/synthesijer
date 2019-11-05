@@ -828,6 +828,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 		if(o.getType() instanceof ArrayType && o.getIdent().getSymbol().equals("length")){
 			type = PrimitiveTypeKind.INT;
 			tmp = newVariable("field_access", type);
+			tmp.setFieldAccess(true);
 			Operand v = stepIn(o.getSelected());
 			parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
 		}else if(o.getType() instanceof ComponentType){
@@ -847,11 +848,12 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 
 			if(type instanceof ArrayType){
 				tmp = newVariable("field_access", new ArrayRef((ArrayType)type));
+				tmp.setFieldAccess(true);
 			}else{
 				tmp = newVariable("field_access", type);
+				tmp.setFieldAccess(true);
 			}
 
-			//tmp = newVariable("field_access", new ComponentRef(ct, type));
 			Operand v = stepIn(o.getSelected());
 			parent.addSchedulerItem(new FieldAccessItem(parent.getBoard(), (VariableOperand)v, o.getIdent().getSymbol(), null, tmp));
 			//System.out.println("visitFiledAccess: " + tmp.getName() + "::" + tmp.getType());
@@ -861,6 +863,7 @@ class GenSchedulerBoardExprVisitor implements SynthesijerExprVisitor{
 			VariableInfo var = GlobalSymbolTable.INSTANCE.searchVariable(klass, o.getIdent().getSymbol());
 			type = var.var.getType();
 			tmp = newVariable("field_access", type);
+			tmp.setFieldAccess(true);
 			Operand v = stepIn(var.var.getInitExpr());
 			//Operand v = var.var.getInitSrc();
 			Operand replica = new ConstantOperand(String.format("constant_%05d", parent.getIdGen().id()), ((ConstantOperand)v).getValue(), v.getType());
