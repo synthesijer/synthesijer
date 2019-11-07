@@ -60,4 +60,8 @@ public class StateTransitCondition{
 	public boolean hasCondition(){
 		return (cond != null);
 	}
+
+	public HDLValue getStateId(){
+		return stateId;
+	}
 }

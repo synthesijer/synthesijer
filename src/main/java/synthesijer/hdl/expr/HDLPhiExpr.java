@@ -23,12 +23,20 @@ public class HDLPhiExpr implements HDLExpr {
 
     private final HDLSignal result;
 
-    public HDLPhiExpr(HDLModule m, int uid, HDLOp op, HDLExpr dest, HDLExpr[] args) {
+    public HDLPhiExpr(HDLModule m, int uid, HDLOp op, HDLExpr dest, HDLExpr[] args, SequencerState[] ss) {
         this.uid = uid;
         this.op = op;
 		this.dest = dest;
         this.args = args;
 		this.patterns = new SequencerState[args.length];
+		for(int i = 0; i < patterns.length; i++){
+			this.patterns[i] = ss[i];
+			if(ss[i] != null){
+				var seq = ss[i].getSequencer();
+				var prev = seq.getPrevStateKey();
+				prev.setAssign(ss[i], ss[i].getStateId());
+			}
+		}
         for (HDLExpr expr : args) {
             if (expr == null)
                 throw new RuntimeException("An argument of HDLCombinationExpr is null.");
@@ -36,17 +44,11 @@ public class HDLPhiExpr implements HDLExpr {
         HDLType type = args[0].getType();
         result = m.newSignal(String.format("tmp_%04d", uid), type, HDLSignal.ResourceKind.WIRE, this, true);
     }
-	
+
     @Override
     public void accept(HDLTreeVisitor v) {
         v.visitHDLExpr(this);
     }
-
-	public void setStatePatterns(SequencerState[] ss){
-		for(int i = 0; i < patterns.length; i++){
-			this.patterns[i] = ss[i];
-		}
-	}
 
     public String toString() {
         return "HDLPhiExpr::(" + op + " " + getArgsString(args) + ")";

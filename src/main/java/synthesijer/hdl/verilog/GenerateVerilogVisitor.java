@@ -232,7 +232,6 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
 		// reset
-		HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getPrevStateKey().getName(), o.getStateKey().getName()));
 		if(o.getModule().isNegativeReset()){
 			HDLUtils.println(dest, offset+2, String.format("if(%s == 1'b0) begin", o.getModule().getSysResetName()));
 		}else{

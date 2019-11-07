@@ -12,6 +12,7 @@ import synthesijer.hdl.expr.HDLPhiExpr;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.verilog.GenerateVerilogVisitor;
 import synthesijer.hdl.vhdl.GenerateVHDLVisitor;
+import synthesijer.hdl.sequencer.SequencerState;
 
 /**
  * HDLModule: The top module for HDL-side AST.
@@ -506,10 +507,10 @@ public class HDLModule implements HDLTree, SynthesijerComponent{
 	 * @param args arguments
 	 * @return created new expression.
 	 */
-	public HDLPhiExpr newPhiExpr(HDLOp op, HDLExpr[] args, HDLExpr dest){
+	public HDLPhiExpr newPhiExpr(HDLOp op, HDLExpr[] args, HDLExpr dest, SequencerState[] ss){
 		HDLPhiExpr expr = null;
 		if(op == HDLOp.PHI){
-			expr = new HDLPhiExpr(this, getExprUniqueId(), op, dest, args);
+			expr = new HDLPhiExpr(this, getExprUniqueId(), op, dest, args, ss);
 			exprs.add(expr);
 		}else{
 			SynthesijerUtils.error("HDLModule::newPhiExpr with args[] are not supported for " + op);

@@ -226,21 +226,6 @@ public class SchedulerInfoCompiler {
 				}else{
 					sig.setResetValue(e);
 				}
-				/*
-				  }else if(v.getInitSrc() instanceof VariableOperand){
-				  VariableOperand o = (VariableOperand)(v.getInitSrc());
-				  if(varTable.containsKey(o.getName())){
-				  HDLExpr e = varTable.get(o.getName());
-				  sig.setResetValue(e);
-				  }else{
-				  if(v.isMember()){
-				  SynthesijerUtils.warn(v.getInitSrc().info() + " is not defiend at previous using by "+ v.getName());
-				  }
-				  }
-				  //				if(v.isMember()){
-				  //					SynthesijerUtils.warn("only litral for initial value of member is allowed: " + v.getName() + ":" + v.getInitSrc().info());
-				  //				}
-				  */
 			}
 		}
 		if(v.isMethodParam()){
@@ -1177,7 +1162,6 @@ public class SchedulerInfoCompiler {
 				for(int i = 0; i < args.length; i++){
 					args[i] = convOperandToHDLExpr(item, src[i]);
 				}
-				HDLPhiExpr expr = hm.newPhiExpr(op, args, dest);
 
 				SequencerState[] ss = new SequencerState[phi.pat.length];
 				for(int i = 0; i < phi.pat.length; i++){
@@ -1186,7 +1170,7 @@ public class SchedulerInfoCompiler {
 						System.out.println("undefined slot id=" + phi.pat[i].getStepId() + " in " + item.info());
 					}
 				}
-				expr.setStatePatterns(ss);
+				HDLPhiExpr expr = hm.newPhiExpr(op, args, dest, ss);
 				
 				dest.setAssign(state, expr);
 				predExprMap.put(item, expr);
