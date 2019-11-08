@@ -222,7 +222,6 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 
 	private void genSyncSequencerBody(HDLSequencer o, int offset){
 		HDLUtils.println(dest, offset, String.format("if rising_edge(%s) then", o.getModule().getSysClkName(), o.getModule().getSysClkName()));
-		HDLUtils.println(dest, offset+2, String.format("%s <= %s;", o.getPrevStateKey().getName(), o.getStateKey().getName()));
 		// reset
 		if(o.getModule().isNegativeReset()){
 			HDLUtils.println(dest, offset+2, String.format("if %s = '0' then", o.getModule().getSysResetName()));

@@ -23,12 +23,24 @@ public class HDLPhiExpr implements HDLExpr {
 
     private final HDLSignal result;
 
+	private final HDLSignal prevStateKey;
+
     public HDLPhiExpr(HDLModule m, int uid, HDLOp op, HDLExpr dest, HDLExpr[] args, SequencerState[] ss) {
         this.uid = uid;
         this.op = op;
 		this.dest = dest;
         this.args = args;
 		this.patterns = new SequencerState[args.length];
+		
+		HDLSignal key = null;
+		for(int i = 0; i < patterns.length; i++){
+			if(ss[i] != null){
+				key = m.newSignal(String.format("phi_prev_%04d", uid), ss[i].getKey().getType());
+				break;
+			}
+		}
+		this.prevStateKey = key;
+		
 		for(int i = 0; i < patterns.length; i++){
 			this.patterns[i] = ss[i];
 			if(ss[i] != null){
@@ -36,9 +48,7 @@ public class HDLPhiExpr implements HDLExpr {
 				var prev = seq.getPrevStateKey();
 				prev.setAssign(ss[i], ss[i].getStateId());
 
-				if(dest instanceof HDLSignal){
-					((HDLSignal)dest).setAssignForSequencer(seq, prev, ss[i].getStateId(), args[i]);
-				}
+				((HDLSignal)dest).setAssignForSequencer(seq, prevStateKey, ss[i].getStateId(), args[i]);
 			}
 		}
         for (HDLExpr expr : args) {
@@ -78,7 +88,8 @@ public class HDLPhiExpr implements HDLExpr {
 			s += "        ";
 			s += args[i].getVHDL();
 			s += " when ";
-			s += patterns[i].getSequencer().getPrevStateKey().getVHDL();
+			//s += patterns[i].getSequencer().getPrevStateKey().getVHDL();
+			s += prevStateKey.getVHDL();
 			s += " = ";
 			s += patterns[i].getStateId().getVHDL();
 			s += " else" + Constant.BR;
@@ -98,9 +109,10 @@ public class HDLPhiExpr implements HDLExpr {
 		for(int i = 0; i < args.length; i++){
 			if(patterns[i] == null) continue;
 			s += "        ";
-			s += patterns[i].getSequencer().getPrevStateKey().getVerilogHDL();
+			//s += patterns[i].getSequencer().getPrevStateKey().getVerilogHDL();
+			s += prevStateKey.getVerilogHDL();
 			s += " == ";
-			s += patterns[i].getStateId().getVHDL();
+			s += patterns[i].getStateId().getVerilogHDL();
 			s += " ? ";
 			s += args[i].getVerilogHDL();
 			s += " :" + Constant.BR;
