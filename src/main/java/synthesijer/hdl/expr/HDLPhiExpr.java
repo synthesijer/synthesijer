@@ -47,8 +47,8 @@ public class HDLPhiExpr implements HDLExpr {
 				var seq = ss[i].getSequencer();
 				var prev = seq.getPrevStateKey();
 				prev.setAssign(ss[i], ss[i].getStateId());
-
-				((HDLSignal)dest).setAssignForSequencer(seq, prevStateKey, ss[i].getStateId(), args[i]);
+				
+				prevStateKey.setAssignForSequencer(seq, seq.getPrevStateKey(), ss[i].getStateId(), args[i]);
 			}
 		}
         for (HDLExpr expr : args) {
