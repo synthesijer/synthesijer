@@ -48,7 +48,7 @@ public class HDLPhiExpr implements HDLExpr {
 				var prev = seq.getPrevStateKey();
 				prev.setAssign(ss[i], ss[i].getStateId());
 				
-				prevStateKey.setAssignForSequencer(seq, seq.getPrevStateKey(), ss[i].getStateId(), ss[i].getStateId());
+				prevStateKey.setAssignForSequencer(seq, seq.getStateKey(), ss[i].getStateId(), ss[i].getStateId());
 			}
 		}
         for (HDLExpr expr : args) {
@@ -88,7 +88,6 @@ public class HDLPhiExpr implements HDLExpr {
 			s += "        ";
 			s += args[i].getVHDL();
 			s += " when ";
-			//s += patterns[i].getSequencer().getPrevStateKey().getVHDL();
 			s += prevStateKey.getVHDL();
 			s += " = ";
 			s += patterns[i].getStateId().getVHDL();
@@ -109,7 +108,6 @@ public class HDLPhiExpr implements HDLExpr {
 		for(int i = 0; i < args.length; i++){
 			if(patterns[i] == null) continue;
 			s += "        ";
-			//s += patterns[i].getSequencer().getPrevStateKey().getVerilogHDL();
 			s += prevStateKey.getVerilogHDL();
 			s += " == ";
 			s += patterns[i].getStateId().getVerilogHDL();
