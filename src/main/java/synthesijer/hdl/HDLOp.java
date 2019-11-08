@@ -10,6 +10,7 @@ public enum HDLOp {
 	XOR(KIND.INFIX, 2, "xor", "^"),
 	NOT(KIND.OTHER, 1, "not", "~"),
 	EQ(KIND.COMP, 2, "=", "=="),
+	IS(KIND.OTHER, 2, "=", "=="),
 	LT(KIND.COMP, 2, "<", "<"),
 	GT(KIND.COMP, 2, ">", ">"),
 	LEQ(KIND.COMP, 2, "<=", "<="),

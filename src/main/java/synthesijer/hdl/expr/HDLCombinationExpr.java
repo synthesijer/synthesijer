@@ -231,6 +231,8 @@ public class HDLCombinationExpr implements HDLExpr {
                     HDLPrimitiveType t = (HDLPrimitiveType) (args[0].getResultExpr().getType());
                     return String.format("(not %s(%d-1)) & %s(%d-2 downto 0)", v, t.getWidth(), v, t.getWidth());
                 }
+                case IS:
+                    return String.format("(%s = %s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
                 case REF:
                     return String.format("%s(%s)", args[0].getResultExpr().getVHDL(), args[1].getResultExpr().getVHDL());
                 case IF: {
@@ -387,6 +389,8 @@ public class HDLCombinationExpr implements HDLExpr {
                     HDLPrimitiveType t = (HDLPrimitiveType) (args[0].getResultExpr().getType());
                     return String.format("{(~%s[%d-1]), %s[%d-2:0]}", v, t.getWidth(), v, t.getWidth());
                 }
+                case IS:
+                    return String.format("(%s == %s)", args[0].getResultExpr().getVerilogHDL(), args[1].getResultExpr().getVerilogHDL());
                 case REF:
                     return String.format("%s[%s]", args[0].getResultExpr().getVerilogHDL(),
                             args[1].getResultExpr().getVerilogHDL());

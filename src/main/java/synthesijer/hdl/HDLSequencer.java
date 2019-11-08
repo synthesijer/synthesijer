@@ -16,6 +16,7 @@ public class HDLSequencer implements HDLTree{
 	private ArrayList<SequencerState> states;
 	private ArrayList<Pair> seqExprList = new ArrayList<>();
 	private ArrayList<Triple> seqCondExprList = new ArrayList<>();
+	private ArrayList<Quatro> seqCondExprList2 = new ArrayList<>();
 	private SequencerState idle;
 	private int timestep = -1;
 
@@ -103,6 +104,10 @@ public class HDLSequencer implements HDLTree{
 	public void addSeqCondExpr(HDLSignal dest, HDLExpr cond, HDLExpr expr){
 		seqCondExprList.add(new Triple(dest, cond, expr));
 	}
+	
+	public void addSeqCondExpr(HDLSignal dest, HDLExpr a, HDLExpr b, HDLExpr expr){
+		seqCondExprList2.add(new Quatro(dest, a, b, expr));
+	}
 
 	public Pair[] getSeqExprList(){
 		return seqExprList.toArray(new Pair[0]);
@@ -112,6 +117,9 @@ public class HDLSequencer implements HDLTree{
 		return seqCondExprList.toArray(new Triple[0]);
 	}
 
+	public Quatro[] getSeqCondExprList2(){
+		return seqCondExprList2.toArray(new Quatro[0]);
+	}
 
 	public class Pair{
 		public final HDLSignal dest;
@@ -129,6 +137,19 @@ public class HDLSequencer implements HDLTree{
 		public Triple(HDLSignal d, HDLExpr c, HDLExpr e){
 			this.dest = d;
 			this.cond = c;
+			this.expr = e;
+		}
+	}
+	
+	public class Quatro{
+		public final HDLSignal dest;
+		public final HDLExpr a;
+		public final HDLExpr b;
+		public final HDLExpr expr;
+		public Quatro(HDLSignal d, HDLExpr a, HDLExpr b, HDLExpr e){
+			this.dest = d;
+			this.a = a;
+			this.b = b;
 			this.expr = e;
 		}
 	}
