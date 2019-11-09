@@ -268,6 +268,7 @@ public enum Manager {
 			GenSchedulerBoardVisitor v = new GenSchedulerBoardVisitor(si, i);
 			info.m.accept(v);
 			info.setSchedulerInfo(si);
+			dumpId = 0; // reset dump id for optimizing each module
 			dumpSchedulerInfo(si, "init");
 			if(Options.INSTANCE.iroha){
 				outIroha(info.getSchedulerInfo());
@@ -352,7 +353,6 @@ public enum Manager {
 	}
 
 	private void optimize(SynthesijerModuleInfo info, Options opt){
-		dumpId = 0; // reset dump id for optimizing each module
 		if(info.sysnthesisFlag == false){
 			// skip, nothing to do
 			return;
