@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.HashMap;
 
+import synthesijer.SynthesijerUtils;
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
@@ -37,7 +38,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		return newSlot;
 	}
 
-	private SchedulerSlot chaining(ArrayList<SchedulerSlot> bb){
+	private SchedulerSlot chaining(ArrayList<SchedulerSlot> bb, HashMap<Integer, Integer> id_map){
 
 		Hashtable<Operand, SchedulerItem> predItem = new Hashtable<>();
 		SchedulerSlot newSlot = null;
@@ -59,6 +60,9 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 				newSlot = copySlots(s);
 			}else{
 				for(SchedulerItem item: s.getItems()){
+					int oid = item.getStepId();
+					int nid = newSlot.getStepId();
+					id_map.put(oid, nid);
 					newSlot.addItem(item);
 					item.setSlot(newSlot);
 				}
@@ -156,6 +160,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 	}
 
 	public SchedulerBoard conv(SchedulerBoard src){
+		HashMap<Integer, Integer> id_map = new HashMap<>();
 		HashMap<SchedulerSlot, Integer> degrees = src.getEntryDegrees();
 		SchedulerBoard ret = src.genSameEnvBoard();
 		SchedulerSlot[] slots = src.getSlots();
@@ -165,7 +170,7 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 			int d = degrees.get(slot);
 			if(isChained(d, bb, slot) == false){
 				if(bb != null && bb.size() > 0){
-					ret.addSlot(chaining(bb));
+					ret.addSlot(chaining(bb, id_map));
 				}
 				ret.addSlot(slot);
 				bb = null; // reset
@@ -177,8 +182,12 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 			}
 		}
 		if(bb != null && bb.size() > 0){
-			ret.addSlot(chaining(bb));
+			ret.addSlot(chaining(bb, id_map));
 		}
+		for(var k : id_map.keySet()){
+			SynthesijerUtils.devel(2, "SimpleChaining: id_map " + k + " => " + id_map.get(k));
+		}
+		ret.convPhiSlotIdAll(id_map);
 		return ret;
 	}
 

@@ -1,6 +1,6 @@
 name: synthesijer
 base: core18
-version: '3.1.0'
+version: '3.1.1'
 summary: Synthesijer is a compiler from Java to VHDL/Verilog HDL
 description: |
   Synthesijer is a compiler from Java to VHDL/Verilog HDL.

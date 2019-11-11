@@ -138,11 +138,6 @@ public class BasicParallelizer implements SchedulerInfoOptimizer{
 			prev = target;
 			target = null; // next
 		}
-//		for(SchedulerSlot s: genList){
-//			for(SchedulerItem i: s.getItems()){
-//				i.remapBranchIds(id_map);
-//			}
-//		}
 		return prev;
 	}
 
