@@ -294,14 +294,14 @@ class SSAIDManager{
 	 * @param i ID of SSA-ed variable
 	 */
 	private void push(VariableOperand v, int i){
-		System.out.println(" [before push] " + dumpList(v));
+		SynthesijerUtils.devel(2, " [before push] " + dumpList(v));
 		if(T.get(v) == null){
 			ArrayList<Integer> a = new ArrayList<>();
 			a.add(0, defaultValue);
 			T.put(v, a);
 		}
 		T.get(v).add(0, i); // insert 'i' at index 0
-		System.out.println(" [after push] " + dumpList(v));
+		SynthesijerUtils.devel(2, " [after push] " + dumpList(v));
 	}
 
 	/**
@@ -309,7 +309,7 @@ class SSAIDManager{
 	 */
 	public void pop(VariableOperand vv){
 		VariableOperand v = R.get(vv.getName());
-		System.out.println(" [before pop] " + dumpList(v));
+		SynthesijerUtils.devel(2, " [before pop] " + dumpList(v));
 		if(T.get(v) == null){
 			SynthesijerUtils.error("SSAConverter: Internal Error. The ID record of SSA-ed variable is not found: " + vv.getName());
 		}else{
@@ -317,7 +317,7 @@ class SSAIDManager{
 				T.get(v).remove(0);
 			}
 		}
-		System.out.println(" [after pop] " + dumpList(v));
+		SynthesijerUtils.devel(2, " [after pop] " + dumpList(v));
 	}
 	
 }
