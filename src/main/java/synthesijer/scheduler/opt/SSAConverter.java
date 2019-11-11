@@ -311,9 +311,7 @@ class SSAIDManager{
 		VariableOperand v = R.get(vv.getName());
 		System.out.println(" [before pop] " + dumpList(v));
 		if(T.get(v) == null){
-			ArrayList<Integer> a = new ArrayList<>();
-			a.add(0, defaultValue);
-			T.put(v, a);
+			SynthesijerUtils.error("SSAConverter: Internal Error. The ID record of SSA-ed variable is not found: " + vv.getName());
 		}else{
 			if(T.get(v).size() > 1){
 				T.get(v).remove(0);

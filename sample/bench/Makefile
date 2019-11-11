@@ -20,7 +20,7 @@ iverilog : build primesim_top.v bubblesortsim_top.v mergesortsim_top.v
 test: ghdl iverilog
 	./primesim_top
 	./bubblesortsim_top
-	./iverilog -DDUMP_ENABLE 
+	./mergesortsim_top
 	ghdl -r primesim_top
 	ghdl -r bubblesortsim_top
 	ghdl -r mergesortsim_top
