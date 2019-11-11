@@ -24,13 +24,13 @@ public class SynthesijerUtils {
 
 	public static void debug(String s){
 		if(Options.INSTANCE.debug){
-			System.err.println("Debug: " + s);
+			System.out.println("Debug: " + s);
 		}
 	}
 	
 	public static void devel(int level, String s){
 		if(Options.INSTANCE.develLevel >= level){
-			System.err.println("Devel: " + s);
+			System.out.println("Devel: " + s);
 		}
 	}
 

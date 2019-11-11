@@ -109,8 +109,8 @@ public class SchedulerSlot {
 		String s = "";
 		String sep = "";
 		for(SchedulerItem item: items){
-			s += sep + item.info();
-			sep = ",";
+			s += sep + item.info() + "";
+			sep = ",\\l     ";
 		}
 		return s;
 	}

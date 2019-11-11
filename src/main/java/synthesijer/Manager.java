@@ -353,6 +353,7 @@ public enum Manager {
 	}
 
 	private void optimize(SynthesijerModuleInfo info, Options opt){
+		dumpId = 1; // reset dump id for optimizing each module
 		if(info.sysnthesisFlag == false){
 			// skip, nothing to do
 			return;
