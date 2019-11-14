@@ -135,6 +135,7 @@ public class Main {
 		Options.INSTANCE.chaining = opt.flag("chaining");
 		Options.INSTANCE.bb2 = opt.flag("bb2");
 		Options.INSTANCE.bb = opt.flag("bb");
+		Options.INSTANCE.ibb = opt.flag("inner-bb");
 		Options.INSTANCE.legacy_instance_variable_name = opt.flag("legacy-instance-variable-name");
 		Options.INSTANCE.operation_strength_reduction = opt.flag("operation_strength_reduction");
 		Options.INSTANCE.iroha = opt.flag("iroha");
