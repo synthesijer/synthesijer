@@ -11,6 +11,10 @@ public enum Options {
     public boolean bb2;
 
     public boolean bb;
+	
+    public boolean ibb;
+	
+    public boolean nbb;
 
     public boolean operation_strength_reduction;
 

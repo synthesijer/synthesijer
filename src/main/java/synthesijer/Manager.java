@@ -68,6 +68,7 @@ import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerInfoCompiler;
 import synthesijer.scheduler.opt.BasicParallelizer;
 import synthesijer.scheduler.opt.BasicParallelizer2;
+import synthesijer.scheduler.opt.InnerBasicBlockParallelizer;
 import synthesijer.scheduler.opt.ConvArrayAccessToArrayIndex;
 import synthesijer.scheduler.opt.OperationStrengthReduction;
 import synthesijer.scheduler.opt.PackArrayWriteAccess;
@@ -366,9 +367,13 @@ public enum Manager {
 		if(opt.with_ssa){
 			optimize(new SSAConverter(), info);
 		}
-		if(opt.bb2){
+		if(opt.nbb){
+			// nothing to apply parallilization
+		}else if(opt.bb2){
 			// Only when "--bb2" is specified, BasicParallelizer2 is used.
 			optimize(new BasicParallelizer2(), info);
+		}else if(opt.ibb){
+			optimize(new InnerBasicBlockParallelizer(), info);
 		}else{
 			// In default, BasicParallelizer is used.
 			optimize(new BasicParallelizer(), info);

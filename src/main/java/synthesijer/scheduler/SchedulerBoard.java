@@ -103,6 +103,18 @@ public class SchedulerBoard {
 		return new SchedulerBoard(this);
 	}
 
+	public SchedulerBoard copyBoard(){
+		SchedulerBoard ret = this.genSameEnvBoard();
+		for(var s: slots){
+			SchedulerSlot ns = new SchedulerSlot(s.getStepId());
+			for(SchedulerItem item: s.getItems()){
+				ns.addItem(item.copy(ret, ns));
+			}
+			ret.addSlot(ns);
+		}
+		return ret;
+	}
+
 	public String getName(){
 		return name;
 	}

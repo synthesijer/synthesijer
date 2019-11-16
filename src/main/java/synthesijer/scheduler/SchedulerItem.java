@@ -69,17 +69,17 @@ public class SchedulerItem {
 			}
 		}
 		SchedulerItem item = new SchedulerItem(board, this.op, src, this.dest);
-		item.copyEnvFrom(this);
+		item.copyEnvFrom(this, slot);
 		return item;
 	}
 
-	protected void copyEnvFrom(SchedulerItem orig){
+	protected void copyEnvFrom(SchedulerItem orig, SchedulerSlot slot){
 		int[] ids = new int[orig.getBranchId().length];
 		for(int i = 0; i < orig.getBranchId().length; i++){
 			ids[i] = orig.getBranchId()[i];
 		}
 		this.setBranchIds(ids);
-		this.setSlot(orig.slot);
+		this.setSlot(slot);
 	}
 
 
@@ -304,7 +304,7 @@ class MethodEntryItem extends SchedulerItem {
 
 	public MethodEntryItem copy(SchedulerBoard board, SchedulerSlot slot) {
 		MethodEntryItem item = new MethodEntryItem(board, this.name);
-		item.copyEnvFrom(this);
+		item.copyEnvFrom(this, slot);
 		return item;
 	}
 
@@ -344,7 +344,7 @@ class MethodInvokeItem extends SchedulerItem {
 			}
 		}
 		MethodInvokeItem item = new MethodInvokeItem(board, this.getOp(), this.obj, this.name, src, this.getDestOperand(), this.args);
-		item.copyEnvFrom(this);
+		item.copyEnvFrom(this, slot);
 		return item;
 	}
 
@@ -408,7 +408,7 @@ class FieldAccessItem extends SchedulerItem {
 			}
 		}
 		FieldAccessItem item = new FieldAccessItem(board, this.obj, this.name, src, this.getDestOperand());
-		item.copyEnvFrom(this);
+		item.copyEnvFrom(this, slot);
 		return item;
 	}
 
@@ -451,7 +451,7 @@ class TypeCastItem extends SchedulerItem {
 			}
 		}
 		TypeCastItem item = new TypeCastItem(board, this.getOp(), src[0], this.getDestOperand(), this.orig, this.target);
-		item.copyEnvFrom(this);
+		item.copyEnvFrom(this, slot);
 		return item;
 	}
 
@@ -523,7 +523,7 @@ class SelectItem extends SchedulerItem {
 			}
 		}
 		SelectItem item = new SelectItem(board, this.target, newPat);
-		item.copyEnvFrom(this);
+		item.copyEnvFrom(this, slot);
 		return item;
 	}
 

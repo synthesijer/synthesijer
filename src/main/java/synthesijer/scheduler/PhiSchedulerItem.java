@@ -34,7 +34,7 @@ public class PhiSchedulerItem extends SchedulerItem {
 			newPat[i] = pat[i];
 		}
 		PhiSchedulerItem item = new PhiSchedulerItem(board, newPat, newSrc, this.getDestOperand());
-		item.copyEnvFrom(this);
+		item.copyEnvFrom(this, slot);
 		return item;
 	}
 

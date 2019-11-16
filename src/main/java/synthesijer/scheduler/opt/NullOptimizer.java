@@ -16,16 +16,17 @@ public class NullOptimizer implements SchedulerInfoOptimizer{
 
 	public static final boolean DEBUG = false;
 
+	public String getKey(){
+		return "null_optimizer";
+	}
+
 	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
-			result.addBoard(b);
+			SchedulerBoard newB = b.copyBoard();
+			result.addBoard(newB);
 		}
 		return result;
-	}
-
-	public String getKey(){
-		return "null_optimizer";
 	}
 
 }
