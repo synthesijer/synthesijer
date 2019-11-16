@@ -367,7 +367,9 @@ public enum Manager {
 		if(opt.with_ssa){
 			optimize(new SSAConverter(), info);
 		}
-		if(opt.bb2){
+		if(opt.nbb){
+			// nothing to apply parallilization
+		}else if(opt.bb2){
 			// Only when "--bb2" is specified, BasicParallelizer2 is used.
 			optimize(new BasicParallelizer2(), info);
 		}else if(opt.ibb){

@@ -285,6 +285,9 @@ public class GenerateVerilogVisitor implements HDLTreeVisitor{
 			String sep = "";
 			int cnt = 0;
 			for(StateTransitCondition c: s.getTransitions()){
+				if(c.getDestState() == null){
+					SynthesijerUtils.error("desination state is not found: " + c.info());
+				}
 				String str = String.format("%s <= %s;", s.getKey().getName(), c.getDestState().getStateId().getVerilogHDL());
 				if(c.hasCondition()){
 					HDLUtils.println(dest, offset, String.format("%sif (%s) begin", sep, c.getCondExprAsVerilogHDL()));

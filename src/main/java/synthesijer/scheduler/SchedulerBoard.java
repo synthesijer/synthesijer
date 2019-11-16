@@ -105,12 +105,12 @@ public class SchedulerBoard {
 
 	public SchedulerBoard copyBoard(){
 		SchedulerBoard ret = this.genSameEnvBoard();
-		for(SchedulerSlot s: this.slots){
-			SchedulerSlot slot = new SchedulerSlot(s.getStepId());
-			for(var i: s.getItems()){
-				slot.addItem(i.copy(ret, slot));
+		for(var s: slots){
+			SchedulerSlot ns = new SchedulerSlot(s.getStepId());
+			for(SchedulerItem item: s.getItems()){
+				ns.addItem(item.copy(ret, ns));
 			}
-			ret.addSlot(slot);
+			ret.addSlot(ns);
 		}
 		return ret;
 	}

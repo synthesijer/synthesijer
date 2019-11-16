@@ -39,16 +39,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 
 	public SchedulerBoard conv(SchedulerBoard src){
 
-		SchedulerBoard ret = src.genSameEnvBoard();
-		SchedulerSlot[] slots = src.getSlots();
-
-		for(SchedulerSlot s: slots){
-			SchedulerSlot slot = new SchedulerSlot(s.getStepId());
-			for(var i: s.getItems()){
-				slot.addItem(i.copy(ret, slot));
-			}
-			ret.addSlot(slot);
-		}
+		SchedulerBoard ret = src.copyBoard();
 
 		ControlFlowGraph g = new ControlFlowGraph(ret, info.getName() + "_scheduler_board_" + getKey());
 		insertPhiFuncAll(ret, g);

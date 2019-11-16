@@ -64,4 +64,14 @@ public class StateTransitCondition{
 	public HDLValue getStateId(){
 		return stateId;
 	}
+
+	public String info(){
+		String s = "StateTransitionCondition: ";
+		s += "state=" + stateKey;
+		s += ", stepId=" + stateId;
+		s += ", cond=" + cond;
+		s += ", dest=" + destState;
+		return s;
+	}
+
 }
