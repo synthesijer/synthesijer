@@ -33,11 +33,11 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 
 	public SchedulerBoard conv(SchedulerBoard src){
 		var cfg = new ControlFlowGraph(src, getKey());
-
 		for(var b : cfg.getBasicBlocks()){
+			System.out.println("--basic block--");
 			var items = b.getItems();
 			for(var i: items){
-				System.out.println(i);
+				System.out.println(i.info());
 			}
 		}
 			
