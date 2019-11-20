@@ -17,20 +17,23 @@ import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
-public class InstructionSelection implements SchedulerInfoOptimizer{
-  public InstructionSelection(){
+public class SSAGraph{
+
+  public SSAGraph(ControlFlowGraph cg){
+
+    genSSANode();
   }
 
-  public SchedulerInfo opt(SchedulerInfo info){
-    SchedulerInfo result = info.getSameInfo();
-    for(SchedulerBoard b: info.getBoardsList()){
-        result.addBoard(b);
-    }
-    return result;
+  public genSSANode(){
+    ArrayList<SSAGraphNode> nodes = new ArrayList<>();
   }
+}
 
-  public String getKey(){
-    //System.out.println("命令選択");
-    return "inst_sel";
-  }
+class SSAGraphNode{
+  public int num;
+  public String type;
+  public int sequence;
+}
+
+class SSAGraphEdge{
 }

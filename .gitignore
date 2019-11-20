@@ -26,3 +26,4 @@ data
 copy-resources
 run.script
 *.zip
+sim.*

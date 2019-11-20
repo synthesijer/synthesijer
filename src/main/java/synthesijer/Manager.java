@@ -369,6 +369,7 @@ public enum Manager {
 			optimize(new SSAConverter(), info);
 		}
 		if(opt.inst_sel){
+			optimize(new SSAConverter(), info);
 			optimize(new InstructionSelection(), info);
 		}
 		if(opt.nbb){
