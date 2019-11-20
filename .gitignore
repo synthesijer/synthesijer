@@ -12,17 +12,3 @@ a.out
 /stage
 /parts
 *.tmp_info
-*.cache
-*.class
-*.xml
-*.properties
-out
-export
-inputs
-output
-ivy-report.*
-*_dsp
-data
-copy-resources
-run.script
-*.zip
