@@ -26,10 +26,11 @@ public enum Options {
 
     public boolean with_ssa = false;
 
+    public boolean inst_sel = false;
+
 	public boolean verbose = false;
 
 	public boolean debug = false;
 	
 	public int develLevel = 0;
-
 }
