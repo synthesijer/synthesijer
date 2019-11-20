@@ -36,7 +36,7 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		GetOpt opt = new GetOpt("h",
-				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa,verbose,debug,devel:,inner-bb,no-bb",
+				"no-optimize,vhdl,verilog,help,config:,chaining,no-chaining,ip-exact:,vendor:,libname:,lib-classes:,legacy-instance-variable-name,iroha,bb2,opencl,bb,ssa,inst_sel,verbose,debug,devel:,inner-bb,no-bb",
 				args);
 		if (opt.flag("h") || opt.flag("help") || opt.getArgs().length == 0) {
 			printHelp();
@@ -142,6 +142,7 @@ public class Main {
 		Options.INSTANCE.iroha = opt.flag("iroha");
 		Options.INSTANCE.opencl = opt.flag("opencl");
 		Options.INSTANCE.with_ssa = opt.flag("ssa");
+		Options.INSTANCE.inst_sel = opt.flag("inst_sel");
 		boolean packaging = false;
 		String packageTop = "";
 		if (opt.flag("ip-exact")) {

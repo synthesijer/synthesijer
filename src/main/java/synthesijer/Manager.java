@@ -75,6 +75,7 @@ import synthesijer.scheduler.opt.PackArrayWriteAccess;
 import synthesijer.scheduler.opt.ReduceRedundantJump;
 import synthesijer.scheduler.opt.RemoveUnreachableSlot;
 import synthesijer.scheduler.opt.SSAConverter;
+import synthesijer.scheduler.opt.InstructionSelection;
 import synthesijer.scheduler.opt.SchedulerInfoOptimizer;
 import synthesijer.scheduler.opt.SimpleChaining;
 
@@ -366,6 +367,9 @@ public enum Manager {
 		optimize(new PackArrayWriteAccess(), info);
 		if(opt.with_ssa){
 			optimize(new SSAConverter(), info);
+		}
+		if(opt.inst_sel){
+			optimize(new InstructionSelection(), info);
 		}
 		if(opt.nbb){
 			// nothing to apply parallilization
