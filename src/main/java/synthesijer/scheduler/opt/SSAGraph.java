@@ -42,10 +42,15 @@ public class SSAGraph{
     SchedulerItem[] items = slot.getItems();
     n.num = count;
     for(SchedulerItem i: items){
-      if(i.toSexp().contains("ADD")){
-        n.type = "operator";
+      if(i.dest == null){
+        n.type = i.op.toString();
       }else{
-        n.type = "operand";
+        if(i.toSexp().contains("ADD")){
+          n.type = "operator";
+        }else{
+          n.type = "operand";
+        }
+        n.dest = i.dest.getName();
       }
     }
     n.sequence = slot.getStepId();
@@ -56,10 +61,15 @@ public class SSAGraph{
     System.out.println("SSAGraphNodes ---");
     for(SSAGraphNode n: nodes){
       System.out.print("("+n.sequence+") ");
-      if(n.type.equals("operator")){
-        System.out.println("OP : + ->");
-      }else{
-        System.out.println("x : 10 ->");
+      switch(n.type){
+        case "operator":
+          System.out.println("OP: + ->");
+          break;
+        case "operand":
+          System.out.println("x : 10 ->");
+          break;
+        default:
+          System.out.println(n.type+" ->");
       }
     }
     System.out.println("");
@@ -70,6 +80,7 @@ class SSAGraphNode{
   public int num;
   public String type;
   public int sequence;
+  public String dest;
 }
 
 class SSAGraphEdge{

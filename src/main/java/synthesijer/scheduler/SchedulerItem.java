@@ -22,7 +22,7 @@ public class SchedulerItem {
 	/**
 	 * operator
 	 */
-	private Op op;
+	public Op op;
 
 	/**
 	 * source variables
@@ -34,7 +34,7 @@ public class SchedulerItem {
 	/**
 	 * a destination variable
 	 */
-	private VariableOperand dest;
+	public VariableOperand dest;
 
 	/**
 	 * the index values to jump, which available when this is a kind of jump
