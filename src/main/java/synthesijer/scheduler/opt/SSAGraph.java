@@ -18,14 +18,51 @@ import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 
 public class SSAGraph{
+  ArrayList<SSAGraphNode> ssa_nodes;  
 
   public SSAGraph(ControlFlowGraph cg){
-
-    genSSANode();
+    //System.out.println("スロット数: "+cg.slots.length);
+    ssa_nodes = buildAll(cg.slots);
+    toString(ssa_nodes);
   }
 
-  public genSSANode(){
+  public ArrayList<SSAGraphNode> buildAll(SchedulerSlot[] slots){
     ArrayList<SSAGraphNode> nodes = new ArrayList<>();
+    int count = 1;
+
+    for(SchedulerSlot s: slots){
+      nodes.add(genSSANode(s, count));
+      count ++;
+    }
+    return nodes;
+  }
+
+  public SSAGraphNode genSSANode(SchedulerSlot slot, int count){
+    SSAGraphNode n = new SSAGraphNode();
+    SchedulerItem[] items = slot.getItems();
+    n.num = count;
+    for(SchedulerItem i: items){
+      if(i.toSexp().contains("ADD")){
+        n.type = "operator";
+      }else{
+        n.type = "operand";
+      }
+    }
+    n.sequence = slot.getStepId();
+    return n;
+  }
+
+  public void toString(ArrayList<SSAGraphNode> nodes){
+    System.out.println("SSAGraphNodes ---");
+    for(SSAGraphNode n: nodes){
+      System.out.print("("+n.sequence+") ");
+      if(n.type.equals("operator")){
+        System.out.println("OP : + ->");
+      }else{
+        System.out.println("x : 10 ->");
+      }
+    }
+    System.out.println("");
   }
 }
 

@@ -23,11 +23,12 @@ public class ControlFlowGraph{
 	
 	ControlFlowGraphBB root;
 	ControlFlowDominatorTree dominatorTree;
+	SchedulerSlot[] slots;
 	
 	private String base;
 
 	public ControlFlowGraph(SchedulerBoard board, String key){
-		SchedulerSlot[] slots = board.getSlots();
+		slots = board.getSlots();
 		if(!(slots.length > 0)) return;
 		base = board.getName();
 		this.blocks = buildAll(slots);
