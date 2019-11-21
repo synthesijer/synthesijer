@@ -45,12 +45,14 @@ public class SSAGraph{
       if(i.dest == null){
         n.type = i.op.toString();
       }else{
+        n.dest = i.dest.getName();
         if(i.toSexp().contains("ADD")){
           n.type = "operator";
         }else{
           n.type = "operand";
+          String[] tmp = n.dest.split("_",0);
+          n.variable_name = tmp[1];
         }
-        n.dest = i.dest.getName();
       }
     }
     n.sequence = slot.getStepId();
@@ -64,9 +66,10 @@ public class SSAGraph{
       switch(n.type){
         case "operator":
           System.out.println("OP: + ->");
+          //System.out.println(n.dest);
           break;
         case "operand":
-          System.out.println("x : 10 ->");
+          System.out.println(n.variable_name+" : 10 ->");
           break;
         default:
           System.out.println(n.type+" ->");
@@ -81,6 +84,7 @@ class SSAGraphNode{
   public String type;
   public int sequence;
   public String dest;
+  public String variable_name;
 }
 
 class SSAGraphEdge{
