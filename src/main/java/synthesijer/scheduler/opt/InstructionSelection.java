@@ -30,6 +30,7 @@ public class InstructionSelection implements SchedulerInfoOptimizer{
   }
 
   public String getKey(){
+    //System.out.println("命令選択");
     return "inst_sel";
   }
 }

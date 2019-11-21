@@ -34,6 +34,7 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 	}
 
 	public String getKey(){
+		//System.out.println("SSA化したよ！");
 		return "ssa_converter";
 	}
 
@@ -46,6 +47,8 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		setPhiFuncValuesAll(ret, g);
 
 		ControlFlowGraph g2 = new ControlFlowGraph(ret, info.getName() + "_scheduler_board_after_ssa_conv" + getKey());
+		SSAGraph sg = new SSAGraph(g2);
+
 		return ret;
 	}
 

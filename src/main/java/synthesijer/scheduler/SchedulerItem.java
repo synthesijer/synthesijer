@@ -22,19 +22,19 @@ public class SchedulerItem {
 	/**
 	 * operator
 	 */
-	private Op op;
+	public Op op;
 
 	/**
 	 * source variables
 	 */
-	private Operand[] src;
+	public Operand[] src;
 
 	public final Hashtable<Operand, SchedulerItem> pred = new Hashtable<>();
 
 	/**
 	 * a destination variable
 	 */
-	private VariableOperand dest;
+	public VariableOperand dest;
 
 	/**
 	 * the index values to jump, which available when this is a kind of jump
