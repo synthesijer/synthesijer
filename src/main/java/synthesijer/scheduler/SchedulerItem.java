@@ -27,7 +27,7 @@ public class SchedulerItem {
 	/**
 	 * source variables
 	 */
-	private Operand[] src;
+	public Operand[] src;
 
 	public final Hashtable<Operand, SchedulerItem> pred = new Hashtable<>();
 

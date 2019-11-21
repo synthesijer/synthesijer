@@ -46,12 +46,33 @@ public class SSAGraph{
         n.type = i.op.toString();
       }else{
         n.dest = i.dest.getName();
-        if(i.toSexp().contains("ADD")){
-          n.type = "operator";
-        }else{
-          n.type = "operand";
-          String[] tmp = n.dest.split("_",0);
-          n.variable_name = tmp[1];
+        switch(i.op.toString()){
+          case "ASSIGN":
+            n.type = "operand";
+            String[] tmp = n.dest.split("_",0);
+            n.variable_name = tmp[1];
+            n.value = i.src[0].getName();
+            break;
+          case "ADD":
+            n.type = "operator";
+            n.operator = "+";
+            break;
+          case "SUB":
+            n.type = "operator";
+            n.operator = "-";
+            break;
+          case "MUL32":
+            n.type = "operator";
+            n.operator = "*";
+            break;
+          case "DIV32":
+            n.type = "operator";
+            n.operator = "/";
+            break;
+          default:
+            n.type = "operator";
+            n.operator = "まだ";
+            break;
         }
       }
     }
@@ -65,11 +86,11 @@ public class SSAGraph{
       System.out.print("("+n.sequence+") ");
       switch(n.type){
         case "operator":
-          System.out.println("OP: + ->");
+          System.out.println("OP: "+n.operator+" ->");
           //System.out.println(n.dest);
           break;
         case "operand":
-          System.out.println(n.variable_name+" : 10 ->");
+          System.out.println(n.variable_name+" : "+n.value+" ->");
           break;
         default:
           System.out.println(n.type+" ->");
@@ -85,6 +106,8 @@ class SSAGraphNode{
   public int sequence;
   public String dest;
   public String variable_name;
+  public String value;
+  public String operator;
 }
 
 class SSAGraphEdge{
