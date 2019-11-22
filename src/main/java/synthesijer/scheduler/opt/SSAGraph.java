@@ -98,6 +98,10 @@ public class SSAGraph{
     }
     System.out.println("");
   }
+
+  public ArrayList<SSAGraphNode> getSSAGraph(){
+    return this.ssa_nodes;
+  }
 }
 
 class SSAGraphNode{

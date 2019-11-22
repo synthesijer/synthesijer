@@ -368,10 +368,10 @@ public enum Manager {
 		if(opt.with_ssa){
 			optimize(new SSAConverter(), info);
 		}
-		if(opt.inst_sel){
+		/*if(opt.inst_sel){
 			optimize(new SSAConverter(), info);
 			optimize(new InstructionSelection(), info);
-		}
+		}*/
 		if(opt.nbb){
 			// nothing to apply parallilization
 		}else if(opt.bb2){
