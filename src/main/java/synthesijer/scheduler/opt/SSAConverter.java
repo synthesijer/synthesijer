@@ -23,6 +23,7 @@ import synthesijer.scheduler.VariableRefOperand;
 public class SSAConverter implements SchedulerInfoOptimizer{
 
 	private SchedulerInfo info;
+	public ArrayList<SSAGraphNode> nodes;
 
 	public SchedulerInfo opt(SchedulerInfo info){
 		this.info = info;
@@ -47,7 +48,8 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		setPhiFuncValuesAll(ret, g);
 
 		ControlFlowGraph g2 = new ControlFlowGraph(ret, info.getName() + "_scheduler_board_after_ssa_conv" + getKey());
-		SSAGraph sg = new SSAGraph(g2);
+		this.nodes = getSSAGraphNode(g2);
+		InstructionSelection is = new InstructionSelection(this.nodes);
 
 		return ret;
 	}
@@ -209,6 +211,10 @@ public class SSAConverter implements SchedulerInfoOptimizer{
 		}
 	}
 
+	public ArrayList<SSAGraphNode> getSSAGraphNode(ControlFlowGraph g2){
+		SSAGraph sg = new SSAGraph(g2);
+    return sg.ssa_nodes;
+  }
 }
 
 class SSAIDManager{
