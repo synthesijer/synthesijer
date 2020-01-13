@@ -23,6 +23,7 @@ public class HDLCombinationExpr implements HDLExpr {
         this.uid = uid;
         this.op = op;
         this.args = args;
+        System.out.println("最新のuid: "+uid+", op: "+op+", args: "+args);
         for (HDLExpr expr : args) {
             if (expr == null)
                 throw new RuntimeException("An argument of HDLCombinationExpr is null.");
@@ -30,7 +31,8 @@ public class HDLCombinationExpr implements HDLExpr {
         // System.out.println(this);
         HDLType type = decideExprType(op, this.args);
         result = m.newSignal(String.format("tmp_%04d", uid), type, HDLSignal.ResourceKind.WIRE, this, true);
-        // System.out.println(result);
+
+        System.out.println("result: "+result);
     }
 
     public HDLType getType() {
@@ -42,22 +44,25 @@ public class HDLCombinationExpr implements HDLExpr {
     }
 
     private HDLType getPriorType(HDLType t1, HDLType t2) {
-        if (t1 == null && t2 != null)
+        if (t1 == null && t2 != null){
+            System.out.println("t2: "+t2);
             return t2;
-        if (t1 != null && t2 == null)
+        }
+        if (t1 != null && t2 == null){
+            System.out.println("t1: "+t1);
             return t1;
+        }
         HDLType t = null;
         if (t1.getKind().hasWidth() && t1.getKind().isPrimitive() && t2.getKind().hasWidth()
-                && t2.getKind().isPrimitive()) {
+                && t2.getKind().isPrimitive()) { 
             boolean signFlag = false;
             if (t1.isSigned() || t2.isSigned())
                 signFlag = true;
             HDLType tmp = ((HDLPrimitiveType) t1).getWidth() > ((HDLPrimitiveType) t2).getWidth() ? t1 : t2;
-            if (signFlag) {
+            if (signFlag)
                 t = HDLPrimitiveType.genSignedType(((HDLPrimitiveType) tmp).getWidth());
-            } else {
+            else
                 t = HDLPrimitiveType.genVectorType(((HDLPrimitiveType) tmp).getWidth());
-            }
         } else if (t1.getKind().hasWidth() && t1.getKind().isPrimitive()) {
             t = t1;
         } else if (t1.getKind().hasWidth() && t1.getKind().isPrimitive()) {
@@ -107,6 +112,9 @@ public class HDLCombinationExpr implements HDLExpr {
 
     private HDLType decideExprType(HDLOp op, HDLExpr[] args) {
         if (op.isInfix()) {
+            // signedが返ってくる
+            System.out.println("オペ"+op);
+            System.out.println(getPriorType(args[0].getType(), args[1].getType()));
             return getPriorType(args[0].getType(), args[1].getType());
         } else if (op.isCompare()) {
             return HDLPrimitiveType.genBitType();
