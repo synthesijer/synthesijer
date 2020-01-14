@@ -73,7 +73,8 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	}
 
 	private void genPortList(PrintWriter dest, int offset, HDLPort[] ports, boolean paramFlag){
-		/*HDLUtils.println(dest, offset, "port (");
+		// ここでentity部のportを宣言
+		HDLUtils.println(dest, offset, "port (");
 		String sep = "";
 		for(HDLPort p: ports){
 			dest.print(sep);
@@ -82,7 +83,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
-		HDLUtils.println(dest, offset, ");");*/
+		HDLUtils.println(dest, offset, ");");
 	}
 
 	private void genParamList(PrintWriter dest, int offset, HDLParameter[] params, boolean paramFlag){
@@ -105,13 +106,13 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	public void visitHDLModule(HDLModule o) {
 
 		HDLUtils.println(dest, offset, String.format("entity %s is", o.getName()));
-		/*
+		
 		if(o.getParameters().length > 0){
 			genParamList(dest, offset+2, o.getParameters(), false);
 		}
 		if(o.getPorts().length > 0){
 			genPortList(dest, offset+2, o.getPorts(), false);
-		}*/
+		}
 		HDLUtils.println(dest, offset, String.format("end %s;", o.getName()));
     HDLUtils.nl(dest);
 
@@ -152,8 +153,8 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLPort(HDLPort o) {
-		//System.out.println(o);
-		//HDLUtils.print(dest, offset, String.format("%s : %s %s", o.getName(), o.getDir().getVHDL(), o.getType().getVHDL()));
+		System.out.println(o);
+		HDLUtils.print(dest, offset, String.format("%s : %s %s", o.getName(), o.getDir().getVHDL(), o.getType().getVHDL()));
 	}
 
 	@Override
