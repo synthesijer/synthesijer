@@ -54,15 +54,16 @@ public class HDLCombinationExpr implements HDLExpr {
         }
         HDLType t = null;
         if (t1.getKind().hasWidth() && t1.getKind().isPrimitive() && t2.getKind().hasWidth()
-                && t2.getKind().isPrimitive()) { 
+                && t2.getKind().isPrimitive()) {
             boolean signFlag = false;
             if (t1.isSigned() || t2.isSigned())
                 signFlag = true;
             HDLType tmp = ((HDLPrimitiveType) t1).getWidth() > ((HDLPrimitiveType) t2).getWidth() ? t1 : t2;
-            if (signFlag)
+            if (signFlag) {
                 t = HDLPrimitiveType.genSignedType(((HDLPrimitiveType) tmp).getWidth());
-            else
+            } else {
                 t = HDLPrimitiveType.genVectorType(((HDLPrimitiveType) tmp).getWidth());
+            }
         } else if (t1.getKind().hasWidth() && t1.getKind().isPrimitive()) {
             t = t1;
         } else if (t1.getKind().hasWidth() && t1.getKind().isPrimitive()) {

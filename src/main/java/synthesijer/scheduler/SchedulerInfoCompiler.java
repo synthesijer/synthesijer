@@ -618,12 +618,12 @@ public class SchedulerInfoCompiler {
 			case ASSIGN : break;
 			case NOP : break;
 			//ここでHDLOp.ADDにするかHDLOp.IP_ADDにするかを実装
-			case ADD :
-				if(1==1){
+			case ADD : ret = HDLOp.ADD;break;
+				/*if(1==1){
 					ret = HDLOp.IP_ADD;break;
 				}else{
 					ret = HDLOp.ADD;break;	
-				}
+				}*/
 			case SUB : ret = HDLOp.SUB;break;
 			case MUL32 : break; //ret = HDLOp.MUL;break;
 			case MUL64 : break; // ret = HDLOp.MUL;break;
