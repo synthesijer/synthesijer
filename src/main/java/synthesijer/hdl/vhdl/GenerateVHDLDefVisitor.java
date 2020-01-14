@@ -41,6 +41,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 
 	@Override
 	public void visitHDLInstance(HDLInstance o) {
+		/*
 		if(o.getSubModule().isComponentDeclRequired() == false) return;
 		HDLUtils.println(dest, offset, String.format("component %s", o.getSubModule().getName()));
 		if(o.getSubModule().getParameters().length > 0){
@@ -48,6 +49,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		}
 		genPortList(dest, offset+2, o.getSubModule().getPorts(), (o.getSubModule().getParameters().length > 0));
 		HDLUtils.println(dest, offset, String.format("end component %s;", o.getSubModule().getName()));
+		*/
 	}
 
 	@Override
@@ -71,7 +73,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	}
 
 	private void genPortList(PrintWriter dest, int offset, HDLPort[] ports, boolean paramFlag){
-		HDLUtils.println(dest, offset, "port (");
+		/*HDLUtils.println(dest, offset, "port (");
 		String sep = "";
 		for(HDLPort p: ports){
 			dest.print(sep);
@@ -80,7 +82,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			sep = ";" + Constant.BR;
 		}
 		HDLUtils.println(dest, 0, "");
-		HDLUtils.println(dest, offset, ");");
+		HDLUtils.println(dest, offset, ");");*/
 	}
 
 	private void genParamList(PrintWriter dest, int offset, HDLParameter[] params, boolean paramFlag){
@@ -103,22 +105,24 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	public void visitHDLModule(HDLModule o) {
 
 		HDLUtils.println(dest, offset, String.format("entity %s is", o.getName()));
+		/*
 		if(o.getParameters().length > 0){
 			genParamList(dest, offset+2, o.getParameters(), false);
 		}
 		if(o.getPorts().length > 0){
 			genPortList(dest, offset+2, o.getPorts(), false);
-		}
+		}*/
 		HDLUtils.println(dest, offset, String.format("end %s;", o.getName()));
-		HDLUtils.nl(dest);
+    HDLUtils.nl(dest);
 
 		// architecture
 		HDLUtils.println(dest, offset, String.format("architecture RTL of %s is", o.getName()));
-		HDLUtils.nl(dest);
+		//HDLUtils.nl(dest);
+		/*
 		HDLUtils.println(dest, offset+2, String.format("attribute mark_debug : string;"));
 		HDLUtils.println(dest, offset+2, String.format("attribute keep : string;"));
 		HDLUtils.println(dest, offset+2, String.format("attribute S : string;"));
-		HDLUtils.nl(dest);
+		HDLUtils.nl(dest);*/
 
 		Hashtable<String, Boolean> componentFlags = new Hashtable<>();
 		for(HDLInstance i: o.getModuleInstances()){
@@ -130,7 +134,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			componentFlags.put(i.getSubModule().getName(), true);
 		}
 
-		HDLUtils.nl(dest);
+		//HDLUtils.nl(dest);
 		for(HDLPort p: o.getPorts()){
 			if(p.isSet(OPTION.NO_SIG)) continue;
 			if(p.getSignal() == null) continue;
@@ -138,23 +142,23 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			p.getSignal().accept(this);
 			offset -= 2;
 		}
-		HDLUtils.nl(dest);
+		//HDLUtils.nl(dest);
 		offset += 2;
 		for(HDLSignal s: o.getSignals()){ s.accept(this); }
 		offset -= 2;
-		HDLUtils.nl(dest);
+		//HDLUtils.nl(dest);
 
 	}
 
 	@Override
 	public void visitHDLPort(HDLPort o) {
 		//System.out.println(o);
-		HDLUtils.print(dest, offset, String.format("%s : %s %s", o.getName(), o.getDir().getVHDL(), o.getType().getVHDL()));
+		//HDLUtils.print(dest, offset, String.format("%s : %s %s", o.getName(), o.getDir().getVHDL(), o.getType().getVHDL()));
 	}
 
 	@Override
 	public void visitHDLParameter(HDLParameter o) {
-		HDLUtils.print(dest, offset, String.format("%s : %s := %s", o.getName(), o.getType().getVHDL(), o.getDefaultValue().getVHDL()));
+		//HDLUtils.print(dest, offset, String.format("%s : %s := %s", o.getName(), o.getType().getVHDL(), o.getDefaultValue().getVHDL()));
 	}
 
 	@Override
@@ -168,17 +172,18 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 		}
 		String s;
 		//if(o.getResetValue() != null && o.isRegister()){
-		if(o.getResetValue() != null){
+		/*if(o.getResetValue() != null){
 			s = String.format("signal %s : %s := %s;", o.getName(), o.getType().getVHDL(), o.getResetValue().getVHDL());
 		}else{
 			s = String.format("signal %s : %s;", o.getName(), o.getType().getVHDL());
 		}
+		
 		HDLUtils.println(dest, offset, s);
 		if(o.isDebugFlag()){
 			HDLUtils.println(dest, offset, String.format("attribute mark_debug of %s : signal is \"true\";", o.getName()));
 			HDLUtils.println(dest, offset, String.format("attribute keep of %s : signal is \"true\";", o.getName()));
 			HDLUtils.println(dest, offset, String.format("attribute S of %s : signal is \"true\";", o.getName()));
-		}
+		}*/
 	}
 
 	@Override
@@ -191,14 +196,14 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 	public void visitHDLUserDefinedType(HDLUserDefinedType o) {
 		if(definedType.containsKey(o) == true) return;
 		definedType.put(o, true);
-		HDLUtils.println(dest, offset, String.format("type %s is (", o.getName()));
+		/*HDLUtils.println(dest, offset, String.format("type %s is (", o.getName()));
 		String sep = "";
 		for(HDLValue s: o.getItems()){
 			HDLUtils.print(dest, 0, sep);
 			HDLUtils.print(dest, offset+2, String.format("%s", s.getVHDL()));
 			sep = "," + Constant.BR;
 		}
-		HDLUtils.println(dest, offset, String.format("%s  );", Constant.BR));
+		HDLUtils.println(dest, offset, String.format("%s  );", Constant.BR));*/
 	}
 
 	@Override
