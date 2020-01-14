@@ -617,7 +617,13 @@ public class SchedulerInfoCompiler {
 			case METHOD_EXIT : break;
 			case ASSIGN : break;
 			case NOP : break;
+			//ここでHDLOp.ADDにするかHDLOp.IP_ADDにするかを実装
 			case ADD : ret = HDLOp.ADD;break;
+				/*if(1==1){
+					ret = HDLOp.IP_ADD;break;
+				}else{
+					ret = HDLOp.ADD;break;	
+				}*/
 			case SUB : ret = HDLOp.SUB;break;
 			case MUL32 : break; //ret = HDLOp.MUL;break;
 			case MUL64 : break; // ret = HDLOp.MUL;break;
@@ -1177,8 +1183,8 @@ public class SchedulerInfoCompiler {
 				break;
 			}
 			default: {
-				//System.out.println(item.info());
 				HDLOp op = convOp2HDLOp(item.getOp());
+				//System.out.println(op);
 				//if(op == HDLOp.UNDEFINED) return;
 				HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
 				Operand[] src = item.getSrcOperand();
