@@ -160,7 +160,7 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 			offset -= 2;
 		}
 		HDLUtils.nl(dest);*/
-		HDLUtils.println(dest, offset, String.format("end RTL;"));
+		//HDLUtils.println(dest, offset, String.format("end RTL;"));
 	}
 
 	@Override
