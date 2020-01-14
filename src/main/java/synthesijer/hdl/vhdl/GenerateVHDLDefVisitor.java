@@ -164,10 +164,10 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			}
 			HDLUtils.println(dest, offset, String.format("end %s;", entityName));
 			HDLUtils.nl(dest);
-
+			HDLUtils.nl(dest);
 			// architecture
 			HDLUtils.println(dest, offset, String.format("architecture RTL of %s is", entityName));
-			//HDLUtils.nl(dest);
+			HDLUtils.nl(dest);
 			/*
 			HDLUtils.println(dest, offset+2, String.format("attribute mark_debug : string;"));
 			HDLUtils.println(dest, offset+2, String.format("attribute keep : string;"));
@@ -197,6 +197,7 @@ public class GenerateVHDLDefVisitor implements HDLTreeVisitor{
 			for(HDLSignal s: o.getSignals()){ s.accept(this); }
 			offset -= 2;
 			HDLUtils.println(dest, offset, String.format("end RTL;"));
+			HDLUtils.nl(dest);
 			HDLUtils.nl(dest);
 		}
 	}
