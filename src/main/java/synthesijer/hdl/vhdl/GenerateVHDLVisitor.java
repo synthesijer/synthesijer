@@ -105,6 +105,9 @@ public class GenerateVHDLVisitor implements HDLTreeVisitor{
 	@Override
 	public void visitHDLModule(HDLModule o) {
 		// library import
+		HDLUtils.println(dest, offset, String.format("library lpm;"));
+		HDLUtils.println(dest, offset, String.format("use lpm.all;"));
+	  HDLUtils.nl(dest);
 		HDLUtils.println(dest, offset, String.format("library IEEE;"));
 		HDLUtils.println(dest, offset, String.format("use IEEE.std_logic_1164.all;"));
 		//HDLUtils.println(dest, offset, String.format("use IEEE.numeric_std.all;"));
