@@ -1134,6 +1134,7 @@ public class SchedulerInfoCompiler {
 			case FLEQ32:    genCompUnitExpr(item, FCOMP32.LEQ, state, resource, board); break;
 			case FGT32:     genCompUnitExpr(item, FCOMP32.GT, state, resource, board);  break;
 			case FGEQ32:    genCompUnitExpr(item, FCOMP32.GEQ, state, resource, board); break;
+			//ここね
 			case FCOMPEQ32: genCompUnitExpr(item, FCOMP32.EQ, state, resource, board);  break;
 			case FNEQ32:    genCompUnitExpr(item, FCOMP32.NEQ, state, resource, board); break;
 			case FLT64:     genCompUnitExpr(item, FCOMP64.LT, state, resource, board);  break;
@@ -1252,6 +1253,7 @@ public class SchedulerInfoCompiler {
 	}
 
 	private void genCompUnitExpr(SchedulerItem item, int opcode, SequencerState state, HardwareResource resource, SchedulerBoard board){
+		System.out.println("オペコード :"+opcode);
 		Operand[] arg = item.getSrcOperand();
 		HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 		inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
