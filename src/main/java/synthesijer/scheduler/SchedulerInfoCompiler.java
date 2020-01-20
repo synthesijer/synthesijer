@@ -38,9 +38,18 @@ import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
 import synthesijer.hdl.expr.HDLPhiExpr;
 import synthesijer.hdl.sequencer.SequencerState;
-import synthesijer.lib.FCOMP32;
-import synthesijer.lib.FCOMP64;
-
+import synthesijer.lib.FCOMPEQ32;
+import synthesijer.lib.FCOMPEQ64;
+import synthesijer.lib.FGEQ32;
+import synthesijer.lib.FGEQ64;
+import synthesijer.lib.FGT32;
+import synthesijer.lib.FGT64;
+import synthesijer.lib.FLEQ32;
+import synthesijer.lib.FLEQ64;
+import synthesijer.lib.FLT32;
+import synthesijer.lib.FLT64;
+import synthesijer.lib.FNEQ32;
+import synthesijer.lib.FNEQ64;
 public class SchedulerInfoCompiler {
 
 	private SchedulerInfo info;
@@ -566,8 +575,18 @@ public class SchedulerInfoCompiler {
 		private HDLInstance logic_rshift64 = null;
 		private HDLInstance arith_rshift64 = null;
 
-		private HDLInstance fcomp32 = null;
-		private HDLInstance fcomp64 = null;
+		private HDLInstance fcompeq32 = null;
+		private HDLInstance fcompeq64 = null;
+		private HDLInstance fgeq32 = null;
+		private HDLInstance fgeq64 = null;
+		private HDLInstance fgt32 = null;
+		private HDLInstance fgt64 = null;
+		private HDLInstance fleq32 = null;
+		private HDLInstance fleq64 = null;
+		private HDLInstance flt32 = null;
+		private HDLInstance flt64 = null;
+		private HDLInstance fneq32 = null;
+		private HDLInstance fneq64 = null;
 	}
 
 	private IdentifierGenerator constIdGen = new IdentifierGenerator();
@@ -1130,19 +1149,18 @@ public class SchedulerInfoCompiler {
 				predExprMap.put(item, inst.getSignalForPort("result"));
 				break;
 			}
-			case FLT32:     genCompUnitExpr(item, FCOMP32.LT, state, resource, board);  break;
-			case FLEQ32:    genCompUnitExpr(item, FCOMP32.LEQ, state, resource, board); break;
-			case FGT32:     genCompUnitExpr(item, FCOMP32.GT, state, resource, board);  break;
-			case FGEQ32:    genCompUnitExpr(item, FCOMP32.GEQ, state, resource, board); break;
-			//ここね
-			case FCOMPEQ32: genCompUnitExpr(item, FCOMP32.EQ, state, resource, board);  break;
-			case FNEQ32:    genCompUnitExpr(item, FCOMP32.NEQ, state, resource, board); break;
-			case FLT64:     genCompUnitExpr(item, FCOMP64.LT, state, resource, board);  break;
-			case FLEQ64:    genCompUnitExpr(item, FCOMP64.LEQ, state, resource, board); break;
-			case FGT64:     genCompUnitExpr(item, FCOMP64.GT, state, resource, board);  break;
-			case FGEQ64:    genCompUnitExpr(item, FCOMP64.GEQ, state, resource, board); break;
-			case FCOMPEQ64: genCompUnitExpr(item, FCOMP64.EQ, state, resource, board);  break;
-			case FNEQ64:    genCompUnitExpr(item, FCOMP64.NEQ, state, resource, board); break;
+			case FLT32:     genCompUnitExpr(item, state, resource, board);  break;
+			case FLEQ32:    genCompUnitExpr(item, state, resource, board); break;
+			case FGT32:     genCompUnitExpr(item, state, resource, board);  break;
+			case FGEQ32:    genCompUnitExpr(item, state, resource, board); break;
+			case FCOMPEQ32: genCompUnitExpr(item, state, resource, board);  break;
+			case FNEQ32:    genCompUnitExpr(item, state, resource, board); break;
+			case FLT64:     genCompUnitExpr(item, state, resource, board);  break;
+			case FLEQ64:    genCompUnitExpr(item, state, resource, board); break;
+			case FGT64:     genCompUnitExpr(item, state, resource, board);  break;
+			case FGEQ64:    genCompUnitExpr(item, state, resource, board); break;
+			case FCOMPEQ64: genCompUnitExpr(item, state, resource, board);  break;
+			case FNEQ64:    genCompUnitExpr(item, state, resource, board); break;
 			case MSB_FLAP:{
 				HDLOp op = convOp2HDLOp(item.getOp());
 				HDLVariable dest = (HDLVariable)(convOperandToHDLExpr(item, item.getDestOperand()));
@@ -1252,13 +1270,11 @@ public class SchedulerInfoCompiler {
 		src.replacePortPair(src_oe_b, oe_b_or);
 	}
 
-	private void genCompUnitExpr(SchedulerItem item, int opcode, SequencerState state, HardwareResource resource, SchedulerBoard board){
-		System.out.println("オペコード :"+opcode);
+	private void genCompUnitExpr(SchedulerItem item, SequencerState state, HardwareResource resource, SchedulerBoard board){
 		Operand[] arg = item.getSrcOperand();
 		HDLInstance inst = getOperationUnit(item.getOp(), resource, board.getName());
 		inst.getSignalForPort("a").setAssign(state, 0, convOperandToHDLExpr(item, arg[0]));
 		inst.getSignalForPort("b").setAssign(state, 0, convOperandToHDLExpr(item, arg[1]));
-		inst.getSignalForPort("opcode").setAssign(state, 0, HDLUtils.newValue(opcode, 8));
 		inst.getSignalForPort("nd").setAssign(state, 0, HDLPreDefinedConstant.HIGH);
 		inst.getSignalForPort("nd").setDefaultValue(HDLPreDefinedConstant.LOW);
 		HDLSignal dest = (HDLSignal)convOperandToHDLExpr(item, item.getDestOperand());
@@ -1807,23 +1823,54 @@ public class SchedulerInfoCompiler {
 				if(resource.arith_rshift64 == null) resource.arith_rshift64 = newInstModule("ARITH_RSHIFT64", "u_synthesijer_arith_rshift64" + "_" + name);
 				return resource.arith_rshift64;
 			}
-			case FLT32:
-			case FLEQ32:
-			case FGT32:
-			case FGEQ32:
-			case FCOMPEQ32:
-			case FNEQ32:{
-				if(resource.fcomp32 == null) resource.fcomp32 = newInstModule("FCOMP32", "u_synthesijer_fcomp32" + "_" + name);
-				return resource.fcomp32;
+			case FLT32:{
+				if(resource.flt32 == null) resource.flt32 = newInstModule("FLT32", "u_synthesijer_flt32" + "_" + name);
+				return resource.flt32;
 			}
-			case FLT64:
-			case FLEQ64:
-			case FGT64:
-			case FGEQ64:
-			case FCOMPEQ64:
+			case FLEQ32:{
+				if(resource.fleq32 == null) resource.fleq32 = newInstModule("FLEQ32", "u_synthesijer_fleq32" + "_" + name);
+				return resource.fleq32;
+			}
+			case FGT32:{
+				if(resource.fgt32 == null) resource.fgt32 = newInstModule("FGT32", "u_synthesijer_fgt32" + "_" + name);
+				return resource.fgt32;
+			}
+			case FGEQ32:{
+				if(resource.fgeq32 == null) resource.fgeq32 = newInstModule("FGEQ32", "u_synthesijer_fgeq32" + "_" + name);
+				return resource.fgeq32;
+			}
+			case FCOMPEQ32:{
+				if(resource.fcompeq32 == null) resource.fcompeq32 = newInstModule("FCOMPEQ32", "u_synthesijer_fcompeq32" + "_" + name);
+				return resource.fcompeq32;
+			}
+			case FNEQ32:{
+				if(resource.fneq32 == null) resource.fneq32 = newInstModule("FNEQ32", "u_synthesijer_fneq32" + "_" + name);
+				return resource.fneq32;
+			}
+			case FLT64:{
+				if(resource.flt64 == null) resource.flt64 = newInstModule("FLT64", "u_synthesijer_flt64" + "_" + name);
+				return resource.flt64;
+			}
+			case FLEQ64:{
+				if(resource.fleq64 == null) resource.fleq64 = newInstModule("FLEQ64", "u_synthesijer_fleq64" + "_" + name);
+				return resource.fleq64;
+			}
+			case FGT64:{
+				if(resource.fgt64 == null) resource.fgt64 = newInstModule("FGT64", "u_synthesijer_fgt64" + "_" + name);
+				return resource.fgt64;
+			}
+			case FGEQ64:{
+				if(resource.fgeq64 == null) resource.fgeq64 = newInstModule("FGEQ64", "u_synthesijer_fgeq64" + "_" + name);
+				return resource.fgeq64;
+			}
+			case FCOMPEQ64:{
+				if(resource.fcompeq64 == null) resource.fcompeq64 = newInstModule("FCOMPEQ64", "u_synthesijer_fcompeq64" + "_" + name);
+				return resource.fcompeq64;
+			}
+
 			case FNEQ64:{
-				if(resource.fcomp64 == null) resource.fcomp64 = newInstModule("FCOMP64", "u_synthesijer_fcomp64" + "_" + name);
-				return resource.fcomp64;
+				if(resource.fneq64 == null) resource.fneq64 = newInstModule("FNEQ64", "u_synthesijer_fneq64" + "_" + name);
+				return resource.fneq64;
 			}
 			default: return null;
 		}
