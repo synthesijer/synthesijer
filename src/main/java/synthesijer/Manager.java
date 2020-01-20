@@ -25,8 +25,18 @@ import synthesijer.lib.DIV32;
 import synthesijer.lib.DIV64;
 import synthesijer.lib.FADD32;
 import synthesijer.lib.FADD64;
-import synthesijer.lib.FCOMP32;
-import synthesijer.lib.FCOMP64;
+import synthesijer.lib.FCOMPEQ32;
+import synthesijer.lib.FCOMPEQ64;
+import synthesijer.lib.FGEQ32;
+import synthesijer.lib.FGEQ64;
+import synthesijer.lib.FGT32;
+import synthesijer.lib.FGT64;
+import synthesijer.lib.FLEQ32;
+import synthesijer.lib.FLEQ64;
+import synthesijer.lib.FLT32;
+import synthesijer.lib.FLT64;
+import synthesijer.lib.FNEQ32;
+import synthesijer.lib.FNEQ64;
 import synthesijer.lib.FCONV_D2F;
 import synthesijer.lib.FCONV_D2L;
 import synthesijer.lib.FCONV_F2D;
@@ -154,8 +164,18 @@ public enum Manager {
 		addHDLModule("ARITH_RSHIFT32", null, new ARITH_RSHIFT32(), false);
 		addHDLModule("ARITH_RSHIFT64", null, new ARITH_RSHIFT64(), false);
 		// COMP
-		addHDLModule("FCOMP32", null, new FCOMP32(), false);
-		addHDLModule("FCOMP64", null, new FCOMP64(), false);
+		addHDLModule("FCOMPEQ32", null, new FCOMPEQ32(), false);
+		addHDLModule("FCOMPEQ64", null, new FCOMPEQ64(), false);
+		addHDLModule("FGEQ32", null, new FGEQ32(), false);
+		addHDLModule("FGEQ64", null, new FGEQ64(), false);
+		addHDLModule("FGT32", null, new FGT32(), false);
+		addHDLModule("FGT64", null, new FGT64(), false);
+		addHDLModule("FLEQ32", null, new FLEQ32(), false);
+		addHDLModule("FLEQ64", null, new FLEQ64(), false);
+		addHDLModule("FLT32", null, new FLT32(), false);
+		addHDLModule("FLT64", null, new FLT64(), false);
+		addHDLModule("FNEQ32", null, new FNEQ32(), false);
+		addHDLModule("FNEQ64", null, new FNEQ64(), false);
 	}
 
 	public void addModule(Module m, boolean synthesisFlag, String pkgStr){
