@@ -18,26 +18,27 @@ architecture RTL of synthesijer_fmul32 is
 
   component fmul32_ip
     port (
-      aclk                 : in  std_logic;
-      s_axis_a_tdata       : in  std_logic_vector(32-1 downto 0);
-      s_axis_a_tvalid      : in  std_logic;
-      s_axis_b_tdata       : in  std_logic_vector(32-1 downto 0);
-      s_axis_b_tvalid      : in  std_logic;
-      m_axis_result_tvalid : out std_logic;
-      m_axis_result_tdata  : out std_logic_vector(32-1 downto 0)
-      );
+      clock		: IN STD_LOGIC ;
+      dataa		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+      datab		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+      result		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+    );
   end component fmul32_ip;
 
 begin
+  --OK
+  process (clk)
+  begin
+    if nd = '1' then
+      valid <= '1' after 1.051 ns;
+    end if;
+  end process;
 
   U: fmul32_ip port map(
-    aclk                 => clk,
-    s_axis_a_tdata       => a,
-    s_axis_a_tvalid      => nd,
-    s_axis_b_tdata       => b,
-    s_axis_b_tvalid      => nd,
-    m_axis_result_tvalid => valid,
-    m_axis_result_tdata  => result
-    );
+    clock       => clk,
+    dataa       => a,
+    datab       => b,
+    result      => result
+  );
 
 end RTL;

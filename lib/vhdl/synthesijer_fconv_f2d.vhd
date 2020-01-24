@@ -17,22 +17,18 @@ architecture RTL of synthesijer_fconv_f2d is
 
   component fconv_f2d_ip
     port (
-      aclk                 : in  std_logic;
-      s_axis_a_tdata       : in  std_logic_vector(32-1 downto 0);
-      s_axis_a_tvalid      : in  std_logic;
-      m_axis_result_tvalid : out std_logic;
-      m_axis_result_tdata  : out std_logic_vector(64-1 downto 0)
-      );
+      clock                 : in  std_logic;
+      dataa       : in  std_logic_vector(32-1 downto 0);
+      result  : out std_logic_vector(64-1 downto 0)
+    );
   end component fconv_f2d_ip;
 
 begin
 
   U: fconv_f2d_ip port map(
-    aclk                 => clk,
-    s_axis_a_tdata       => a,
-    s_axis_a_tvalid      => nd,
-    m_axis_result_tvalid => valid,
-    m_axis_result_tdata  => result
-    );
+    clock                 => clk,
+    dataa       => a,
+    result  => result
+  );
 
 end RTL;
