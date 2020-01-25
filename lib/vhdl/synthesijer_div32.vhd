@@ -54,6 +54,12 @@ architecture RTL of synthesijer_div32 is
   end component synthesijer_div;
 
 begin
+  process (clk)
+  begin
+    if nd = '1' then
+      valid <= '1' after 1.351 ns;
+    end if;
+  end process;
 
   U : synthesijer_div
     generic map(WIDTH => 32)
