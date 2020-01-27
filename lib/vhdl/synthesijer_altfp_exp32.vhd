@@ -8,21 +8,21 @@ entity synthesijer_altfp_exp32 is
     reset  : in  std_logic;
     a      : in  std_logic_vector(32-1 downto 0);
     nd     : in  std_logic;
-    result : out std_logic;
+    result : out std_logic_vector(32-1 downto 0);
     valid  : out std_logic
     );
 end synthesijer_altfp_exp32;
 
 architecture RTL of synthesijer_altfp_exp32 is
 
-  component altfp_exp_ip
+  component altfp_exp32_ip
     port (
-        clock : in std_logic;
-        data : in std_logic_vector(32-1 downto 0);
-        result : out std_logic_vector(32-1 downto 0)
-    );
-  end component altfp_exp_ip;
-  
+      clock  : in std_logic;
+      data   : in  std_logic_vector(32-1 downto 0);
+      result : out std_logic_vector(32-1 downto 0)
+      );
+  end component altfp_exp32_ip;
+
 begin
   process (clk)
   begin
@@ -31,9 +31,9 @@ begin
     end if;
   end process;
 
-  U: altfp_exp_ip port map(
+  U: altfp_exp32_ip port map(
     clock => clk,
-    data => a,
+    data  => a,
     result => result
-  );
+    );
 end RTL;

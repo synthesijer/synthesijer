@@ -8,21 +8,21 @@ entity synthesijer_altfp_sqrt32 is
     reset  : in  std_logic;
     a      : in  std_logic_vector(32-1 downto 0);
     nd     : in  std_logic;
-    result : out std_logic;
+    result : out std_logic_vector(32-1 downto 0);
     valid  : out std_logic
     );
 end synthesijer_altfp_sqrt32;
 
 architecture RTL of synthesijer_altfp_sqrt32 is
 
-  component altfp_sqrt_ip
+  component altfp_sqrt32_ip
     port (
-        clock : in std_logic;
-        data : in std_logic_vector(32-1 downto 0);
-        result : out std_logic_vector(32-1 downto 0)
-    );
-  end component altfp_sqrt_ip;
-
+      clock  : in std_logic;
+      data   : in  std_logic_vector(32-1 downto 0);
+      result : out std_logic_vector(32-1 downto 0)
+      );
+  end component altfp_sqrt32_ip;
+  
 begin
   process (clk)
   begin
@@ -31,9 +31,10 @@ begin
     end if;
   end process;
 
-  U: altfp_sqrt_ip port map(
+  U: altfp_sqrt32_ip port map(
     clock => clk,
-    data => a,
+    data  => a,
     result => result
-  );
+    );
+
 end RTL;

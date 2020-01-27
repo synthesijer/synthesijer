@@ -8,7 +8,7 @@ entity synthesijer_altfp_abs32 is
     reset  : in  std_logic;
     a      : in  std_logic_vector(32-1 downto 0);
     nd     : in  std_logic;
-    result : out std_logic;
+    result : out std_logic_vector(32-1 downto 0);
     valid  : out std_logic
     );
 end synthesijer_altfp_abs32;

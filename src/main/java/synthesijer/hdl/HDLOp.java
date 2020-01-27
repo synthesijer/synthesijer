@@ -3,6 +3,8 @@ package synthesijer.hdl;
 public enum HDLOp {
 
 	ADD(KIND.INFIX, 2, "+"),
+	// ここに新しいopを追加
+	// IP_ADD(KIND.INFIX, 2, "+"),
 	SUB(KIND.INFIX, 2, "-"),
 	MUL(KIND.INFIX, 2, "*"),
 	AND(KIND.INFIX, 2, "and", "&"),
