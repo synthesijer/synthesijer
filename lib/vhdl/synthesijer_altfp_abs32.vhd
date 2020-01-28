@@ -15,22 +15,22 @@ end synthesijer_altfp_abs32;
 
 architecture RTL of synthesijer_altfp_abs32 is
 
-  component altfp_abs_ip
+  component altfp_abs32_ip
     port (
         data : in std_logic_vector(32-1 downto 0);
         result : out std_logic_vector(32-1 downto 0)
     );
-  end component altfp_abs_ip;
+  end component altfp_abs32_ip;
   
 begin
 process (clk)
 begin
   if nd = '1' then
-    valid <= '1';
+    valid <= '1' after 0.001 ns;
   end if;
 end process;
 
-  U: altfp_abs_ip port map(
+  U: altfp_abs32_ip port map(
     data => a,
     result => result
   );
