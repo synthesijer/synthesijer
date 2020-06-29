@@ -373,6 +373,8 @@ public enum Manager {
 			// Only when "--bb2" is specified, BasicParallelizer2 is used.
 			optimize(new BasicParallelizer2(), info);
 		}else if(opt.ibb){
+			optimize(new ReduceRedundantJump(), info);
+			optimize(new RemoveUnreachableSlot(), info);
 			optimize(new InnerBasicBlockParallelizer(), info);
 		}else{
 			// In default, BasicParallelizer is used.
