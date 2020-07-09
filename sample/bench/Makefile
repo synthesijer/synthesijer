@@ -2,7 +2,7 @@ SYNTHESIJER ?= ../../target/synthesijer
 SOURCES = Prime.java PrimeSim.java BubbleSort.java BubbleSortSim.java MergeSort.java MergeSortSim.java
 VHDL_SOURCES = $(SOURCES:.java=.vhd)
 VERILOG_SOURCES = $(SOURCES:.java=.v)
-OPT ?= --chaining --bb2
+OPT ?= --chaining --bb2 --ssa
 
 all: build
 
@@ -21,9 +21,9 @@ test: ghdl iverilog
 	./primesim_top
 	./bubblesortsim_top
 	./mergesortsim_top
-	ghdl -r primesim_top
-	ghdl -r bubblesortsim_top
-	ghdl -r mergesortsim_top
+	ghdl --elab-run primesim_top
+	ghdl --elab-run bubblesortsim_top
+	ghdl --elab-run mergesortsim_top
 
 clean:
 	-rm -f *.class

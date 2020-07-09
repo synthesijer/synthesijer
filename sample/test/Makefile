@@ -44,21 +44,21 @@ test_java: synthesis
 	java -cp $(SYNTHESIJER):. Test023
 
 test_vhdl: ghdl
-	ghdl -r sim_test001
-	ghdl -r sim_test002
-	ghdl -r sim_test003
-	ghdl -r sim_test004
-	ghdl -r sim_test005
-	ghdl -r sim_test006
-	ghdl -r sim_test007
-	ghdl -r sim_test014
-	ghdl -r sim_test017
-	ghdl -r sim_test018
-	ghdl -r sim_test020
-	ghdl -r sim_test021
-	ghdl -r sim_test022
-	ghdl -r sim_test023
-	ghdl -r sim_test_arithint
+	ghdl --elab-run sim_test001
+	ghdl --elab-run sim_test002
+	ghdl --elab-run sim_test003
+	ghdl --elab-run sim_test004
+	ghdl --elab-run sim_test005
+	ghdl --elab-run sim_test006
+	ghdl --elab-run sim_test007
+	ghdl --elab-run sim_test014
+	ghdl --elab-run sim_test017
+	ghdl --elab-run sim_test018
+	ghdl --elab-run sim_test020
+	ghdl --elab-run sim_test021
+	ghdl --elab-run sim_test022
+	ghdl --elab-run sim_test023
+	ghdl --elab-run sim_test_arithint
 
 iverilog: synthesis
 	iverilog $(IVERILOG_OPT) -o sim_verilog_Test001 sim_Test001.v Test001.v
