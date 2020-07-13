@@ -1,6 +1,7 @@
 package synthesijer.scheduler;
 
 import java.util.Hashtable;
+import java.util.HashMap;
 
 import synthesijer.ast.Type;
 import synthesijer.ast.type.PrimitiveTypeKind;
@@ -38,7 +39,12 @@ public class PhiSchedulerItem extends SchedulerItem {
 		return item;
 	}
 
-
+	public void remap(HashMap<Integer, SchedulerSlot> table) {
+		for(int i = 0; i < pat.length; i++){
+			pat[i] = table.get(pat[i].getStepId());
+		}
+	}
+		
 	public String info() {
 		String s = super.info();
 		s += " (";

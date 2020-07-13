@@ -363,10 +363,10 @@ public enum Manager {
 			optimize(new OperationStrengthReduction(), info);
 		}
 		optimize(new ConvArrayAccessToArrayIndex(), info);
-		optimize(new PackArrayWriteAccess(), info);
 		if(opt.with_ssa){
 			optimize(new SSAConverter(), info);
 		}
+		optimize(new PackArrayWriteAccess(), info);
 		if(opt.nbb){
 			// nothing to apply parallilization
 		}else if(opt.bb2){

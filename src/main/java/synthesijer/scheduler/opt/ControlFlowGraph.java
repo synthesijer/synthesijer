@@ -268,6 +268,20 @@ class ControlFlowGraphBB{
 		return items;
 	}
 
+	public int size(){
+		return nodes.size();
+	}
+
+	public int getEntryStepId(){
+		if(size() == 0) return -1;
+		return nodes.get(0).slot.getStepId();
+	}
+	
+	public int[] getExitNextStep(){
+		if(size() == 0) return new int[]{-1};
+		return getLastNode().slot.getNextStep();
+	}
+
 	public int getPredIndex(ControlFlowGraphBB bb){
 		for(int i = 0; i < pred.size(); i++){
 			if(pred.get(i) == bb) return i;
