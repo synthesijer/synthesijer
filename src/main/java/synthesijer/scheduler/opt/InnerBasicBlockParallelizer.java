@@ -26,8 +26,7 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 	public SchedulerInfo opt(SchedulerInfo info){
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
-			SchedulerBoard newB = b.copyBoard();
-			result.addBoard(conv(newB));
+			result.addBoard(conv(b));
 		}
 		return result;
 	}

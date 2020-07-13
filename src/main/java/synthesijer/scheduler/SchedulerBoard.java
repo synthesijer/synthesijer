@@ -103,6 +103,7 @@ public class SchedulerBoard {
 		return new SchedulerBoard(this);
 	}
 
+	@Deprecated
 	public SchedulerBoard copyBoard(){
 		SchedulerBoard ret = this.genSameEnvBoard();
 		for(var s: slots){
