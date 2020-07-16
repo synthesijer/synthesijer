@@ -85,6 +85,7 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 		trace.put(dfg.root, -1);
 		ArrayList<ArrayList<SchedulerItem>> itemGroups = new ArrayList<ArrayList<SchedulerItem>>();
 		asap(itemGroups, trace, dfg.root);
+		itemGroups = splitSpecialItems(itemGroups);
 		SchedulerSlot slot = null;
 		for(int i = 0; i < itemGroups.size(); i++){
 			int stepId = (i == 0) ? entryStep : itemGroups.get(i).get(0).getStepId();
@@ -105,6 +106,30 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 		updateBranchIds(slot, exitNextStep);
 		
 		return;
+	}
+
+	private ArrayList<ArrayList<SchedulerItem>> splitSpecialItems(ArrayList<ArrayList<SchedulerItem>> itemGroups){
+		ArrayList<ArrayList<SchedulerItem>> ret = new ArrayList<ArrayList<SchedulerItem>>();
+		for(ArrayList<SchedulerItem> items: itemGroups){
+			ArrayList<SchedulerItem> excludes = new ArrayList<>();
+			for(SchedulerItem item: items){
+				if(item.getOp() == Op.CALL || item.getOp() == Op.EXT_CALL){
+					excludes.add(item);
+				}
+			}
+			for(SchedulerItem item: excludes){
+				items.remove(item);
+			}
+			if(items.size() > 0){
+				ret.add(items);
+			}
+			for(SchedulerItem item: excludes){
+				ArrayList<SchedulerItem> o = new ArrayList<>();
+				o.add(item);
+				ret.add(o);
+			}
+		}
+		return ret;
 	}
 
 	private void updateBranchId(SchedulerSlot slot, int id){

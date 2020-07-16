@@ -34,6 +34,8 @@ public class DataFlowGraph{
 		}
 		SchedulerSlot exitSlot = bb.getLastNode().slot;
 		DataFlowNode exitNode = map.get(exitSlot);
+
+		// make exitSlots be a successor of all nodes
 		for(SchedulerSlot slot: bb.getSlots()){
 			if(slot != exitSlot){
 				map.get(slot).addChild(exitNode);
