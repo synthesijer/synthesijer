@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
+import synthesijer.ast.type.*;
 
 public class DataFlowGraph{
 
@@ -25,26 +27,34 @@ public class DataFlowGraph{
 	public DataFlowGraph(ControlFlowGraphBB bb){
 		if(bb.getItems().size() == 0) return;
 		
-		HashMap<SchedulerSlot, Boolean> trace = new HashMap<>();
 		HashMap<Operand, DataFlowNode> cur = new HashMap<>();
-		for(SchedulerItem item: bb.getItems()){
-			SchedulerSlot slot = item.getSlot();
-			if(trace.containsKey(slot)) continue; // skip
-			trace.put(slot, true);
-			buildNode(cur, slot);
+		HashMap<SchedulerSlot, DataFlowNode> map = new HashMap<>();
+		for(SchedulerSlot slot: bb.getSlots()){
+			buildNode(cur, slot, map);
+		}
+		SchedulerSlot exitSlot = bb.getLastNode().slot;
+		DataFlowNode exitNode = map.get(exitSlot);
+		for(SchedulerSlot slot: bb.getSlots()){
+			if(slot != exitSlot){
+				map.get(slot).addChild(exitNode);
+			}
 		}
 	}
 
-	private DataFlowNode buildNode(HashMap<Operand, DataFlowNode> cur, SchedulerSlot slot){
+	private DataFlowNode buildNode(HashMap<Operand, DataFlowNode> cur, SchedulerSlot slot, HashMap<SchedulerSlot, DataFlowNode> map){
 		DataFlowNode n = new DataFlowNode(slot);
+		map.put(slot, n);
 		for(Operand src: slot.getSrcOperands()){
 			if(cur.get(src) != null){ // update in some previous slot
 				cur.get(src).addChild(n); // to avoid RAW hazard
 			}
+			if(src.getType() instanceof ArrayType){
+				cur.put(src, n); // set this node as the last updater
+			}
 		}
 		for(Operand dst: slot.getDestOperands()){
 			if(cur.get(dst) != null){
-				if(cur.get(dst) != n){ // remove chained or packed slots
+				if(cur.get(dst).slot != n.slot){ // remove chained or packed slots
 					cur.get(dst).addChild(n); // to avoid WAW hazard
 				}
 			}
@@ -56,7 +66,7 @@ public class DataFlowGraph{
 		return n;
 	}
 
-	public boolean doneAll(HashMap<DataFlowNode, Boolean> trace, DataFlowNode node){
+	public boolean doneAll(HashMap<DataFlowNode, String> trace, DataFlowNode node){
 		for(DataFlowNode n: node.parents){
 			if(trace.containsKey(n) == false)
 				return false;
@@ -64,32 +74,36 @@ public class DataFlowGraph{
 		return true;
 	}
 
-	public void dump(){
-		HashMap<DataFlowNode, Boolean> trace = new HashMap<>();
-		trace.put(root, true);
-		dump(trace, root, 0);
+	private int id = 0;
+	public void dumpDot(PrintStream out, int base){
+		HashMap<DataFlowNode, String> trace = new HashMap<>();
+		String label = "N_"+base+"_"+(id++);
+		out.printf("%s [shape = box, label =\"%s\"];\n", label, label);
+		trace.put(root, label);
+		dumpDot(out, trace, root, base);
 	}
 	
-	private void dump(HashMap<DataFlowNode, Boolean> trace, DataFlowNode node, int level){
+	private void dumpDot(PrintStream out, HashMap<DataFlowNode, String> trace, DataFlowNode node, int base){
 		for(DataFlowNode n: node.children){
-			if(doneAll(trace, n)){
-				trace.put(n, true);
+			if(trace.get(n) == null && doneAll(trace, n)){
+				String label = "N_" + base + "_" + (id++);
+				String s = "";
 				for(SchedulerItem item : n.slot.getItems()){
-					System.out.println(sep(level) + item.info());
+					s += item.info() + "\\l";
 				}
+				out.printf("%s [shape = box, label =\"%s\"];", label, s);
+				out.println();
+				for(DataFlowNode parent: n.parents){
+					out.printf("%s -> %s;\n", trace.get(parent), label);
+				}
+				trace.put(n, label);
 			}
 		}
 		for(DataFlowNode n: node.children){
 			if(doneAll(trace, n)){
-				dump(trace, n, level+2);
+				dumpDot(out, trace, n, base);
 			}
 		}
-	}
-	
-	private String sep(int level){
-		String s = "";
-		for(int i = 0; i < level; i++) s += " ";
-		return s;
 	}
 
 }
@@ -97,15 +111,15 @@ public class DataFlowGraph{
 class DataFlowNode{
 
 	SchedulerSlot slot;
-	ArrayList<DataFlowNode> children = new ArrayList<>();
-	ArrayList<DataFlowNode> parents = new ArrayList<>();
+	HashSet<DataFlowNode> children = new HashSet<>();
+	HashSet<DataFlowNode> parents = new HashSet<>();
 
 	public DataFlowNode(SchedulerSlot slot){
 		this.slot = slot;
 	}
 
 	public void addChild(DataFlowNode n){
-		children.add(n);
+		this.children.add(n);
 		n.parents.add(this);
 	}
 

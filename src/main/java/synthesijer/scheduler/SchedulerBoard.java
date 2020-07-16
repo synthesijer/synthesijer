@@ -231,9 +231,11 @@ public class SchedulerBoard {
 				if(item instanceof PhiSchedulerItem){
 					PhiSchedulerItem phi = (PhiSchedulerItem)item;
 					for(int i = 0; i < phi.pat.length; i++){
-						if(convTable.containsKey(phi.pat[i].getStepId())){
-							int v = convTable.get(phi.pat[i].getStepId());
-							phi.pat[i] = getSlot(v);
+						if(phi.pat[i] != null){
+							if(convTable.containsKey(phi.pat[i].getStepId())){
+								int v = convTable.get(phi.pat[i].getStepId());
+								phi.pat[i] = getSlot(v);
+							}
 						}
 					}
 				}

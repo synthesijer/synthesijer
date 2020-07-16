@@ -324,7 +324,12 @@ public enum Manager {
 	
 	private void compileSchedulerInfoAll(){
 		for(SynthesijerModuleInfo info: modules.values()){
-			compileSchedulerInfo(info);
+			try{
+				compileSchedulerInfo(info);
+			}catch(Exception e){
+				System.err.println("Internal error: " + info.getName());
+				throw e;
+			}
 		}
 	}
 

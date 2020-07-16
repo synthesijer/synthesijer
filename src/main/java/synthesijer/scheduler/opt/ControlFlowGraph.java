@@ -268,6 +268,14 @@ class ControlFlowGraphBB{
 		return items;
 	}
 
+	public ArrayList<SchedulerSlot> getSlots(){
+		ArrayList<SchedulerSlot> slots = new ArrayList<>();
+		for(var n: nodes){
+			slots.add(n.slot);
+		}
+		return slots;
+	}
+
 	public int size(){
 		return nodes.size();
 	}

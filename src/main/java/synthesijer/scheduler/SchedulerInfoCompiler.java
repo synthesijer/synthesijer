@@ -1165,9 +1165,11 @@ public class SchedulerInfoCompiler {
 
 				SequencerState[] ss = new SequencerState[phi.pat.length];
 				for(int i = 0; i < phi.pat.length; i++){
-					ss[i] = states.get(phi.pat[i].getStepId());
-					if(ss[i] == null){
-						System.out.println("undefined slot id=" + phi.pat[i].getStepId() + " in " + item.info());
+					if(phi.pat[i] != null){
+						ss[i] = states.get(phi.pat[i].getStepId());
+						if(ss[i] == null){
+							System.out.println("undefined slot id=" + phi.pat[i].getStepId() + " in " + item.info());
+						}
 					}
 				}
 				HDLPhiExpr expr = hm.newPhiExpr(op, args, dest, ss);

@@ -51,7 +51,7 @@ public class PhiSchedulerItem extends SchedulerItem {
 		s += " pat=";
 		String sep = "";
 		for (SchedulerSlot slot: pat) {
-			s += sep + slot.getStepId();
+			if(slot != null) s += sep + slot.getStepId();
 			sep = ", ";
 		}
 		s += ")";
@@ -62,7 +62,7 @@ public class PhiSchedulerItem extends SchedulerItem {
 		String s = "";
 		s += " :patterns (";
 		for (SchedulerSlot slot : pat) {
-			s += " " + slot.getStepId();
+			if(slot != null) s += " " + slot.getStepId();
 		}
 		s += ")";
 		return s;

@@ -5,6 +5,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.HashMap;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
+import java.io.File;
 
 import synthesijer.scheduler.Op;
 import synthesijer.scheduler.Operand;
@@ -18,12 +21,14 @@ import synthesijer.scheduler.VariableOperand;
 public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 
 	public static final boolean DEBUG = false;
+	private SchedulerInfo info;
 
 	public String getKey(){
 		return "inner_bb_parallelize";
 	}
 
 	public SchedulerInfo opt(SchedulerInfo info){
+		this.info = info;
 		SchedulerInfo result = info.getSameInfo();
 		for(SchedulerBoard b: info.getBoardsList()){
 			result.addBoard(conv(b));
@@ -37,12 +42,25 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 
 		HashMap<Integer, SchedulerSlot> remap = new HashMap<>();
 		ArrayList<PhiSchedulerItem> phiItems = new ArrayList<>(); // ad-hoc
-		for(var bb : cfg.getBasicBlocks()){
-			if(bb.size() == 0) continue;
-			SchedulerSlot[] slots = parallelize(bb, remap, phiItems);
-			for(SchedulerSlot slot: slots){
-				ret.addSlot(slot);
+		
+		try{
+			String base = String.format("%s_sjr_scehduler_board_%s_%s", info.getName(), getKey(), ret.getName());
+			PrintStream dot = new PrintStream(new FileOutputStream(new File(base + "_dfg" + ".dot")));
+			dot.printf("digraph %s {\n", ret.getName() + "_" + getKey() + "_dfg");
+			
+			int dfg_id = 0;
+			for(var bb : cfg.getBasicBlocks()){
+				if(bb.size() == 0) continue;
+				DataFlowGraph dfg = new DataFlowGraph(bb);
+				dfg.dumpDot(dot, dfg_id);
+				parallelize(ret, bb, dfg, remap, phiItems);
+				dfg_id++;
 			}
+			
+			dot.printf("}\n");
+			dot.close();
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 
 		for(PhiSchedulerItem phi: phiItems){
@@ -52,17 +70,21 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 		return ret;
 	}
 	
-	public SchedulerSlot[] parallelize(ControlFlowGraphBB bb,
-									   HashMap<Integer, SchedulerSlot> remap,
-									   ArrayList<PhiSchedulerItem> phiItems){
+	public void parallelize(SchedulerBoard board,
+							ControlFlowGraphBB bb,
+							DataFlowGraph dfg,
+							HashMap<Integer, SchedulerSlot> remap,
+							ArrayList<PhiSchedulerItem> phiItems
+							){
+		ArrayList<SchedulerSlot> ret = new ArrayList<>();
+		
 		int entryStep = bb.getEntryStepId();
 		int[] exitNextStep = bb.getExitNextStep();
-		ArrayList<SchedulerSlot> ret = new ArrayList<>();
-		DataFlowGraph dfg = new DataFlowGraph(bb);
-		HashMap<DataFlowNode, Boolean> trace = new HashMap<>();
-		trace.put(dfg.root, true);
+			
+		HashMap<DataFlowNode, Integer> trace = new HashMap<>();
+		trace.put(dfg.root, -1);
 		ArrayList<ArrayList<SchedulerItem>> itemGroups = new ArrayList<ArrayList<SchedulerItem>>();
-		asap(itemGroups, trace, dfg.root, 0);
+		asap(itemGroups, trace, dfg.root);
 		SchedulerSlot slot = null;
 		for(int i = 0; i < itemGroups.size(); i++){
 			int stepId = (i == 0) ? entryStep : itemGroups.get(i).get(0).getStepId();
@@ -78,10 +100,11 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 					phiItems.add((PhiSchedulerItem)item);
 				}
 			}
-			ret.add(slot);
+			board.addSlot(slot);
 		}
 		updateBranchIds(slot, exitNextStep);
-		return ret.toArray(new SchedulerSlot[]{});
+		
+		return;
 	}
 
 	private void updateBranchId(SchedulerSlot slot, int id){
@@ -103,33 +126,36 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 		itemGroups.get(level).add(item);
 	}
 	
-	private boolean doneAll(HashMap<DataFlowNode, Boolean> trace, DataFlowNode node){
+	private int doneAll(HashMap<DataFlowNode, Integer> trace, DataFlowNode node){
+		int max = 0;
 		for(DataFlowNode n: node.parents){
-			if(trace.containsKey(n) == false)
-				return false;
+			if(trace.containsKey(n) == false){
+				return -1;
+			}else{
+				int lv = trace.get(n) + 1;
+				max = max > lv ? max : lv;
+			}
 		}
-		return true;
+		return max;
 	}
 
 	private void asap(ArrayList<ArrayList<SchedulerItem>> itemGroups,
-					  HashMap<DataFlowNode, Boolean> trace,
-					  DataFlowNode node,
-					  int level){
+					  HashMap<DataFlowNode, Integer> trace,
+					  DataFlowNode node){
 		for(DataFlowNode n: node.children){
-			if(doneAll(trace, n)){
-				trace.put(n, true);
+			int level = -1;
+			if(trace.get(n) == null && (level = doneAll(trace, n)) >= 0){
+				trace.put(n, level);
 				for(SchedulerItem item : n.slot.getItems()){
 					addItem(itemGroups, item, level);
 				}
 			}
 		}
 		for(DataFlowNode n: node.children){
-			if(doneAll(trace, n)){
-				asap(itemGroups, trace, n, level+1);
+			if(trace.get(n) != null){
+				asap(itemGroups, trace, n);
 			}
 		}
 	}
-
-
 
 }

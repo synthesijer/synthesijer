@@ -1,6 +1,7 @@
 package synthesijer.hdl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import synthesijer.hdl.expr.HDLPreDefinedConstant;
 import synthesijer.hdl.expr.HDLValue;
@@ -19,6 +20,7 @@ public class HDLSequencer implements HDLTree{
 	private ArrayList<Quatro> seqCondExprList2 = new ArrayList<>();
 	private SequencerState idle;
 	private int timestep = -1;
+	private HashMap<String, SequencerState> map = new HashMap<>();
 
 	private final HDLSignal delayCounter;
 
@@ -31,6 +33,7 @@ public class HDLSequencer implements HDLTree{
 		this.idle = new SequencerState(this, stateKey, idleId);
 		states = new ArrayList<>();
 		states.add(idle);
+		map.put(idleId.getValue(), this.idle);
 		delayCounter = module.newSignal(key + "_delay", HDLPrimitiveType.genSignedType(32), HDLSignal.ResourceKind.REGISTER);
 		delayCounter.setDefaultValue(HDLPreDefinedConstant.VECTOR_ZERO);
 		delayCounter.setIgnore(true);
@@ -53,9 +56,13 @@ public class HDLSequencer implements HDLTree{
 
 	public SequencerState addSequencerState(String id, boolean flag){
 		String n = flag ? stateKey.getName()+"_"+id : id;
+		if(map.containsKey(n)){
+			return map.get(n);
+		}
 		HDLValue value = stateType.addItem(n);
 		SequencerState s = new SequencerState(this, stateKey, value);
 		states.add(s);
+		map.put(value.getValue(), s);
 		return s;
 	}
 
