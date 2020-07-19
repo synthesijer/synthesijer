@@ -394,12 +394,17 @@ public enum Manager {
 
 	private void optimizeAll(Options opt){
 		for(SynthesijerModuleInfo info: modules.values()){
-			optimize(info, opt);
+			try{
+				optimize(info, opt);
+			}catch(Exception e){
+				System.err.println("Internal error: " + info.getName());
+				throw e;
+			}
 		}
 	}
 
 	public void optimize(Options opt){
-		if(opt.optimizing){
+		if(opt.optimizing){			
 			optimizeAll(opt);
 		}
 	}

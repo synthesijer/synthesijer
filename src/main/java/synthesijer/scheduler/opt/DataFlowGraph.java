@@ -16,6 +16,8 @@ import synthesijer.scheduler.Operand;
 import synthesijer.scheduler.SchedulerBoard;
 import synthesijer.scheduler.SchedulerInfo;
 import synthesijer.scheduler.SchedulerItem;
+import synthesijer.scheduler.MethodInvokeItem;
+import synthesijer.scheduler.FieldAccessItem;
 import synthesijer.scheduler.SchedulerSlot;
 import synthesijer.scheduler.VariableOperand;
 import synthesijer.ast.type.*;
@@ -46,22 +48,49 @@ public class DataFlowGraph{
 	private DataFlowNode buildNode(HashMap<Operand, DataFlowNode> cur, SchedulerSlot slot, HashMap<SchedulerSlot, DataFlowNode> map){
 		DataFlowNode n = new DataFlowNode(slot);
 		map.put(slot, n);
-		for(Operand src: slot.getSrcOperands()){
+		
+		for(Operand src: slot.getSrcOperands()){ // to avoid RAW hazard
 			if(cur.get(src) != null){ // update in some previous slot
-				cur.get(src).addChild(n); // to avoid RAW hazard
+				cur.get(src).addChild(n); 
 			}
 			if(src.getType() instanceof ArrayType){
 				cur.put(src, n); // set this node as the last updater
-			}
+			}			
 		}
-		for(Operand dst: slot.getDestOperands()){
+		
+		for(Operand dst: slot.getDestOperands()){ // to avoid WAW hazard, update the last updater
+			
 			if(cur.get(dst) != null){
 				if(cur.get(dst).slot != n.slot){ // remove chained or packed slots
-					cur.get(dst).addChild(n); // to avoid WAW hazard
+					cur.get(dst).addChild(n); 
 				}
 			}
-			cur.put(dst, n); // set this node as the last updater
+			
+			cur.put(dst, n); // set this node as the last updater			
 		}
+
+		// for instance access
+		// TODO: too large guard
+		for(SchedulerItem s: slot.getItems()){
+			if(s.getOp() == Op.EXT_CALL){
+				MethodInvokeItem m = (MethodInvokeItem)s;
+				//System.out.println("query: " + m.obj + ":" + m.obj.getName() + " in " + m.info());
+				if(cur.get(m.obj) != null){ // update in some previous slot
+					cur.get(m.obj).addChild(n);
+				}
+				cur.put(m.obj, n); // set this node as the last updater
+				//System.out.println("add: " + m.obj + ":" + m.obj.getName() + " in " + m.info());
+			}else if(s.getOp() == Op.FIELD_ACCESS){
+				FieldAccessItem f = (FieldAccessItem)s;
+				//System.out.println("query: " + f.obj + ":" + f.obj.getName() + " in " + f.info());
+				if(cur.get(f.obj) != null){ // update in some previous slot
+					cur.get(f.obj).addChild(n);
+				}
+				cur.put(f.obj, n); // set this node as the last updater
+				//System.out.println("add: " + f.obj + ":" + f.obj.getName() + " in " + f.info());
+			}
+		}
+
 		if(n.parents.size() == 0){
 			this.root.addChild(n);
 		}

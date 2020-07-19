@@ -113,7 +113,9 @@ public class InnerBasicBlockParallelizer implements SchedulerInfoOptimizer{
 		for(ArrayList<SchedulerItem> items: itemGroups){
 			ArrayList<SchedulerItem> excludes = new ArrayList<>();
 			for(SchedulerItem item: items){
-				if(item.getOp() == Op.CALL || item.getOp() == Op.EXT_CALL){
+				if(item.getOp() == Op.CALL ||
+				   item.getOp() == Op.EXT_CALL
+				   ){
 					excludes.add(item);
 				}
 			}
