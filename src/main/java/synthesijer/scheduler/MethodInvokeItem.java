@@ -63,6 +63,19 @@ public class MethodInvokeItem extends SchedulerItem {
 		}
 		return s;
 	}
+	
+	public String dot() {
+		String s = super.dot();
+		String argsStr = "";
+		for (String a : args)
+			argsStr += " " + a;
+		if (obj == null) {
+			s += " (name=" + name + ", args=" + argsStr + ")";
+		} else {
+			s += " (obj = " + obj.getName() + ", name=" + name + ", args=" + argsStr + ")";
+		}
+		return s;
+	}
 
 	public void setNoWait(boolean flag) {
 		noWaitFlag = flag;

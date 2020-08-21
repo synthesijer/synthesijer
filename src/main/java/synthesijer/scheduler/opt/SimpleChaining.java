@@ -47,7 +47,8 @@ public class SimpleChaining implements SchedulerInfoOptimizer{
 		for(SchedulerSlot s: bb){
 			last = s.getNextStep()[0];
 			for(SchedulerItem item : s.getItems()){
-				int num = item.getSrcOperand().length;
+				Operand[] src = item.getSrcOperand();
+				int num = src != null ? item.getSrcOperand().length : 0;
 				for(int i = 0; i < num; i++){
 					Operand o = item.getSrcOperand()[i];
 					if((o instanceof VariableOperand) && predItem.containsKey(o)){

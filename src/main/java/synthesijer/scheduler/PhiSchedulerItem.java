@@ -58,6 +58,23 @@ public class PhiSchedulerItem extends SchedulerItem {
 		return s;
 	}
 
+	public String dot() {
+		String s0 = "";
+		s0 += " (";
+		String sep = "";
+		for (SchedulerSlot slot: pat) {
+			if(slot != null) s0 += sep + slot.getStepId();
+			sep = ", ";
+		}
+		s0 += ")";
+		
+		String s = "";
+		s += String.format("[%s %s]", "PHI", s0);
+		if(!srcInfo().equals("")) s += String.format("\\lsrc=%s", srcInfo());
+		if(!destInfo().equals("")) s += String.format("\\ldest=%s", destInfo());
+		return s;
+	}
+
 	public String addInfo() {
 		String s = "";
 		s += " :patterns (";

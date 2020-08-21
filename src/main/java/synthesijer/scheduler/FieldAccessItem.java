@@ -48,6 +48,16 @@ public class FieldAccessItem extends SchedulerItem {
 		return s;
 	}
 
+	public String dot() {
+		String s = super.dot();
+		if (obj == null) {
+			s += " (name=" + name + ")";
+		} else {
+			s += " (obj=" + obj.getName() + ", name=" + name + ")";
+		}
+		return s;
+	}
+
 	public String addInfo() {
 		String s = "";
 		s += " :obj " + obj.getName() + " :name " + name;

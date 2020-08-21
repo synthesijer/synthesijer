@@ -156,7 +156,7 @@ public class SchedulerItem {
 		this.dest = v;
 	}
 
-	private String srcInfo() {
+	public String srcInfo() {
 		if (src == null)
 			return "";
 		String s = "";
@@ -170,7 +170,7 @@ public class SchedulerItem {
 		return s;
 	}
 
-	private String destInfo() {
+	public String destInfo() {
 		if (dest == null)
 			return "";
 		return dest.info();
@@ -181,8 +181,7 @@ public class SchedulerItem {
 		String sep = "";
 		// for(int id: branchIDs){
 		for (int id : getSlot().getNextStep()) {
-			// s += String.format("%s%s_%04d", sep, getBoardName(), id);
-			s += String.format("%s%04d", sep, id);
+			s += String.format("%s%d", sep, id);
 			sep = ", ";
 		}
 		return s;
@@ -191,6 +190,17 @@ public class SchedulerItem {
 	public String info() {
 		String s = String.format("%s_%04d: op=%s, src=%s, dest=%s, next=%s", getBoardName(), getStepId(), op, srcInfo(),
 				destInfo(), branchList());
+		return s;
+	}
+	
+	public String dot() {
+		String s = "";
+		//s += String.format("%s_%04d: %s\\l", getBoardName(), getStepId(), op);
+		s += String.format("[%s]", op);
+		if(!srcInfo().equals("")) s += String.format("\\lsrc=%s", srcInfo());
+		if(!destInfo().equals("")) s += String.format("\\ldest=%s", destInfo());
+		if(op == Op.JP || op == Op.JT)
+			s += String.format("\\lnext=%s", branchList());
 		return s;
 	}
 
@@ -301,6 +311,12 @@ class MethodEntryItem extends SchedulerItem {
 		s += " (name=" + name + ")";
 		return s;
 	}
+	
+	public String dot() {
+		String s = super.dot();
+		s += " (name=" + name + ")";
+		return s;
+	}
 
 	public MethodEntryItem copy(SchedulerBoard board, SchedulerSlot slot) {
 		MethodEntryItem item = new MethodEntryItem(board, this.name);
@@ -337,6 +353,12 @@ class TypeCastItem extends SchedulerItem {
 
 	public String info() {
 		String s = super.info();
+		s += " (" + orig + "->" + target + ")";
+		return s;
+	}
+	
+	public String dot() {
+		String s = super.dot();
 		s += " (" + orig + "->" + target + ")";
 		return s;
 	}
@@ -410,6 +432,18 @@ class SelectItem extends SchedulerItem {
 
 	public String info() {
 		String s = super.info();
+		s += " ( target=" + target.info();
+		s += " pat=";
+		String sep = "";
+		for (Operand o : pat) {
+			s += sep + o.info();
+			sep = ", ";
+		}
+		return s;
+	}
+
+	public String dot() {
+		String s = super.dot();
 		s += " ( target=" + target.info();
 		s += " pat=";
 		String sep = "";

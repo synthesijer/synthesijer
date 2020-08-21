@@ -93,8 +93,9 @@ public class SchedulerSlot {
 		if(items.size() == 0) return;
 		String base = items.get(0).getBoardName();
 		String s = "";
+		s += items.get(0).getStepId() + ":\\l";
 		for(SchedulerItem item: items){
-			s += item.info() + "\\l";
+			s += item.dot() + "\\l";
 		}
 		out.printf("%s_%d [shape = box, label =\"%s\"];", base, getStepId(), s);
 		out.println();

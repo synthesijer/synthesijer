@@ -236,6 +236,21 @@ public enum Manager {
 			}
 			txt.println("");
 			dot.println("digraph {");
+			dot.println("graph [");
+			dot.println("charset = \"UTF-8\";");
+			dot.println("label = \""+si.getName()+"\",");
+			dot.println("labelloc = \"t\",");
+			dot.println("labeljust = \"c\",");
+			dot.println("bgcolor = \"#FFFFFF\",");
+			dot.println("fontcolor = black,");
+			dot.println("fontsize = 18,");
+			dot.println("style = \"filled\",");
+			dot.println("rankdir = TB,");
+			dot.println("margin = 1.0,");
+			dot.println("splines = spline,");
+			dot.println("ranksep = 1.0,");
+			dot.println("nodesep = 1.2");
+			dot.println("];");
 			for(SchedulerBoard b: si.getBoardsList()){
 				b.dump(txt);
 				b.dumpDot(dot);
