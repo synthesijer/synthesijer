@@ -17,7 +17,7 @@ public class SchedulerItem {
 	/**
 	 * the board where this item belongs.
 	 */
-	private final SchedulerBoard board;
+	protected final SchedulerBoard board;
 
 	/**
 	 * operator

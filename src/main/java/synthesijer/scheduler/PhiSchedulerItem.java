@@ -15,10 +15,35 @@ import synthesijer.ast.type.PrimitiveTypeKind;
 public class PhiSchedulerItem extends SchedulerItem {
 
 	public final SchedulerSlot[] pat;
+	private String[] tmp_pat;
 
 	public PhiSchedulerItem(SchedulerBoard board, SchedulerSlot[] pat, Operand[] src, VariableOperand dest) {
 		super(board, Op.PHI, src, dest);
 		this.pat = pat;
+		this.tmp_pat = null;
+	}
+
+	public PhiSchedulerItem(SchedulerBoard board, String[] tmp_pat, Operand[] src, VariableOperand dest) {
+		super(board, Op.PHI, src, dest);
+		this.pat = new SchedulerSlot[tmp_pat.length];
+		this.tmp_pat = tmp_pat;
+	}
+
+	/**
+	 * update pat with Slot-ID in tmp_pat
+	 * @TOOD : too ad-hoc
+	 */ 
+	public void updatePhiPattern(){
+		if(tmp_pat == null) return;
+		for(int i = 0; i < tmp_pat.length; i++){
+			int id = Integer.parseInt(tmp_pat[i]);
+			SchedulerSlot slot = board.getSlot(id);
+			if(slot == null){
+				throw new RuntimeException("undefined slot for PHI-op: " + id);
+			}
+			pat[i] = slot;
+		}
+		tmp_pat = null;
 	}
 
 	public PhiSchedulerItem copy(SchedulerBoard board, SchedulerSlot slot) {

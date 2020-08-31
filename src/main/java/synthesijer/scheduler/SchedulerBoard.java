@@ -243,6 +243,22 @@ public class SchedulerBoard {
 		}
 	}
 	
+	/**
+	 * update Slot-ID for all PHI-op in this board
+	 * @TOOD : too ad-hoc
+	 */ 
+	public void updatePhiPattern(){
+		System.out.println("updatePhiPattern");
+		for(var slot : slots){
+			for(var item: slot.getItems()){
+				if(item instanceof PhiSchedulerItem){
+					PhiSchedulerItem phi = (PhiSchedulerItem)item;
+					phi.updatePhiPattern();
+				}
+			}
+		}
+	}
+	
 	public void dump(PrintStream out){
 		for(SchedulerSlot s: slots){
 			s.dump(out);

@@ -378,6 +378,9 @@ public class IRReader {
 				throw new IRReaderException("Illegal format: expected VARIABLES or SEQUENCER, but " + o);
 			}
 		}
+
+		board.updatePhiPattern();
+		
 		info.addBoard(board);
 	}
 
@@ -514,6 +517,16 @@ public class IRReader {
 						Type orig = TypeGen.get(parseArgument(expr, ":orig").toString());
 						Type target = TypeGen.get(parseArgument(expr, ":target").toString());
 						item = TypeCastItem.newCastItem(board, src[0], (VariableOperand)dest, orig, target);
+					}
+					break;
+					case PHI:{
+						// TODO
+						SExp n = (SExp)(parseArgument(expr, ":patterns"));
+						String[] pat_str = new String[n.size()];
+						for(int i = 0; i < n.size(); i++){
+							pat_str[i] = n.get(i).toString();
+						}
+						item = new PhiSchedulerItem(board, pat_str, src, (VariableOperand)dest);
 					}
 					break;
 					default:{

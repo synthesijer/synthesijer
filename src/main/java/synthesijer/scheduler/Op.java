@@ -341,6 +341,8 @@ public enum Op {
 			case "XOR" : return XOR;
 			case "LNOT" : return LNOT;
 			case "ARRAY_ACCESS" : return ARRAY_ACCESS;
+			case "ARRAY_ACCESS0" : return ARRAY_ACCESS0;
+			case "ARRAY_ACCESS_WAIT" : return ARRAY_ACCESS_WAIT;
 			case "ARRAY_INDEX" : return ARRAY_INDEX;
 			case "CALL" : return CALL;
 			case "EXT_CALL" : return EXT_CALL;
