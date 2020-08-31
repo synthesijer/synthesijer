@@ -8,7 +8,5 @@ public class Test030{
 			c[i] = a[i] + b[i];
 		}
 	}
-
-
 	
 }
