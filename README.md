@@ -42,7 +42,7 @@ Some options are printed by the following
 ### Prepare the project directory
 
     % sbt new synthesijer/sjr-scala.g8 --name=sjr-scala-test
-	% cd sjr-scala-test
+    % cd sjr-scala-test
     % sbt run
 
 By executing this command, Hello.scala is compiled and executed. And then, you can get VHDL, Verilog and some constriants files.
