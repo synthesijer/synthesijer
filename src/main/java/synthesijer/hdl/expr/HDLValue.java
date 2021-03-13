@@ -71,7 +71,7 @@ public class HDLValue implements HDLLiteral {
             case SIGNED: {
                 if (type.getWidth() % 4 == 0) {
                     // String v = String.format("%016x", Long.parseLong(value));
-                    String v = String.format("%020x", asLongValue());
+                    String v = String.format("%040x", asLongValue());
                     // System.out.printf("%s => %s => %s\n", value, v,
                     // v.substring(v.length()-type.getWidth()/4, v.length()));
                     if (v.length() - type.getWidth() / 4 < 0) {

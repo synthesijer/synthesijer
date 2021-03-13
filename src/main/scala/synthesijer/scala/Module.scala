@@ -415,6 +415,8 @@ abstract class ExprItem(val module:ModuleFunc) {
   def ref(i:Int):ExprItem = module.ref(this, i)
 
   def range(b:Int, e:Int):ExprItem = module.range(this, b, e)
+
+  def drop(v:Int):ExprItem = module.drop(this, v)
   
   def ?(a:ExprItem, b:ExprItem) = module.?(this, a, b)
 
@@ -554,7 +556,7 @@ object Op{
   val neq = HDLOp.NEQ
   val REF = HDLOp.REF
   val IF = HDLOp.IF
-    val & = HDLOp.CONCAT
+  val & = HDLOp.CONCAT
   val concat = HDLOp.CONCAT
   val drop = HDLOp.DROPHEAD
   val take = HDLOp.TAKE
