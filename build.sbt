@@ -2,8 +2,8 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "synthesijer",
-      scalaVersion := "2.12.10",
-      version      := "3.0.1",
+      scalaVersion := "2.12.12",
+      version      := "3.0.2",
       javacOptions ++= Seq("-source", "11", "-target", "11"),
       javacOptions += "-Xlint:unchecked",
       javacOptions += "-Xlint:deprecation",
@@ -12,9 +12,9 @@ lazy val root = (project in file(".")).
     name := "synthesijer",
     autoScalaLibrary := true,
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+      "org.scalatest" %% "scalatest" % "3.2.5" % "test",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-      "junit" % "junit" % "4.12" % "test",
+      "junit" % "junit" % "4.13.2" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test"
     )
   )

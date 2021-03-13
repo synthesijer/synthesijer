@@ -1,8 +1,10 @@
 package synthesijer.scala.vhdl
 
 import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
-class VHDLParserTest extends FlatSpec with Matchers {
+class VHDLParserTest extends AnyFlatSpec with should.Matchers {
 
   "identifiers" should "be parsed" in {
     val obj = new VHDLParser()
