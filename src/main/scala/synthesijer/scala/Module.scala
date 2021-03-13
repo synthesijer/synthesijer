@@ -372,8 +372,10 @@ abstract class ExprItem(val module:ModuleFunc) {
   def and (e:ExprItem):ExprItem = module.expr(Op.and, this, e)
   def or (e:ExprItem):ExprItem = module.expr(Op.or, this, e)
   def xor (e:ExprItem):ExprItem = module.expr(Op.xor, this, e)
-  def ! : ExprItem = module.expr(Op.not, this)
   def unary_! : ExprItem = module.expr(Op.not, this)
+
+  @deprecated("postfix unary method need compile option in Scala 2.13.x ")
+  def ! : ExprItem = module.expr(Op.not, this)
   
   def == (e:ExprItem):ExprItem = module.expr(Op.eq, this, e)
   def == (v:Int) : ExprItem = module.expr(Op.eq, this, v)

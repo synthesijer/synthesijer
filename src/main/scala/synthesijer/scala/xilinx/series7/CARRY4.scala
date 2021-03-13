@@ -34,7 +34,7 @@ class CARRY4_test() extends Module("CARRY4_test", "clk", "reset") {
   c(3) := a(3) or b(3)
   
   c(4) := CARRY4.not(this, a(4))
-  c(5) := (a(5)!)
+  c(5) := (!a(5))
 
   val x = CARRY4.half_addr(this, a(6), b(6))
   c(6) := x._1

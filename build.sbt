@@ -2,8 +2,8 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "synthesijer",
-      scalaVersion := "2.12.12",
-      version      := "3.0.2",
+      scalaVersion := "2.13.4",
+      version      := "3.1.0",
       javacOptions ++= Seq("-source", "11", "-target", "11"),
       javacOptions += "-Xlint:unchecked",
       javacOptions += "-Xlint:deprecation",
