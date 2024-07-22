@@ -10,8 +10,8 @@ Please refer https://snapcraft.io/synthesijer .
 ## Build from source code
 ### Requirement
 
-* JDK 11 https://openjdk.java.net/install/
-* sbt https://www.scala-sbt.org/index.html
+* JDK 17 https://openjdk.java.net/install/
+* sbt 1.10.0 https://www.scala-sbt.org/index.html
 
 ### Build
 
