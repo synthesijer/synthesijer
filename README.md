@@ -36,8 +36,8 @@ Some options are printed by the following
 
 ### Prerequirements
 
-+ Java (11 and later)
-+ Sbt (1.2.8 and later)
++ Java (17 and later)
++ Sbt (1.10.0 and later)
 
 ### Prepare the project directory
 
