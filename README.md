@@ -8,7 +8,7 @@ In addition to that, we can build hardware logic by using HDL building block in 
 
     % sudo snap install synthesijer
 
-For detai, please refer https://snapcraft.io/synthesijer .
+For detail, please refer https://snapcraft.io/synthesijer .
 
 ### Run
 
