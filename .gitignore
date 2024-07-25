@@ -12,3 +12,4 @@ a.out
 /stage
 /parts
 *.tmp_info
+/scripts/run.script

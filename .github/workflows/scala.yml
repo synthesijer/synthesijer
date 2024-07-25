@@ -14,5 +14,9 @@ jobs:
       with:
         java-version: 1.17
     - name: Run compile
-      run: sbt compile
+      run: make all
+    - name: setup-test
+      run: sudo apt-get install iverilog ghdl
+    - name: Run test
+      run: make test
 
