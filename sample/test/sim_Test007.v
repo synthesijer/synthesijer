@@ -54,6 +54,7 @@ module sim_Test007;
             $display("Test007: TEST SUCCESS");
 	 end else begin
             $display("Test007: TEST *** FAILURE ***");
+            $fatal(1);
 	 end
 	 $finish;
       end

@@ -52,6 +52,7 @@ module sim_Test_ArithInt;
             $display("Test_ArithInt: TEST SUCCESS");
 	 end else begin
             $display("Test_ArithInt: TEST *** FAILURE ***");
+            $fatal(1);
 	 end
 	 $finish;
       end

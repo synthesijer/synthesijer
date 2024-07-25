@@ -108,6 +108,7 @@ begin
          report "Test018: TEST SUCCESS";
        else
          report "Test018: TEST *** FAILURE ***";
+         assert (false) report "Simulation End!" severity failure;
        end if;
        end_of_simulation <= '1';
        --assert (false) report "Simulation End!" severity failure;

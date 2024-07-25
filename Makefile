@@ -11,6 +11,16 @@ clean:
 	sbt clean
 	-rm -rf target
 	snapcraft clean
+
+test:
+	cd sample/test; \
+	make; \
+	make ghdl; \
+	make iverilog; \
+	make test_vhdl; \
+	make test_verilog; \
+	make clean
+
 	
 # TODO: broken
 #snapcraft: clean

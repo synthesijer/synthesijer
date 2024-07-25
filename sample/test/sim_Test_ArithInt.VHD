@@ -118,6 +118,7 @@ begin
          report "Test_ArithInt: TEST SUCCESS";
        else
          report "Test_ArithInt: TEST *** FAILURE ***";
+         assert (false) report "Simulation End!" severity failure;
        end if;
        end_of_simulation <= '1';
        --assert (false) report "Simulation End!" severity failure;
