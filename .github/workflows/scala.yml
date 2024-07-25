@@ -16,7 +16,7 @@ jobs:
     - name: Run compile
       run: make all
     - name: setup-test
-      run: sudo apt install -y iverilog ghdl
+      run: sudo apt-get install iverilog ghdl
     - name: Run test
       run: make test
 
